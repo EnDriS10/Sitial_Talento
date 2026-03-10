@@ -125,11 +125,65 @@
         .tabla-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .tabla-avatar-initials { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; color: var(--navy-light); }
         .estudiante-cell { display: flex; align-items: center; }
-        @media (max-width: 600px) {
-            .stats-bar { gap: 14px; }
+        /* VER MÁS BUTTON */
+        .ver-mas-wrap { text-align: center; margin-top: 28px; }
+        .ver-mas-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background: var(--navy); color: #fff; border: none; border-radius: 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s, transform .15s; }
+        .ver-mas-btn:hover { background: var(--navy-light); transform: translateY(-2px); }
+        .ver-mas-count { background: rgba(255,255,255,.18); border-radius: 12px; padding: 2px 8px; font-size: 12px; }
+
+        /* ── MOBILE ── */
+        @media (max-width: 640px) {
+            header { padding: 36px 16px 32px; }
+            header h1 { font-size: 22px; }
+            header p { font-size: 13px; }
+            .stats-bar { gap: 10px; }
+            .stat-num { font-size: 22px; }
+            .stat-label { font-size: 10px; }
             .stat-divider { display: none; }
-            .sort-controls { margin-left: 0; width: 100%; }
-            .search-input { width: 100%; margin-left: 0; }
+            nav { justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            nav::-webkit-scrollbar { display: none; }
+            nav button { padding: 14px 16px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+            .contenedor { padding: 24px 14px 60px; }
+            .section-title { font-size: 22px; }
+            .section-sub { font-size: 13px; margin-bottom: 20px; }
+            .cuadricula-sitial { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .tarjeta { padding: 18px 12px 14px; }
+            .tarjeta-avatar { width: 64px; height: 64px; margin-bottom: 10px; }
+            .avatar-initials { font-size: 20px; }
+            .tarjeta h3 { font-size: 13px; }
+            .tarjeta-years { font-size: 11px; margin-bottom: 10px; }
+            .medalla-chip { font-size: 10px; padding: 3px 7px; }
+            .tarjeta-top { font-size: 15px; top: 8px; right: 8px; }
+            .filtros-sitial { gap: 7px; }
+            .filtro-btn { padding: 6px 12px; font-size: 12px; }
+            .search-input { width: 100%; margin-left: 0; font-size: 13px; }
+            .controles-evento { gap: 10px; }
+            .custom-select { font-size: 13px; padding: 8px 12px; width: 100%; }
+            .sort-controls { margin-left: 0; width: 100%; flex-wrap: wrap; }
+            .sort-label { font-size: 11px; }
+            .sort-btn { font-size: 11px; padding: 6px 10px; }
+            .tabla-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { min-width: 440px; }
+            th, td { padding: 10px 10px; font-size: 12px; }
+            th:nth-child(2), td:nth-child(2),
+            th:nth-child(5), td:nth-child(5) { display: none; }
+            .tabla-avatar { width: 26px; height: 26px; margin-right: 7px; }
+            .tabla-avatar-initials { font-size: 10px; }
+            .badge { font-size: 11px; padding: 4px 8px; }
+            .sede-flag { font-size: 14px; margin-right: 4px; }
+            .tabla-footer { flex-direction: column; gap: 4px; align-items: flex-start; font-size: 11px; padding: 10px 12px; }
+            .honor-grid { grid-template-columns: 1fr; gap: 12px; }
+            .honor-card { padding: 14px; }
+            .honor-avatar { width: 46px; height: 46px; }
+            .honor-info h3 { font-size: 13px; }
+            .honor-role { font-size: 10px; }
+            .honor-desc { font-size: 12px; }
+            #modal-topbar { padding: 12px 14px; }
+            #modal-back-btn { font-size: 13px; padding: 7px 12px; }
+            #modal-topbar-title { font-size: 14px; }
+            #modal-body > div { padding: 20px 18px !important; font-size: 14px !important; }
+            #modal-body img { float: none !important; display: block !important; margin: 0 auto 18px auto !important; width: 110px !important; height: 110px !important; }
+            #modal-body h2 { font-size: 22px !important; }
         }
 
         /* FOOTER */
@@ -229,6 +283,7 @@
             <input class="search-input" type="text" placeholder="🔎 Buscar estudiante…" oninput="buscarSitial(this.value)">
         </div>
         <div class="cuadricula-sitial" id="cuadricula-sitial"></div>
+        <div class="ver-mas-wrap" id="ver-mas-wrap"></div>
     </div>
     <!-- EVENTOS -->
     <div id="eventos" class="seccion">
@@ -760,37 +815,65 @@ function construirSitial() {
     renderizarSitial(window._estudiantesTodos);
 }
 
+const SITIAL_PAGINA = 12;
+let sitialVerTodos = false;
+let _listaActual = [];
+
+function tarjetaHTML(est) {
+    const sinP  = est.medallas.filter(m => m.tipo !== 'participante');
+    const mejor = sinP.reduce((a,b) => medallaOrden[a.tipo] <= medallaOrden[b.tipo] ? a : b);
+    const trofeo = mejor.tipo==='oro'?'🏆': mejor.tipo==='plata'?'⭐': mejor.tipo==='bronce'?'🌟':'';
+    const chips  = sinP.map(m =>
+        `<span class="medalla-chip chip-${m.tipo}">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>`
+    ).join('');
+    const añoRange = est.años.length>1
+        ? `${Math.min(...est.años)} – ${Math.max(...est.años)}`
+        : `${est.años[0]}`;
+    return `
+    <div class="tarjeta" data-nombre="${est.nombre}" data-mejor="${mejor.tipo}">
+        ${trofeo ? `<div class="tarjeta-top">${trofeo}</div>` : ''}
+        <div class="tarjeta-avatar">${avatarHTML(est.nombre)}</div>
+        <h3>${est.nombre}</h3>
+        <p class="tarjeta-years">${añoRange}</p>
+        <div class="medallas-tarjeta">${chips}</div>
+    </div>`;
+}
+
 function renderizarSitial(lista) {
+    _listaActual = lista;
     const grid = document.getElementById('cuadricula-sitial');
-    if (!lista.length) { grid.innerHTML='<div class="no-results">No se encontraron estudiantes.</div>'; return; }
-    grid.innerHTML = lista.map(est => {
-        const sinP  = est.medallas.filter(m => m.tipo !== 'participante');
-        const mejor = sinP.reduce((a,b) => medallaOrden[a.tipo] <= medallaOrden[b.tipo] ? a : b);
-        const trofeo = mejor.tipo==='oro'?'🏆': mejor.tipo==='plata'?'⭐': mejor.tipo==='bronce'?'🌟':'';
-        const chips  = sinP.map(m =>
-            `<span class="medalla-chip chip-${m.tipo}">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>`
-        ).join('');
-        const añoRange = est.años.length>1
-            ? `${Math.min(...est.años)} – ${Math.max(...est.años)}`
-            : `${est.años[0]}`;
-        return `
-        <div class="tarjeta" data-nombre="${est.nombre}" data-mejor="${mejor.tipo}">
-            ${trofeo ? `<div class="tarjeta-top">${trofeo}</div>` : ''}
-            <div class="tarjeta-avatar">${avatarHTML(est.nombre)}</div>
-            <h3>${est.nombre}</h3>
-            <p class="tarjeta-years">${añoRange}</p>
-            <div class="medallas-tarjeta">${chips}</div>
-        </div>`;
-    }).join('');
+    const wrap = document.getElementById('ver-mas-wrap');
+    if (!lista.length) {
+        grid.innerHTML='<div class="no-results">No se encontraron estudiantes.</div>';
+        wrap.innerHTML=''; return;
+    }
+    const mostrar = sitialVerTodos ? lista : lista.slice(0, SITIAL_PAGINA);
+    grid.innerHTML = mostrar.map(tarjetaHTML).join('');
+    const restantes = lista.length - SITIAL_PAGINA;
+    if (!sitialVerTodos && lista.length > SITIAL_PAGINA) {
+        wrap.innerHTML = `<button class="ver-mas-btn" onclick="verMasSitial()">Ver más <span class="ver-mas-count">+${restantes}</span></button>`;
+    } else {
+        wrap.innerHTML = '';
+    }
+}
+
+function verMasSitial() {
+    sitialVerTodos = true;
+    renderizarSitial(_listaActual);
 }
 
 function filtrarSitial(filtro, btn) {
     filtroSitial = filtro;
+    sitialVerTodos = false;
     document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo');
     aplicarFiltros();
 }
-function buscarSitial(txt) { busquedaSitial = txt.toLowerCase(); aplicarFiltros(); }
+function buscarSitial(txt) {
+    busquedaSitial = txt.toLowerCase();
+    sitialVerTodos = !!txt; // si busca, muestra todo para no ocultar resultados
+    aplicarFiltros();
+}
 function aplicarFiltros() {
     let lista = window._estudiantesTodos || [];
     if (filtroSitial !== 'todos') lista = lista.filter(e => e.medallas.some(m => m.tipo===filtroSitial));
