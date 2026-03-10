@@ -816,7 +816,7 @@ function construirSitial() {
 }
 
 const SITIAL_PAGINA = 12;
-let sitialVerTodos = false;
+let sitialPagina = 1;
 let _listaActual = [];
 
 function tarjetaHTML(est) {
@@ -847,31 +847,32 @@ function renderizarSitial(lista) {
         grid.innerHTML='<div class="no-results">No se encontraron estudiantes.</div>';
         wrap.innerHTML=''; return;
     }
-    const mostrar = sitialVerTodos ? lista : lista.slice(0, SITIAL_PAGINA);
-    grid.innerHTML = mostrar.map(tarjetaHTML).join('');
-    const restantes = lista.length - SITIAL_PAGINA;
-    if (!sitialVerTodos && lista.length > SITIAL_PAGINA) {
-        wrap.innerHTML = `<button class="ver-mas-btn" onclick="verMasSitial()">Ver más <span class="ver-mas-count">+${restantes}</span></button>`;
+    const visibles = sitialPagina * SITIAL_PAGINA;
+    grid.innerHTML = lista.slice(0, visibles).map(tarjetaHTML).join('');
+    const restantes = lista.length - visibles;
+    if (restantes > 0) {
+        const proximos = Math.min(restantes, SITIAL_PAGINA);
+        wrap.innerHTML = `<button class="ver-mas-btn" onclick="verMasSitial()">Ver más <span class="ver-mas-count">+${proximos}</span></button>`;
     } else {
         wrap.innerHTML = '';
     }
 }
 
 function verMasSitial() {
-    sitialVerTodos = true;
+    sitialPagina++;
     renderizarSitial(_listaActual);
 }
 
 function filtrarSitial(filtro, btn) {
     filtroSitial = filtro;
-    sitialVerTodos = false;
+    sitialPagina = 1;
     document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo');
     aplicarFiltros();
 }
 function buscarSitial(txt) {
     busquedaSitial = txt.toLowerCase();
-    sitialVerTodos = !!txt; // si busca, muestra todo para no ocultar resultados
+    sitialPagina = txt ? 999 : 1;
     aplicarFiltros();
 }
 function aplicarFiltros() {
