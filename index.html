@@ -307,6 +307,22 @@
                     <p class="honor-desc">Felton, Holguín. Entrenador por más de 40 años. Fundador del Centro Nacional de Entrenamiento y primer Coordinador General. 19 premios internacionales, 8 medallas de oro. Medalla José Tey y Orden Frank País. <span style="color:var(--accent);font-size:12px;">Leer más →</span></p>
                 </div>
             </div>
+            <div class="honor-card" onclick="abrirArticulo('roberto')">
+                <div class="honor-avatar"><img src="https://i.imgur.com/1ZsU1UA.jpeg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Roberto"><span class="honor-initials" style="display:none">RC</span></div>
+                <div class="honor-info">
+                    <p class="honor-role">Científico e Investigador · Universidad de La Habana</p>
+                    <h3>Dr. Roberto Cao Vázquez</h3>
+                    <p class="honor-desc">La Habana, 1946. Doctor en Ciencias Químicas. Presidente de la Sociedad Cubana de Química. Pionero de la nanotecnología en Cuba. Orden Carlos J. Finlay, máxima distinción científica cubana. <span style="color:var(--accent);font-size:12px;">Leer más →</span></p>
+                </div>
+            </div>
+            <div class="honor-card" onclick="abrirArticulo('julieta')">
+                <div class="honor-avatar"><img src="https://i.imgur.com/qj9U1KW.png" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Julieta"><span class="honor-initials" style="display:none">JC</span></div>
+                <div class="honor-info">
+                    <p class="honor-role">Presidenta SCQ · Universidad de La Habana</p>
+                    <h3>Dra. Julieta Coro Bermello</h3>
+                    <p class="honor-desc">La Habana, 1969. Profesora Titular y Doctora en Química. Presidenta de la Sociedad Cubana de Química. Cuatro premios de la Academia de Ciencias de Cuba. Mentora de olimpiadas internacionales. <span style="color:var(--accent);font-size:12px;">Leer más →</span></p>
+                </div>
+            </div>
         </div>
 
         <!-- MODAL ARTÍCULO FULL SCREEN -->
@@ -398,6 +414,50 @@ const articulos = {
                 <p style="margin-bottom:16px;">Ha elaborado diferentes textos y materiales de estudio para concursantes y para estudiantes de la enseñanza superior en las asignaturas que imparte. Es miembro de la Sociedad Cubana de Química. Fue entrenador de concursos de Química para estudiantes de preuniversitario durante más de 10 años, tanto en el Preuniversitario de Ciencias Exactas "Mártires de Humboldt 7", como en la Preselección Nacional en las asignaturas de Análisis Químico y Termodinámica Química.</p>
                 <p style="margin-bottom:16px;">Ha integrado los Comités Científicos de las dos ediciones de la Olimpiadas Centroamericana y del Caribe de Química celebradas en Cuba (2016 y 2022). Asistió a dos ediciones de la Olimpiada Internacional de Química, en una ocasión como jefe de la delegación.</p>
                 <p style="margin-bottom:0;">En reconocimiento a sus méritos ha recibido como distinciones más importantes: el Diploma por la Excelencia Académica otorgado por Latin American Science Education Research Association por la labor desplegada en el Congreso Internacional Didáctica de las Ciencias (2016), el Premio del Rector a la Investigación Científica (2017) y la Distinción Especial del Ministro de la Educación Superior por labor destacada y méritos relevantes en el trabajo educativo, docente y metodológico en la Educación Superior (2017).</p>
+            </div>`
+    },
+    roberto: {
+        nombre: "Roberto Cao Vázquez",
+        rol: "Científico e Investigador · Universidad de La Habana",
+        contenido: `
+            <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
+                <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
+                <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.15;margin-bottom:8px;">Roberto Cao Vázquez</h2>
+                <p style="font-size:13px;color:rgba(255,255,255,.6);font-weight:300;">Dr. en Ciencias Químicas · Laboratorio de Bioinorgánica · Universidad de La Habana</p>
+            </div>
+            <div style="padding:36px 40px;font-family:'DM Sans',sans-serif;color:#1a1a2e;line-height:1.75;font-size:15px;overflow-y:auto;flex:1;">
+                <div style="float:right;margin:0 0 20px 28px;text-align:center;">
+                    <img src="https://i.imgur.com/1ZsU1UA.jpeg" alt="Roberto Cao Vázquez" style="width:140px;height:140px;object-fit:cover;border-radius:12px;border:3px solid var(--gold);display:block;">
+                </div>
+                <p style="margin-bottom:16px;">Nacido en La Habana en 1946, graduado del tecnológico Mártires de Girón en 1965 y de la Licenciatura en Química de la Universidad de La Habana en 1971. Doctor en Ciencias Químicas en el Instituto Tecnológico Lensovet, Leningrado, en 1977. Doctor en Ciencias (segundo doctorado) en la Universidad de La Habana en 2007. Presidente de la Sociedad Cubana de Química del 2009 al 2012.</p>
+                <p style="margin-bottom:16px;">Ha impartido docencia de pregrado de química general, química inorgánica, química de coordinación, química analítica, metodología de la investigación, química bioinorgánica, química supramolecular, entre otras. Desarrolló su actividad docente en diferentes países, tales como Cuba, México, Chile y Mozambique.</p>
+                <p style="margin-bottom:16px;">En su tesis de doctorado investigó compuestos de coordinación de níquel(II). Al regresar a Cuba, comenzó una colaboración con el Instituto de Oncología relacionada con la aplicación de compuestos de coordinación. Esta colaboración culminó con el desarrollo de una metodología para la producción nacional de cis-platino, un medicamento antitumoral, el primero de su tipo producido en Cuba. Además, estas investigaciones motivaron la introducción de la Química Bioinorgánica, la "paradójica" química inanimada de la vida, en la docencia universitaria.</p>
+                <p style="margin-bottom:16px;">En 1990 pasó a dirigir el laboratorio de Bioinorgánica (LBI) adscrito al Polo Científico del Oeste de la capital. En los años 90, en el LBI, se realizaron los primeros trabajos en el campo de la química supramolecular realizados en Cuba. Esa novedosa área de la química también pasó a engrosar la docencia universitaria. Las investigaciones en ambos campos, bioinorgánica y supramolecular, se desarrollaron armónicamente en torno a la búsqueda de inhibidores del radical superóxido, que resulta especialmente nocivo dentro del organismo humano. También se trabajó en el desarrollo de miméticos de metaloenzimas, enzimas que requieren de un ion metálico en el centro activo de la proteína para desarrollar su actividad biológica.</p>
+                <p style="margin-bottom:16px;">A inicios del 2000, en el LBI, comenzó a trabajar en el novedoso campo de la nanotecnología, siendo los precursores de ese campo en Cuba. En un inicio, se trabajó en la formación de monocapas moleculares autoensambladas (SAM), con grosores de 5-10 nm, sobre electrodos metálicos, principalmente de oro. Estos sistemas nanométricos fueron aplicados en el desarrollo de sensores y biosensores. También se trabajó en la síntesis, modificación química y autoensamblaje de nanotubos de carbono y grafeno, y se desarrollaron nanopartículas de oro, plata y óxidos de hierro para aplicaciones biomédicas. Esta síntesis de nanopartículas metálicas además contemplaba el recubrimiento con SAM.</p>
+                <p style="margin-bottom:16px;">Dentro de ese campo resaltan los estudios relacionados con la nanomedicina y la nanoteranosis, es decir, la terapia y el diagnóstico de enfermedades mediante el uso de nanosistemas. Respecto a la nanoteranosis, cabe resaltar la colaboración con el Centro de Inmunología Molecular, mediante el uso de anticuerpos monoclonales asociados a nanopartículas.</p>
+                <p style="margin-bottom:16px;">Realmente, su trabajo en el Laboratorio de Bioinorgánica ha sido muy fructífero, gracias en parte a la dedicación y talento de no pocos jóvenes que estuvieron bajo su tutoría y colegas científicos. Esa labor demostró que cuando se trabaja con pasión, capacidad y dedicación, ninguna meta es inalcanzable. La constante actualización con las publicaciones internacionales más recientes jugó un papel importante en el trabajo investigativo del grupo. Se logró hacer investigaciones de nivel internacional, con enfoques novedosos, aun sin contar con todos los recursos necesarios. En este sentido, la colaboración internacional fue muy valiosa e indispensable.</p>
+                <p style="margin-bottom:16px;">El doctor Cao es autor de dos patentes, una cubana y otra internacional; cinco textos docentes y dos capítulos de libros científicos. Es parte del Colectivo de autores de la enciclopedia "Mil Preguntas, Mil Respuestas". Entre sus publicaciones se encuentran más de 130 artículos científicos, la mayoría en revistas internacionales de alto índice de impacto. Ha presentado los resultados de su extensa labor científica en más de 70 conferencias y seminarios en universidades extranjeras de España, Alemania, Italia, México, Estados Unidos, Israel, Francia, Suiza, Brasil, Portugal, etcétera.</p>
+                <p style="margin-bottom:0;">Por todas estas razones, en el orden nacional, ha recibido numerosos reconocimientos, sobre todo a nivel universitario (16) y de la Academia de Ciencias (10), así como uno del CITMA provincial. Entre las distinciones nacionales recibidas se encuentran la Orden Frank País (1er y 2do grado) y la Orden Carlos J. Finlay, la máxima distinción que otorga el Gobierno cubano a nacionales y extranjeros por sus aportes al desarrollo de la ciencia en beneficio de la humanidad.</p>
+            </div>`
+    },
+    julieta: {
+        nombre: "Julieta Coro Bermello",
+        rol: "Presidenta de la Sociedad Cubana de Química · Universidad de La Habana",
+        contenido: `
+            <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
+                <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
+                <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.15;margin-bottom:8px;">Julieta Coro Bermello</h2>
+                <p style="font-size:13px;color:rgba(255,255,255,.6);font-weight:300;">Dra. · Profesora Titular · Facultad de Química, Universidad de La Habana</p>
+            </div>
+            <div style="padding:36px 40px;font-family:'DM Sans',sans-serif;color:#1a1a2e;line-height:1.75;font-size:15px;overflow-y:auto;flex:1;">
+                <div style="float:right;margin:0 0 20px 28px;text-align:center;">
+                    <img src="https://i.imgur.com/qj9U1KW.png" alt="Julieta Coro Bermello" style="width:140px;height:140px;object-fit:cover;border-radius:12px;border:3px solid var(--gold);display:block;">
+                </div>
+                <p style="margin-bottom:16px;">Julieta nació el 8 de enero de 1969. Es graduada de Licenciatura en Química en la Facultad de Química de la Universidad de La Habana en 1991. En esta misma institución concluyó la maestría en Química Orgánica en 1999 y el Doctorado en Química en el año 2006. Trabajó durante 10 años en el Instituto Cubano de investigaciones de los Derivados de la Caña de Azúcar y desde el año 2003 lo hace en la Facultad de Química de la Universidad de La Habana donde es Profesora Titular.</p>
+                <p style="margin-bottom:16px;">Tiene 33 años de trabajo en la rama de la síntesis orgánica, en particular en la síntesis de moléculas pequeñas con actividad biológica. Ha recibido, entre otros reconocimientos, cuatro premios de la Academia de Ciencias de Cuba. Es autora de 86 trabajos presentados en eventos nacionales e internacionales (25, en los últimos cinco años) y de 40 artículos (8, en los últimos cinco años). Ha tutorado 14 Trabajos de Diploma, dos maestrías y dos doctorados. Ha realizado la oponencia a 19 Tesis de Diploma, 7 de maestrías y 10 de doctorados.</p>
+                <p style="margin-bottom:16px;">Ha tenido varias responsabilidades. En la Facultad de Química de la Universidad de La Habana en la actualidad pertenece a: Comité de Doctorado en Química, Comité de Maestría en Química y Consejo Científico. Además, es Presidenta de la Sociedad Cubana de Química (SCQ), Miembro de la Academia de Ciencias de Cuba, Jefa de la Sección de Ciencias Naturales de la Comisión Nacional de Grados Científicos, y Subdirectora del Laboratorio de Síntesis Química y Biomolecular.</p>
+                <p style="margin-bottom:16px;">Ha impartido las asignaturas Métodos de Investigación en Química, Química Orgánica I y II en las carreras de Licenciatura en Química, Licenciatura en Microbiología y Licenciatura en Bioquímica y Biología Molecular. En la enseñanza de postgrado es la profesora principal de la asignatura Química Física Orgánica y ha impartido algunos aspectos de la Química Orgánica Superior I en dos ocasiones.</p>
+                <p style="margin-bottom:0;">En los últimos tres años ha preparado materiales y entrenado a estudiantes de la preselección nacional de Química y apoyado de manera particular esta actividad como presidenta de la SCQ. Participó como observadora en la XXVII Olimpiada Iberoamericana de Química realizada online y organizada por Ecuador en 2023 y como mentora en la 59a Olimpiada Internacional de Química Mendeléyev en Belo Horizonte, Brasil en 2025.</p>
             </div>`
     },
     luis: {
@@ -810,11 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <footer>
     <div class="footer-links">
         <a href="#" onclick="cambiarPestana('noticias');return false;">📰 Noticias y Entrevistas</a>
-        <a href="mailto:tchoquimica@yahoo.com">Contacto</a>
+        <a href="/cdn-cgi/l/email-protection#fa8e9992958b8f939793999bba839b929595d4999597">Contacto</a>
     </div>
     <p style="font-size:12px;opacity:.5;margin-top:6px;">
-        © 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química · 🇨🇺
-    </p>
-</footer>
-</body>
-</html>
+        © 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química · 
