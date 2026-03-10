@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talentos Cubanos — Olimpiadas de Química</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #04122b;
+            --navy-mid: #0b2150;
+            --navy-light: #122d6b;
+            --gold: #c9a227;
+            --gold-light: #f0c84a;
+            --silver: #b0bec5;
+            --bronze: #a0522d;
+            --accent: #1a6fb5;
+            --bg: #f5f3ee;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-muted: #5a6a8a;
+            --border: #dde3f0;
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: var(--navy);
+            position: relative;
+            overflow: hidden;
+            padding: 60px 24px 50px;
+            text-align: center;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 20% 50%, rgba(201,162,39,.13) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 70% at 80% 40%, rgba(26,111,181,.18) 0%, transparent 70%);
+        }
+        .header-inner { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+
+        .flag-stripe {
+            display: flex; justify-content: center; gap: 6px;
+            margin-bottom: 22px;
+        }
+        .flag-stripe span {
+            display: block; height: 4px; border-radius: 4px;
+        }
+        .flag-stripe span:nth-child(1) { width: 70px; background: #002a8f; }
+        .flag-stripe span:nth-child(2) { width: 70px; background: #cc0001; }
+        .flag-stripe span:nth-child(3) { width: 70px; background: #002a8f; }
+        .flag-stripe span:nth-child(4) { width: 40px; background: #ffffff; }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(26px, 5vw, 44px);
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        header h1 span { color: var(--gold-light); }
+        header p {
+            margin-top: 12px;
+            font-size: 15px;
+            color: rgba(255,255,255,.65);
+            font-weight: 300;
+            letter-spacing: 0.3px;
+        }
+
+        .stats-bar {
+            display: flex; justify-content: center; gap: 32px;
+            margin-top: 32px; flex-wrap: wrap;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--gold-light);
+        }
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255,255,255,.5);
+            margin-top: 2px;
+        }
+        .stat-divider { width: 1px; background: rgba(255,255,255,.15); }
+
+        /* ── NAV ── */
+        nav {
+            background: var(--navy-mid);
+            display: flex; justify-content: center;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+        nav button {
+            background: none; border: none; cursor: pointer;
+            color: rgba(255,255,255,.6);
+            padding: 16px 28px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 500;
+            letter-spacing: 0.3px;
+            position: relative; transition: color .2s;
+        }
+        nav button::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; right: 50%;
+            height: 2px; background: var(--gold-light);
+            transition: left .25s, right .25s;
+        }
+        nav button:hover { color: #fff; }
+        nav button.activo { color: #fff; }
+        nav button.activo::after { left: 16px; right: 16px; }
+
+        /* ── LAYOUT ── */
+        .contenedor {
+            max-width: 1100px; margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+        .seccion { display: none; }
+        .seccion.activa { display: block; animation: fadeIn .35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px; font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+        .section-sub {
+            font-size: 14px; color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        /* ── SITIAL: CARDS ── */
+        .cuadricula-sitial {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 22px;
+        }
+
+        .tarjeta {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 28px 20px 22px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 16px rgba(4,18,43,.07);
+            transition: transform .22s, box-shadow .22s;
+            position: relative;
+        }
+        .tarjeta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(4,18,43,.14);
+        }
+
+        .tarjeta-avatar {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            overflow: hidden;
+            border: 3px solid var(--border);
+            background: #e8ecf5;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .tarjeta-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-initials {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px; font-weight: 700;
+            color: var(--navy-light);
+        }
+
+        .tarjeta h3 {
+            font-size: 15px; font-weight: 600;
+            color: var(--navy); margin-bottom: 4px;
+        }
+        .tarjeta-years {
+            font-size: 12px; color: var(--text-muted); margin-bottom: 14px;
+        }
+
+        .medallas-tarjeta {
+            display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 5px;
+        }
+        .medalla-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 9px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            line-height: 1;
+        }
+        .chip-oro    { background: #fff8e1; color: #9a7200; border: 1.5px solid #f0c84a; }
+        .chip-plata  { background: #f0f4f8; color: #5a6a8a; border: 1.5px solid #b0bec5; }
+        .chip-bronce { background: #fdf0e8; color: #7a3b10; border: 1.5px solid #c87941; }
+        .chip-mencion      { background: #e8f0fb; color: #1a4a9a; border: 1.5px solid #7aaae8; }
+        .chip-participante { background: #f4f4f4; color: #888; border: 1.5px solid #ccc; }
+
+        .tarjeta-top {
+            position: absolute; top: 12px; right: 12px;
+            font-size: 18px;
+        }
+
+        /* ── FILTROS SITIAL ── */
+        .filtros-sitial {
+            display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
+            align-items: center;
+        }
+        .filtro-btn {
+            padding: 7px 16px; border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: white; cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 500; color: var(--text-muted);
+            transition: all .2s;
+        }
+        .filtro-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+        .filtro-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
+
+        .search-input {
+            margin-left: auto;
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            width: 200px;
+            transition: border-color .2s;
+        }
+        .search-input:focus { border-color: var(--accent); }
+
+        /* ── EVENTOS: TABLA ── */
+        .controles-evento {
+            display: flex; gap: 14px; margin-bottom: 24px;
+            align-items: center; flex-wrap: wrap;
+        }
+        .controles-evento label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+
+        .custom-select {
+            padding: 10px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            color: var(--text);
+            cursor: pointer;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .custom-select:focus { border-color: var(--accent); }
+
+        .sort-controls {
+            display: flex; gap: 8px; margin-left: auto; align-items: center;
+        }
+        .sort-label { font-size: 12px; color: var(--text-muted); }
+        .sort-btn {
+            padding: 7px 14px; border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: white; cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            display: flex; align-items: center; gap: 4px;
+            transition: all .2s;
+        }
+        .sort-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+        .sort-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
+
+        .tabla-wrapper {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 16px rgba(4,18,43,.07);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: var(--navy);
+            color: rgba(255,255,255,.85);
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        th:hover { background: var(--navy-light); }
+        th .sort-arrow { margin-left: 4px; opacity: .4; font-size: 10px; }
+        th.sorted .sort-arrow { opacity: 1; }
+
+        td {
+            padding: 13px 18px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8f9ff; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 11px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .badge-oro    { background: #fff8e1; color: #9a7200; }
+        .badge-plata  { background: #f0f4f8; color: #5a6a8a; }
+        .badge-bronce { background: #fdf0e8; color: #7a3b10; }
+        .badge-mencion     { background: #e8f0fb; color: #1a4a9a; }
+        .badge-participante{ background: #f4f4f4; color: #888; }
+
+        .badge-dot { width: 7px; height: 7px; border-radius: 50%; }
+        .dot-oro    { background: var(--gold); }
+        .dot-plata  { background: var(--silver); }
+        .dot-bronce { background: var(--bronze); }
+        .dot-mencion      { background: var(--accent); }
+        .dot-participante { background: #ccc; }
+
+        .sede-flag { font-size: 18px; margin-right: 6px; }
+        .no-results {
+            text-align: center; padding: 48px 20px;
+            color: var(--text-muted); font-size: 15px;
+        }
+
+        .tabla-footer {
+            padding: 12px 18px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            font-size: 12px; color: var(--text-muted);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* ── PRÓXIMAMENTE ── */
+        .coming-soon {
+            text-align: center; padding: 80px 20px;
+        }
+        .coming-soon .icon { font-size: 48px; margin-bottom: 16px; }
+        .coming-soon h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px; color: var(--navy); margin-bottom: 8px;
+        }
+        .coming-soon p { color: var(--text-muted); font-size: 14px; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .stats-bar { gap: 20px; }
+            .stat-divider { display: none; }
+            .sort-controls { margin-left: 0; width: 100%; }
+            .search-input { width: 100%; margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="flag-stripe">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <h1>Talentos Cubanos en<br><span>Olimpiadas de Química</span></h1>
+        <p>Reconociendo la excelencia de estudiantes cubanos en competencias internacionales</p>
+
+        <div class="stats-bar" id="stats-bar">
+            <div class="stat">
+                <div class="stat-num" id="stat-total">—</div>
+                <div class="stat-label">Participaciones IChO</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <div class="stat-num" id="stat-oro">—</div>
+                <div class="stat-label">Medallas de Oro</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <div class="stat-num" id="stat-plata">—</div>
+                <div class="stat-label">Medallas de Plata</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <div class="stat-num" id="stat-bronce">—</div>
+                <div class="stat-label">Medallas de Bronce</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav>
+    <button id="btn-sitial" class="activo" onclick="cambiarPestana('sitial')">🏅 Sitial de Talentos</button>
+    <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Búsqueda por Eventos</button>
+</nav>
+
+<div class="contenedor">
+
+    <!-- ════ SITIAL ════ -->
+    <div id="sitial" class="seccion activa">
+        <h2 class="section-title">Sitial de Honor</h2>
+        <p class="section-sub">Estudiantes cubanos y sus logros históricos en olimpiadas de química</p>
+
+        <div class="filtros-sitial">
+            <button class="filtro-btn activo" onclick="filtrarSitial('todos', this)">Todos</button>
+            <button class="filtro-btn" onclick="filtrarSitial('oro', this)">🥇 Oro</button>
+            <button class="filtro-btn" onclick="filtrarSitial('plata', this)">🥈 Plata</button>
+            <button class="filtro-btn" onclick="filtrarSitial('bronce', this)">🥉 Bronce</button>
+            <button class="filtro-btn" onclick="filtrarSitial('mencion', this)">🎖 Mención</button>
+            <input class="search-input" type="text" placeholder="🔎 Buscar estudiante…" oninput="buscarSitial(this.value)">
+        </div>
+
+        <div class="cuadricula-sitial" id="cuadricula-sitial"></div>
+    </div>
+
+    <!-- ════ EVENTOS ════ -->
+    <div id="eventos" class="seccion">
+        <h2 class="section-title">Resultados por Evento</h2>
+        <p class="section-sub">Historial completo de participaciones y medallas por olimpiada</p>
+
+        <div class="controles-evento">
+            <label for="selector-olimpiada"><strong>Olimpiada:</strong></label>
+            <select class="custom-select" id="selector-olimpiada" onchange="cargarTabla()">
+                <option value="icho">🌍 IChO — Internacional</option>
+                <option value="imcho">🧪 IMChO — Mendeleyev</option>
+                <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
+                <option value="occq">🌴 OCCQ — Centroam. y del Caribe</option>
+            </select>
+
+            <div class="sort-controls">
+                <span class="sort-label">Ordenar:</span>
+                <button class="sort-btn activo" id="sort-año" onclick="ordenarTabla('año', this)">
+                    Año <span class="sort-icon">↓</span>
+                </button>
+                <button class="sort-btn" id="sort-nombre" onclick="ordenarTabla('nombre', this)">
+                    Nombre <span class="sort-icon">↕</span>
+                </button>
+                <button class="sort-btn" id="sort-medalla" onclick="ordenarTabla('medalla', this)">
+                    Medalla <span class="sort-icon">↕</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tabla-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
+                        <th>N°</th>
+                        <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Estudiante <span class="sort-arrow">↕</span></th>
+                        <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
+                        <th onclick="ordenarTabla('rank', document.getElementById('sort-nombre'))">Rank <span class="sort-arrow">↕</span></th>
+                        <th>Sede</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla"></tbody>
+            </table>
+            <div class="tabla-footer">
+                <span id="tabla-count">— resultados</span>
+                <span style="color: var(--text-muted); font-size:11px;">Fuente: icho-official.org</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// BASE DE DATOS
+// ═══════════════════════════════════════════════════════
+
+// Resultados IChO Cuba
+// Fuente: https://www.icho-official.org/results/country_info.php?country=Cuba
+// ⚠ Verificar y completar con datos actualizados del sitio oficial
+
+// Fuente oficial: https://www.icho-official.org/results/country_info.php?country=Cuba
+const datosIChO = [
+    // 2025
+    { ed: 57, año: 2025, sede: "Dubái",           pais: "🇦🇪", nombre: "Juan Carlos Yepe Muñiz",          medalla: "plata",     rank: 111  },
+    { ed: 57, año: 2025, sede: "Dubái",           pais: "🇦🇪", nombre: "Leticia María Merlo Alfonso",     medalla: "bronce",    rank: 186  },
+    { ed: 57, año: 2025, sede: "Dubái",           pais: "🇦🇪", nombre: "Bárbaro Eriel Rodríguez Gil",     medalla: "bronce",    rank: 210  },
+    { ed: 57, año: 2025, sede: "Dubái",           pais: "🇦🇪", nombre: "Osmani Lázaro Hernández Fiallo",  medalla: "participante", rank: null },
+    // 2024
+    { ed: 56, año: 2024, sede: "Riad",            pais: "🇸🇦", nombre: "Hector Manuel Domínguez Pérez",   medalla: "bronce",    rank: 124  },
+    { ed: 56, año: 2024, sede: "Riad",            pais: "🇸🇦", nombre: "Mario Luis Pérez Brito",          medalla: "mencion",   rank: 213  },
+    // 2023
+    { ed: 55, año: 2023, sede: "Zúrich",          pais: "🇨🇭", nombre: "César Endris Acosta Martínez",    medalla: "bronce",    rank: 171  },
+    { ed: 55, año: 2023, sede: "Zúrich",          pais: "🇨🇭", nombre: "Erik Jordan Valdés Abreu",        medalla: "bronce",    rank: 217  },
+    // 2022
+    { ed: 54, año: 2022, sede: "Tianjín (Online)",pais: "🇨🇳", nombre: "Geiler Esteban López Corría",     medalla: "participante", rank: null },
+    { ed: 54, año: 2022, sede: "Tianjín (Online)",pais: "🇨🇳", nombre: "Dahysmer Hernández Ricardo",      medalla: "participante", rank: null },
+    { ed: 54, año: 2022, sede: "Tianjín (Online)",pais: "🇨🇳", nombre: "Ana Sabrina Salvador Pérez",      medalla: "participante", rank: null },
+    { ed: 54, año: 2022, sede: "Tianjín (Online)",pais: "🇨🇳", nombre: "Brenda María Zayas Hernández",    medalla: "participante", rank: null },
+    // 2019
+    { ed: 51, año: 2019, sede: "París",           pais: "🇫🇷", nombre: "Samuel Báez Lao",                 medalla: "participante", rank: null },
+    { ed: 51, año: 2019, sede: "París",           pais: "🇫🇷", nombre: "Rey Michel Rodríguez Navarro",    medalla: "participante", rank: null },
+    // 2017
+    { ed: 49, año: 2017, sede: "Nakhon Pathom",   pais: "🇹🇭", nombre: "Rafael José Rodríguez",           medalla: "bronce",    rank: 163  },
+    // 2015
+    { ed: 47, año: 2015, sede: "Bakú",            pais: "🇦🇿", nombre: "Juan Pablo Figueroa Macías",      medalla: "mencion",   rank: 191  },
+    // 2014
+    { ed: 46, año: 2014, sede: "Hanói",           pais: "🇻🇳", nombre: "Alejandro Alexéi Vistorte Salgado", medalla: "mencion", rank: 188  },
+    // 2011
+    { ed: 43, año: 2011, sede: "Ankara",          pais: "🇹🇷", nombre: "Reinaldo Román Martín Pardo",     medalla: "bronce",    rank: 142  },
+    // 2010
+    { ed: 42, año: 2010, sede: "Tokio",           pais: "🇯🇵", nombre: "Ramón Lorenzo Panadés Barrueta",  medalla: "participante", rank: null },
+    // 2009
+    { ed: 41, año: 2009, sede: "Cambridge",       pais: "🇬🇧", nombre: "Hernández Hiram Borbolla",        medalla: "bronce",    rank: 132  },
+    { ed: 41, año: 2009, sede: "Cambridge",       pais: "🇬🇧", nombre: "Infante Ernesto Aguilar",         medalla: "bronce",    rank: 162  },
+    // 2008
+    { ed: 40, año: 2008, sede: "Budapest",        pais: "🇭🇺", nombre: "Gerardo Ojeda Carralero",         medalla: "plata",     rank: 40   },
+    { ed: 40, año: 2008, sede: "Budapest",        pais: "🇭🇺", nombre: "Mendez Gómez Yanira",             medalla: "bronce",    rank: 134  },
+    // 2007
+    { ed: 39, año: 2007, sede: "Moscú",           pais: "🇷🇺", nombre: "Manuel Garcia Ricardo",           medalla: "bronce",    rank: 150  },
+    // 2006
+    { ed: 38, año: 2006, sede: "Gyeongsan",       pais: "🇰🇷", nombre: "Juan José Del Campo Lopez",       medalla: "bronce",    rank: 158  },
+    { ed: 38, año: 2006, sede: "Gyeongsan",       pais: "🇰🇷", nombre: "Williams Ernesto Miranda Delgado",medalla: "mencion",   rank: 174  },
+    // 2005 — única medalla de ORO
+    { ed: 37, año: 2005, sede: "Taipei",          pais: "🇹🇼", nombre: "Luis Daniel Cruz Zaragoza",       medalla: "oro",       rank: 26   },
+    // 2004
+    { ed: 36, año: 2004, sede: "Kiel",            pais: "🇩🇪", nombre: "Enrique Méndez Vega",             medalla: "participante", rank: null },
+    // 2003
+    { ed: 35, año: 2003, sede: "Atenas",          pais: "🇬🇷", nombre: "Kenny Bravo Rodriguez",           medalla: "plata",     rank: 42   },
+    // 2002
+    { ed: 34, año: 2002, sede: "Groningen",       pais: "🇳🇱", nombre: "Kenny Bravo Rodriguez",           medalla: "participante", rank: null },
+    { ed: 34, año: 2002, sede: "Groningen",       pais: "🇳🇱", nombre: "V. Perez Barzaga",                medalla: "mencion",   rank: 184  },
+    { ed: 34, año: 2002, sede: "Groningen",       pais: "🇳🇱", nombre: "I.B. Gonzalez Valdes",            medalla: "participante", rank: null },
+    { ed: 34, año: 2002, sede: "Groningen",       pais: "🇳🇱", nombre: "J.E. Hernandez Gonzalez",         medalla: "participante", rank: null },
+    // 2001
+    { ed: 33, año: 2001, sede: "Mumbai",          pais: "🇮🇳", nombre: "David Santos Carballal",          medalla: "bronce",    rank: 70   },
+    { ed: 33, año: 2001, sede: "Mumbai",          pais: "🇮🇳", nombre: "Karel Hernandez Sanchez",         medalla: "bronce",    rank: 73   },
+    { ed: 33, año: 2001, sede: "Mumbai",          pais: "🇮🇳", nombre: "Elain Fernando Carbonel",         medalla: "bronce",    rank: 91   },
+    { ed: 33, año: 2001, sede: "Mumbai",          pais: "🇮🇳", nombre: "Castillo Aleman Marx",            medalla: "bronce",    rank: 100  },
+    // 1999
+    { ed: 31, año: 1999, sede: "Bangkok",         pais: "🇹🇭", nombre: "Darel Martínez Bedoya",           medalla: "bronce",    rank: 123  },
+    // 1997
+    { ed: 29, año: 1997, sede: "Montreal",        pais: "🇨🇦", nombre: "Rachel Crespo",                   medalla: "bronce",    rank: 98   },
+    // 1996
+    { ed: 28, año: 1996, sede: "Moscú",           pais: "🇷🇺", nombre: "Rivera Daniel Garcia",            medalla: "bronce",    rank: 87   },
+    // 1995
+    { ed: 27, año: 1995, sede: "Beijing",         pais: "🇨🇳", nombre: "Joel Torres Alacan",              medalla: "participante", rank: null },
+    // 1994
+    { ed: 26, año: 1994, sede: "Oslo",            pais: "🇳🇴", nombre: "Adria Jimenez Diaz",              medalla: "participante", rank: null },
+    // 1993
+    { ed: 25, año: 1993, sede: "Perugia",         pais: "🇮🇹", nombre: "Yonier Rodriguez",                medalla: "bronce",    rank: 78   },
+    { ed: 25, año: 1993, sede: "Perugia",         pais: "🇮🇹", nombre: "Victor Lorenzo",                  medalla: "bronce",    rank: 88   },
+    { ed: 25, año: 1993, sede: "Perugia",         pais: "🇮🇹", nombre: "Adria Jimenez Diaz",              medalla: "bronce",    rank: 91   },
+    { ed: 25, año: 1993, sede: "Perugia",         pais: "🇮🇹", nombre: "Reinaldo Moya Barrios",           medalla: "participante", rank: null },
+    // 1991
+    { ed: 23, año: 1991, sede: "Londres",         pais: "🇬🇧", nombre: "Heidi Portuondo Campa",           medalla: "bronce",    rank: 68   },
+    { ed: 23, año: 1991, sede: "Londres",         pais: "🇬🇧", nombre: "Reynaldo López Mirabal",          medalla: "participante", rank: null },
+    { ed: 23, año: 1991, sede: "Londres",         pais: "🇬🇧", nombre: "Nelanie Mora-Diaz",               medalla: "participante", rank: null },
+    { ed: 23, año: 1991, sede: "Londres",         pais: "🇬🇧", nombre: "Mitcheell Maestre Martínez",      medalla: "participante", rank: null },
+    // 1990
+    { ed: 22, año: 1990, sede: "París",           pais: "🇫🇷", nombre: "Elier Paz Rojas",                 medalla: "bronce",    rank: 56   },
+    { ed: 22, año: 1990, sede: "París",           pais: "🇫🇷", nombre: "David Alvarez Carbonnell",        medalla: "participante", rank: null },
+    { ed: 22, año: 1990, sede: "París",           pais: "🇫🇷", nombre: "Heidi Portuondo Campa",           medalla: "participante", rank: null },
+    { ed: 22, año: 1990, sede: "París",           pais: "🇫🇷", nombre: "Ana Helena Lopez Campistous",     medalla: "participante", rank: null },
+    // 1989
+    { ed: 21, año: 1989, sede: "Halle",           pais: "🇩🇪", nombre: "Omar Quinter Monzon",             medalla: "bronce",    rank: 61   },
+    { ed: 21, año: 1989, sede: "Halle",           pais: "🇩🇪", nombre: "David Carbonell",                 medalla: "participante", rank: null },
+    { ed: 21, año: 1989, sede: "Halle",           pais: "🇩🇪", nombre: "Virna Veiga Perez",               medalla: "participante", rank: null },
+    { ed: 21, año: 1989, sede: "Halle",           pais: "🇩🇪", nombre: "Elier Paz Rojas",                 medalla: "participante", rank: null },
+    // 1988
+    { ed: 20, año: 1988, sede: "Espoo",           pais: "🇫🇮", nombre: "Eduardo Baquero Fernandez",       medalla: "bronce",    rank: 58   },
+    { ed: 20, año: 1988, sede: "Espoo",           pais: "🇫🇮", nombre: "Ernesto Ortitz Suri",             medalla: "participante", rank: null },
+    { ed: 20, año: 1988, sede: "Espoo",           pais: "🇫🇮", nombre: "Raul Gonzales Lio",               medalla: "participante", rank: null },
+    { ed: 20, año: 1988, sede: "Espoo",           pais: "🇫🇮", nombre: "Elier Paz Rojas",                 medalla: "participante", rank: null },
+    // 1987
+    { ed: 19, año: 1987, sede: "Veszprém",        pais: "🇭🇺", nombre: "Ernesto Ortitz",                  medalla: "bronce",    rank: 52   },
+    { ed: 19, año: 1987, sede: "Veszprém",        pais: "🇭🇺", nombre: "Raul Gonzalez",                   medalla: "participante", rank: null },
+    { ed: 19, año: 1987, sede: "Veszprém",        pais: "🇭🇺", nombre: "Eduardo Baquero",                 medalla: "participante", rank: null },
+    { ed: 19, año: 1987, sede: "Veszprém",        pais: "🇭🇺", nombre: "Tania Crombet",                   medalla: "participante", rank: null },
+    // 1985
+    { ed: 17, año: 1985, sede: "Bratislava",      pais: "🇸🇰", nombre: "Tirso Gassié Rodriguez",          medalla: "participante", rank: null },
+    { ed: 17, año: 1985, sede: "Bratislava",      pais: "🇸🇰", nombre: "Geni Gómez Morejón",              medalla: "participante", rank: null },
+    { ed: 17, año: 1985, sede: "Bratislava",      pais: "🇸🇰", nombre: "César Fernández Estrabao",        medalla: "participante", rank: null },
+    { ed: 17, año: 1985, sede: "Bratislava",      pais: "🇸🇰", nombre: "Luis Javier Gonzáles López",      medalla: "participante", rank: null },
+];
+
+// Datos placeholder para otras olimpiadas
+const datosIMChO = [];
+const datosOIAQ  = [];
+const datosOCCQ  = [];
+
+const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, occq: datosOCCQ };
+
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+let ordenActual = { campo: 'año', dir: -1 }; // -1 = desc, 1 = asc
+let filtroSitial = 'todos';
+let busquedaSitial = '';
+
+// ═══════════════════════════════════════════════════════
+// UTILIDADES
+// ═══════════════════════════════════════════════════════
+const medallaOrden = { oro: 1, plata: 2, bronce: 3, mencion: 4, participante: 5 };
+const medallaLabel = { oro: 'Medalla de Oro', plata: 'Medalla de Plata', bronce: 'Medalla de Bronce', mencion: 'Mención Honorífica', participante: 'Participante' };
+const medallaEmoji = { oro: '🥇', plata: '🥈', bronce: '🥉', mencion: '🎖', participante: '—' };
+
+function getIniciales(nombre) {
+    return nombre.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+}
+
+// ═══════════════════════════════════════════════════════
+// ESTADÍSTICAS HEADER
+// ═══════════════════════════════════════════════════════
+function calcularStats() {
+    const totales = { total: datosIChO.length, oro: 0, plata: 0, bronce: 0 };
+    datosIChO.forEach(r => {
+        if (r.medalla === 'oro')    totales.oro++;
+        if (r.medalla === 'plata')  totales.plata++;
+        if (r.medalla === 'bronce') totales.bronce++;
+    });
+
+    animarContador('stat-total', totales.total);
+    animarContador('stat-oro', totales.oro);
+    animarContador('stat-plata', totales.plata);
+    animarContador('stat-bronce', totales.bronce);
+}
+
+function animarContador(id, fin) {
+    const el = document.getElementById(id);
+    let n = 0;
+    const step = Math.ceil(fin / 20);
+    const iv = setInterval(() => {
+        n = Math.min(n + step, fin);
+        el.textContent = n;
+        if (n >= fin) clearInterval(iv);
+    }, 40);
+}
+
+// ═══════════════════════════════════════════════════════
+// SITIAL
+// ═══════════════════════════════════════════════════════
+function construirSitial() {
+    // Agrupar por estudiante
+    const mapa = {};
+    datosIChO.forEach(r => {
+        if (!mapa[r.nombre]) mapa[r.nombre] = { nombre: r.nombre, medallas: [], años: [] };
+        mapa[r.nombre].medallas.push({ olimpiada: 'IChO', tipo: r.medalla, año: r.año });
+        mapa[r.nombre].años.push(r.año);
+    });
+    datosIMChO.forEach(r => {
+        if (!mapa[r.nombre]) mapa[r.nombre] = { nombre: r.nombre, medallas: [], años: [] };
+        mapa[r.nombre].medallas.push({ olimpiada: 'IMChO', tipo: r.medalla, año: r.año });
+        if (!mapa[r.nombre].años.includes(r.año)) mapa[r.nombre].años.push(r.año);
+    });
+
+    // Only include students who won at least one medal (exclude pure participantes)
+    const estudiantesConMedalla = Object.values(mapa).filter(e =>
+        e.medallas.some(m => m.tipo !== 'participante')
+    );
+
+    // Ordenar: mejores medallas primero
+    const estudiantes = estudiantesConMedalla.sort((a, b) => {
+        const mejorA = Math.min(...a.medallas.map(m => medallaOrden[m.tipo]));
+        const mejorB = Math.min(...b.medallas.map(m => medallaOrden[m.tipo]));
+        return mejorA - mejorB || b.medallas.length - a.medallas.length;
+    });
+
+    window._estudiantesTodos = estudiantes;
+    renderizarSitial(estudiantes);
+}
+
+function renderizarSitial(lista) {
+    const grid = document.getElementById('cuadricula-sitial');
+
+    if (!lista.length) {
+        grid.innerHTML = '<div class="no-results">No se encontraron estudiantes.</div>';
+        return;
+    }
+
+    grid.innerHTML = lista.map(est => {
+        const mejor = est.medallas.reduce((a, b) =>
+            medallaOrden[a.tipo] <= medallaOrden[b.tipo] ? a : b
+        );
+        const trofeo = mejor.tipo === 'oro' ? '🏆' : mejor.tipo === 'plata' ? '⭐' : mejor.tipo === 'bronce' ? '🌟' : '';
+
+        const chips = est.medallas
+            .filter(m => m.tipo !== 'participante')
+            .map(m =>
+            `<span class="medalla-chip chip-${m.tipo}">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>`
+        ).join('');
+
+        const añoRange = est.años.length > 1
+            ? `${Math.min(...est.años)} – ${Math.max(...est.años)}`
+            : `${est.años[0]}`;
+
+        return `
+        <div class="tarjeta" data-nombre="${est.nombre}" data-mejor="${mejor.tipo}">
+            ${trofeo ? `<div class="tarjeta-top">${trofeo}</div>` : ''}
+            <div class="tarjeta-avatar">
+                <span class="avatar-initials">${getIniciales(est.nombre)}</span>
+            </div>
+            <h3>${est.nombre}</h3>
+            <p class="tarjeta-years">${añoRange}</p>
+            <div class="medallas-tarjeta">${chips}</div>
+        </div>`;
+    }).join('');
+}
+
+function filtrarSitial(filtro, btn) {
+    filtroSitial = filtro;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    aplicarFiltrosSitial();
+}
+
+function buscarSitial(texto) {
+    busquedaSitial = texto.toLowerCase();
+    aplicarFiltrosSitial();
+}
+
+function aplicarFiltrosSitial() {
+    let lista = window._estudiantesTodos || [];
+    if (filtroSitial !== 'todos') {
+        lista = lista.filter(e => e.medallas.some(m => m.tipo === filtroSitial));
+    }
+    if (busquedaSitial) {
+        lista = lista.filter(e => e.nombre.toLowerCase().includes(busquedaSitial));
+    }
+    renderizarSitial(lista);
+}
+
+// ═══════════════════════════════════════════════════════
+// TABLA DE EVENTOS
+// ═══════════════════════════════════════════════════════
+function cargarTabla() {
+    const olimpiada = document.getElementById('selector-olimpiada').value;
+    const datos = todasLasOlimpiadas[olimpiada] || [];
+    renderizarTabla(datos);
+}
+
+function ordenarTabla(campo, btn) {
+    if (ordenActual.campo === campo) {
+        ordenActual.dir *= -1;
+    } else {
+        ordenActual.campo = campo;
+        ordenActual.dir = campo === 'año' ? -1 : 1;
+    }
+
+    document.querySelectorAll('.sort-btn').forEach(b => {
+        b.classList.remove('activo');
+        b.querySelector('.sort-icon').textContent = '↕';
+    });
+    btn.classList.add('activo');
+    btn.querySelector('.sort-icon').textContent = ordenActual.dir === -1 ? '↓' : '↑';
+
+    cargarTabla();
+}
+
+function renderizarTabla(datos) {
+    const tbody = document.getElementById('cuerpo-tabla');
+    const countEl = document.getElementById('tabla-count');
+
+    if (!datos.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        countEl.textContent = '0 resultados';
+        return;
+    }
+
+    // Ordenar
+    const ordenados = [...datos].sort((a, b) => {
+        if (ordenActual.campo === 'año') return (a.año - b.año) * ordenActual.dir;
+        if (ordenActual.campo === 'nombre') return a.nombre.localeCompare(b.nombre) * ordenActual.dir;
+        if (ordenActual.campo === 'medalla') return (medallaOrden[a.medalla] - medallaOrden[b.medalla]) * ordenActual.dir;
+        return 0;
+    });
+
+    // Numerar por año (orden dentro del año)
+    let contador = {};
+    tbody.innerHTML = ordenados.map(r => {
+        contador[r.año] = (contador[r.año] || 0) + 1;
+
+        return `
+        <tr>
+            <td><strong>${r.año}</strong> <small style="color:var(--text-muted); font-size:11px;">Ed. ${r.ed}</small></td>
+            <td style="color:var(--text-muted); font-size:13px;">${contador[r.año]}</td>
+            <td><strong>${r.nombre}</strong></td>
+            <td>
+                <span class="badge badge-${r.medalla}">
+                    <span class="badge-dot dot-${r.medalla}"></span>
+                    ${medallaLabel[r.medalla]}
+                </span>
+            </td>
+            <td style="color:var(--text-muted); font-size:13px; text-align:center;">${r.rank !== null && r.rank !== undefined ? r.rank : '—'}</td>
+            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+        </tr>`;
+    }).join('');
+
+    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════════════════════════
+function cambiarPestana(pestana) {
+    document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'));
+    document.getElementById(pestana).classList.add('activa');
+    document.getElementById('btn-' + pestana).classList.add('activo');
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    calcularStats();
+    construirSitial();
+    cargarTabla();
+});
+</script>
+</body>
+</html>
