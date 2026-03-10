@@ -199,7 +199,7 @@
                 <option value="icho">🌍 IChO — Internacional</option>
                 <option value="imcho">🧪 IMChO — Mendeleyev</option>
                 <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
-                <option value="occq">🌴 OCCQ — Centroam. y del Caribe</option>
+                <option value="ocacq">🌴 OCACQ — Centroam. y del Caribe</option>
             </select>
             <div class="sort-controls">
                 <span class="sort-label">Ordenar:</span>
@@ -249,7 +249,7 @@ const datosIChO = [
     { ed:57, año:2025, sede:"Dubái",            pais:"🇦🇪", nombre:"Osmani Lázaro Hernández Fiallo",    medalla:"participante", rank:null },
     { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Hector Manuel Domínguez Pérez",     medalla:"bronce",       rank:124  },
     { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Mario Luis Pérez Brito",            medalla:"mencion",      rank:213  },
-    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"César Endris Acosta Martínez",      medalla:"bronce",       rank:171,  foto:"https://i.imgur.com/viCJItS.jpeg" },
+    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"César Endris Acosta Martínez",      medalla:"bronce",       rank:171,  foto:"https://i.imgur.com/98WvY48.jpeg" },
     { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"Erik Jordan Valdés Abreu",          medalla:"bronce",       rank:217  },
     { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Geiler Esteban López Corría",       medalla:"participante", rank:null },
     { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Dahysmer Hernández Ricardo",        medalla:"participante", rank:null },
@@ -315,24 +315,43 @@ const datosIChO = [
     { ed:17, año:1985, sede:"Bratislava",       pais:"🇸🇰", nombre:"Luis Javier Gonzáles López",        medalla:"participante", rank:null },
 ];
 
-// IMChO — ⚠ Reemplazar con datos reales.
+// IMChO — Olimpiada Internacional Mendeleyev de Química
 const datosIMChO = [
-    { ed:1, año:2024, sede:"Moscú",      pais:"🇷🇺", nombre:"ZZ Estudiante Prueba", medalla:"mencion", rank:null },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Juan Carlos Yepe Muñiz",          medalla:"plata",        rank:null },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Roy Roger González",               medalla:"bronce",       rank:null },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Marco Antonio Asin López",         medalla:"bronce",       rank:null },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Ernesto Alejandro Barrera Ramírez",medalla:"bronce",       rank:null },
+    { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Héctor Manuel Domínguez Pérez",    medalla:"participante", rank:null },
+    { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Mario Luis Pérez Brito",           medalla:"participante", rank:null },
 ];
 
-// OIAQ — ⚠ Reemplazar con datos reales.
+// OIAQ — Olimpiada Iberoamericana de Química
 const datosOIAQ = [
-    { ed:1, año:2024, sede:"Madrid",     pais:"🇪🇸", nombre:"ZZ Estudiante Prueba", medalla:"mencion", rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Melissa María Reyes Pérez",         medalla:"bronce",       rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Cynthia Maria Rodríguez Pérez",      medalla:"bronce",       rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Pedro Alexis Rodríguez Ferrer",      medalla:"participante", rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Nathán David Rivadeneira Martínez",  medalla:"participante", rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Juan Carlos Yepe Muñiz",             medalla:"oro",          rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Roy Roger González",                 medalla:"plata",        rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Ernesto Alejandro Barrera Ramírez",  medalla:"bronce",       rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Marco Antonio Asin López",           medalla:"bronce",       rank:null },
 ];
 
-// OCCQ — ⚠ Reemplazar con datos reales.
-const datosOCCQ = [
-    { ed:1, año:2024, sede:"La Habana",  pais:"🇨🇺", nombre:"ZZ Estudiante Prueba", medalla:"mencion", rank:null },
+// OCACQ — Olimpiada Centroamericana y del Caribe de Química
+const datosOCACQ = [
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Alejandro Murad Alcina Salazar",     medalla:"oro",          rank:null },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Jennifer García González",            medalla:"plata",        rank:null },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Carlos Manuel Hernández Machín",      medalla:"plata",        rank:null },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Brayan Tejeda Marrero",               medalla:"bronce",       rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",   pais:"🇬🇹", nombre:"Osmani Lázaro Hernández Fiallo",      medalla:"oro",          rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",   pais:"🇬🇹", nombre:"Melissa María Reyes Pérez",           medalla:"oro",          rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",   pais:"🇬🇹", nombre:"Bárbaro Eriel Rodríguez Gil",         medalla:"plata",        rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",   pais:"🇬🇹", nombre:"Pedro Alexis Rodríguez Ferrer",       medalla:"plata",        rank:null },
 ];
 
-const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, occq: datosOCCQ };
-const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', occq: 'OCCQ' };
-const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oiaq: 'Fuente: OIAQ', occq: 'Fuente: OCCQ' };
+const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, ocacq: datosOCACQ };
+const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oiaq: 'Fuente: OIAQ', ocacq: 'Fuente: OCACQ' };
 
 // ════════════════════════════════════════════════════
 // ÍNDICE DE FOTOS: nombre → URL
