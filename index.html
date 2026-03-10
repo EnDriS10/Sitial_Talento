@@ -198,7 +198,7 @@
             <select class="custom-select" id="selector-olimpiada" onchange="cargarTabla()">
                 <option value="icho">🌍 IChO — Internacional</option>
                 <option value="imcho">🧪 IMChO — Mendeleyev</option>
-                <option value="oibq">🌎 OIAQ — Iberoamericana</option>
+                <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
                 <option value="ocacq">🌴 OCACQ — Centroam. y del Caribe</option>
             </select>
             <div class="sort-controls">
@@ -250,7 +250,7 @@ const datosIChO = [
     { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Hector Manuel Domínguez Pérez",     medalla:"bronce",       rank:124  },
     { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Mario Luis Pérez Brito",            medalla:"mencion",      rank:213  },
     { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"César Endris Acosta Martínez",      medalla:"bronce",       rank:171,  foto:"https://i.imgur.com/viCJItS.jpeg" },
-    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"Erik Jordan Valdés Abreu",          medalla:"bronce",       rank:217  },
+    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"Erik Jordan Valdés Abreu",          medalla:"bronce",       rank:217,  foto:"https://i.imgur.com/C2Gl4I3.jpeg" },
     { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Geiler Esteban López Corría",       medalla:"participante", rank:null },
     { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Dahysmer Hernández Ricardo",        medalla:"participante", rank:null },
     { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Ana Sabrina Salvador Pérez",        medalla:"participante", rank:null },
@@ -325,8 +325,8 @@ const datosIMChO = [
     { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Mario Luis Pérez Brito",           medalla:"participante", rank:null },
 ];
 
-// OIBQ — Olimpiada Iberoamericana de Química
-const datosOIBQ = [
+// OIAQ — Olimpiada Iberoamericana de Química
+const datosOIAQ = [
     { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Melissa María Reyes Pérez",          medalla:"bronce",       rank:null },
     { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Cynthia Maria Rodríguez Pérez",       medalla:"bronce",       rank:null },
     { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Pedro Alexis Rodríguez Ferrer",       medalla:"participante", rank:null },
@@ -386,9 +386,9 @@ const datosOCACQ = [
     { ed:10, año:2016, sede:"La Habana",            pais:"🇨🇺", nombre:"Eliosdanis González Machado",         medalla:"plata",        rank:null },
 ];
 
-const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oibq: datosOIBQ, ocacq: datosOCACQ };
-const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oibq: 'OIBQ', ocacq: 'OCACQ' };
-const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oibq: 'Fuente: OIBQ', ocacq: 'Fuente: OCACQ' };
+const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, ocacq: datosOCACQ };
+const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oiaq: 'Fuente: OIAQ', ocacq: 'Fuente: OCACQ' };
 
 // ════════════════════════════════════════════════════
 // ÍNDICE DE FOTOS: nombre → URL
@@ -472,7 +472,7 @@ function construirSitial() {
             if (!mapa[r.nombre].años.includes(r.año)) mapa[r.nombre].años.push(r.año);
         });
     });
-    const olimpiadaOrden = { IChO:0, IMChO:1, OIBQ:2, OCACQ:3 };
+    const olimpiadaOrden = { IChO:0, IMChO:1, OIAQ:2, OCACQ:3 };
     const nivelMedalla   = { oro:0, plata:1, bronce:2, mencion:3, participante:4 };
     function mejorRango(e) {
         return Math.min(...e.medallas
