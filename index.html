@@ -131,6 +131,37 @@
             .sort-controls { margin-left: 0; width: 100%; }
             .search-input { width: 100%; margin-left: 0; }
         }
+
+        /* FOOTER */
+        footer { background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px; font-size: 13px; }
+        footer a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+        footer a:hover { opacity: .75; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 14px; flex-wrap: wrap; }
+        .footer-links a { font-size: 13px; font-weight: 500; }
+        /* HONOR */
+        .honor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
+        .honor-card { background: var(--card-bg); border-radius: var(--radius); padding: 28px 22px 22px; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); display: flex; gap: 18px; align-items: flex-start; transition: transform .22s, box-shadow .22s; }
+        .honor-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(4,18,43,.14); }
+        .honor-avatar { width: 70px; height: 70px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid var(--gold); overflow: hidden; }
+        .honor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .honor-initials { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold-light); }
+        .honor-info h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+        .honor-role { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 6px; }
+        .honor-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        /* NOTICIAS */
+        .noticias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
+        .noticia-card { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); overflow: hidden; transition: transform .22s, box-shadow .22s; }
+        .noticia-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(4,18,43,.14); }
+        .noticia-placeholder { width: 100%; height: 160px; background: linear-gradient(135deg, var(--navy-mid), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 42px; }
+        .noticia-body { padding: 18px 20px 20px; }
+        .noticia-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 6px; }
+        .noticia-body h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; line-height: 1.4; }
+        .noticia-body p { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+        .noticia-fecha { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
+        .empty-section { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-section .empty-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-section h3 { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+        .empty-section p { font-size: 14px; }
     </style>
 </head>
 <body>
@@ -172,7 +203,9 @@
 </header>
 <nav>
     <button id="btn-sitial" class="activo" onclick="cambiarPestana('sitial')">🏅 Sitial de Talentos</button>
-    <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Búsqueda por Eventos</button>
+    <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Historial de Eventos</button>
+    <button id="btn-honor" onclick="cambiarPestana('honor')">🎓 Honor a quien Honor Merece</button>
+    <button id="btn-noticias" onclick="cambiarPestana('noticias')">📰 Noticias y Entrevistas</button>
 </nav>
 <div class="contenedor">
     <!-- SITIAL -->
@@ -226,6 +259,32 @@
                 <span id="tabla-count">— resultados</span>
                 <span id="tabla-fuente" style="font-size:11px;">Fuente: icho-official.org</span>
             </div>
+        </div>
+    </div>
+
+    <!-- HONOR -->
+    <div id="honor" class="seccion">
+        <h2 class="section-title">Honor a quien Honor Merece</h2>
+        <p class="section-sub">Entrenadores y profesores que han forjado la excelencia de la Preselección Nacional de Química de Cuba</p>
+        <div class="honor-grid" id="honor-grid">
+            <div class="honor-card">
+                <div class="honor-avatar"><span class="honor-initials">RA</span></div>
+                <div class="honor-info">
+                    <p class="honor-role">Entrenador Nacional</p>
+                    <h3>MSc. Rolando Alfonso Valdés</h3>
+                    <p class="honor-desc">IPVCE Ernesto Che Guevara, Villa Clara. Más de una década dedicada a la formación de campeones en olimpiadas regionales e internacionales.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- NOTICIAS -->
+    <div id="noticias" class="seccion">
+        <h2 class="section-title">Noticias y Entrevistas</h2>
+        <p class="section-sub">Historias, logros y voces de los concursantes cubanos en olimpiadas de química</p>
+        <div class="empty-section">
+            <div class="empty-icon">📰</div>
+            <h3>Próximamente</h3>
+            <p>Esta sección albergará noticias, crónicas y entrevistas con los concursantes.<br>¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
         </div>
     </div>
 </div>
@@ -598,5 +657,12 @@ document.addEventListener('DOMContentLoaded', () => {
     statsParaSitial();
 });
 </script>
+<footer>
+    <div class="footer-links">
+        <a href="mailto:tchoquimica@yahoo.com">✉️ Contacto</a>
+        <a href="#" onclick="cambiarPestana('noticias');return false;">📰 Noticias y Entrevistas</a>
+    </div>
+    <div>© Sitial de Talentos Química Cuba 2026</div>
+</footer>
 </body>
 </html>
