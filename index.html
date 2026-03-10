@@ -139,15 +139,23 @@
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 14px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
         /* HONOR */
-        .honor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
-        .honor-card { background: var(--card-bg); border-radius: var(--radius); padding: 28px 22px 22px; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); display: flex; gap: 18px; align-items: flex-start; transition: transform .22s, box-shadow .22s; }
-        .honor-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(4,18,43,.14); }
-        .honor-avatar { width: 70px; height: 70px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid var(--gold); overflow: hidden; }
+        .honor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .honor-card { background: var(--card-bg); border-radius: var(--radius); padding: 16px 16px 14px; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); display: flex; gap: 13px; align-items: flex-start; transition: transform .22s, box-shadow .22s; cursor: pointer; }
+        .honor-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(4,18,43,.14); }
+        .honor-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2.5px solid var(--gold); overflow: hidden; }
         .honor-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .honor-initials { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold-light); }
-        .honor-info h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-        .honor-role { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 6px; }
-        .honor-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .honor-initials { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--gold-light); }
+        .honor-info h3 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; line-height: 1.3; }
+        .honor-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 5px; }
+        .honor-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        /* MODAL FULL SCREEN */
+        #modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; overflow: hidden; }
+        #modal-topbar { background: var(--navy); display: flex; align-items: center; gap: 14px; padding: 14px 20px; flex-shrink: 0; }
+        #modal-back-btn { background: rgba(255,255,255,.12); border: none; border-radius: 8px; color: #fff; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background .2s; }
+        #modal-back-btn:hover { background: rgba(255,255,255,.22); }
+        #modal-topbar-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: rgba(255,255,255,.8); }
+        #modal-scroll { flex: 1; overflow-y: auto; }
+        #modal-body { max-width: 780px; margin: 0 auto; }
         /* NOTICIAS */
         .noticias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
         .noticia-card { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); overflow: hidden; transition: transform .22s, box-shadow .22s; }
@@ -277,10 +285,13 @@
             </div>
         </div>
 
-        <!-- MODAL ARTÍCULO -->
-        <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(4,18,43,.7);z-index:1000;overflow-y:auto;backdrop-filter:blur(4px);" onclick="cerrarArticulo(event)">
-            <div id="modal-content" style="max-width:780px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 80px rgba(4,18,43,.35);position:relative;" onclick="event.stopPropagation()">
-                <button onclick="cerrarArticulo()" style="position:absolute;top:18px;right:20px;background:rgba(255,255,255,.9);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:10;">✕</button>
+        <!-- MODAL ARTÍCULO FULL SCREEN -->
+        <div id="modal-overlay">
+            <div id="modal-topbar">
+                <button id="modal-back-btn" onclick="cerrarArticulo()">← Volver</button>
+                <span id="modal-topbar-title">Honor a quien Honor Merece</span>
+            </div>
+            <div id="modal-scroll">
                 <div id="modal-body"></div>
             </div>
         </div>
@@ -296,7 +307,8 @@
         </div>
     </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 // ════════════════════════════════════════════════════
 // ARTÍCULOS — HONOR A QUIEN HONOR MERECE
 // ════════════════════════════════════════════════════
@@ -306,12 +318,12 @@ const articulos = {
         rol: "Entrenador Nacional · Preselección Nacional de Química",
         foto: null,
         contenido: `
-            <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;">
+            <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
                 <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
                 <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.15;margin-bottom:8px;">Rolando Alfonso Valdés</h2>
                 <p style="font-size:13px;color:rgba(255,255,255,.6);font-weight:300;">MSc. · Entrenador Nacional · IPVCE Ernesto Che Guevara, Villa Clara</p>
             </div>
-            <div style="padding:36px 40px;font-family:'DM Sans',sans-serif;color:#1a1a2e;line-height:1.75;font-size:15px;">
+            <div style="padding:36px 40px;font-family:'DM Sans',sans-serif;color:#1a1a2e;line-height:1.75;font-size:15px;overflow-y:auto;flex:1;">
                 <p style="margin-bottom:16px;">Natural de Sagua la Grande, provincia de Villa Clara, el 11 de julio de 1950, empezó a trabajar en el sector de educación el 12 de enero de 1971, en la facultad obrero-campesina "Neftalí Martínez" de la referida localidad, después de concluir sus estudios de preuniversitario.</p>
                 <p style="margin-bottom:16px;">Matriculó el curso por encuentros para trabajadores del Instituto Superior Pedagógico "Félix Varela" en 1973 y culminó sus estudios universitarios en 1978. Obtuvo el grado de Máster en 2010. Es miembro de la Sociedad Cubana de Química.</p>
                 <p style="margin-bottom:16px;">En el curso 1980-1981 comenzó a laborar en el IPU "Miguel D. Pérez Pimentel" hasta 1985, cuando se trasladó al IPVCE "Jesús Menéndez Larrondo" (Yabú 4) hasta la disolución de este centro. En el curso 1991-1992 inició su fructífera labor en el IPVCE "Ernesto Guevara de la Serna", donde se encuentra trabajando todavía. Su faena como entrenador de estudiantes talentos para participar en las olimpiadas se inició en 1985 y ha sido una de las principales motivaciones de su carrera profesional.</p>
@@ -325,17 +337,17 @@ function abrirArticulo(id) {
     const art = articulos[id];
     if (!art) return;
     document.getElementById('modal-body').innerHTML = art.contenido;
-    document.getElementById('modal-overlay').style.display = 'block';
+    const overlay = document.getElementById('modal-overlay');
+    overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
-function cerrarArticulo(e) {
-    if (e && e.target !== document.getElementById('modal-overlay')) return;
+function cerrarArticulo() {
     document.getElementById('modal-overlay').style.display = 'none';
     document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('modal-overlay').style.display='none'; document.body.style.overflow=''; }});
 
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarArticulo(); });
 </script><script>
 // ════════════════════════════════════════════════════
 // BASE DE DATOS
