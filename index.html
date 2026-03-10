@@ -472,15 +472,21 @@ function construirSitial() {
             if (!mapa[r.nombre].años.includes(r.año)) mapa[r.nombre].años.push(r.año);
         });
     });
+    const olimpiadaOrden = { IChO:0, IMChO:1, OIBQ:2, OCACQ:3 };
+    const nivelMedalla   = { oro:0, plata:1, bronce:2, mencion:3, participante:4 };
+    function mejorRango(e) {
+        return Math.min(...e.medallas
+            .filter(m => m.tipo !== 'participante')
+            .map(m => (olimpiadaOrden[m.olimpiada] ?? 9) * 5 + (nivelMedalla[m.tipo] ?? 4))
+        );
+    }
     window._estudiantesTodos = Object.values(mapa)
         .filter(e => e.medallas.some(m => m.tipo !== 'participante'))
         .sort((a,b) => {
             const yA = Math.max(...a.años);
             const yB = Math.max(...b.años);
             if (yB !== yA) return yB - yA;
-            const mA = Math.min(...a.medallas.map(m=>medallaOrden[m.tipo]));
-            const mB = Math.min(...b.medallas.map(m=>medallaOrden[m.tipo]));
-            return mA - mB || b.medallas.length - a.medallas.length;
+            return mejorRango(a) - mejorRango(b);
         });
     renderizarSitial(window._estudiantesTodos);
 }
