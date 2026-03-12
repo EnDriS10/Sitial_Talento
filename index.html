@@ -904,6 +904,22 @@ function avatarHTML(nombre, mini = false) {
 }
 
 // ════ ESTADÍSTICAS ════
+function animarNumero(el, destino) {
+    const inicio = parseInt(el.textContent) || 0;
+    if (inicio === destino) return;
+    const dur = 280;
+    const pasos = 14;
+    const intervalo = dur / pasos;
+    let paso = 0;
+    const timer = setInterval(() => {
+        paso++;
+        const progreso = paso / pasos;
+        const ease = 1 - Math.pow(1 - progreso, 3);
+        el.textContent = Math.round(inicio + (destino - inicio) * ease);
+        if (paso >= pasos) { el.textContent = destino; clearInterval(timer); }
+    }, intervalo);
+}
+
 function calcularStats(datos, contexto) {
     const t = { total:datos.length, oro:0, plata:0, bronce:0, mencion:0 };
     datos.forEach(r => {
@@ -913,7 +929,7 @@ function calcularStats(datos, contexto) {
         if (r.medalla==='mencion') t.mencion++;
     });
     ['total','oro','plata','bronce','mencion'].forEach(k =>
-        document.getElementById('stat-'+k).textContent = t[k]
+        animarNumero(document.getElementById('stat-'+k), t[k])
     );
     document.getElementById('stats-context').textContent = contexto;
 }
