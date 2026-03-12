@@ -129,15 +129,7 @@
             transform: scale(1.05);
             box-shadow: 0 10px 30px rgba(201,162,39,.45);
         }
-        #tarjeta-modal-avatar-wrap.tiene-foto::after {
-            content: '🔍';
-            position: absolute; bottom: 6px; right: 6px;
-            background: rgba(255,255,255,.95);
-            border-radius: 50%; width: 26px; height: 26px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,.15);
-            pointer-events: none;
-        }
+
         #tarjeta-modal-avatar-wrap img {
             width: 100%; height: 100%; object-fit: cover;
         }
@@ -198,6 +190,43 @@
             padding: 8px 20px; border-radius: 20px;
             font-size: 14px; font-weight: 500;
             white-space: nowrap; backdrop-filter: blur(4px);
+        }
+
+        /* ── TOOLTIP MEDALLA EN MODAL ── */
+        .chip-tooltip-wrap {
+            position: relative; display: inline-flex;
+        }
+        .chip-tooltip-wrap .medalla-chip {
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .chip-tooltip-wrap .medalla-chip:hover,
+        .chip-tooltip-wrap .medalla-chip:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(4,18,43,.15);
+        }
+        .chip-popup {
+            display: none;
+            position: absolute; bottom: calc(100% + 10px); left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy); color: #fff;
+            border-radius: 10px; padding: 10px 14px;
+            font-size: 12px; line-height: 1.55; white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(4,18,43,.35);
+            z-index: 10; pointer-events: none;
+            animation: tooltipPop .18s cubic-bezier(.34,1.56,.64,1);
+        }
+        .chip-popup::after {
+            content: '';
+            position: absolute; top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--navy);
+        }
+        .chip-tooltip-wrap.activo .chip-popup { display: block; }
+        @keyframes tooltipPop {
+            from { opacity: 0; transform: translateX(-50%) scale(.85) translateY(4px); }
+            to   { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
         }
 
         /* FILTROS */
@@ -1084,13 +1113,43 @@ function abrirTarjetaModal(nombre) {
     document.getElementById('tarjeta-modal-subtitulo').textContent =
         `${añoRange}  ·  ${olimpiadasUnicas}`;
 
-    document.getElementById('tarjeta-modal-chips').innerHTML = sinP.map(m =>
-        `<span class="medalla-chip chip-${m.tipo}">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>`
-    ).join('');
+    // Buscar sede y país para cada medalla
+    const todasFilas = Object.values(todasLasOlimpiadas).flat();
+    document.getElementById('tarjeta-modal-chips').innerHTML = sinP.map((m, i) => {
+        const fila = todasFilas.find(r =>
+            r.nombre === nombre &&
+            nombreOlimpiada[Object.keys(todasLasOlimpiadas).find(k => nombreOlimpiada[k] === m.olimpiada)] === m.olimpiada &&
+            r.año === m.año && r.medalla === m.tipo
+        );
+        const sede  = fila ? fila.sede  : '—';
+        const pais  = fila ? fila.pais  : '';
+        const popupId = `chip-popup-${i}`;
+        return `<span class="chip-tooltip-wrap" id="wrap-${popupId}" onclick="toggleChipPopup('wrap-${popupId}', event)">
+            <span class="medalla-chip chip-${m.tipo}" tabindex="0">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>
+            <span class="chip-popup" id="${popupId}">
+                <strong>${m.olimpiada} ${m.año}</strong><br>
+                ${pais} ${sede}
+            </span>
+        </span>`;
+    }).join('');
 
     document.getElementById('tarjeta-modal-overlay').classList.add('abierto');
     document.body.style.overflow = 'hidden';
 }
+
+function toggleChipPopup(wrapId, e) {
+    e.stopPropagation();
+    const wrap = document.getElementById(wrapId);
+    const yaActivo = wrap.classList.contains('activo');
+    // cerrar todos
+    document.querySelectorAll('.chip-tooltip-wrap.activo').forEach(w => w.classList.remove('activo'));
+    if (!yaActivo) wrap.classList.add('activo');
+}
+
+// Cerrar popups al tocar fuera
+document.addEventListener('click', () => {
+    document.querySelectorAll('.chip-tooltip-wrap.activo').forEach(w => w.classList.remove('activo'));
+});
 
 function cerrarTarjetaModal(e, forzar) {
     if (!forzar && e && e.target !== document.getElementById('tarjeta-modal-overlay')) return;
