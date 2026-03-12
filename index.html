@@ -37,9 +37,10 @@
         .flag-stripe { display: flex; justify-content: center; gap: 6px; margin-bottom: 22px; }
         .flag-stripe span { display: block; height: 4px; border-radius: 4px; }
         .flag-stripe span:nth-child(1) { width: 70px; background: #002a8f; }
-        .flag-stripe span:nth-child(2) { width: 70px; background: #cc0001; }
-        .flag-stripe span:nth-child(3) { width: 70px; background: #002a8f; }
-        .flag-stripe span:nth-child(4) { width: 40px; background: #ffffff; }
+        .flag-stripe span:nth-child(2) { width: 70px; background: #ffffff; }
+        .flag-stripe span:nth-child(3) { width: 70px; background: #cc0001; }
+        .flag-stripe span:nth-child(4) { width: 70px; background: #ffffff; }
+        .flag-stripe span:nth-child(5) { width: 70px; background: #002a8f; }
         header h1 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 44px); font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -0.5px; }
         header h1 span { color: var(--gold-light); }
         header p { margin-top: 12px; font-size: 15px; color: rgba(255,255,255,.65); font-weight: 300; }
@@ -385,7 +386,7 @@
 <header>
     <div class="header-inner">
         <div class="flag-stripe">
-            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
         </div>
         <h1>Talentos Cubanos en<br><span>Olimpiadas de Química</span></h1>
         <p>Reconociendo la excelencia de estudiantes cubanos en competencias internacionales</p>
@@ -420,7 +421,7 @@
 </header>
 <nav>
     <button id="btn-sitial" class="activo" onclick="cambiarPestana('sitial')">🏅 Sitial de Talentos</button>
-    <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Historial de Eventos</button>
+    <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Historial por Eventos</button>
     <button id="btn-honor" onclick="cambiarPestana('honor')">🎓 Honor a quien Honor Merece</button>
     <button id="btn-noticias" onclick="cambiarPestana('noticias')">📰 Noticias y Entrevistas</button>
 </nav>
@@ -1075,7 +1076,7 @@ function cambiarPestana(p) {
     document.querySelectorAll('nav button').forEach(b=>b.classList.remove('activo'));
     document.getElementById(p).classList.add('activa');
     document.getElementById('btn-'+p).classList.add('activo');
-    if (p==='sitial') statsParaSitial();
+    if (p==='sitial' || p==='honor' || p==='noticias') statsParaSitial();
     else if (p==='eventos') statsParaEvento();
 }
 
