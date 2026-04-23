@@ -23,33 +23,263 @@
             --text-muted: #5a6a8a;
             --border: #dde3f0;
             --radius: 14px;
+            /* Cuban flag */
+            --cu-blue:  #002a8f;
+            --cu-white: #f2f2f2;
+            --cu-red:   #cc0001;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-        /* HEADER */
-        header { background: var(--navy); position: relative; overflow: hidden; padding: 60px 24px 50px; text-align: center; }
-        header::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(201,162,39,.13) 0%, transparent 70%),
-                        radial-gradient(ellipse 50% 70% at 80% 40%, rgba(26,111,181,.18) 0%, transparent 70%);
+
+        /* ═══════════════════════════════════════════
+           HEADER
+        ═══════════════════════════════════════════ */
+        header {
+            background: var(--navy);
+            position: relative;
+            overflow: hidden;
+            padding: 52px 24px 48px;
+            text-align: center;
         }
-        .header-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-        .flag-stripe { display: flex; justify-content: center; gap: 6px; margin-bottom: 22px; }
-        .flag-stripe span { display: block; height: 4px; border-radius: 4px; }
-        .flag-stripe span:nth-child(1) { width: 70px; background: #002a8f; }
-        .flag-stripe span:nth-child(2) { width: 70px; background: #ffffff; }
-        .flag-stripe span:nth-child(3) { width: 70px; background: #cc0001; }
-        .flag-stripe span:nth-child(4) { width: 70px; background: #ffffff; }
-        .flag-stripe span:nth-child(5) { width: 70px; background: #002a8f; }
-        header h1 { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 44px); font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -0.5px; }
-        header h1 span { color: var(--gold-light); }
-        header p { margin-top: 12px; font-size: 15px; color: rgba(255,255,255,.65); font-weight: 300; }
-        .stats-bar { display: flex; justify-content: center; gap: 28px; margin-top: 32px; flex-wrap: wrap; align-items: center; }
+        /* Subtle radial glows */
+        header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 55% 75% at 15% 50%,  rgba(0,42,143,.22)  0%, transparent 65%),
+                radial-gradient(ellipse 45% 65% at 85% 40%,  rgba(204,0,1,.16)   0%, transparent 65%),
+                radial-gradient(ellipse 60% 50% at 50% 100%, rgba(201,162,39,.10) 0%, transparent 70%);
+        }
+        /* Fine grid texture */
+        header::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+        }
+        .header-inner {
+            position: relative; z-index: 1;
+            max-width: 960px; margin: 0 auto;
+        }
+
+        /* ── FLAG STRIPE ── */
+        .flag-stripe {
+            display: flex; justify-content: center;
+            gap: 0; margin-bottom: 28px;
+            border-radius: 3px; overflow: hidden;
+            width: 200px; margin-left: auto; margin-right: auto;
+            height: 5px;
+        }
+        .flag-stripe span { display: block; flex: 1; }
+        .flag-stripe span:nth-child(1) { background: var(--cu-blue); }
+        .flag-stripe span:nth-child(2) { background: var(--cu-white); }
+        .flag-stripe span:nth-child(3) { background: var(--cu-red); }
+        .flag-stripe span:nth-child(4) { background: var(--cu-white); }
+        .flag-stripe span:nth-child(5) { background: var(--cu-blue); }
+
+        /* ── PERIODIC TITLE ── */
+        .periodic-eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,.4);
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+        .periodic-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .periodic-word {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ── ELEMENT CARD ── */
+        .el {
+            position: relative;
+            width: 68px; height: 76px;
+            border-radius: 7px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 6px 6px;
+            cursor: default;
+            transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .el::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(160deg, rgba(255,255,255,.18) 0%, transparent 60%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .el:hover {
+            transform: translateY(-5px) scale(1.07);
+            z-index: 2;
+        }
+
+        /* Blue card */
+        .el-blue {
+            background: linear-gradient(145deg, #0038b8, #002080);
+            border: 1.5px solid rgba(100,140,255,.5);
+            box-shadow: 0 6px 20px rgba(0,40,143,.55), inset 0 1px 0 rgba(255,255,255,.12);
+        }
+        .el-blue:hover {
+            box-shadow: 0 14px 32px rgba(0,40,143,.7), 0 0 0 2px rgba(100,150,255,.4), inset 0 1px 0 rgba(255,255,255,.2);
+        }
+        /* Red card */
+        .el-red {
+            background: linear-gradient(145deg, #d40001, #940000);
+            border: 1.5px solid rgba(255,100,100,.4);
+            box-shadow: 0 6px 20px rgba(160,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12);
+        }
+        .el-red:hover {
+            box-shadow: 0 14px 32px rgba(160,0,0,.7), 0 0 0 2px rgba(255,100,100,.4), inset 0 1px 0 rgba(255,255,255,.2);
+        }
+        /* White card */
+        .el-white {
+            background: linear-gradient(145deg, #ffffff, #dde4f0);
+            border: 1.5px solid rgba(180,200,240,.8);
+            box-shadow: 0 6px 20px rgba(0,20,80,.3), inset 0 1px 0 rgba(255,255,255,.9);
+        }
+        .el-white:hover {
+            box-shadow: 0 14px 32px rgba(0,20,80,.4), 0 0 0 2px rgba(150,180,240,.6), inset 0 1px 0 rgba(255,255,255,.9);
+        }
+
+        .el-num {
+            position: absolute;
+            top: 5px; left: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 1;
+            opacity: .8;
+        }
+        .el-symbol {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -1px;
+            margin-top: 4px;
+        }
+        .el-name {
+            font-size: 7.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-top: 2px;
+            opacity: .7;
+            white-space: nowrap;
+        }
+        .el-mass {
+            font-size: 8px;
+            font-weight: 400;
+            opacity: .6;
+            margin-top: 1px;
+        }
+
+        /* color variants for text */
+        .el-blue .el-num,
+        .el-blue .el-symbol,
+        .el-blue .el-name,
+        .el-blue .el-mass { color: #fff; }
+
+        .el-red .el-num,
+        .el-red .el-symbol,
+        .el-red .el-name,
+        .el-red .el-mass  { color: #fff; }
+
+        .el-white .el-num,
+        .el-white .el-name,
+        .el-white .el-mass { color: var(--cu-blue); }
+        .el-white .el-symbol { color: var(--cu-blue); }
+
+        /* "DE" separator */
+        .el-de {
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255,255,255,.25);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            padding: 0 4px;
+            align-self: center;
+            flex-shrink: 0;
+        }
+
+        /* subtitle under title */
+        .periodic-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,.5);
+            font-weight: 300;
+            letter-spacing: .5px;
+            margin-bottom: 0;
+        }
+        .periodic-subtitle strong { color: rgba(255,255,255,.8); font-weight: 500; }
+
+        /* ── STATS ── */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            margin-top: 36px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
         .stat { text-align: center; }
-        .stat-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--gold-light); }
-        .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.5); margin-top: 2px; }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px; font-weight: 700;
+            color: var(--gold-light);
+        }
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgba(255,255,255,.5);
+            margin-top: 2px;
+        }
         .stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,.15); }
-        .stats-context { width: 100%; font-size: 11px; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+        .stats-context {
+            width: 100%;
+            font-size: 11px;
+            color: rgba(255,255,255,.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 660px) {
+            header { padding: 36px 14px 36px; }
+            .el { width: 52px; height: 58px; }
+            .el-symbol { font-size: 24px; }
+            .el-num { font-size: 7.5px; top: 4px; left: 4px; }
+            .el-name { font-size: 6px; }
+            .el-mass { font-size: 6.5px; }
+            .periodic-word { gap: 5px; }
+            .el-de { font-size: 10px; letter-spacing: 2px; }
+            .periodic-eyebrow { font-size: 9px; letter-spacing: 2px; }
+            .periodic-subtitle { font-size: 12px; }
+            .stats-bar { gap: 12px; margin-top: 24px; }
+            .stat-num { font-size: 22px; }
+            .stat-label { font-size: 10px; }
+            .stat-divider { display: none; }
+        }
+
         /* NAV */
         nav { background: var(--navy-mid); display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.07); }
         nav button { background: none; border: none; cursor: pointer; color: rgba(255,255,255,.6); padding: 16px 28px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; position: relative; transition: color .2s; }
@@ -57,6 +287,7 @@
         nav button:hover { color: #fff; }
         nav button.activo { color: #fff; }
         nav button.activo::after { left: 16px; right: 16px; }
+
         /* LAYOUT */
         .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
         .seccion { display: none; }
@@ -64,6 +295,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
         .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
         .section-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+
         /* CARDS */
         .cuadricula-sitial { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
         .tarjeta { background: var(--card-bg); border-radius: var(--radius); padding: 28px 20px 22px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); transition: transform .22s, box-shadow .22s; position: relative; cursor: pointer; }
@@ -83,152 +315,41 @@
         .chip-participante{ background: #f4f4f4; color: #888;    border: 1.5px solid #ccc; }
         .tarjeta-top { position: absolute; top: 12px; right: 12px; font-size: 18px; }
 
-        /* ── TARJETA MODAL EXPANDIDO ── */
-        #tarjeta-modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(4,18,43,.65); z-index: 500;
-            align-items: center; justify-content: center;
-            padding: 20px; backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
+        /* TARJETA MODAL */
+        #tarjeta-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(4,18,43,.65); z-index: 500; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
         #tarjeta-modal-overlay.abierto { display: flex; animation: fadeIn .25s ease; }
-        #tarjeta-modal-card {
-            background: var(--card-bg); border-radius: 22px;
-            max-width: 420px; width: 100%; padding: 40px 28px 32px;
-            text-align: center; position: relative;
-            box-shadow: 0 28px 70px rgba(4,18,43,.35);
-            animation: cardPop .28s cubic-bezier(.34,1.56,.64,1);
-        }
-        @keyframes cardPop {
-            from { opacity: 0; transform: scale(.88) translateY(16px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        #tarjeta-modal-close {
-            position: absolute; top: 14px; right: 14px;
-            background: var(--bg); border: none; border-radius: 50%;
-            width: 34px; height: 34px; cursor: pointer; font-size: 16px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); transition: background .2s, transform .15s;
-            line-height: 1;
-        }
+        #tarjeta-modal-card { background: var(--card-bg); border-radius: 22px; max-width: 420px; width: 100%; padding: 40px 28px 32px; text-align: center; position: relative; box-shadow: 0 28px 70px rgba(4,18,43,.35); animation: cardPop .28s cubic-bezier(.34,1.56,.64,1); }
+        @keyframes cardPop { from { opacity: 0; transform: scale(.88) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        #tarjeta-modal-close { position: absolute; top: 14px; right: 14px; background: var(--bg); border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background .2s, transform .15s; line-height: 1; }
         #tarjeta-modal-close:hover { background: var(--border); transform: scale(1.1); }
+        #tarjeta-modal-avatar-wrap { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 20px; overflow: hidden; border: 4px solid var(--gold); background: #e8ecf5; display: flex; align-items: center; justify-content: center; position: relative; transition: transform .22s, box-shadow .22s; }
+        #tarjeta-modal-avatar-wrap.tiene-foto { cursor: zoom-in; }
+        #tarjeta-modal-avatar-wrap.tiene-foto:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(201,162,39,.45); }
+        #tarjeta-modal-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-avatar-initials-big { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--navy-light); }
+        #tarjeta-modal-nombre { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 5px; line-height: 1.2; }
+        #tarjeta-modal-subtitulo { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .tarjeta-modal-divider { width: 44px; height: 3px; background: var(--gold); border-radius: 2px; margin: 0 auto 20px; }
+        #tarjeta-modal-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        #tarjeta-modal-chips .medalla-chip { font-size: 12px; padding: 7px 13px; }
 
-        /* Avatar modal — clickeable para zoom */
-        #tarjeta-modal-avatar-wrap {
-            width: 130px; height: 130px; border-radius: 50%;
-            margin: 0 auto 20px; overflow: hidden;
-            border: 4px solid var(--gold);
-            background: #e8ecf5;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            transition: transform .22s, box-shadow .22s;
-        }
-        #tarjeta-modal-avatar-wrap.tiene-foto {
-            cursor: zoom-in;
-        }
-        #tarjeta-modal-avatar-wrap.tiene-foto:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(201,162,39,.45);
-        }
-
-        #tarjeta-modal-avatar-wrap img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .modal-avatar-initials-big {
-            font-family: 'Playfair Display', serif;
-            font-size: 42px; font-weight: 700; color: var(--navy-light);
-        }
-        #tarjeta-modal-nombre {
-            font-family: 'Playfair Display', serif;
-            font-size: 21px; font-weight: 700; color: var(--navy);
-            margin-bottom: 5px; line-height: 1.2;
-        }
-        #tarjeta-modal-subtitulo {
-            font-size: 13px; color: var(--text-muted); margin-bottom: 20px;
-        }
-        .tarjeta-modal-divider {
-            width: 44px; height: 3px; background: var(--gold);
-            border-radius: 2px; margin: 0 auto 20px;
-        }
-        #tarjeta-modal-chips {
-            display: flex; flex-wrap: wrap;
-            justify-content: center; gap: 8px;
-        }
-        #tarjeta-modal-chips .medalla-chip {
-            font-size: 12px; padding: 7px 13px;
-        }
-
-        /* ── FOTO ZOOM FULLSCREEN ── */
-        #foto-zoom-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,.93); z-index: 900;
-            align-items: center; justify-content: center;
-            cursor: zoom-out;
-        }
+        /* FOTO ZOOM */
+        #foto-zoom-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.93); z-index: 900; align-items: center; justify-content: center; cursor: zoom-out; }
         #foto-zoom-overlay.abierto { display: flex; animation: fadeIn .2s ease; }
-        #foto-zoom-img {
-            max-width: 88vw; max-height: 86vh;
-            border-radius: 16px; object-fit: contain;
-            box-shadow: 0 0 80px rgba(0,0,0,.7);
-            animation: zoomIn .22s cubic-bezier(.34,1.36,.64,1);
-        }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(.82); }
-            to   { opacity: 1; transform: scale(1); }
-        }
-        #foto-zoom-close {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,.12); border: none;
-            color: #fff; border-radius: 50%; width: 42px; height: 42px;
-            font-size: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background .2s; z-index: 1;
-        }
+        #foto-zoom-img { max-width: 88vw; max-height: 86vh; border-radius: 16px; object-fit: contain; box-shadow: 0 0 80px rgba(0,0,0,.7); animation: zoomIn .22s cubic-bezier(.34,1.36,.64,1); }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(.82); } to { opacity: 1; transform: scale(1); } }
+        #foto-zoom-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,.12); border: none; color: #fff; border-radius: 50%; width: 42px; height: 42px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; z-index: 1; }
         #foto-zoom-close:hover { background: rgba(255,255,255,.25); }
-        #foto-zoom-nombre {
-            position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,.55); color: #fff;
-            padding: 8px 20px; border-radius: 20px;
-            font-size: 14px; font-weight: 500;
-            white-space: nowrap; backdrop-filter: blur(4px);
-        }
+        #foto-zoom-nombre { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.55); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; white-space: nowrap; backdrop-filter: blur(4px); }
 
-        /* ── TOOLTIP MEDALLA EN MODAL ── */
-        .chip-tooltip-wrap {
-            position: relative; display: inline-flex;
-        }
-        .chip-tooltip-wrap .medalla-chip {
-            cursor: pointer;
-            transition: transform .15s, box-shadow .15s;
-        }
-        .chip-tooltip-wrap .medalla-chip:hover,
-        .chip-tooltip-wrap .medalla-chip:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(4,18,43,.15);
-        }
-        .chip-popup {
-            display: none;
-            position: absolute; bottom: calc(100% + 10px); left: 50%;
-            transform: translateX(-50%);
-            background: var(--navy); color: #fff;
-            border-radius: 10px; padding: 10px 14px;
-            font-size: 12px; line-height: 1.55; white-space: nowrap;
-            box-shadow: 0 8px 24px rgba(4,18,43,.35);
-            z-index: 10; pointer-events: none;
-            animation: tooltipPop .18s cubic-bezier(.34,1.56,.64,1);
-        }
-        .chip-popup::after {
-            content: '';
-            position: absolute; top: 100%; left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: var(--navy);
-        }
+        /* TOOLTIP */
+        .chip-tooltip-wrap { position: relative; display: inline-flex; }
+        .chip-tooltip-wrap .medalla-chip { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+        .chip-tooltip-wrap .medalla-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(4,18,43,.15); }
+        .chip-popup { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.55; white-space: nowrap; box-shadow: 0 8px 24px rgba(4,18,43,.35); z-index: 10; pointer-events: none; animation: tooltipPop .18s cubic-bezier(.34,1.56,.64,1); }
+        .chip-popup::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--navy); }
         .chip-tooltip-wrap.activo .chip-popup { display: block; }
-        @keyframes tooltipPop {
-            from { opacity: 0; transform: translateX(-50%) scale(.85) translateY(4px); }
-            to   { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
-        }
+        @keyframes tooltipPop { from { opacity: 0; transform: translateX(-50%) scale(.85) translateY(4px); } to { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); } }
 
         /* FILTROS */
         .filtros-sitial { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
@@ -237,6 +358,7 @@
         .filtro-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
         .search-input { margin-left: auto; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; width: 200px; transition: border-color .2s; }
         .search-input:focus { border-color: var(--accent); }
+
         /* TABLA */
         .controles-evento { display: flex; gap: 14px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
         .controles-evento label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
@@ -270,26 +392,19 @@
         .sede-flag { font-size: 18px; margin-right: 6px; }
         .no-results { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 15px; }
         .tabla-footer { padding: 12px 18px; background: var(--bg); border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-        /* Tabla avatar mini */
         .tabla-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8ecf5; border: 2px solid var(--border); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 10px; flex-shrink: 0; }
         .tabla-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .tabla-avatar-initials { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; color: var(--navy-light); }
         .estudiante-cell { display: flex; align-items: center; }
-        /* VER MÁS BUTTON */
+
+        /* VER MÁS */
         .ver-mas-wrap { text-align: center; margin-top: 28px; }
         .ver-mas-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 32px; background: var(--navy); color: #fff; border: none; border-radius: 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s, transform .15s; }
         .ver-mas-btn:hover { background: var(--navy-light); transform: translateY(-2px); }
         .ver-mas-count { background: rgba(255,255,255,.18); border-radius: 12px; padding: 2px 8px; font-size: 12px; }
 
-        /* ── MOBILE ── */
+        /* MOBILE GENERAL */
         @media (max-width: 640px) {
-            header { padding: 36px 16px 32px; }
-            header h1 { font-size: 22px; }
-            header p { font-size: 13px; }
-            .stats-bar { gap: 10px; }
-            .stat-num { font-size: 22px; }
-            .stat-label { font-size: 10px; }
-            .stat-divider { display: none; }
             nav { justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
             nav::-webkit-scrollbar { display: none; }
             nav button { padding: 14px 16px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
@@ -315,8 +430,7 @@
             .tabla-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             table { min-width: 440px; }
             th, td { padding: 10px 10px; font-size: 12px; }
-            th:nth-child(2), td:nth-child(2),
-            th:nth-child(5), td:nth-child(5) { display: none; }
+            th:nth-child(2), td:nth-child(2), th:nth-child(5), td:nth-child(5) { display: none; }
             .tabla-avatar { width: 26px; height: 26px; margin-right: 7px; }
             .tabla-avatar-initials { font-size: 10px; }
             .badge { font-size: 11px; padding: 4px 8px; }
@@ -334,7 +448,6 @@
             #modal-body > div { padding: 20px 18px !important; font-size: 14px !important; }
             #modal-body img { float: none !important; display: block !important; margin: 0 auto 18px auto !important; width: 110px !important; height: 110px !important; }
             #modal-body h2 { font-size: 22px !important; }
-            /* Modal card mobile */
             #tarjeta-modal-card { padding: 32px 20px 26px; }
             #tarjeta-modal-avatar-wrap { width: 110px; height: 110px; }
             .modal-avatar-initials-big { font-size: 34px; }
@@ -348,6 +461,7 @@
         footer a:hover { opacity: .75; }
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 14px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
+
         /* HONOR */
         .honor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
         .honor-card { background: var(--card-bg); border-radius: var(--radius); padding: 16px 16px 14px; border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); display: flex; gap: 13px; align-items: flex-start; transition: transform .22s, box-shadow .22s; cursor: pointer; }
@@ -358,6 +472,7 @@
         .honor-info h3 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; line-height: 1.3; }
         .honor-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 5px; }
         .honor-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
         /* MODAL FULL SCREEN */
         #modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; overflow: hidden; }
         #modal-topbar { background: var(--navy); display: flex; align-items: center; gap: 14px; padding: 14px 20px; flex-shrink: 0; }
@@ -366,16 +481,8 @@
         #modal-topbar-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: rgba(255,255,255,.8); }
         #modal-scroll { flex: 1; overflow-y: auto; }
         #modal-body { max-width: 780px; margin: 0 auto; }
+
         /* NOTICIAS */
-        .noticias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
-        .noticia-card { background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 2px 16px rgba(4,18,43,.07); overflow: hidden; transition: transform .22s, box-shadow .22s; }
-        .noticia-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(4,18,43,.14); }
-        .noticia-placeholder { width: 100%; height: 160px; background: linear-gradient(135deg, var(--navy-mid), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 42px; }
-        .noticia-body { padding: 18px 20px 20px; }
-        .noticia-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 6px; }
-        .noticia-body h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 8px; line-height: 1.4; }
-        .noticia-body p { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
-        .noticia-fecha { font-size: 11px; color: var(--text-muted); margin-top: 10px; }
         .empty-section { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .empty-section .empty-icon { font-size: 48px; margin-bottom: 16px; }
         .empty-section h3 { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
@@ -383,13 +490,97 @@
     </style>
 </head>
 <body>
+
 <header>
     <div class="header-inner">
+
+        <!-- Bandera cubana decorativa -->
         <div class="flag-stripe">
             <span></span><span></span><span></span><span></span><span></span>
         </div>
-        <h1>Talentos Cubanos en<br><span>Olimpiadas de Química</span></h1>
-        <p>Reconociendo la excelencia de estudiantes cubanos en competencias internacionales</p>
+
+        <p class="periodic-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+
+        <!-- ═══ TÍTULO CON ELEMENTOS DE LA TABLA PERIÓDICA ═══ -->
+        <div class="periodic-title">
+
+            <!-- Palabra: SITIAL  →  Si · Ti · Al -->
+            <div class="periodic-word">
+                <!-- Si — Silicio, Z=14 -->
+                <div class="el el-blue" title="Silicio · 14">
+                    <span class="el-num">14</span>
+                    <span class="el-symbol">Si</span>
+                    <span class="el-name">Silicio</span>
+                    <span class="el-mass">28.085</span>
+                </div>
+                <!-- Ti — Titanio, Z=22 -->
+                <div class="el el-white" title="Titanio · 22">
+                    <span class="el-num">22</span>
+                    <span class="el-symbol">Ti</span>
+                    <span class="el-name">Titanio</span>
+                    <span class="el-mass">47.867</span>
+                </div>
+                <!-- Al — Aluminio, Z=13 -->
+                <div class="el el-red" title="Aluminio · 13">
+                    <span class="el-num">13</span>
+                    <span class="el-symbol">Al</span>
+                    <span class="el-name">Aluminio</span>
+                    <span class="el-mass">26.982</span>
+                </div>
+
+                <span class="el-de">de</span>
+
+                <!-- Ta — Tantalo, Z=73 -->
+                <div class="el el-blue" title="Tantalo · 73">
+                    <span class="el-num">73</span>
+                    <span class="el-symbol">Ta</span>
+                    <span class="el-name">Tantalo</span>
+                    <span class="el-mass">180.95</span>
+                </div>
+                <!-- La — Lantano, Z=57 -->
+                <div class="el el-white" title="Lantano · 57">
+                    <span class="el-num">57</span>
+                    <span class="el-symbol">La</span>
+                    <span class="el-name">Lantano</span>
+                    <span class="el-mass">138.91</span>
+                </div>
+                <!-- N — Nitrógeno, Z=7 -->
+                <div class="el el-red" title="Nitrógeno · 7">
+                    <span class="el-num">7</span>
+                    <span class="el-symbol">N</span>
+                    <span class="el-name">Nitrógeno</span>
+                    <span class="el-mass">14.007</span>
+                </div>
+                <!-- Th — Torio, Z=90 -->
+                <div class="el el-blue" title="Torio · 90">
+                    <span class="el-num">90</span>
+                    <span class="el-symbol">Th</span>
+                    <span class="el-name">Torio</span>
+                    <span class="el-mass">232.04</span>
+                </div>
+                <!-- O — Oxígeno, Z=8 -->
+                <div class="el el-white" title="Oxígeno · 8">
+                    <span class="el-num">8</span>
+                    <span class="el-symbol">O</span>
+                    <span class="el-name">Oxígeno</span>
+                    <span class="el-mass">15.999</span>
+                </div>
+                <!-- S — Azufre, Z=16 -->
+                <div class="el el-red" title="Azufre · 16">
+                    <span class="el-num">16</span>
+                    <span class="el-symbol">S</span>
+                    <span class="el-name">Azufre</span>
+                    <span class="el-mass">32.065</span>
+                </div>
+            </div>
+
+        </div><!-- /periodic-title -->
+
+        <p class="periodic-subtitle">
+            Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>
+        </p>
+
+        <!-- Stats -->
         <div class="stats-bar">
             <div class="stat">
                 <div class="stat-num" id="stat-total">—</div>
@@ -417,14 +608,17 @@
             </div>
             <div class="stats-context" id="stats-context">Totales en todas las olimpiadas</div>
         </div>
+
     </div>
 </header>
+
 <nav>
     <button id="btn-sitial" class="activo" onclick="cambiarPestana('sitial')">🏅 Sitial de Talentos</button>
     <button id="btn-eventos" onclick="cambiarPestana('eventos')">🔍 Historial por Eventos</button>
     <button id="btn-honor" onclick="cambiarPestana('honor')">🎓 Honor a quien Honor Merece</button>
     <button id="btn-noticias" onclick="cambiarPestana('noticias')">📰 Noticias y Entrevistas</button>
 </nav>
+
 <div class="contenedor">
     <!-- SITIAL -->
     <div id="sitial" class="seccion activa">
@@ -441,6 +635,7 @@
         <div class="cuadricula-sitial" id="cuadricula-sitial"></div>
         <div class="ver-mas-wrap" id="ver-mas-wrap"></div>
     </div>
+
     <!-- EVENTOS -->
     <div id="eventos" class="seccion">
         <h2 class="section-title">Resultados por Evento</h2>
@@ -547,6 +742,7 @@
             </div>
         </div>
     </div>
+
     <!-- NOTICIAS -->
     <div id="noticias" class="seccion">
         <h2 class="section-title">Noticias y Entrevistas</h2>
@@ -559,7 +755,7 @@
     </div>
 </div>
 
-<!-- ════ TARJETA EXPANDIDA MODAL ════ -->
+<!-- TARJETA MODAL -->
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
         <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
@@ -571,7 +767,7 @@
     </div>
 </div>
 
-<!-- ════ FOTO ZOOM FULLSCREEN ════ -->
+<!-- FOTO ZOOM -->
 <div id="foto-zoom-overlay" onclick="cerrarFotoZoom()">
     <button id="foto-zoom-close" onclick="cerrarFotoZoom()" aria-label="Cerrar">✕</button>
     <img id="foto-zoom-img" src="" alt="">
@@ -590,7 +786,7 @@
 
 <script>
 // ════════════════════════════════════════════════════
-// ARTÍCULOS — HONOR A QUIEN HONOR MERECE
+// ARTÍCULOS
 // ════════════════════════════════════════════════════
 const articulos = {
     rolando: {
@@ -717,7 +913,6 @@ function abrirArticulo(id) {
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
-
 function cerrarArticulo() {
     document.getElementById('modal-overlay').style.display = 'none';
     document.body.style.overflow = '';
@@ -803,9 +998,9 @@ const datosIChO = [
 const datosIMChO = [
     { ed:60, año:2026, sede:"Moscú",          pais:"🇷🇺", nombre:"Ernesto Alejandro Barrera Ramírez", medalla:"bronce",       rank:80 },
     { ed:60, año:2026, sede:"Moscú",          pais:"🇷🇺", nombre:"Leticia María Merlo Alfonso",       medalla:"bronce",       rank:73 },
-    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Juan Carlos Yepe Muñiz",            medalla:"plata",        rank:49 ,  foto:"https://i.imgur.com/wKFCREW.png" },
-    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Roy Roger González",                medalla:"bronce",       rank:92 ,  foto:"https://i.imgur.com/TH8Tpzh.png" },
-    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Marco Antonio Asin López",          medalla:"bronce",       rank:98  ,  foto:"https://i.imgur.com/MN9ydDc.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Juan Carlos Yepe Muñiz",            medalla:"plata",        rank:49,  foto:"https://i.imgur.com/wKFCREW.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Roy Roger González",                medalla:"bronce",       rank:92,  foto:"https://i.imgur.com/TH8Tpzh.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Marco Antonio Asin López",          medalla:"bronce",       rank:98,  foto:"https://i.imgur.com/MN9ydDc.png" },
     { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Ernesto Alejandro Barrera Ramírez", medalla:"bronce",       rank:113 },
     { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Héctor Manuel Domínguez Pérez",     medalla:"participante", rank:null },
     { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Mario Luis Pérez Brito",            medalla:"participante", rank:null },
@@ -842,17 +1037,17 @@ const datosOIAQ = [
 ];
 
 const datosOCACQ = [
-    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Alejandro Murad Alcina Salazar",  medalla:"oro",    rank:null ,  foto:"https://i.imgur.com/r1nKRLO.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Alejandro Murad Alcina Salazar",  medalla:"oro",    rank:null, foto:"https://i.imgur.com/r1nKRLO.png" },
     { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Jennifer García González",         medalla:"plata",  rank:null },
-    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Carlos Manuel Hernández Machín",   medalla:"plata",  rank:null ,  foto:"https://i.imgur.com/VmT7du4.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Carlos Manuel Hernández Machín",   medalla:"plata",  rank:null, foto:"https://i.imgur.com/VmT7du4.png" },
     { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Brayan Tejeda Marrero",            medalla:"bronce", rank:null },
     { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Osmani Lázaro Hernández Fiallo",   medalla:"oro",    rank:null },
     { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Melissa María Reyes Pérez",        medalla:"oro",    rank:null },
     { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Bárbaro Eriel Rodríguez Gil",      medalla:"plata",  rank:null },
     { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Pedro Alexis Rodríguez Ferrer",    medalla:"plata",  rank:null },
-    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Diego Armando Martínez Ramírez",   medalla:"oro",    rank:null ,  foto:"https://i.imgur.com/fnAWp0b.png" },
-    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Royman Ramos Pérez",               medalla:"oro",    rank:null ,  foto:"https://i.imgur.com/a35Z8PJ.png" },
-    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Daniel Alejandro González Guzmán", medalla:"oro",    rank:null ,  foto:"https://i.imgur.com/kmf4O27.png" },
+    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Diego Armando Martínez Ramírez",   medalla:"oro",    rank:null, foto:"https://i.imgur.com/fnAWp0b.png" },
+    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Royman Ramos Pérez",               medalla:"oro",    rank:null, foto:"https://i.imgur.com/a35Z8PJ.png" },
+    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Daniel Alejandro González Guzmán", medalla:"oro",    rank:null, foto:"https://i.imgur.com/kmf4O27.png" },
     { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Erik Jordan Valdés Abreu",         medalla:"plata",  rank:null },
     { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Royman Ramos Pérez",               medalla:"plata",  rank:null },
     { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Diego Armando Martínez Ramírez",   medalla:"plata",  rank:null },
@@ -874,18 +1069,15 @@ const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ
 const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
 const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oiaq: 'Fuente: OIAQ', ocacq: 'Fuente: OCACQ' };
 
-// ════ ÍNDICE DE FOTOS ════
 const fotosPorNombre = {};
 Object.values(todasLasOlimpiadas).flat().forEach(r => {
     if (r.foto && !fotosPorNombre[r.nombre]) fotosPorNombre[r.nombre] = r.foto;
 });
 
-// ════ ESTADO ════
 let ordenActual    = { campo: 'año', dir: -1 };
 let filtroSitial   = 'todos';
 let busquedaSitial = '';
 
-// ════ UTILIDADES ════
 const medallaOrden = { oro:1, plata:2, bronce:3, mencion:4, participante:5 };
 const medallaLabel = { oro:'Medalla de Oro', plata:'Medalla de Plata', bronce:'Medalla de Bronce', mencion:'Mención Honorífica', participante:'Participante' };
 const medallaEmoji = { oro:'🥇', plata:'🥈', bronce:'🥉', mencion:'🎖', participante:'—' };
@@ -894,10 +1086,9 @@ function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').
 function avatarHTML(nombre, mini = false) {
     const foto = fotosPorNombre[nombre];
     if (mini) {
-        return `<span class="tabla-avatar">${
-            foto
-              ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(nombre)}</span>'">`
-              : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
+        return `<span class="tabla-avatar">${foto
+            ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(nombre)}</span>'">`
+            : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
         }</span>`;
     }
     return foto
@@ -905,18 +1096,14 @@ function avatarHTML(nombre, mini = false) {
         : `<span class="avatar-initials">${getIniciales(nombre)}</span>`;
 }
 
-// ════ ESTADÍSTICAS ════
 function animarNumero(el, destino) {
     const inicio = parseInt(el.textContent) || 0;
     if (inicio === destino) return;
-    const dur = 280;
-    const pasos = 14;
-    const intervalo = dur / pasos;
+    const dur = 280, pasos = 14, intervalo = dur / pasos;
     let paso = 0;
     const timer = setInterval(() => {
         paso++;
-        const progreso = paso / pasos;
-        const ease = 1 - Math.pow(1 - progreso, 3);
+        const ease = 1 - Math.pow(1 - paso / pasos, 3);
         el.textContent = Math.round(inicio + (destino - inicio) * ease);
         if (paso >= pasos) { el.textContent = destino; clearInterval(timer); }
     }, intervalo);
@@ -943,7 +1130,6 @@ function statsParaEvento() {
     calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
 }
 
-// ════ SITIAL ════
 function construirSitial() {
     const mapa = {};
     Object.entries(todasLasOlimpiadas).forEach(([key, arr]) => {
@@ -959,14 +1145,12 @@ function construirSitial() {
     function mejorRango(e) {
         return Math.min(...e.medallas
             .filter(m => m.tipo !== 'participante')
-            .map(m => (olimpiadaOrden[m.olimpiada] ?? 9) * 5 + (nivelMedalla[m.tipo] ?? 4))
-        );
+            .map(m => (olimpiadaOrden[m.olimpiada] ?? 9) * 5 + (nivelMedalla[m.tipo] ?? 4)));
     }
     window._estudiantesTodos = Object.values(mapa)
         .filter(e => e.medallas.some(m => m.tipo !== 'participante'))
         .sort((a,b) => {
-            const yA = Math.max(...a.años);
-            const yB = Math.max(...b.años);
+            const yA = Math.max(...a.años), yB = Math.max(...b.años);
             if (yB !== yA) return yB - yA;
             return mejorRango(a) - mejorRango(b);
         });
@@ -987,7 +1171,6 @@ function tarjetaHTML(est) {
     const añoRange = est.años.length>1
         ? `${Math.min(...est.años)} – ${Math.max(...est.años)}`
         : `${est.años[0]}`;
-    // Escapar comillas simples en el nombre para uso en onclick
     const nombreEsc = est.nombre.replace(/'/g, "\\'");
     return `
     <div class="tarjeta" data-nombre="${est.nombre}" data-mejor="${mejor.tipo}" onclick="abrirTarjetaModal('${nombreEsc}')">
@@ -1018,10 +1201,7 @@ function renderizarSitial(lista) {
     }
 }
 
-function verMasSitial() {
-    sitialPagina++;
-    renderizarSitial(_listaActual);
-}
+function verMasSitial() { sitialPagina++; renderizarSitial(_listaActual); }
 
 function filtrarSitial(filtro, btn) {
     filtroSitial = filtro;
@@ -1042,7 +1222,6 @@ function aplicarFiltros() {
     renderizarSitial(lista);
 }
 
-// ════ TABLA EVENTOS ════
 function cargarTabla() {
     const ol    = document.getElementById('selector-olimpiada').value;
     const datos = todasLasOlimpiadas[ol] || [];
@@ -1088,7 +1267,6 @@ function renderizarTabla(datos) {
     countEl.textContent = `${datos.length} resultado${datos.length!==1?'s':''}`;
 }
 
-// ════ NAVEGACIÓN ════
 function cambiarPestana(p) {
     document.querySelectorAll('.seccion').forEach(s=>s.classList.remove('activa'));
     document.querySelectorAll('nav button').forEach(b=>b.classList.remove('activo'));
@@ -1098,22 +1276,17 @@ function cambiarPestana(p) {
     else if (p==='eventos') statsParaEvento();
 }
 
-// ════════════════════════════════════════════════════
-// TARJETA MODAL EXPANDIDO
-// ════════════════════════════════════════════════════
+// ════ MODAL TARJETA ════
 let _tarjetaModalActual = null;
 
 function abrirTarjetaModal(nombre) {
     const est = (window._estudiantesTodos || []).find(e => e.nombre === nombre);
     if (!est) return;
     _tarjetaModalActual = est;
-
     const foto = fotosPorNombre[nombre];
     const avEl = document.getElementById('tarjeta-modal-avatar-wrap');
-
     if (foto) {
-        avEl.innerHTML = `<img src="${foto}" alt="${nombre}"
-            onerror="this.parentElement.innerHTML='<span class=\\'modal-avatar-initials-big\\'>${getIniciales(nombre)}</span>';this.parentElement.classList.remove('tiene-foto');">`;
+        avEl.innerHTML = `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\'modal-avatar-initials-big\\'>${getIniciales(nombre)}</span>';this.parentElement.classList.remove('tiene-foto');">`;
         avEl.classList.add('tiene-foto');
         avEl.title = 'Ampliar foto';
     } else {
@@ -1121,18 +1294,11 @@ function abrirTarjetaModal(nombre) {
         avEl.classList.remove('tiene-foto');
         avEl.title = '';
     }
-
     document.getElementById('tarjeta-modal-nombre').textContent = nombre;
-
-    const añoRange = est.años.length > 1
-        ? `${Math.min(...est.años)} – ${Math.max(...est.años)}`
-        : `${est.años[0]}`;
+    const añoRange = est.años.length > 1 ? `${Math.min(...est.años)} – ${Math.max(...est.años)}` : `${est.años[0]}`;
     const sinP = est.medallas.filter(m => m.tipo !== 'participante');
     const olimpiadasUnicas = [...new Set(sinP.map(m => m.olimpiada))].join(', ');
-    document.getElementById('tarjeta-modal-subtitulo').textContent =
-        `${añoRange}  ·  ${olimpiadasUnicas}`;
-
-    // Buscar sede y país para cada medalla
+    document.getElementById('tarjeta-modal-subtitulo').textContent = `${añoRange}  ·  ${olimpiadasUnicas}`;
     const todasFilas = Object.values(todasLasOlimpiadas).flat();
     document.getElementById('tarjeta-modal-chips').innerHTML = sinP.map((m, i) => {
         const fila = todasFilas.find(r =>
@@ -1151,7 +1317,6 @@ function abrirTarjetaModal(nombre) {
             </span>
         </span>`;
     }).join('');
-
     document.getElementById('tarjeta-modal-overlay').classList.add('abierto');
     document.body.style.overflow = 'hidden';
 }
@@ -1160,12 +1325,9 @@ function toggleChipPopup(wrapId, e) {
     e.stopPropagation();
     const wrap = document.getElementById(wrapId);
     const yaActivo = wrap.classList.contains('activo');
-    // cerrar todos
     document.querySelectorAll('.chip-tooltip-wrap.activo').forEach(w => w.classList.remove('activo'));
     if (!yaActivo) wrap.classList.add('activo');
 }
-
-// Cerrar popups al tocar fuera
 document.addEventListener('click', () => {
     document.querySelectorAll('.chip-tooltip-wrap.activo').forEach(w => w.classList.remove('activo'));
 });
@@ -1177,9 +1339,7 @@ function cerrarTarjetaModal(e, forzar) {
     _tarjetaModalActual = null;
 }
 
-// ════════════════════════════════════════════════════
-// FOTO ZOOM FULLSCREEN
-// ════════════════════════════════════════════════════
+// ════ FOTO ZOOM ════
 function abrirFotoZoom() {
     if (!_tarjetaModalActual) return;
     const foto = fotosPorNombre[_tarjetaModalActual.nombre];
@@ -1189,12 +1349,10 @@ function abrirFotoZoom() {
     document.getElementById('foto-zoom-nombre').textContent = _tarjetaModalActual.nombre;
     document.getElementById('foto-zoom-overlay').classList.add('abierto');
 }
-
 function cerrarFotoZoom() {
     document.getElementById('foto-zoom-overlay').classList.remove('abierto');
 }
 
-// ════ TECLADO ════
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         if (document.getElementById('foto-zoom-overlay').classList.contains('abierto')) {
@@ -1207,7 +1365,6 @@ document.addEventListener('keydown', e => {
     }
 });
 
-// ════ INIT ════
 document.addEventListener('DOMContentLoaded', () => {
     construirSitial();
     cargarTabla();
