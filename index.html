@@ -103,6 +103,10 @@
             gap: 8px;
             flex-wrap: wrap;
         }
+        .periodic-word-group {
+            display: flex;
+            gap: 8px;
+        }
 
         /* ── ELEMENT CARD ── */
         .el {
@@ -271,6 +275,7 @@
             .el-name { font-size: 6px; }
             .el-mass { font-size: 6.5px; }
             .periodic-word { gap: 5px; }
+            .periodic-word-group { gap: 5px; }
             .el-de { font-size: 10px; letter-spacing: 2px; }
             .periodic-eyebrow { font-size: 9px; letter-spacing: 2px; }
             .periodic-subtitle { font-size: 12px; }
@@ -494,93 +499,82 @@
 <header>
     <div class="header-inner">
 
-        <!-- Bandera cubana decorativa -->
         <div class="flag-stripe">
             <span></span><span></span><span></span><span></span><span></span>
         </div>
 
         <p class="periodic-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
 
-        <!-- ═══ TÍTULO CON ELEMENTOS DE LA TABLA PERIÓDICA ═══ -->
         <div class="periodic-title">
 
-            <!-- Palabra: SITIAL  →  Si · Ti · Al -->
             <div class="periodic-word">
-                <!-- Si — Silicio, Z=14 -->
-                <div class="el el-blue" title="Silicio · 14">
-                    <span class="el-num">14</span>
-                    <span class="el-symbol">Si</span>
-                    <span class="el-name">Silicio</span>
-                    <span class="el-mass">28.085</span>
-                </div>
-                <!-- Ti — Titanio, Z=22 -->
-                <div class="el el-white" title="Titanio · 22">
-                    <span class="el-num">22</span>
-                    <span class="el-symbol">Ti</span>
-                    <span class="el-name">Titanio</span>
-                    <span class="el-mass">47.867</span>
-                </div>
-                <!-- Al — Aluminio, Z=13 -->
-                <div class="el el-red" title="Aluminio · 13">
-                    <span class="el-num">13</span>
-                    <span class="el-symbol">Al</span>
-                    <span class="el-name">Aluminio</span>
-                    <span class="el-mass">26.982</span>
+                <div class="periodic-word-group">
+                    <div class="el el-blue" title="Silicio · 14">
+                        <span class="el-num">14</span>
+                        <span class="el-symbol">Si</span>
+                        <span class="el-name">Silicio</span>
+                        <span class="el-mass">28.085</span>
+                    </div>
+                    <div class="el el-white" title="Titanio · 22">
+                        <span class="el-num">22</span>
+                        <span class="el-symbol">Ti</span>
+                        <span class="el-name">Titanio</span>
+                        <span class="el-mass">47.867</span>
+                    </div>
+                    <div class="el el-red" title="Aluminio · 13">
+                        <span class="el-num">13</span>
+                        <span class="el-symbol">Al</span>
+                        <span class="el-name">Aluminio</span>
+                        <span class="el-mass">26.982</span>
+                    </div>
                 </div>
 
                 <span class="el-de">de</span>
 
-                <!-- Ta — Tantalo, Z=73 -->
-                <div class="el el-blue" title="Tantalo · 73">
-                    <span class="el-num">73</span>
-                    <span class="el-symbol">Ta</span>
-                    <span class="el-name">Tantalo</span>
-                    <span class="el-mass">180.95</span>
-                </div>
-                <!-- La — Lantano, Z=57 -->
-                <div class="el el-white" title="Lantano · 57">
-                    <span class="el-num">57</span>
-                    <span class="el-symbol">La</span>
-                    <span class="el-name">Lantano</span>
-                    <span class="el-mass">138.91</span>
-                </div>
-                <!-- N — Nitrógeno, Z=7 -->
-                <div class="el el-red" title="Nitrógeno · 7">
-                    <span class="el-num">7</span>
-                    <span class="el-symbol">N</span>
-                    <span class="el-name">Nitrógeno</span>
-                    <span class="el-mass">14.007</span>
-                </div>
-                <!-- Th — Torio, Z=90 -->
-                <div class="el el-blue" title="Torio · 90">
-                    <span class="el-num">90</span>
-                    <span class="el-symbol">Th</span>
-                    <span class="el-name">Torio</span>
-                    <span class="el-mass">232.04</span>
-                </div>
-                <!-- O — Oxígeno, Z=8 -->
-                <div class="el el-white" title="Oxígeno · 8">
-                    <span class="el-num">8</span>
-                    <span class="el-symbol">O</span>
-                    <span class="el-name">Oxígeno</span>
-                    <span class="el-mass">15.999</span>
-                </div>
-                <!-- S — Azufre, Z=16 -->
-                <div class="el el-red" title="Azufre · 16">
-                    <span class="el-num">16</span>
-                    <span class="el-symbol">S</span>
-                    <span class="el-name">Azufre</span>
-                    <span class="el-mass">32.065</span>
+                <div class="periodic-word-group">
+                    <div class="el el-blue" title="Tantalo · 73">
+                        <span class="el-num">73</span>
+                        <span class="el-symbol">Ta</span>
+                        <span class="el-name">Tantalo</span>
+                        <span class="el-mass">180.95</span>
+                    </div>
+                    <div class="el el-white" title="Lantano · 57">
+                        <span class="el-num">57</span>
+                        <span class="el-symbol">La</span>
+                        <span class="el-name">Lantano</span>
+                        <span class="el-mass">138.91</span>
+                    </div>
+                    <div class="el el-red" title="Nitrógeno · 7">
+                        <span class="el-num">7</span>
+                        <span class="el-symbol">N</span>
+                        <span class="el-name">Nitrógeno</span>
+                        <span class="el-mass">14.007</span>
+                    </div>
+                    <div class="el el-blue" title="Torio · 90">
+                        <span class="el-num">90</span>
+                        <span class="el-symbol">Th</span>
+                        <span class="el-name">Torio</span>
+                        <span class="el-mass">232.04</span>
+                    </div>
+                    <div class="el el-white" title="Oxígeno · 8">
+                        <span class="el-num">8</span>
+                        <span class="el-symbol">O</span>
+                        <span class="el-name">Oxígeno</span>
+                        <span class="el-mass">15.999</span>
+                    </div>
+                    <div class="el el-red" title="Azufre · 16">
+                        <span class="el-num">16</span>
+                        <span class="el-symbol">S</span>
+                        <span class="el-name">Azufre</span>
+                        <span class="el-mass">32.065</span>
+                    </div>
                 </div>
             </div>
 
-        </div><!-- /periodic-title -->
-
-        <p class="periodic-subtitle">
+        </div><p class="periodic-subtitle">
             Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>
         </p>
 
-        <!-- Stats -->
         <div class="stats-bar">
             <div class="stat">
                 <div class="stat-num" id="stat-total">—</div>
@@ -620,7 +614,6 @@
 </nav>
 
 <div class="contenedor">
-    <!-- SITIAL -->
     <div id="sitial" class="seccion activa">
         <h2 class="section-title">Sitial de Honor</h2>
         <p class="section-sub">Estudiantes cubanos y sus logros históricos en olimpiadas de química</p>
@@ -636,7 +629,6 @@
         <div class="ver-mas-wrap" id="ver-mas-wrap"></div>
     </div>
 
-    <!-- EVENTOS -->
     <div id="eventos" class="seccion">
         <h2 class="section-title">Resultados por Evento</h2>
         <p class="section-sub">Historial completo de participaciones y medallas por olimpiada</p>
@@ -676,7 +668,6 @@
         </div>
     </div>
 
-    <!-- HONOR -->
     <div id="honor" class="seccion">
         <h2 class="section-title">Honor a quien Honor Merece</h2>
         <p class="section-sub">Entrenadores y profesores que han forjado la excelencia de la Preselección Nacional de Química de Cuba</p>
@@ -731,7 +722,6 @@
             </div>
         </div>
 
-        <!-- MODAL ARTÍCULO FULL SCREEN -->
         <div id="modal-overlay">
             <div id="modal-topbar">
                 <button id="modal-back-btn" onclick="cerrarArticulo()">← Volver</button>
@@ -743,7 +733,6 @@
         </div>
     </div>
 
-    <!-- NOTICIAS -->
     <div id="noticias" class="seccion">
         <h2 class="section-title">Noticias y Entrevistas</h2>
         <p class="section-sub">Historias, logros y voces de los concursantes cubanos en olimpiadas de química</p>
@@ -755,7 +744,6 @@
     </div>
 </div>
 
-<!-- TARJETA MODAL -->
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
         <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
@@ -767,7 +755,6 @@
     </div>
 </div>
 
-<!-- FOTO ZOOM -->
 <div id="foto-zoom-overlay" onclick="cerrarFotoZoom()">
     <button id="foto-zoom-close" onclick="cerrarFotoZoom()" aria-label="Cerrar">✕</button>
     <img id="foto-zoom-img" src="" alt="">
