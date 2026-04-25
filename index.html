@@ -1073,7 +1073,8 @@ function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').
 function avatarHTML(nombre, mini = false) {
     const foto = fotosPorNombre[nombre];
     if (mini) {
-        return `<span class="tabla-avatar">${foto
+        const nombreEsc = nombre.replace(/'/g, "\\'");
+        return `<span class="tabla-avatar" style="cursor:pointer;" onclick="abrirTarjetaModal('${nombreEsc}')">${foto
             ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(nombre)}</span>'">`
             : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
         }</span>`;
