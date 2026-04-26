@@ -732,10 +732,10 @@
         /* ── FILTRO AÑOS NOTICIAS ── */
         #filtro-años-wrapper {
             display: none; align-items: center;
-            gap: 10px; margin-bottom: 24px;
-            padding: 12px 16px; background: white;
+            gap: 10px;
+            padding: 8px 14px; background: white;
             border-radius: var(--radius); border: 1px solid var(--border);
-            flex-wrap: wrap;
+            width: fit-content;
         }
         .filtro-años-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; }
         .filtro-año-btn {
@@ -781,15 +781,20 @@
         /* ═══════════════════════════════════════════
            IChO COUNTDOWN
         ═══════════════════════════════════════════ */
+        .icho-countdown-outer {
+            display: flex;
+            justify-content: center;
+            margin-top: 36px;
+        }
         .icho-countdown-wrap {
             background: linear-gradient(135deg, #f8f9ff 0%, #fff8f0 100%);
             border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 22px 24px 20px;
-            margin-bottom: 36px;
-            box-shadow: 0 4px 20px rgba(4,18,43,.07);
+            border-radius: 20px;
+            padding: 26px 32px 24px;
+            box-shadow: 0 6px 28px rgba(4,18,43,.09);
             position: relative;
             overflow: hidden;
+            display: inline-block;
         }
         .icho-countdown-wrap::before {
             content: '';
@@ -798,11 +803,11 @@
         }
         .icho-cd-header {
             display: flex; align-items: baseline; gap: 10px;
-            justify-content: center; margin-bottom: 16px; flex-wrap: wrap;
+            justify-content: center; margin-bottom: 20px; flex-wrap: wrap;
         }
         .icho-cd-title {
             font-family: 'Playfair Display', serif;
-            font-size: 20px; font-weight: 900;
+            font-size: 24px; font-weight: 900;
             background: linear-gradient(90deg, #3b6ef0 0%, #22c065 40%, #f77b24 70%, #9b59d6 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -812,52 +817,51 @@
         }
         .icho-cd-location strong { color: var(--accent); font-weight: 600; }
         .icho-cd-cards {
-            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
         }
         .icho-cd-card {
             background: white;
-            border-radius: 12px;
-            padding: 10px 14px 10px;
-            min-width: 72px;
+            border-radius: 14px;
+            padding: 14px 18px 12px;
+            min-width: 86px;
             text-align: center;
             border: 1px solid var(--border);
-            box-shadow: 0 2px 10px rgba(4,18,43,.06);
-            position: relative;
+            box-shadow: 0 2px 12px rgba(4,18,43,.07);
         }
         .icho-cd-formula {
             display: block;
-            font-size: 9px; font-weight: 600;
+            font-size: 10px; font-weight: 600;
             color: var(--text-muted); letter-spacing: .3px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .icho-cd-num {
             display: block;
             font-family: 'Playfair Display', serif;
-            font-size: 28px; font-weight: 700;
-            line-height: 1; margin-bottom: 4px;
+            font-size: 38px; font-weight: 700;
+            line-height: 1; margin-bottom: 6px;
         }
         .icho-cd-unit {
             display: block;
             font-size: 9px; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase;
+            letter-spacing: 1.2px; text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .icho-cd-bar {
             height: 3px; border-radius: 2px; margin: 0 auto;
-            width: 70%;
+            width: 60%;
         }
         .icho-cd-num.c-blue   { color: #3b6ef0; }
         .icho-cd-num.c-green  { color: #22c065; }
         .icho-cd-num.c-orange { color: #f77b24; }
         .icho-cd-num.c-purple { color: #9b59d6; }
         .icho-cd-finished {
-            text-align: center; padding: 12px 0 8px;
-            font-size: 14px; color: var(--text-muted);
+            text-align: center; padding: 14px 0 10px;
+            font-size: 15px; color: var(--text-muted);
         }
         @media (max-width: 500px) {
-            .icho-cd-card { min-width: 60px; padding: 8px 10px; }
-            .icho-cd-num  { font-size: 22px; }
+            .icho-cd-card { min-width: 68px; padding: 10px 12px; }
+            .icho-cd-num  { font-size: 28px; }
         }
     </style>
 </head>
@@ -982,10 +986,6 @@
 
 <div id="menu-overlay" onclick="cerrarMenu()"></div>
 <div id="menu-panel">
-    <div class="menu-header">
-        <div class="menu-logo">Talentos Cubanos<br>en Olimpiadas de Química</div>
-        <div class="menu-logo-sub">Cuba · IChO · IMChO · OIAQ · OCACQ</div>
-    </div>
     <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span>Inicio</span></button>
     <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Sitial de Talentos</span></button>
     <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span>Historial por Eventos</span></button>
@@ -1000,7 +1000,31 @@
             <p>Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
         </div>
 
+        <div class="inicio-grid">
+            <div class="inicio-card" onclick="cambiarSeccion('sitial')">
+                <span class="inicio-card-icon">🏅</span>
+                <h3>Sitial de Talentos</h3>
+                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
+            </div>
+            <div class="inicio-card" onclick="cambiarSeccion('eventos')">
+                <span class="inicio-card-icon">🔍</span>
+                <h3>Historial por Eventos</h3>
+                <p>Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
+            </div>
+            <div class="inicio-card" onclick="cambiarSeccion('honor')">
+                <span class="inicio-card-icon">🎓</span>
+                <h3>Honor a quien Honor Merece</h3>
+                <p>Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
+            </div>
+            <div class="inicio-card" onclick="cambiarSeccion('noticias')">
+                <span class="inicio-card-icon">📰</span>
+                <h3>Noticias y Entrevistas</h3>
+                <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
+            </div>
+        </div>
+
         <!-- IChO Countdown Banner -->
+        <div class="icho-countdown-outer">
         <div class="icho-countdown-wrap" id="icho-countdown-wrap">
             <div class="icho-cd-header">
                 <span class="icho-cd-title" id="icho-cd-title">IChO 2026</span>
@@ -1033,28 +1057,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="inicio-grid">
-            <div class="inicio-card" onclick="cambiarSeccion('sitial')">
-                <span class="inicio-card-icon">🏅</span>
-                <h3>Sitial de Talentos</h3>
-                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
-            </div>
-            <div class="inicio-card" onclick="cambiarSeccion('eventos')">
-                <span class="inicio-card-icon">🔍</span>
-                <h3>Historial por Eventos</h3>
-                <p>Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
-            </div>
-            <div class="inicio-card" onclick="cambiarSeccion('honor')">
-                <span class="inicio-card-icon">🎓</span>
-                <h3>Honor a quien Honor Merece</h3>
-                <p>Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
-            </div>
-            <div class="inicio-card" onclick="cambiarSeccion('noticias')">
-                <span class="inicio-card-icon">📰</span>
-                <h3>Noticias y Entrevistas</h3>
-                <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
-            </div>
         </div>
     </div>
 
@@ -1179,9 +1181,10 @@
 
     <div id="noticias" class="seccion">
         <article id="noticias-inner" class="seccion-contenido">
-            <h2 class="titulo-seccion">Noticias y Entrevistas</h2>
-
-            <div id="filtro-años-wrapper"></div>
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px; flex-wrap:wrap;">
+                <h2 class="titulo-seccion" style="margin-bottom:0;">Noticias y Entrevistas</h2>
+                <div id="filtro-años-wrapper"></div>
+            </div>
 
             <div id="seccion-articulos">
                 <h3 class="subtitulo-seccion">Prensa y Crónicas</h3>
@@ -1197,7 +1200,7 @@
 
             <div class="proximamente" style="margin-top:60px; border-top: 1px solid var(--border); padding-top: 40px;">
                 <div class="empty-icon">📰</div>
-                <p>Esta sección albergará noticias, crónicas y entrevistas con los concursantes.</p>
+                <p>Pronto más noticias, crónicas y entrevistas con los concursantes.</p>
                 <p>¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
             </div>
         </article>
@@ -2101,7 +2104,6 @@ async function inicializarNoticias() {
 //════════════════════════════
 //════ Contador de IChO ══════
 //════════════════════════════
-// Modifica aquí la fecha, ciudad y año de la próxima IChO:
 const ICHO_FECHA  = new Date('2026-07-10T00:00:00');   // ← Fecha de inicio (año-mes-día)
 const ICHO_CIUDAD = 'Tashkent';                         // ← Ciudad sede
 const ICHO_AÑO    = 2026;                               // ← Año del evento
