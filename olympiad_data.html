@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!--
+    ══════════════════════════════════════════════════════════════
+    DATOS DE OLIMPIADAS DE QUÍMICA — CUBA
+    ══════════════════════════════════════════════════════════════
+    Este archivo contiene la base de datos de participaciones
+    cubanas en olimpiadas internacionales de química.
+
+    Para añadir o modificar entradas:
+      · ed      → número de edición de la olimpiada
+      · año     → año de celebración
+      · sede    → ciudad sede
+      · pais    → emoji de bandera del país sede
+      · nombre  → nombre completo del participante
+      · medalla → "oro" | "plata" | "bronce" | "mencion" | "participante"
+      · rank    → posición numérica, o null si no aplica
+      · foto    → URL de imagen (opcional, omitir si no existe)
+
+    ══════════════════════════════════════════════════════════════
+-->
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="olympiad-data">
+// ════════════════════════════════════════════════════
+// IChO — Olimpiada Internacional de Química
+// ════════════════════════════════════════════════════
+const datosIChO = [
+    { ed:57, año:2025, sede:"Dubái",            pais:"🇦🇪", nombre:"Juan Carlos Yepe Muñiz",            medalla:"plata",        rank:111  },
+    { ed:57, año:2025, sede:"Dubái",            pais:"🇦🇪", nombre:"Leticia María Merlo Alfonso",       medalla:"bronce",       rank:186  },
+    { ed:57, año:2025, sede:"Dubái",            pais:"🇦🇪", nombre:"Bárbaro Eriel Rodríguez Gil",       medalla:"bronce",       rank:210,  foto:"https://i.imgur.com/OkSdhzZ.png"  },
+    { ed:57, año:2025, sede:"Dubái",            pais:"🇦🇪", nombre:"Osmani Lázaro Hernández Fiallo",    medalla:"participante", rank:null,  foto:"https://i.imgur.com/GEXpJTK.png"  },
+    { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Héctor Manuel Domínguez Pérez",     medalla:"bronce",       rank:124,  foto:"https://i.imgur.com/AsW4kw3.png" },
+    { ed:56, año:2024, sede:"Riad",             pais:"🇸🇦", nombre:"Mario Luis Pérez Brito",            medalla:"mencion",      rank:213,  foto:"https://i.imgur.com/SbIVid2.png" },
+    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"César Endris Acosta Martínez",      medalla:"bronce",       rank:171,  foto:"https://i.imgur.com/pDUJxyy.png" },
+    { ed:55, año:2023, sede:"Zúrich",           pais:"🇨🇭", nombre:"Erik Jordan Valdés Abreu",          medalla:"bronce",       rank:217,  foto:"https://i.imgur.com/C2Gl4I3.jpeg" },
+    { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Geiler Esteban López Corría",       medalla:"participante", rank:null },
+    { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Dahysmer Hernández Ricardo",        medalla:"participante", rank:null },
+    { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Ana Sabrina Salvador Pérez",        medalla:"participante", rank:null },
+    { ed:54, año:2022, sede:"Tianjín (Online)", pais:"🇨🇳", nombre:"Brenda María Zayas Hernández",      medalla:"participante", rank:null },
+    { ed:51, año:2019, sede:"París",            pais:"🇫🇷", nombre:"Samuel Báez Lao",                   medalla:"participante", rank:null },
+    { ed:51, año:2019, sede:"París",            pais:"🇫🇷", nombre:"Rey Michel Rodríguez Navarro",      medalla:"participante", rank:null },
+    { ed:49, año:2017, sede:"Nakhon Pathom",    pais:"🇹🇭", nombre:"José Rafael Rodríguez Rodríguez",   medalla:"bronce",       rank:163,  foto:"https://i.imgur.com/5VqdK3n.png" },
+    { ed:47, año:2015, sede:"Bakú",             pais:"🇦🇿", nombre:"Juan Pablo Figueroa Macías",        medalla:"mencion",      rank:191  },
+    { ed:46, año:2014, sede:"Hanói",            pais:"🇻🇳", nombre:"Alejandro Alexéi Vistorte Salgado", medalla:"mencion",      rank:188  },
+    { ed:43, año:2011, sede:"Ankara",           pais:"🇹🇷", nombre:"Reinaldo Román Martín Pardo",       medalla:"bronce",       rank:142  },
+    { ed:42, año:2010, sede:"Tokio",            pais:"🇯🇵", nombre:"Ramón Lorenzo Panadés Barrueta",    medalla:"participante", rank:null },
+    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Hernández Hiram Borbolla",          medalla:"bronce",       rank:132  },
+    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Infante Ernesto Aguilar",           medalla:"bronce",       rank:162  },
+    { ed:40, año:2008, sede:"Budapest",         pais:"🇭🇺", nombre:"Gerardo Ojeda Carralero",           medalla:"plata",        rank:40   },
+    { ed:40, año:2008, sede:"Budapest",         pais:"🇭🇺", nombre:"Yanira Mendez Gómez",               medalla:"bronce",       rank:134  },
+    { ed:39, año:2007, sede:"Moscú",            pais:"🇷🇺", nombre:"Manuel Garcia Ricardo",             medalla:"bronce",       rank:150  },
+    { ed:38, año:2006, sede:"Gyeongsan",        pais:"🇰🇷", nombre:"Juan José Del Campo Lopez",         medalla:"bronce",       rank:158  },
+    { ed:38, año:2006, sede:"Gyeongsan",        pais:"🇰🇷", nombre:"Williams Ernesto Miranda Delgado",  medalla:"mencion",      rank:174  },
+    { ed:37, año:2005, sede:"Taipei",           pais:"🇹🇼", nombre:"Luis Daniel Cruz Zaragoza",         medalla:"oro",          rank:26   },
+    { ed:36, año:2004, sede:"Kiel",             pais:"🇩🇪", nombre:"Enrique Méndez Vega",               medalla:"participante", rank:null },
+    { ed:35, año:2003, sede:"Atenas",           pais:"🇬🇷", nombre:"Kenny Bravo Rodriguez",             medalla:"plata",        rank:42   },
+    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"Kenny Bravo Rodriguez",             medalla:"participante", rank:null },
+    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"V. Perez Barzaga",                  medalla:"mencion",      rank:184  },
+    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"I.B. Gonzalez Valdes",              medalla:"participante", rank:null },
+    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"J.E. Hernandez Gonzalez",           medalla:"participante", rank:null },
+    { ed:33, año:2001, sede:"Mumbai",           pais:"🇮🇳", nombre:"David Santos Carballal",            medalla:"bronce",       rank:70   },
+    { ed:33, año:2001, sede:"Mumbai",           pais:"🇮🇳", nombre:"Karel Hernandez Sanchez",           medalla:"bronce",       rank:73   },
+    { ed:33, año:2001, sede:"Mumbai",           pais:"🇮🇳", nombre:"Elain Fernando Carbonel",           medalla:"bronce",       rank:91   },
+    { ed:33, año:2001, sede:"Mumbai",           pais:"🇮🇳", nombre:"Castillo Aleman Marx",              medalla:"bronce",       rank:100  },
+    { ed:31, año:1999, sede:"Bangkok",          pais:"🇹🇭", nombre:"Darel Martínez Bedoya",             medalla:"bronce",       rank:123  },
+    { ed:29, año:1997, sede:"Montreal",         pais:"🇨🇦", nombre:"Rachel Crespo",                     medalla:"bronce",       rank:98   },
+    { ed:28, año:1996, sede:"Moscú",            pais:"🇷🇺", nombre:"Rivera Daniel Garcia",              medalla:"bronce",       rank:87   },
+    { ed:27, año:1995, sede:"Beijing",          pais:"🇨🇳", nombre:"Joel Torres Alacan",                medalla:"participante", rank:null },
+    { ed:26, año:1994, sede:"Oslo",             pais:"🇳🇴", nombre:"Adria Jimenez Diaz",                medalla:"participante", rank:null },
+    { ed:25, año:1993, sede:"Perugia",          pais:"🇮🇹", nombre:"Yonier Rodriguez",                  medalla:"bronce",       rank:78   },
+    { ed:25, año:1993, sede:"Perugia",          pais:"🇮🇹", nombre:"Victor Lorenzo",                    medalla:"bronce",       rank:88   },
+    { ed:25, año:1993, sede:"Perugia",          pais:"🇮🇹", nombre:"Adria Jimenez Diaz",                medalla:"bronce",       rank:91   },
+    { ed:25, año:1993, sede:"Perugia",          pais:"🇮🇹", nombre:"Reinaldo Moya Barrios",             medalla:"participante", rank:null },
+    { ed:23, año:1991, sede:"Londres",          pais:"🇬🇧", nombre:"Heidi Portuondo Campa",             medalla:"bronce",       rank:68   },
+    { ed:23, año:1991, sede:"Londres",          pais:"🇬🇧", nombre:"Reynaldo López Mirabal",            medalla:"participante", rank:null },
+    { ed:23, año:1991, sede:"Londres",          pais:"🇬🇧", nombre:"Nelanie Mora-Diaz",                 medalla:"participante", rank:null },
+    { ed:23, año:1991, sede:"Londres",          pais:"🇬🇧", nombre:"Mitcheell Maestre Martínez",        medalla:"participante", rank:null },
+    { ed:22, año:1990, sede:"París",            pais:"🇫🇷", nombre:"Elier Paz Rojas",                   medalla:"bronce",       rank:56   },
+    { ed:22, año:1990, sede:"París",            pais:"🇫🇷", nombre:"David Alvarez Carbonnell",          medalla:"participante", rank:null },
+    { ed:22, año:1990, sede:"París",            pais:"🇫🇷", nombre:"Heidi Portuondo Campa",             medalla:"participante", rank:null },
+    { ed:22, año:1990, sede:"París",            pais:"🇫🇷", nombre:"Ana Helena Lopez Campistous",       medalla:"participante", rank:null },
+    { ed:21, año:1989, sede:"Halle",            pais:"🇩🇪", nombre:"Omar Quinter Monzon",               medalla:"bronce",       rank:61   },
+    { ed:21, año:1989, sede:"Halle",            pais:"🇩🇪", nombre:"David Carbonell",                   medalla:"participante", rank:null },
+    { ed:21, año:1989, sede:"Halle",            pais:"🇩🇪", nombre:"Virna Veiga Perez",                 medalla:"participante", rank:null },
+    { ed:21, año:1989, sede:"Halle",            pais:"🇩🇪", nombre:"Elier Paz Rojas",                   medalla:"participante", rank:null },
+    { ed:20, año:1988, sede:"Espoo",            pais:"🇫🇮", nombre:"Eduardo Baquero Fernandez",         medalla:"bronce",       rank:58   },
+    { ed:20, año:1988, sede:"Espoo",            pais:"🇫🇮", nombre:"Ernesto Ortitz Suri",               medalla:"participante", rank:null },
+    { ed:20, año:1988, sede:"Espoo",            pais:"🇫🇮", nombre:"Raul Gonzales Lio",                 medalla:"participante", rank:null },
+    { ed:20, año:1988, sede:"Espoo",            pais:"🇫🇮", nombre:"Elier Paz Rojas",                   medalla:"participante", rank:null },
+    { ed:19, año:1987, sede:"Veszprém",         pais:"🇭🇺", nombre:"Ernesto Ortitz Suri",               medalla:"bronce",       rank:52   },
+    { ed:19, año:1987, sede:"Veszprém",         pais:"🇭🇺", nombre:"Raul Gonzalez Lio",                 medalla:"participante", rank:null },
+    { ed:19, año:1987, sede:"Veszprém",         pais:"🇭🇺", nombre:"Eduardo Baquero Fernandez",         medalla:"participante", rank:null },
+    { ed:19, año:1987, sede:"Veszprém",         pais:"🇭🇺", nombre:"Tania Crombet",                     medalla:"participante", rank:null },
+    { ed:17, año:1985, sede:"Bratislava",       pais:"🇸🇰", nombre:"Tirso Gassié Rodriguez",            medalla:"participante", rank:null },
+    { ed:17, año:1985, sede:"Bratislava",       pais:"🇸🇰", nombre:"Geni Gómez Morejón",                medalla:"participante", rank:null },
+    { ed:17, año:1985, sede:"Bratislava",       pais:"🇸🇰", nombre:"César Fernández Estrabao",          medalla:"participante", rank:null },
+    { ed:17, año:1985, sede:"Bratislava",       pais:"🇸🇰", nombre:"Luis Javier Gonzáles López",        medalla:"participante", rank:null },
+];
+
+// ════════════════════════════════════════════════════
+// IMChO — Olimpiada Internacional Mendeleyev de Química
+// ════════════════════════════════════════════════════
+const datosIMChO = [
+    { ed:60, año:2026, sede:"Moscú",          pais:"🇷🇺", nombre:"Ernesto Alejandro Barrera Ramírez", medalla:"bronce",       rank:80,  foto:"https://i.imgur.com/u8A8ELp.png" },
+    { ed:60, año:2026, sede:"Moscú",          pais:"🇷🇺", nombre:"Leticia María Merlo Alfonso",       medalla:"bronce",       rank:73,  foto:"https://i.imgur.com/YPY8dOY.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Juan Carlos Yepe Muñiz",            medalla:"plata",        rank:49,  foto:"https://i.imgur.com/wKFCREW.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Roy Roger González",                medalla:"bronce",       rank:92,  foto:"https://i.imgur.com/TH8Tpzh.png" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Marco Antonio Asin López",          medalla:"bronce",       rank:98,  foto:"https://i.imgur.com/xlmBneM.jpeg" },
+    { ed:59, año:2025, sede:"Belo Horizonte", pais:"🇧🇷", nombre:"Ernesto Alejandro Barrera Ramírez", medalla:"bronce",       rank:113 },
+    { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Héctor Manuel Domínguez Pérez",     medalla:"participante", rank:null },
+    { ed:58, año:2024, sede:"Shenzhen",       pais:"🇨🇳", nombre:"Mario Luis Pérez Brito",            medalla:"participante", rank:null },
+];
+
+// ════════════════════════════════════════════════════
+// OIAQ — Olimpiada Iberoamericana de Química
+// ════════════════════════════════════════════════════
+const datosOIAQ = [
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Melissa María Reyes Pérez",          medalla:"bronce",       rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Cynthia Maria Rodríguez Pérez",       medalla:"bronce",       rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Pedro Alexis Rodríguez Ferrer",       medalla:"participante", rank:null },
+    { ed:29, año:2025, sede:"Ciudad de México", pais:"🇲🇽", nombre:"Nathán David Rivadeneira Martínez",   medalla:"participante", rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Juan Carlos Yepe Muñiz",              medalla:"oro",          rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Roy Roger González",                  medalla:"plata",        rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Ernesto Alejandro Barrera Ramírez",   medalla:"bronce",       rank:null },
+    { ed:28, año:2024, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Marco Antonio Asin López",            medalla:"bronce",       rank:null },
+    { ed:27, año:2023, sede:"Quito (Online)",   pais:"🇪🇨", nombre:"Mario Luis Pérez Brito",              medalla:"oro",          rank:null },
+    { ed:27, año:2023, sede:"Quito (Online)",   pais:"🇪🇨", nombre:"Héctor Manuel Domínguez Pérez",       medalla:"oro",          rank:null },
+    { ed:27, año:2023, sede:"Quito (Online)",   pais:"🇪🇨", nombre:"Lianet Leonard García",               medalla:"bronce",       rank:null },
+    { ed:27, año:2023, sede:"Quito (Online)",   pais:"🇪🇨", nombre:"Daniela de la Caridad Piñero Díaz",   medalla:"bronce",       rank:null },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Diego Hernández Barreras",  medalla:"oro",          rank:null },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"César Endris Acosta Martínez", medalla:"plata",     rank:null },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Dahysmer Hernández Ricardo", medalla:"plata",       rank:null,  foto:"https://i.imgur.com/BIkAonq.png" },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Geiler Esteban López Corría", medalla:"bronce",     rank:null },
+    { ed:24, año:2019, sede:"Porto",            pais:"🇵🇹", nombre:"Sheila María Peña González",          medalla:"bronce",       rank:null },
+    { ed:24, año:2019, sede:"Porto",            pais:"🇵🇹", nombre:"Jocdan Lismar López Mantecón",        medalla:"bronce",       rank:null },
+    { ed:23, año:2018, sede:"San Salvador",     pais:"🇸🇻", nombre:"Rey Michel Rodríguez Navarro",        medalla:"plata",        rank:null,  foto:"https://i.imgur.com/eoIouFc.png" },
+    { ed:23, año:2018, sede:"San Salvador",     pais:"🇸🇻", nombre:"Carlos Rafael Castillo Hernández",    medalla:"plata",        rank:null,  foto:"https://i.imgur.com/caS3xRD.png" },
+    { ed:23, año:2018, sede:"San Salvador",     pais:"🇸🇻", nombre:"Sergio Modesto Reyes Díaz",           medalla:"plata",        rank:null,  foto:"https://i.imgur.com/PPgwcIO.png" },
+    { ed:23, año:2018, sede:"San Salvador",     pais:"🇸🇻", nombre:"Isaac Enrique Peñuela Puente",        medalla:"bronce",       rank:null,  foto:"https://i.imgur.com/IqWvP0e.png" },
+    { ed:22, año:2017, sede:"Lima",             pais:"🇵🇪", nombre:"Carlos Rafael Castillo Hernández",    medalla:"oro",          rank:null },
+    { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Miguel Alejandro González Martínez",  medalla:"plata",        rank:null,  foto:"https://i.imgur.com/wQHh6m8.png" },
+    { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Liván Borrego Camejo",                medalla:"bronce",       rank:null,  foto:"https://i.imgur.com/vyKTiEv.png" },
+    { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Fernando Gabriel Martín Rodríguez",   medalla:"bronce",       rank:null,  foto:"https://i.imgur.com/4WqJb4J.png" },
+    { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Norberto Javier Tamayo León",         medalla:"mencion",      rank:null,  foto:"https://i.imgur.com/IO5vAco.png" },
+];
+
+// ════════════════════════════════════════════════════
+// OCACQ — Olimpiada Centroamericana y del Caribe de Química
+// ════════════════════════════════════════════════════
+const datosOCACQ = [
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Alejandro Murad Alcina Salazar",  medalla:"oro",    rank:null, foto:"https://i.imgur.com/r1nKRLO.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Jennifer García González",         medalla:"plata",  rank:null, foto:"https://i.imgur.com/G1vNHoE.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Carlos Manuel Hernández Machín",   medalla:"plata",  rank:null, foto:"https://i.imgur.com/VmT7du4.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Brayan Tejeda Marrero",            medalla:"bronce", rank:null, foto:"https://i.imgur.com/pMlRC8I.png" },
+    { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Osmani Lázaro Hernández Fiallo",   medalla:"oro",    rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Melissa María Reyes Pérez",        medalla:"oro",    rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Bárbaro Eriel Rodríguez Gil",      medalla:"plata",  rank:null },
+    { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Pedro Alexis Rodríguez Ferrer",    medalla:"plata",  rank:null },
+    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Diego Armando Martínez Ramírez",   medalla:"oro",    rank:null, foto:"https://i.imgur.com/fnAWp0b.png" },
+    { ed:16, año:2023, sede:"San Salvador",        pais:"🇸🇻", nombre:"Royman Ramos Pérez",               medalla:"oro",    rank:null, foto:"https://i.imgur.com/a35Z8PJ.png" },
+    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Daniel Alejandro González Guzmán", medalla:"oro",    rank:null, foto:"https://i.imgur.com/kmf4O27.png" },
+    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Erik Jordan Valdés Abreu",         medalla:"plata",  rank:null },
+    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Royman Ramos Pérez",               medalla:"plata",  rank:null },
+    { ed:15, año:2022, sede:"La Habana",           pais:"🇨🇺", nombre:"Diego Armando Martínez Ramírez",   medalla:"plata",  rank:null },
+    { ed:13, año:2019, sede:"Panamá",              pais:"🇵🇦", nombre:"Osniel Alejandro García Orihuela", medalla:"oro",    rank:null },
+    { ed:13, año:2019, sede:"Panamá",              pais:"🇵🇦", nombre:"Rafael Perurena García",           medalla:"oro",    rank:null },
+    { ed:13, año:2019, sede:"Panamá",              pais:"🇵🇦", nombre:"Héctor David Couso Hernández",     medalla:"plata",  rank:null },
+    { ed:13, año:2019, sede:"Panamá",              pais:"🇵🇦", nombre:"Eduardo Adiel Landrove Escalona",  medalla:"plata",  rank:null },
+    { ed:12, año:2018, sede:"Guatemala",           pais:"🇬🇹", nombre:"Adolfo Alejandro Cruz Cruz",       medalla:"oro",    rank:null, foto:"https://i.imgur.com/RnoSRmw.png" },
+    { ed:12, año:2018, sede:"Guatemala",           pais:"🇬🇹", nombre:"Osniel Alejandro García Orihuela", medalla:"plata",  rank:null, foto:"https://i.imgur.com/8Ujrcya.png" },
+    { ed:12, año:2018, sede:"Guatemala",           pais:"🇬🇹", nombre:"Adiel Martínez Rodríguez",         medalla:"plata",  rank:null, foto:"https://i.imgur.com/AnDC62r.png" },
+    { ed:12, año:2018, sede:"Guatemala",           pais:"🇬🇹", nombre:"Jocdan Lismar López Mantecón",     medalla:"bronce", rank:null, foto:"https://i.imgur.com/54bqv23.png" },
+    { ed:10, año:2016, sede:"La Habana",           pais:"🇨🇺", nombre:"José Rafael Rodríguez Rodríguez",  medalla:"oro",    rank:null },
+    { ed:10, año:2016, sede:"La Habana",           pais:"🇨🇺", nombre:"Kendria Beatriz Góngora Parra",    medalla:"oro",    rank:null, foto:"https://i.imgur.com/lfYSJ2G.png" },
+    { ed:10, año:2016, sede:"La Habana",           pais:"🇨🇺", nombre:"Leonor Enedis Collejo Fernández",  medalla:"plata",  rank:null, foto:"https://i.imgur.com/eSzkTXN.png" },
+    { ed:10, año:2016, sede:"La Habana",           pais:"🇨🇺", nombre:"Eliosdanis González Machado",      medalla:"plata",  rank:null, foto:"https://i.imgur.com/2R21juK.png" },
+];
+
+// ════════════════════════════════════════════════════
+// ÍNDICES Y MAPAS DERIVADOS (no modificar)
+// ════════════════════════════════════════════════════
+const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, ocacq: datosOCACQ };
+const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: Olimpiada Mendeleyev', oiaq: 'Fuente: OIAQ', ocacq: 'Fuente: OCACQ' };
+
+const fotosPorNombre = {};
+Object.values(todasLasOlimpiadas).flat().forEach(r => {
+    if (r.foto && !fotosPorNombre[r.nombre]) fotosPorNombre[r.nombre] = r.foto;
+});
+</script>
+</body>
+</html>
