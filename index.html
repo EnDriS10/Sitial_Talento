@@ -778,6 +778,87 @@
             .inicio-card p { font-size: 12px; }
             .inicio-footer-links { gap: 24px; }
         }
+        /* ═══════════════════════════════════════════
+           IChO COUNTDOWN
+        ═══════════════════════════════════════════ */
+        .icho-countdown-wrap {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff8f0 100%);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px 24px 20px;
+            margin-bottom: 36px;
+            box-shadow: 0 4px 20px rgba(4,18,43,.07);
+            position: relative;
+            overflow: hidden;
+        }
+        .icho-countdown-wrap::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #3b6ef0, #22c065, #f77b24, #9b59d6);
+        }
+        .icho-cd-header {
+            display: flex; align-items: baseline; gap: 10px;
+            justify-content: center; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .icho-cd-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px; font-weight: 900;
+            background: linear-gradient(90deg, #3b6ef0 0%, #22c065 40%, #f77b24 70%, #9b59d6 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .icho-cd-location {
+            font-size: 13px; color: var(--text-muted); font-weight: 400;
+        }
+        .icho-cd-location strong { color: var(--accent); font-weight: 600; }
+        .icho-cd-cards {
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+        }
+        .icho-cd-card {
+            background: white;
+            border-radius: 12px;
+            padding: 10px 14px 10px;
+            min-width: 72px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(4,18,43,.06);
+            position: relative;
+        }
+        .icho-cd-formula {
+            display: block;
+            font-size: 9px; font-weight: 600;
+            color: var(--text-muted); letter-spacing: .3px;
+            margin-bottom: 4px;
+        }
+        .icho-cd-num {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-size: 28px; font-weight: 700;
+            line-height: 1; margin-bottom: 4px;
+        }
+        .icho-cd-unit {
+            display: block;
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .icho-cd-bar {
+            height: 3px; border-radius: 2px; margin: 0 auto;
+            width: 70%;
+        }
+        .icho-cd-num.c-blue   { color: #3b6ef0; }
+        .icho-cd-num.c-green  { color: #22c065; }
+        .icho-cd-num.c-orange { color: #f77b24; }
+        .icho-cd-num.c-purple { color: #9b59d6; }
+        .icho-cd-finished {
+            text-align: center; padding: 12px 0 8px;
+            font-size: 14px; color: var(--text-muted);
+        }
+        @media (max-width: 500px) {
+            .icho-cd-card { min-width: 60px; padding: 8px 10px; }
+            .icho-cd-num  { font-size: 22px; }
+        }
     </style>
 </head>
 <body>
@@ -918,6 +999,41 @@
         <div class="inicio-bienvenida">
             <p>Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
         </div>
+
+        <!-- IChO Countdown Banner -->
+        <div class="icho-countdown-wrap" id="icho-countdown-wrap">
+            <div class="icho-cd-header">
+                <span class="icho-cd-title" id="icho-cd-title">IChO 2026</span>
+                <span class="icho-cd-location" id="icho-cd-location">International Chemistry Olympiad · <strong>Tashkent</strong></span>
+            </div>
+            <div class="icho-cd-cards" id="icho-cd-cards">
+                <div class="icho-cd-card">
+                    <span class="icho-cd-formula">H₂O</span>
+                    <span class="icho-cd-num c-blue"   id="cd-days">--</span>
+                    <span class="icho-cd-unit">Días</span>
+                    <div  class="icho-cd-bar" style="background:#3b6ef0"></div>
+                </div>
+                <div class="icho-cd-card">
+                    <span class="icho-cd-formula">CO₂</span>
+                    <span class="icho-cd-num c-green"  id="cd-hours">--</span>
+                    <span class="icho-cd-unit">Horas</span>
+                    <div  class="icho-cd-bar" style="background:#22c065"></div>
+                </div>
+                <div class="icho-cd-card">
+                    <span class="icho-cd-formula">NaCl</span>
+                    <span class="icho-cd-num c-orange" id="cd-mins">--</span>
+                    <span class="icho-cd-unit">Minutos</span>
+                    <div  class="icho-cd-bar" style="background:#f77b24"></div>
+                </div>
+                <div class="icho-cd-card">
+                    <span class="icho-cd-formula">C₆H₁₂O₆</span>
+                    <span class="icho-cd-num c-purple" id="cd-secs">--</span>
+                    <span class="icho-cd-unit">Segundos</span>
+                    <div  class="icho-cd-bar" style="background:#9b59d6"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="inicio-grid">
             <div class="inicio-card" onclick="cambiarSeccion('sitial')">
                 <span class="inicio-card-icon">🏅</span>
@@ -1599,7 +1715,10 @@ function renderizarTabla(datos) {
         return `<tr>
             <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
             <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
-            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, r.medalla==='participante'?'foto':'modal')}<strong>${r.nombre}</strong></div></td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
+                r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
+                    ? 'foto' : 'modal'
+            )}<strong>${r.nombre}</strong></div></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
             <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank??'—'}</td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1977,6 +2096,62 @@ async function inicializarNoticias() {
         console.warn('newspapers.html no encontrado o error al leer.', err);
     }
 }
+
+
+//════════════════════════════
+//════ Contador de IChO ══════
+//════════════════════════════
+// Modifica aquí la fecha, ciudad y año de la próxima IChO:
+const ICHO_FECHA  = new Date('2026-07-10T00:00:00');   // ← Fecha de inicio (año-mes-día)
+const ICHO_CIUDAD = 'Tashkent';                         // ← Ciudad sede
+const ICHO_AÑO    = 2026;                               // ← Año del evento
+//════════════════════════════
+
+(function iniciarContador() {
+    function run() {
+    const elTitle    = document.getElementById('icho-cd-title');
+    const elLocation = document.getElementById('icho-cd-location');
+    const elCards    = document.getElementById('icho-cd-cards');
+    const elWrap     = document.getElementById('icho-countdown-wrap');
+    if (!elWrap) return;
+
+    if (elTitle)    elTitle.textContent = `IChO ${ICHO_AÑO}`;
+    if (elLocation) elLocation.innerHTML = `International Chemistry Olympiad · <strong>${ICHO_CIUDAD}</strong>`;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+        const ahora   = new Date();
+        const diff    = ICHO_FECHA - ahora;
+        if (diff <= 0) {
+            // Event has started / passed
+            if (elCards) elCards.innerHTML = `<div class="icho-cd-finished">🏆 ¡La IChO ${ICHO_AÑO} está en curso!</div>`;
+            return;
+        }
+        const dias    = Math.floor(diff / 86400000);
+        const horas   = Math.floor((diff % 86400000) / 3600000);
+        const minutos = Math.floor((diff % 3600000)  / 60000);
+        const segs    = Math.floor((diff % 60000)    / 1000);
+
+        const d = document.getElementById('cd-days');
+        const h = document.getElementById('cd-hours');
+        const m = document.getElementById('cd-mins');
+        const s = document.getElementById('cd-secs');
+        if (d) d.textContent = pad(dias);
+        if (h) h.textContent = pad(horas);
+        if (m) m.textContent = pad(minutos);
+        if (s) s.textContent = pad(segs);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
     construirSitial();
