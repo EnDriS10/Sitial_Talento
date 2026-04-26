@@ -664,14 +664,13 @@
             display: none;
             position: fixed;
             inset: 0;
-            top: 52px;
             background: rgba(0,0,0,.35);
             z-index: 300;
         }
         #menu-overlay.abierto { display: block; animation: fadeIn .22s ease; }
         #menu-panel {
             position: fixed;
-            top: 52px; left: 0; right: 0;
+            top: 0; left: 0; right: 0;   /* top se reescribe por JS al abrir */
             width: 100%;
             background: var(--navy);
             z-index: 400;
@@ -785,6 +784,15 @@
             display: flex;
             justify-content: center;
             margin-top: 36px;
+            /* Permite salir del padding del contenedor en móvil */
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        @media (min-width: 501px) {
+            .icho-countdown-outer {
+                margin-left: 0;
+                margin-right: 0;
+            }
         }
         .icho-countdown-wrap {
             background: linear-gradient(135deg, #f8f9ff 0%, #fff8f0 100%);
@@ -860,8 +868,12 @@
             font-size: 15px; color: var(--text-muted);
         }
         @media (max-width: 500px) {
-            .icho-cd-card { min-width: 68px; padding: 10px 12px; }
-            .icho-cd-num  { font-size: 28px; }
+            .icho-countdown-outer { padding: 0; }
+            .icho-countdown-wrap  { width: 100%; border-radius: 0; border-left: none; border-right: none; padding: 20px 16px 18px; box-sizing: border-box; }
+            .icho-cd-cards        { gap: 8px; }
+            .icho-cd-card         { flex: 1; min-width: 0; padding: 10px 8px 10px; }
+            .icho-cd-num          { font-size: 30px; }
+            .icho-cd-formula      { font-size: 9px; }
         }
     </style>
 </head>
@@ -2053,8 +2065,17 @@ const ICHO_AÑO    = 2026;                               // ← Año del evento
 
 // ════ MENÚ HAMBURGUESA ════
 function abrirMenu() {
-    document.getElementById('menu-panel').classList.add('abierto');
-    document.getElementById('menu-overlay').classList.add('abierto');
+    const topbar  = document.getElementById('topbar-hamburger');
+    const panel   = document.getElementById('menu-panel');
+    const overlay = document.getElementById('menu-overlay');
+    if (topbar && panel) {
+        const rect   = topbar.getBoundingClientRect();
+        const bottom = Math.round(rect.bottom);
+        panel.style.top   = bottom + 'px';
+        overlay.style.top = bottom + 'px';
+    }
+    panel.classList.add('abierto');
+    overlay.classList.add('abierto');
     document.body.style.overflow = 'hidden';
 }
 function cerrarMenu() {
