@@ -1,23 +1,4 @@
 <!DOCTYPE html>
-<!--
-    ══════════════════════════════════════════════════════════════
-    DATOS DE OLIMPIADAS DE QUÍMICA — CUBA
-    ══════════════════════════════════════════════════════════════
-    Este archivo contiene la base de datos de participaciones
-    cubanas en olimpiadas internacionales de química.
-
-    Para añadir o modificar entradas:
-      · ed      → número de edición de la olimpiada
-      · año     → año de celebración
-      · sede    → ciudad sede
-      · pais    → emoji de bandera del país sede
-      · nombre  → nombre completo del participante
-      · medalla → "oro" | "plata" | "bronce" | "mencion" | "participante"
-      · rank    → posición numérica, o null si no aplica
-      · foto    → URL de imagen (opcional, omitir si no existe)
-
-    ══════════════════════════════════════════════════════════════
--->
 <html lang="es">
 <head><meta charset="UTF-8"></head>
 <body>
@@ -45,8 +26,8 @@ const datosIChO = [
     { ed:46, año:2014, sede:"Hanói",            pais:"🇻🇳", nombre:"Alejandro Alexéi Vistorte Salgado", medalla:"mencion",      rank:188  },
     { ed:43, año:2011, sede:"Ankara",           pais:"🇹🇷", nombre:"Reinaldo Román Martín Pardo",       medalla:"bronce",       rank:142  },
     { ed:42, año:2010, sede:"Tokio",            pais:"🇯🇵", nombre:"Ramón Lorenzo Panadés Barrueta",    medalla:"participante", rank:null },
-    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Hernández Hiram Borbolla",          medalla:"bronce",       rank:132  },
-    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Infante Ernesto Aguilar",           medalla:"bronce",       rank:162  },
+    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Hirám Borbolla Hernández",          medalla:"bronce",       rank:132  },
+    { ed:41, año:2009, sede:"Cambridge",        pais:"🇬🇧", nombre:"Ernesto René Aguiar Infante",           medalla:"bronce",       rank:162  },
     { ed:40, año:2008, sede:"Budapest",         pais:"🇭🇺", nombre:"Gerardo Ojeda Carralero",           medalla:"plata",        rank:40   },
     { ed:40, año:2008, sede:"Budapest",         pais:"🇭🇺", nombre:"Yanira Mendez Gómez",               medalla:"bronce",       rank:134  },
     { ed:39, año:2007, sede:"Moscú",            pais:"🇷🇺", nombre:"Manuel Garcia Ricardo",             medalla:"bronce",       rank:150  },
@@ -54,8 +35,8 @@ const datosIChO = [
     { ed:38, año:2006, sede:"Gyeongsan",        pais:"🇰🇷", nombre:"Williams Ernesto Miranda Delgado",  medalla:"mencion",      rank:174  },
     { ed:37, año:2005, sede:"Taipei",           pais:"🇹🇼", nombre:"Luis Daniel Cruz Zaragoza",         medalla:"oro",          rank:26   },
     { ed:36, año:2004, sede:"Kiel",             pais:"🇩🇪", nombre:"Enrique Méndez Vega",               medalla:"participante", rank:null },
-    { ed:35, año:2003, sede:"Atenas",           pais:"🇬🇷", nombre:"Kenny Bravo Rodriguez",             medalla:"plata",        rank:42   },
-    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"Kenny Bravo Rodriguez",             medalla:"participante", rank:null },
+    { ed:35, año:2003, sede:"Atenas",           pais:"🇬🇷", nombre:"Kenny Bravo Rodríguez",             medalla:"plata",        rank:42   },
+    { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"Kenny Bravo Rodríguez",             medalla:"participante", rank:null },
     { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"V. Perez Barzaga",                  medalla:"mencion",      rank:184  },
     { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"I.B. Gonzalez Valdes",              medalla:"participante", rank:null },
     { ed:34, año:2002, sede:"Groningen",        pais:"🇳🇱", nombre:"J.E. Hernandez Gonzalez",           medalla:"participante", rank:null },
@@ -65,7 +46,7 @@ const datosIChO = [
     { ed:33, año:2001, sede:"Mumbai",           pais:"🇮🇳", nombre:"Castillo Aleman Marx",              medalla:"bronce",       rank:100  },
     { ed:31, año:1999, sede:"Bangkok",          pais:"🇹🇭", nombre:"Darel Martínez Bedoya",             medalla:"bronce",       rank:123  },
     { ed:29, año:1997, sede:"Montreal",         pais:"🇨🇦", nombre:"Rachel Crespo",                     medalla:"bronce",       rank:98   },
-    { ed:28, año:1996, sede:"Moscú",            pais:"🇷🇺", nombre:"Rivera Daniel Garcia",              medalla:"bronce",       rank:87   },
+    { ed:28, año:1996, sede:"Moscú",            pais:"🇷🇺", nombre:"Daniel García Rivera",              medalla:"bronce",       rank:87   },
     { ed:27, año:1995, sede:"Beijing",          pais:"🇨🇳", nombre:"Joel Torres Alacan",                medalla:"participante", rank:null },
     { ed:26, año:1994, sede:"Oslo",             pais:"🇳🇴", nombre:"Adria Jimenez Diaz",                medalla:"participante", rank:null },
     { ed:25, año:1993, sede:"Perugia",          pais:"🇮🇹", nombre:"Yonier Rodriguez",                  medalla:"bronce",       rank:78   },
@@ -130,8 +111,8 @@ const datosOIAQ = [
     { ed:27, año:2023, sede:"Quito (Online)",   pais:"🇪🇨", nombre:"Daniela de la Caridad Piñero Díaz",   medalla:"bronce",       rank:null },
     { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Diego Hernández Barreras",  medalla:"oro",          rank:null },
     { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"César Endris Acosta Martínez", medalla:"plata",     rank:null },
-    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Dahysmer Hernández Ricardo", medalla:"plata",       rank:null,  foto:"https://i.imgur.com/BIkAonq.png" },
-    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Geiler Esteban López Corría", medalla:"bronce",     rank:null },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Dahysmer Hernández Ricardo", medalla:"plata",        rank:null,  foto:"https://i.imgur.com/BIkAonq.png" },
+    { ed:26, año:2022, sede:"Ciudad de México (Online)", pais:"🇲🇽", nombre:"Geiler Esteban López Corría", medalla:"bronce",      rank:null },
     { ed:24, año:2019, sede:"Porto",            pais:"🇵🇹", nombre:"Sheila María Peña González",          medalla:"bronce",       rank:null },
     { ed:24, año:2019, sede:"Porto",            pais:"🇵🇹", nombre:"Jocdan Lismar López Mantecón",        medalla:"bronce",       rank:null },
     { ed:23, año:2018, sede:"San Salvador",     pais:"🇸🇻", nombre:"Rey Michel Rodríguez Navarro",        medalla:"plata",        rank:null,  foto:"https://i.imgur.com/eoIouFc.png" },
@@ -143,6 +124,55 @@ const datosOIAQ = [
     { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Liván Borrego Camejo",                medalla:"bronce",       rank:null,  foto:"https://i.imgur.com/vyKTiEv.png" },
     { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Fernando Gabriel Martín Rodríguez",   medalla:"bronce",       rank:null,  foto:"https://i.imgur.com/4WqJb4J.png" },
     { ed:21, año:2016, sede:"Bogotá",           pais:"🇨🇴", nombre:"Norberto Javier Tamayo León",         medalla:"mencion",      rank:null,  foto:"https://i.imgur.com/IO5vAco.png" },
+    { ed:20, año:2015, sede:"Brasil",           pais:"🇧🇷", nombre:"Miguel Alejandro González Martínez",  medalla:"plata",        rank:null },
+    { ed:20, año:2015, sede:"Brasil",           pais:"🇧🇷", nombre:"Daniel Platero Rochart",              medalla:"bronce",       rank:null },
+    { ed:19, año:2014, sede:"Uruguay",          pais:"🇺🇾", nombre:"Marcos Rafael Conde González",        medalla:"oro",          rank:null },
+    { ed:19, año:2014, sede:"Uruguay",          pais:"🇺🇾", nombre:"Ernesto Benítez García",              medalla:"bronce",       rank:null },
+    { ed:18, año:2013, sede:"Bolivia",          pais:"🇧🇴", nombre:"Alvaro Lagar Sosa",                   medalla:"plata",        rank:null },
+    { ed:17, año:2012, sede:"Argentina",        pais:"🇦🇷", nombre:"Irodiel Viñales Lozano",              medalla:"bronce",       rank:null },
+    { ed:16, año:2011, sede:"Brasil",           pais:"🇧🇷", nombre:"Juan Enrique Martínez",               medalla:"oro",          rank:null },
+    { ed:15, año:2010, sede:"México",           pais:"🇲🇽", nombre:"Ariel Luis Perez",                    medalla:"plata",        rank:null },
+    { ed:15, año:2010, sede:"México",           pais:"🇲🇽", nombre:"Juan Enrique Martínez",               medalla:"bronce",       rank:null },
+    { ed:14, año:2009, sede:"La Habana",        pais:"🇨🇺", nombre:"Hirám Borbolla Hernández",            medalla:"oro",          rank:null },
+    { ed:14, año:2009, sede:"La Habana",        pais:"🇨🇺", nombre:"Asiel Mena Jimenez",                  medalla:"plata",        rank:null },
+    { ed:14, año:2009, sede:"La Habana",        pais:"🇨🇺", nombre:"José Carlos Gutierres Pérez",         medalla:"plata",        rank:null },
+    { ed:13, año:2008, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Gerardo Ojeda Carralero",             medalla:"oro",          rank:null },
+    { ed:13, año:2008, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Nelson Labrada Madruga",              medalla:"plata",        rank:null },
+    { ed:13, año:2008, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Fidel Ernesto Rodríguez González",    medalla:"bronce",       rank:null },
+    { ed:13, año:2008, sede:"Costa Rica",       pais:"🇨🇷", nombre:"Ernesto René Aguiar Infante",         medalla:"bronce",       rank:null },
+    { ed:12, año:2007, sede:"Brasil",           pais:"🇧🇷", nombre:"Greter Amelia Ortega Rodríguez",      medalla:"plata",        rank:null },
+    { ed:12, año:2007, sede:"Brasil",           pais:"🇧🇷", nombre:"Aldrín Vasco Vidal",                  medalla:"plata",        rank:null },
+    { ed:12, año:2007, sede:"Brasil",           pais:"🇧🇷", nombre:"Gerardo Ojeda Carralero",             medalla:"plata",        rank:null },
+    { ed:12, año:2007, sede:"Brasil",           pais:"🇧🇷", nombre:"Enrique Díez Ávila",                  medalla:"bronce",       rank:null },
+    { ed:11, año:2006, sede:"Portugal",         pais:"🇵🇹", nombre:"Julio Cesar Zuaznabar Gardona",       medalla:"oro",          rank:null },
+    { ed:11, año:2006, sede:"Portugal",         pais:"🇵🇹", nombre:"Victor Acosta Villazón",              medalla:"plata",        rank:null },
+    { ed:11, año:2006, sede:"Portugal",         pais:"🇵🇹", nombre:"Manuel García Ricardo",               medalla:"plata",        rank:null },
+    { ed:11, año:2006, sede:"Portugal",         pais:"🇵🇹", nombre:"Fidel Ernesto Morales Vicente",       medalla:"bronce",       rank:null },
+    { ed:10, año:2005, sede:"Perú",             pais:"🇵🇪", nombre:"Williams Ernesto Miranda Delgado",    medalla:"oro",          rank:null },
+    { ed:10, año:2005, sede:"Perú",             pais:"🇵🇪", nombre:"Ramón Miranda",                       medalla:"oro",          rank:null },
+    { ed:10, año:2005, sede:"Perú",             pais:"🇵🇪", nombre:"Marcos XXXXXX",                              medalla:"plata",        rank:null },
+    { ed:10, año:2005, sede:"Perú",             pais:"🇵🇪", nombre:"Carlos Hernández Fraga",              medalla:"plata",        rank:null },
+    { ed:9,  año:2004, sede:"España",           pais:"🇪🇸", nombre:"Yaser Ruiz Blanco",                   medalla:"plata",        rank:null },
+    { ed:9,  año:2004, sede:"España",           pais:"🇪🇸", nombre:"Daniel Vega",                         medalla:"plata",        rank:null },
+    { ed:9,  año:2004, sede:"España",           pais:"🇪🇸", nombre:"Luis Daniel Cruz Zaragoza",           medalla:"plata",        rank:null },
+    { ed:9,  año:2004, sede:"España",           pais:"🇪🇸", nombre:"Joel Mieres Pérez",                   medalla:"bronce",       rank:null },
+    { ed:8,  año:2003, sede:"México",           pais:"🇲🇽", nombre:"Jorge Enrique Hernández González",    medalla:"oro",          rank:null },
+    { ed:8,  año:2003, sede:"México",           pais:"🇲🇽", nombre:"Miguel Fernández Oliva",              medalla:"oro",          rank:null },
+    { ed:8,  año:2003, sede:"México",           pais:"🇲🇽", nombre:"Dario González Abradelo",             medalla:"plata",        rank:null },
+    { ed:8,  año:2003, sede:"México",           pais:"🇲🇽", nombre:"Joel Mieres Pérez",                   medalla:"bronce",       rank:null },
+    { ed:7,  año:2002, sede:"Argentina",        pais:"🇦🇷", nombre:"Yusbel Sierra Gómez",                 medalla:"oro",          rank:null },
+    { ed:7,  año:2002, sede:"Argentina",        pais:"🇦🇷", nombre:"Miguel Fernández Oliva",              medalla:"oro",          rank:null },
+    { ed:7,  año:2002, sede:"Argentina",        pais:"🇦🇷", nombre:"Kenny Bravo Rodríguez",               medalla:"plata",        rank:null },
+    { ed:7,  año:2002, sede:"Argentina",        pais:"🇦🇷", nombre:"Noslen Rodríguez Dávila",             medalla:"bronce",       rank:null },
+    { ed:6,  año:2000, sede:"España",           pais:"🇪🇸", nombre:"Yosvani Izquierdo",                   medalla:"oro",          rank:null },
+    { ed:6,  año:2000, sede:"España",           pais:"🇪🇸", nombre:"Yunriel Núñez Fernández",             medalla:"oro",          rank:null },
+    { ed:6,  año:2000, sede:"España",           pais:"🇪🇸", nombre:"Bladimir Mulen",                      medalla:"oro",          rank:null },
+    { ed:6,  año:2000, sede:"España",           pais:"🇪🇸", nombre:"Julio Omar Prieto",                   medalla:"plata",        rank:null },
+    { ed:5,  año:1999, sede:"España",           pais:"🇪🇸", nombre:"Leane Saiz Urra",                     medalla:"oro",          rank:null },
+    { ed:4,  año:1998, sede:"Colombia",         pais:"🇨🇴", nombre:"Amaury Pupo Meniño",                  medalla:"oro",          rank:null },
+    { ed:3,  año:1997, sede:"Brasil",           pais:"🇧🇷", nombre:"Amaury Pupo Meniño",                  medalla:"plata",        rank:null },
+    { ed:2,  año:1996, sede:"México",           pais:"🇲🇽", nombre:"Tania Faría Pineiro",                 medalla:"plata",        rank:null },
+    { ed:1,  año:1995, sede:"Argentina",        pais:"🇦🇷", nombre:"Daniel García Rivera",                medalla:"plata",        rank:null }
 ];
 
 // ════════════════════════════════════════════════════
@@ -150,7 +180,7 @@ const datosOIAQ = [
 // ════════════════════════════════════════════════════
 const datosOCACQ = [
     { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Alejandro Murad Alcina Salazar",  medalla:"oro",    rank:null, foto:"https://i.imgur.com/r1nKRLO.png" },
-    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Jennifer García González",         medalla:"plata",  rank:null, foto:"https://i.imgur.com/G1vNHoE.png" },
+    { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Jennifer García González",        medalla:"plata",  rank:null, foto:"https://i.imgur.com/G1vNHoE.png" },
     { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Carlos Manuel Hernández Machín",   medalla:"plata",  rank:null, foto:"https://i.imgur.com/VmT7du4.png" },
     { ed:18, año:2025, sede:"Santa Rosa de Copán", pais:"🇭🇳", nombre:"Brayan Tejeda Marrero",            medalla:"bronce", rank:null, foto:"https://i.imgur.com/pMlRC8I.png" },
     { ed:17, año:2024, sede:"Guatemala (Online)",  pais:"🇬🇹", nombre:"Osmani Lázaro Hernández Fiallo",   medalla:"oro",    rank:null },
@@ -188,7 +218,7 @@ const datosOCACQ = [
 ];
 
 // ════════════════════════════════════════════════════
-// ÍNDICES Y MAPAS DERIVADOS (no modificar)
+// ÍNDICES Y MAPAS DERIVADOS 
 // ════════════════════════════════════════════════════
 const todasLasOlimpiadas = { icho: datosIChO, imcho: datosIMChO, oiaq: datosOIAQ, ocacq: datosOCACQ };
 const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
