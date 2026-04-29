@@ -11,3 +11,5 @@ Nota 3: Añadir otros en olimpiadas data, para poner lo de gerardo en españa, l
 Nota 4: Las Noticias que no tengan link de foto pues no cologar foto directamente.
 
 Nota 5: Hay algunos problemas con las fotos no cargan correctamente
+
+Nota 6: cuando actualices la pagina debes quedarte en la seccion en la que estas actualmente.
