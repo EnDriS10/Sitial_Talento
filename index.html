@@ -1429,7 +1429,29 @@ const _origInit = () => {
     cargarTabla();
     statsParaSitial();
     inicializarNoticias();
-    actualizarStatsBar('inicio');
+
+    // Restaurar sección activa si el usuario recargó la página
+    const seccionGuardada = (() => {
+        try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
+    })();
+    const secciones = ['inicio','sitial','eventos','honor','noticias'];
+    if (seccionGuardada && secciones.includes(seccionGuardada) && seccionGuardada !== 'inicio') {
+        // Activar sin animación de entrada para que sea instantáneo en la recarga
+        const secEl = document.getElementById(seccionGuardada);
+        const inicioEl = document.getElementById('inicio');
+        if (secEl && inicioEl) {
+            inicioEl.classList.remove('activa');
+            secEl.classList.add('activa');
+            document.getElementById('topbar-titulo-seccion').textContent = _tituloSeccion[seccionGuardada] || seccionGuardada;
+            document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('activo'));
+            const menuBtn = document.getElementById('menu-btn-' + seccionGuardada);
+            if (menuBtn) menuBtn.classList.add('activo');
+            actualizarStatsBar(seccionGuardada);
+            if (seccionGuardada === 'eventos') { statsParaEvento(); cargarTabla(); }
+        }
+    } else {
+        actualizarStatsBar('inicio');
+    }
     window._appReady = true;
 };
 
@@ -1746,6 +1768,8 @@ function cambiarSeccion(p) {
         else if (p === 'eventos') { statsParaEvento(); cargarTabla(); }
         entrar();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Persistir sección activa para sobrevivir recargas
+        try { sessionStorage.setItem('seccionActiva', p); } catch(e) {}
     });
 }
 
