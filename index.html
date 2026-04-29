@@ -974,6 +974,11 @@
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
+                <div class="stat-num" id="stat-estudiantes">—</div>
+                <div class="stat-label">Estudiantes</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
                 <div class="stat-num" id="stat-oro">—</div>
                 <div class="stat-label">Oro 🥇</div>
             </div>
@@ -1508,14 +1513,17 @@ function animarNumero(el, destino) {
 }
 
 function calcularStats(datos, contexto) {
-    const t = { total:datos.length, oro:0, plata:0, bronce:0, mencion:0 };
+    const t = { total:datos.length, estudiantes:0, oro:0, plata:0, bronce:0, mencion:0 };
+    const nombresUnicos = new Set();
     datos.forEach(r => {
+        if (r.nombre) nombresUnicos.add(r.nombre.trim());
         if (r.medalla==='oro')     t.oro++;
         if (r.medalla==='plata')   t.plata++;
         if (r.medalla==='bronce')  t.bronce++;
         if (r.medalla==='mencion') t.mencion++;
     });
-    ['total','oro','plata','bronce','mencion'].forEach(k =>
+    t.estudiantes = nombresUnicos.size;
+    ['total','estudiantes','oro','plata','bronce','mencion'].forEach(k =>
         animarNumero(document.getElementById('stat-'+k), t[k])
     );
     document.getElementById('stats-context').textContent = contexto;
