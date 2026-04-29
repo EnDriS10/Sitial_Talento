@@ -670,7 +670,7 @@
         #menu-overlay.abierto { display: block; animation: fadeIn .22s ease; }
         #menu-panel {
             position: fixed;
-            top: 0; left: 0; right: 0;   /* top se reescribe por JS al abrir */
+            top: 0; left: 0; right: 0;
             width: 100%;
             background: var(--navy);
             z-index: 400;
@@ -678,10 +678,19 @@
             max-height: 0;
             overflow: hidden;
             opacity: 0;
-            transition: max-height .35s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+            transform: translateY(-10px);
+            transition: max-height .28s cubic-bezier(.4,0,.2,1),
+                        opacity .2s ease,
+                        transform .24s cubic-bezier(.34,1.2,.64,1);
             box-shadow: 0 8px 32px rgba(0,0,0,.45);
+            pointer-events: none;
         }
-        #menu-panel.abierto { max-height: 480px; opacity: 1; }
+        #menu-panel.abierto {
+            max-height: 480px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
         .menu-header { padding: 18px 24px 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
         .menu-logo { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--gold-light); line-height: 1.35; }
         .menu-logo-sub { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 2px; }
@@ -1871,16 +1880,13 @@ function renderNoticias() {
         btn.style.display = 'none';
         return;
     }
-    container.innerHTML = visibles.map(item => `
-        <a href="${item.link}" target="_blank" rel="noopener" class="noticia-full">
-            <div class="foto-noticia-wrap">
-                <img src="${item.imagen}" loading="lazy" onerror="this.parentElement.style.background='var(--navy-mid)'">
-            </div>
-            <div class="info-noticia">
-                <span class="fecha-etiqueta">${item.fecha}</span>
-                <h4>${item.titulo}</h4>
-            </div>
-        </a>`).join('');
+    container.innerHTML = visibles.map(item => {
+        const fotoHTML = item.imagen
+            ? `<div class="foto-noticia-wrap"><img src="${item.imagen}" loading="lazy" onerror="var w=this.closest('.foto-noticia-wrap');if(w)w.style.display='none';"></div>`
+            : '';
+        const claseExtra = item.imagen ? ' con-foto' : '';
+        return `<a href="${item.link}" target="_blank" rel="noopener" class="noticia-full${claseExtra}">${fotoHTML}<div class="info-noticia"><span class="fecha-etiqueta">${item.fecha}</span><h4>${item.titulo}</h4></div></a>`;
+    }).join('');
     btn.style.display = filtradas.length > visibles.length ? 'block' : 'none';
 }
 
@@ -2012,7 +2018,7 @@ async function inicializarNoticias() {
                 link:   (c[0]?.textContent || '').trim(),
                 titulo: (c[1]?.textContent || '').trim(),
                 fecha:  (c[2]?.textContent || '').trim(),
-                imagen: (c[3]?.textContent || '').trim() || 'https://via.placeholder.com/800x400?text=Olimpiada+Química'
+                imagen: (c[3]?.textContent || '').trim() || ''
             };
         }).filter(d => d.link && d.titulo);
         // Deduplicar: si un mismo link aparece más de una vez, conservar solo la primera entrada
@@ -2116,6 +2122,17 @@ function cerrarMenu() {
     document.getElementById('menu-overlay').classList.remove('abierto');
     document.body.style.overflow = '';
 }
+// Cerrar menú al hacer scroll
+(function() {
+    let _lastScrollY = window.scrollY;
+    window.addEventListener('scroll', function() {
+        const panel = document.getElementById('menu-panel');
+        if (!panel || !panel.classList.contains('abierto')) return;
+        const dy = Math.abs(window.scrollY - _lastScrollY);
+        if (dy > 8) cerrarMenu();
+        _lastScrollY = window.scrollY;
+    }, { passive: true });
+})();
 </script>
 </body>
 </html>
