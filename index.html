@@ -1503,10 +1503,26 @@ function construirSitial() {
         const ol = nombreOlimpiada[key];
         arr.forEach(r => {
             if (!mapa[r.nombre]) mapa[r.nombre] = { nombre:r.nombre, medallas:[], años:[] };
-            mapa[r.nombre].medallas.push({ olimpiada:ol, tipo:r.medalla, año:r.año });
+            mapa[r.nombre].medallas.push({ olimpiada:ol, tipo:r.medalla, año:r.año, sede:r.sede, pais:r.pais });
             if (!mapa[r.nombre].años.includes(r.año)) mapa[r.nombre].años.push(r.año);
         });
     });
+    // ── datosOtras: olimpiadas adicionales (ej. OEQ, ...) ──
+    if (typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) {
+        datosOtras.forEach(r => {
+            if (!r.nombre || !r.medalla || r.medalla === 'participante') return;
+            if (!mapa[r.nombre]) mapa[r.nombre] = { nombre:r.nombre, medallas:[], años:[] };
+            mapa[r.nombre].medallas.push({
+                olimpiada:     r.Olimp,
+                olimpiadaFull: r.Olimpiada,
+                tipo:          r.medalla,
+                año:           r.año,
+                sede:          r.sede,
+                pais:          r.pais
+            });
+            if (!mapa[r.nombre].años.includes(r.año)) mapa[r.nombre].años.push(r.año);
+        });
+    }
     const olimpiadaOrden = { IChO:0, IMChO:1, OIAQ:2, OCACQ:3 };
     const nivelMedalla   = { oro:0, plata:1, bronce:2, mencion:3, participante:4 };
     function mejorRango(e) {
@@ -1757,13 +1773,16 @@ function abrirTarjetaModal(nombre) {
             nombreOlimpiada[Object.keys(todasLasOlimpiadas).find(k => nombreOlimpiada[k] === m.olimpiada)] === m.olimpiada &&
             r.año === m.año && r.medalla === m.tipo
         );
-        const sede  = fila ? fila.sede  : '—';
-        const pais  = fila ? fila.pais  : '';
+        // Para datosOtras, sede/pais vienen directamente en el objeto de medalla
+        const sede  = fila ? fila.sede  : (m.sede  || '—');
+        const pais  = fila ? fila.pais  : (m.pais  || '');
+        // Nombre completo de la olimpiada para el tooltip (datosOtras incluye olimpiadaFull)
+        const tituloPopup = m.olimpiadaFull ? `${m.olimpiadaFull} ${m.año}` : `${m.olimpiada} ${m.año}`;
         const popupId = `chip-popup-${i}`;
         return `<span class="chip-tooltip-wrap" id="wrap-${popupId}" onclick="toggleChipPopup('wrap-${popupId}', event)">
             <span class="medalla-chip chip-${m.tipo}" tabindex="0">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>
             <span class="chip-popup" id="${popupId}">
-                <strong>${m.olimpiada} ${m.año}</strong><br>
+                <strong>${tituloPopup}</strong><br>
                 ${pais} ${sede}
             </span>
         </span>`;
@@ -1996,9 +2015,16 @@ async function inicializarNoticias() {
                 imagen: (c[3]?.textContent || '').trim() || 'https://via.placeholder.com/800x400?text=Olimpiada+Química'
             };
         }).filter(d => d.link && d.titulo);
-        datos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        _todasNoticias = datos.filter(d => !/youtube\.com|youtu\.be|facebook\.com/.test(d.link));
-        _todosVideos   = datos.filter(d =>  /youtube\.com|youtu\.be|facebook\.com/.test(d.link));
+        // Deduplicar: si un mismo link aparece más de una vez, conservar solo la primera entrada
+        const _seenLinks = new Set();
+        const datosFiltrados = datos.filter(d => {
+            if (_seenLinks.has(d.link)) return false;
+            _seenLinks.add(d.link);
+            return true;
+        });
+        datosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        _todasNoticias = datosFiltrados.filter(d => !/youtube\.com|youtu\.be|facebook\.com/.test(d.link));
+        _todosVideos   = datosFiltrados.filter(d =>  /youtube\.com|youtu\.be|facebook\.com/.test(d.link));
         renderNoticias();
         renderVideos();
         renderFiltroAnios();
@@ -2084,7 +2110,6 @@ function abrirMenu() {
     }
     panel.classList.add('abierto');
     overlay.classList.add('abierto');
-    document.body.style.overflow = 'hidden';
 }
 function cerrarMenu() {
     document.getElementById('menu-panel').classList.remove('abierto');
