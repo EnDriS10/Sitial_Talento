@@ -1356,6 +1356,13 @@ async function cargarProfesoresData() {
         const el   = doc.getElementById('professor-data');
         if (!el) throw new Error('No se encontró #professor-data en professor_data.html');
         window.todasLosProfesores = JSON.parse(el.textContent);
+        // Construir mapa de fotos de profesores (foto leída desde professor_data, distinta de las de estudiantes)
+        window.fotosPorNombreProfesor = {};
+        Object.values(window.todasLosProfesores).flat().forEach(p => {
+            if (p.nombre && p.foto) {
+                window.fotosPorNombreProfesor[p.nombre] = p.foto;
+            }
+        });
     } catch (err) {
         // El archivo es opcional; si no existe, simplemente no hay datos de profesores
         console.warn('professor_data.html no encontrado o sin datos:', err.message);
@@ -1415,7 +1422,11 @@ const medallaEmoji = { oro:'🥇', plata:'🥈', bronce:'🥉', mencion:'🎖', 
 function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase(); }
 
 function avatarHTML(nombre, mini = false, mode = 'modal') {
-    const foto = fotosPorNombre[nombre];
+    // mode='profesor' → foto de profesor (professor_data); nunca la de estudiante
+    // mode='modal'|'foto' → foto de estudiante (fotosPorNombre); nunca la de profesor
+    const foto = (mode === 'profesor')
+        ? ((window.fotosPorNombreProfesor || {})[nombre] || null)
+        : (fotosPorNombre[nombre] || null);
     if (mini) {
         const nombreEsc = nombre.replace(/'/g, "\\'");
         if (mode === 'foto') {
@@ -1520,6 +1531,7 @@ function construirSitial() {
 const SITIAL_PAGINA = 12;
 let sitialPagina = 1;
 let _listaActual = [];
+let _sitialObserver = null;   // IntersectionObserver activo
 
 function tarjetaHTML(est) {
     const sinP  = est.medallas.filter(m => m.tipo !== 'participante');
@@ -1544,24 +1556,57 @@ function tarjetaHTML(est) {
 
 function renderizarSitial(lista) {
     _listaActual = lista;
+    sitialPagina = 1;
     const grid = document.getElementById('cuadricula-sitial');
     const wrap = document.getElementById('ver-mas-wrap');
+
+    // Desconectar observer anterior si existe
+    if (_sitialObserver) { _sitialObserver.disconnect(); _sitialObserver = null; }
+
     if (!lista.length) {
-        grid.innerHTML='<div class="no-results">No se encontraron estudiantes.</div>';
-        wrap.innerHTML=''; return;
+        grid.innerHTML = '<div class="no-results">No se encontraron estudiantes.</div>';
+        wrap.innerHTML = ''; return;
     }
-    const visibles = sitialPagina * SITIAL_PAGINA;
-    grid.innerHTML = lista.slice(0, visibles).map(tarjetaHTML).join('');
-    const restantes = lista.length - visibles;
-    if (restantes > 0) {
-        const proximos = Math.min(restantes, SITIAL_PAGINA);
-        wrap.innerHTML = `<button class="ver-mas-btn" onclick="verMasSitial()">Ver más <span class="ver-mas-count">+${proximos}</span></button>`;
-    } else {
-        wrap.innerHTML = '';
-    }
+
+    const inicial = Math.min(SITIAL_PAGINA, lista.length);
+    grid.innerHTML = lista.slice(0, inicial).map(tarjetaHTML).join('');
+
+    if (lista.length <= inicial) { wrap.innerHTML = ''; return; }
+
+    // Crear sentinel invisible que dispara la carga al entrar en viewport
+    wrap.innerHTML = '<div id="sitial-sentinel" style="height:1px;"></div>';
+    const sentinel = document.getElementById('sitial-sentinel');
+
+    _sitialObserver = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        sitialPagina++;
+        const desde = (sitialPagina - 1) * SITIAL_PAGINA;
+        const hasta = Math.min(sitialPagina * SITIAL_PAGINA, lista.length);
+        lista.slice(desde, hasta).forEach(est => {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = tarjetaHTML(est);
+            const card = tmp.firstElementChild;
+            // Animación de aparición suave
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(18px)';
+            grid.appendChild(card);
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                card.style.transition = 'opacity .38s ease, transform .38s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }));
+        });
+        if (hasta >= lista.length) {
+            _sitialObserver.disconnect();
+            _sitialObserver = null;
+            wrap.innerHTML = '';
+        }
+    }, { rootMargin: '220px' });
+
+    _sitialObserver.observe(sentinel);
 }
 
-function verMasSitial() { sitialPagina++; renderizarSitial(_listaActual); }
+function verMasSitial() { /* legacy — carga automática por scroll */ }
 
 function filtrarSitial(filtro, btn) {
     filtroSitial = filtro;
@@ -1701,7 +1746,7 @@ function renderizarTablaProfesor(datos) {
         return `<tr class="${clase}">
             <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
             <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
-            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'foto')}<strong>${r.nombre}</strong></div></td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
             <td><span class="rol-tag">${r.rol || '—'}</span></td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
         </tr>`;
@@ -1713,63 +1758,81 @@ function renderizarTablaTodos(estudDatos, profDatos) {
     const tbody   = document.getElementById('cuerpo-tabla');
     const countEl = document.getElementById('tabla-count');
 
-    const ordEstud = _sortDatos(estudDatos);
-    const ordProf  = [...profDatos].sort((a, b) => (a.año - b.año) * ordenActual.dir);
-
-    if (!ordEstud.length && !ordProf.length) {
+    if (!estudDatos.length && !profDatos.length) {
         tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
         countEl.textContent = '0 resultados'; return;
     }
 
-    let cnt = {};
-
-    // Filas de estudiantes (color alternante por edición)
+    // Ordenar estudiantes globalmente (para color alternante por edición)
+    const ordEstudAll = _sortDatos(estudDatos);
     const edOrden = {};
     let edIdx = 0;
-    ordEstud.forEach(r => { if (!(r.ed in edOrden)) edOrden[r.ed] = edIdx++; });
+    ordEstudAll.forEach(r => { if (!(r.ed in edOrden)) edOrden[r.ed] = edIdx++; });
 
-    const filasEstud = ordEstud.map(r => {
-        cnt[r.año] = (cnt[r.año] || 0) + 1;
-        const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
-        return `<tr class="${clase}">
-            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
-            <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
-            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
-                r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
-                    ? 'foto' : 'modal'
-            )}<strong>${r.nombre}</strong></div></td>
-            <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
-            <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
-            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
-        </tr>`;
-    }).join('');
+    // Años presentes (en ambos conjuntos), respetando dirección de ordenamiento
+    const añosSet = new Set([...estudDatos.map(r => r.año), ...profDatos.map(r => r.año)]);
+    const años = [...añosSet].sort((a, b) => (a - b) * ordenActual.dir);
 
-    // Separador visual entre estudiantes y profesores
-    const separador = ordEstud.length && ordProf.length
-        ? `<tr style="background:rgba(59,130,246,.06);">
-               <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(59,130,246,.2);">
-                   👨‍🏫 Profesores · Delegación
-               </td>
-           </tr>`
-        : '';
+    let rows = '';
+    let numEstud = 0, numProf = 0;
 
-    // Filas de profesores (azul claro fijo)
-    let cntP = {};
-    const filasProf = ordProf.map(r => {
-        cntP[r.año] = (cntP[r.año] || 0) + 1;
-        return `<tr class="fila-profesor">
-            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
-            <td style="color:var(--text-muted);font-size:13px;">${cntP[r.año]}</td>
-            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'foto')}<strong>${r.nombre}</strong></div></td>
-            <td><span class="rol-tag">${r.rol || '—'}</span></td>
-            <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
-            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
-        </tr>`;
-    }).join('');
+    años.forEach(año => {
+        const estudAño = ordEstudAll.filter(r => r.año === año);
+        const profAño  = [...profDatos]
+            .filter(r => r.año === año)
+            .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-    tbody.innerHTML = filasEstud + separador + filasProf;
-    const total = ordEstud.length + ordProf.length;
-    countEl.textContent = `${ordEstud.length} estudiante${ordEstud.length !== 1 ? 's' : ''} · ${ordProf.length} profesor${ordProf.length !== 1 ? 'es' : ''}`;
+        // ── Bloque de estudiantes para este año ──
+        if (estudAño.length) {
+            rows += `<tr style="background:rgba(4,18,43,.04);">
+                <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(4,18,43,.12);">
+                    👨‍🎓 Estudiantes · Delegación ${año}
+                </td>
+            </tr>`;
+            let cnt = 0;
+            estudAño.forEach(r => {
+                cnt++;
+                const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+                rows += `<tr class="${clase}">
+                    <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+                    <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
+                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
+                        r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
+                            ? 'foto' : 'modal'
+                    )}<strong>${r.nombre}</strong></div></td>
+                    <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
+                    <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
+                    <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+                </tr>`;
+                numEstud++;
+            });
+        }
+
+        // ── Bloque de profesores para este año ──
+        if (profAño.length) {
+            rows += `<tr style="background:rgba(59,130,246,.06);">
+                <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(59,130,246,.2);">
+                    👨‍🏫 Profesores · Delegación ${año}
+                </td>
+            </tr>`;
+            let cntP = 0;
+            profAño.forEach(r => {
+                cntP++;
+                rows += `<tr class="fila-profesor">
+                    <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+                    <td style="color:var(--text-muted);font-size:13px;">${cntP}</td>
+                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
+                    <td><span class="rol-tag">${r.rol || '—'}</span></td>
+                    <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
+                    <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+                </tr>`;
+                numProf++;
+            });
+        }
+    });
+
+    tbody.innerHTML = rows;
+    countEl.textContent = `${numEstud} estudiante${numEstud !== 1 ? 's' : ''} · ${numProf} profesor${numProf !== 1 ? 'es' : ''}`;
 }
 
 // Alias legacy (usado en otros lugares)
