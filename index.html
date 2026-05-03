@@ -403,6 +403,11 @@
         tr.fila-ed-par:hover td  { background: #f0f4ff; }
         tr.fila-ed-impar:hover td { background: rgba(59, 130, 246, 0.14); }
         tr.fila-profesor:hover td { background: rgba(59, 130, 246, 0.18); }
+        /* ── COLORES POR DELEGACIÓN (modo "todos") ── */
+        tr.fila-del-par td  { background: #ffffff; }
+        tr.fila-del-impar td { background: rgba(59, 130, 246, 0.055); }
+        tr.fila-del-par:hover td  { background: #f0f4ff; }
+        tr.fila-del-impar:hover td { background: rgba(59, 130, 246, 0.11); }
         /* tag de rol dentro de la tabla */
         .rol-tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,.13); color: var(--navy-light); }
         /* badge de provincia */
@@ -1209,6 +1214,7 @@
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
         <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
+        <span id="tarjeta-modal-prov" style="display:none;position:absolute;top:16px;left:14px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(201,162,39,.15);color:#7a5800;letter-spacing:.3px;cursor:default;"></span>
         <div id="tarjeta-modal-avatar-wrap" onclick="abrirFotoZoom()"></div>
         <h2 id="tarjeta-modal-nombre"></h2>
         <p id="tarjeta-modal-subtitulo"></p>
@@ -1418,6 +1424,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 let ordenActual    = { campo: 'año', dir: -1 };
 let filtroSitial   = 'todos';
 let busquedaSitial = '';
+
+const PROVINCIAS = {
+    AR:'Provincia Artemisa', CA:'Provincia Ciego de Ávila', CM:'Provincia Camagüey',
+    CF:'Provincia Cienfuegos', GR:'Provincia Granma', GU:'Provincia Guantánamo',
+    LH:'Provincia La Habana', HO:'Provincia Holguín', LT:'Provincia Las Tunas',
+    MT:'Provincia Matanzas', MA:'Provincia Mayabeque', PR:'Provincia Pinar del Río',
+    SC:'Provincia Santiago de Cuba', SS:'Provincia Sancti Spíritus', VC:'Provincia Villa Clara'
+};
 
 const medallaOrden = { oro:1, plata:2, bronce:3, mencion:4, participante:5 };
 const medallaLabel = { oro:'Medalla de Oro', plata:'Medalla de Plata', bronce:'Medalla de Bronce', mencion:'Mención Honorífica', participante:'Participante' };
@@ -1721,7 +1735,7 @@ function renderizarTablaEstudiante(datos) {
                 r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                     ? 'foto' : 'modal'
             )}<strong>${r.nombre}</strong></div></td>
-            <td><span class="prov-badge">${r.prov || '—'}</span></td>
+            <td><span class="prov-badge" title="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
             <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1780,6 +1794,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
 
     let rows = '';
     let numEstud = 0, numProf = 0;
+    let delIdx = 0;  // índice de delegación para color alternante
 
     años.forEach(año => {
         const estudAño = ordEstudAll.filter(r => r.año === año);
@@ -1789,6 +1804,10 @@ function renderizarTablaTodos(estudDatos, profDatos) {
 
         const hayAlgo = estudAño.length || profAño.length;
         if (!hayAlgo) return;
+
+        // Color de la delegación: alterna par/impar por año, independiente de edición o rol
+        const claseDeleg = delIdx % 2 === 0 ? 'fila-del-par' : 'fila-del-impar';
+        delIdx++;
 
         // ── Encabezado único de delegación para este año ──
         rows += `<tr style="background:rgba(4,18,43,.06);">
@@ -1801,15 +1820,14 @@ function renderizarTablaTodos(estudDatos, profDatos) {
         let cnt = 0;
         estudAño.forEach(r => {
             cnt++;
-            const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
-            rows += `<tr class="${clase}">
+            rows += `<tr class="${claseDeleg}">
                     <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
                         r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                             ? 'foto' : 'modal'
                     )}<strong>${r.nombre}</strong></div></td>
-                    <td><span class="prov-badge">${r.prov || '—'}</span></td>
+                    <td><span class="prov-badge" title="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
                     <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
                     <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
                     <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1821,13 +1839,13 @@ function renderizarTablaTodos(estudDatos, profDatos) {
         let cntP = 0;
         profAño.forEach(r => {
             cntP++;
-            rows += `<tr class="fila-profesor">
+            rows += `<tr class="${claseDeleg}">
                     <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cntP}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
                     <td></td>
                     <td><span class="rol-tag">${r.rol || '—'}</span></td>
-                    <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
+                    <td></td>
                     <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
                 </tr>`;
             numProf++;
@@ -1957,6 +1975,16 @@ function abrirTarjetaModal(nombre) {
     const olimpiadasUnicas = [...new Set(sinP.map(m => m.olimpiada))].join(', ');
     document.getElementById('tarjeta-modal-subtitulo').textContent = `${añoRange}  ·  ${olimpiadasUnicas}`;
     const todasFilas = Object.values(todasLasOlimpiadas).flat();
+    // Mostrar provincia en esquina superior izquierda
+    const filaConProv = todasFilas.find(r => r.nombre === nombre && r.prov);
+    const provEl = document.getElementById('tarjeta-modal-prov');
+    if (filaConProv && filaConProv.prov) {
+        provEl.textContent = filaConProv.prov;
+        provEl.title = PROVINCIAS[filaConProv.prov] || '';
+        provEl.style.display = 'inline-block';
+    } else {
+        provEl.style.display = 'none';
+    }
     document.getElementById('tarjeta-modal-chips').innerHTML = sinP.map((m, i) => {
         const fila = todasFilas.find(r =>
             r.nombre === nombre &&
