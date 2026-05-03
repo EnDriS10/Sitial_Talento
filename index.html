@@ -411,7 +411,22 @@
         /* tag de rol dentro de la tabla */
         .rol-tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,.13); color: var(--navy-light); }
         /* badge de provincia */
-        .prov-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: rgba(201,162,39,.12); color: #7a5800; letter-spacing: .3px; }
+        .prov-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: rgba(201,162,39,.12); color: #7a5800; letter-spacing: .3px; cursor: pointer; user-select: none; }
+        /* ── PROVINCE TOOLTIP ── */
+        #prov-tooltip {
+            display: none; position: absolute;
+            background: var(--navy); color: #fff;
+            border-radius: 9px; padding: 6px 13px;
+            font-size: 12px; font-weight: 500;
+            white-space: nowrap; pointer-events: none;
+            box-shadow: 0 6px 20px rgba(4,18,43,.32);
+            z-index: 9999;
+        }
+        #prov-tooltip.visible {
+            display: block;
+            animation: provPop .17s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes provPop { from { opacity:0; transform:scale(.84) translateY(3px); } to { opacity:1; transform:scale(1) translateY(0); } }
         .tabla-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8ecf5; border: 2px solid var(--border); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 10px; flex-shrink: 0; }
         .tabla-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .tabla-avatar-initials { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; color: var(--navy-light); }
@@ -1214,7 +1229,7 @@
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
         <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
-        <span id="tarjeta-modal-prov" style="display:none;position:absolute;top:16px;left:14px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(201,162,39,.15);color:#7a5800;letter-spacing:.3px;cursor:default;"></span>
+        <span id="tarjeta-modal-prov" style="display:none;position:absolute;top:14px;left:14px;padding:4px 11px;border-radius:10px;font-size:14px;font-weight:700;background:rgba(201,162,39,.15);color:#7a5800;letter-spacing:.3px;cursor:pointer;user-select:none;"></span>
         <div id="tarjeta-modal-avatar-wrap" onclick="abrirFotoZoom()"></div>
         <h2 id="tarjeta-modal-nombre"></h2>
         <p id="tarjeta-modal-subtitulo"></p>
@@ -1228,6 +1243,8 @@
     <img id="foto-zoom-img" src="" alt="">
     <div id="foto-zoom-nombre"></div>
 </div>
+
+<div id="prov-tooltip"></div>
 
 <footer>
     <div class="footer-links">
@@ -1426,11 +1443,11 @@ let filtroSitial   = 'todos';
 let busquedaSitial = '';
 
 const PROVINCIAS = {
-    AR:'Provincia Artemisa', CA:'Provincia Ciego de Ávila', CM:'Provincia Camagüey',
-    CF:'Provincia Cienfuegos', GR:'Provincia Granma', GU:'Provincia Guantánamo',
-    LH:'Provincia La Habana', HO:'Provincia Holguín', LT:'Provincia Las Tunas',
-    MT:'Provincia Matanzas', MA:'Provincia Mayabeque', PR:'Provincia Pinar del Río',
-    SC:'Provincia Santiago de Cuba', SS:'Provincia Sancti Spíritus', VC:'Provincia Villa Clara'
+    AR:'Artemisa', CA:'Ciego de Ávila', CM:'Camagüey',
+    CF:'Cienfuegos', GR:'Granma', GU:'Guantánamo',
+    LH:'La Habana', HO:'Holguín', LT:'Las Tunas',
+    MT:'Matanzas', MA:'Mayabeque', PR:'Pinar del Río',
+    SC:'Santiago de Cuba', SS:'Sancti Spíritus', VC:'Villa Clara'
 };
 
 const medallaOrden = { oro:1, plata:2, bronce:3, mencion:4, participante:5 };
@@ -1735,7 +1752,7 @@ function renderizarTablaEstudiante(datos) {
                 r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                     ? 'foto' : 'modal'
             )}<strong>${r.nombre}</strong></div></td>
-            <td><span class="prov-badge" title="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
+            <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
             <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1827,7 +1844,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
                         r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                             ? 'foto' : 'modal'
                     )}<strong>${r.nombre}</strong></div></td>
-                    <td><span class="prov-badge" title="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
+                    <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
                     <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
                     <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
                     <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1980,7 +1997,7 @@ function abrirTarjetaModal(nombre) {
     const provEl = document.getElementById('tarjeta-modal-prov');
     if (filaConProv && filaConProv.prov) {
         provEl.textContent = filaConProv.prov;
-        provEl.title = PROVINCIAS[filaConProv.prov] || '';
+        provEl.setAttribute('data-prov', PROVINCIAS[filaConProv.prov] || '');
         provEl.style.display = 'inline-block';
     } else {
         provEl.style.display = 'none';
@@ -2341,6 +2358,52 @@ function cerrarMenu() {
         if (dy > 8) cerrarMenu();
         _lastScrollY = window.scrollY;
     }, { passive: true });
+})();
+
+// ════ TOOLTIP DE PROVINCIA ════
+(function() {
+    const tt = document.getElementById('prov-tooltip');
+    if (!tt) return;
+
+    function show(el) {
+        const txt = el.dataset.prov;
+        if (!txt) return;
+        tt.textContent = txt;
+        tt.classList.remove('visible');          // reset animation
+        tt.style.display = 'block';
+        const r   = el.getBoundingClientRect();
+        const ttW = tt.offsetWidth;
+        const ttH = tt.offsetHeight;
+        let left = r.left + r.width / 2 - ttW / 2 + window.scrollX;
+        let top  = r.top  - ttH - 9 + window.scrollY;
+        // keep inside viewport horizontally
+        left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
+        // flip below if not enough space above
+        if (top < window.scrollY + 4) top = r.bottom + 8 + window.scrollY;
+        tt.style.left = left + 'px';
+        tt.style.top  = top  + 'px';
+        // re-trigger animation
+        void tt.offsetWidth;
+        tt.classList.add('visible');
+    }
+
+    function hide() { tt.classList.remove('visible'); }
+
+    // Desktop hover
+    document.addEventListener('mouseover', e => {
+        const el = e.target.closest('[data-prov]');
+        el && el.dataset.prov ? show(el) : hide();
+    });
+
+    // Mobile tap + desktop click
+    document.addEventListener('click', e => {
+        const el = e.target.closest('[data-prov]');
+        if (el && el.dataset.prov) { show(el); }
+        else { hide(); }
+    });
+
+    // Hide on scroll
+    window.addEventListener('scroll', hide, { passive: true });
 })();
 </script>
 </body>
