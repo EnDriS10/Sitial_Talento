@@ -395,6 +395,16 @@
         .sede-flag { font-size: 18px; margin-right: 6px; }
         .no-results { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 15px; }
         .tabla-footer { padding: 12px 18px; background: var(--bg); border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+
+        /* ── COLORES DE FILAS POR EDICIÓN Y ROL ── */
+        tr.fila-ed-par td  { background: #ffffff; }
+        tr.fila-ed-impar td { background: rgba(59, 130, 246, 0.055); }
+        tr.fila-profesor td { background: rgba(59, 130, 246, 0.10); }
+        tr.fila-ed-par:hover td  { background: #f0f4ff; }
+        tr.fila-ed-impar:hover td { background: rgba(59, 130, 246, 0.14); }
+        tr.fila-profesor:hover td { background: rgba(59, 130, 246, 0.18); }
+        /* tag de rol dentro de la tabla */
+        .rol-tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,.13); color: var(--navy-light); }
         .tabla-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8ecf5; border: 2px solid var(--border); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 10px; flex-shrink: 0; }
         .tabla-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .tabla-avatar-initials { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; color: var(--navy-light); }
@@ -1112,6 +1122,12 @@
                 <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
                 <option value="ocacq">🌴 OCACQ — Centroam. y del Caribe</option>
             </select>
+            <label for="selector-rol"><strong>Rol:</strong></label>
+            <select class="custom-select" id="selector-rol" onchange="cargarTabla()">
+                <option value="estudiante">👨‍🎓 Estudiante</option>
+                <option value="profesor">👨‍🏫 Profesor</option>
+                <option value="todos">🏛️ Delegación</option>
+            </select>
             <div class="sort-controls">
                 <span class="sort-label">Ordenar:</span>
                 <button class="sort-btn activo" id="sort-año" onclick="ordenarTabla('año', this)">Año <span class="sort-icon">↓</span></button>
@@ -1120,9 +1136,9 @@
             </div>
         </div>
         <div class="tabla-wrapper">
-            <table>
+            <table id="tabla-principal">
                 <thead>
-                    <tr>
+                    <tr id="tabla-thead-row">
                         <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
                         <th>N°</th>
                         <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Estudiante <span class="sort-arrow">↕</span></th>
@@ -1326,6 +1342,27 @@ async function cargarDatosOlimpiadas() {
     }
 }
 
+// ════════════════════════════════════════════════════
+// CARGA ASÍNCRONA DE PROFESORES DESDE professor_data.html
+// ════════════════════════════════════════════════════
+window.todasLosProfesores = {};
+
+async function cargarProfesoresData() {
+    try {
+        const resp = await fetch('professor_data.html');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const html = await resp.text();
+        const doc  = new DOMParser().parseFromString(html, 'text/html');
+        const el   = doc.getElementById('professor-data');
+        if (!el) throw new Error('No se encontró #professor-data en professor_data.html');
+        window.todasLosProfesores = JSON.parse(el.textContent);
+    } catch (err) {
+        // El archivo es opcional; si no existe, simplemente no hay datos de profesores
+        console.warn('professor_data.html no encontrado o sin datos:', err.message);
+        window.todasLosProfesores = {};
+    }
+}
+
 // Reemplaza el DOMContentLoaded original para esperar los datos
 window._appReady = false;
 const _origInit = () => {
@@ -1362,6 +1399,7 @@ const _origInit = () => {
 document.addEventListener('DOMContentLoaded', async () => {
     await cargarDatosOlimpiadas();
     await cargarHonorData();
+    await cargarProfesoresData();
     _origInit();
 });
 
@@ -1545,10 +1583,44 @@ function aplicarFiltros() {
 }
 
 function cargarTabla() {
-    const ol    = document.getElementById('selector-olimpiada').value;
-    const datos = todasLasOlimpiadas[ol] || [];
-    renderizarTabla(datos);
-    document.getElementById('tabla-fuente').textContent = fuenteOlimpiada[ol]||'';
+    const ol  = document.getElementById('selector-olimpiada').value;
+    const rol = document.getElementById('selector-rol').value;
+    const estudDatos = todasLasOlimpiadas[ol] || [];
+    const profDatos  = (window.todasLosProfesores || {})[ol] || [];
+
+    // Mostrar/ocultar botón de ordenar por medalla
+    const btnMedalla = document.getElementById('sort-medalla');
+    if (btnMedalla) btnMedalla.style.display = (rol === 'profesor') ? 'none' : '';
+
+    // Ajustar encabezado de la tabla según el rol
+    const thead = document.getElementById('tabla-thead-row');
+    if (rol === 'profesor') {
+        thead.innerHTML = `
+            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
+            <th>N°</th>
+            <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Profesor <span class="sort-arrow">↕</span></th>
+            <th>Rol</th>
+            <th>Sede</th>`;
+    } else {
+        const etiqueta = (rol === 'todos') ? 'Participante' : 'Estudiante';
+        thead.innerHTML = `
+            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
+            <th>N°</th>
+            <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${etiqueta} <span class="sort-arrow">↕</span></th>
+            <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
+            <th>Rank</th>
+            <th>Sede</th>`;
+    }
+
+    if (rol === 'estudiante') {
+        renderizarTablaEstudiante(estudDatos);
+    } else if (rol === 'profesor') {
+        renderizarTablaProfesor(profDatos);
+    } else {
+        renderizarTablaTodos(estudDatos, profDatos);
+    }
+
+    document.getElementById('tabla-fuente').textContent = fuenteOlimpiada[ol] || '';
     if (document.getElementById('eventos').classList.contains('activa')) statsParaEvento();
 }
 
@@ -1561,23 +1633,39 @@ function ordenarTabla(campo, btn) {
     cargarTabla();
 }
 
-function renderizarTabla(datos) {
+// Calcula clase de color de fila según paridad de edición (para modo único)
+function _claseEdicion(ed, edOrdinal) {
+    return edOrdinal % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+}
+
+function _sortDatos(datos) {
+    return [...datos].sort((a, b) => {
+        if (ordenActual.campo === 'año')     return (a.año - b.año) * ordenActual.dir;
+        if (ordenActual.campo === 'nombre')  return a.nombre.localeCompare(b.nombre) * ordenActual.dir;
+        if (ordenActual.campo === 'medalla') return (medallaOrden[a.medalla] - medallaOrden[b.medalla]) * ordenActual.dir;
+        return 0;
+    });
+}
+
+function renderizarTablaEstudiante(datos) {
     const tbody   = document.getElementById('cuerpo-tabla');
     const countEl = document.getElementById('tabla-count');
     if (!datos.length) {
-        tbody.innerHTML=`<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
-        countEl.textContent='0 resultados'; return;
+        tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        countEl.textContent = '0 resultados'; return;
     }
-    const ord = [...datos].sort((a,b) => {
-        if (ordenActual.campo==='año')     return (a.año-b.año)*ordenActual.dir;
-        if (ordenActual.campo==='nombre')  return a.nombre.localeCompare(b.nombre)*ordenActual.dir;
-        if (ordenActual.campo==='medalla') return (medallaOrden[a.medalla]-medallaOrden[b.medalla])*ordenActual.dir;
-        return 0;
-    });
+    const ord = _sortDatos(datos);
+
+    // Calcular ordinal de edición para el color alternante
+    const edOrden = {};
+    let edIdx = 0;
+    ord.forEach(r => { if (!(r.ed in edOrden)) edOrden[r.ed] = edIdx++; });
+
     let cnt = {};
     tbody.innerHTML = ord.map(r => {
-        cnt[r.año] = (cnt[r.año]||0) + 1;
-        return `<tr>
+        cnt[r.año] = (cnt[r.año] || 0) + 1;
+        const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+        return `<tr class="${clase}">
             <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
             <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
             <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
@@ -1585,12 +1673,107 @@ function renderizarTabla(datos) {
                     ? 'foto' : 'modal'
             )}<strong>${r.nombre}</strong></div></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
-            <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank??'—'}</td>
+            <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
         </tr>`;
     }).join('');
-    countEl.textContent = `${datos.length} resultado${datos.length!==1?'s':''}`;
+    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
 }
+
+function renderizarTablaProfesor(datos) {
+    const tbody   = document.getElementById('cuerpo-tabla');
+    const countEl = document.getElementById('tabla-count');
+    if (!datos.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="no-results">📋 Sin datos de profesores para esta olimpiada</td></tr>`;
+        countEl.textContent = '0 resultados'; return;
+    }
+    const ord = _sortDatos(datos);
+
+    // Ordinal de edición para color alternante
+    const edOrden = {};
+    let edIdx = 0;
+    ord.forEach(r => { if (!(r.ed in edOrden)) edOrden[r.ed] = edIdx++; });
+
+    let cnt = {};
+    tbody.innerHTML = ord.map(r => {
+        cnt[r.año] = (cnt[r.año] || 0) + 1;
+        const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+        return `<tr class="${clase}">
+            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+            <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'foto')}<strong>${r.nombre}</strong></div></td>
+            <td><span class="rol-tag">${r.rol || '—'}</span></td>
+            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+        </tr>`;
+    }).join('');
+    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
+}
+
+function renderizarTablaTodos(estudDatos, profDatos) {
+    const tbody   = document.getElementById('cuerpo-tabla');
+    const countEl = document.getElementById('tabla-count');
+
+    const ordEstud = _sortDatos(estudDatos);
+    const ordProf  = [...profDatos].sort((a, b) => (a.año - b.año) * ordenActual.dir);
+
+    if (!ordEstud.length && !ordProf.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        countEl.textContent = '0 resultados'; return;
+    }
+
+    let cnt = {};
+
+    // Filas de estudiantes (color alternante por edición)
+    const edOrden = {};
+    let edIdx = 0;
+    ordEstud.forEach(r => { if (!(r.ed in edOrden)) edOrden[r.ed] = edIdx++; });
+
+    const filasEstud = ordEstud.map(r => {
+        cnt[r.año] = (cnt[r.año] || 0) + 1;
+        const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+        return `<tr class="${clase}">
+            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+            <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
+                r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
+                    ? 'foto' : 'modal'
+            )}<strong>${r.nombre}</strong></div></td>
+            <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
+            <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
+            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+        </tr>`;
+    }).join('');
+
+    // Separador visual entre estudiantes y profesores
+    const separador = ordEstud.length && ordProf.length
+        ? `<tr style="background:rgba(59,130,246,.06);">
+               <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(59,130,246,.2);">
+                   👨‍🏫 Profesores · Delegación
+               </td>
+           </tr>`
+        : '';
+
+    // Filas de profesores (azul claro fijo)
+    let cntP = {};
+    const filasProf = ordProf.map(r => {
+        cntP[r.año] = (cntP[r.año] || 0) + 1;
+        return `<tr class="fila-profesor">
+            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+            <td style="color:var(--text-muted);font-size:13px;">${cntP[r.año]}</td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'foto')}<strong>${r.nombre}</strong></div></td>
+            <td><span class="rol-tag">${r.rol || '—'}</span></td>
+            <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
+            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+        </tr>`;
+    }).join('');
+
+    tbody.innerHTML = filasEstud + separador + filasProf;
+    const total = ordEstud.length + ordProf.length;
+    countEl.textContent = `${ordEstud.length} estudiante${ordEstud.length !== 1 ? 's' : ''} · ${ordProf.length} profesor${ordProf.length !== 1 ? 'es' : ''}`;
+}
+
+// Alias legacy (usado en otros lugares)
+function renderizarTabla(datos) { renderizarTablaEstudiante(datos); }
 
 // ════ NAVEGACIÓN CON TRANSICIÓN ════
 const _tituloSeccion = {
