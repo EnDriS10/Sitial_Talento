@@ -405,6 +405,8 @@
         tr.fila-profesor:hover td { background: rgba(59, 130, 246, 0.18); }
         /* tag de rol dentro de la tabla */
         .rol-tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,.13); color: var(--navy-light); }
+        /* badge de provincia */
+        .prov-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: rgba(201,162,39,.12); color: #7a5800; letter-spacing: .3px; }
         .tabla-avatar { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8ecf5; border: 2px solid var(--border); display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-right: 10px; flex-shrink: 0; }
         .tabla-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .tabla-avatar-initials { font-family: 'Playfair Display', serif; font-size: 12px; font-weight: 700; color: var(--navy-light); }
@@ -443,7 +445,7 @@
             .tabla-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             table { min-width: 440px; }
             th, td { padding: 10px 10px; font-size: 12px; }
-            th:nth-child(2), td:nth-child(2), th:nth-child(5), td:nth-child(5) { display: none; }
+            th:nth-child(2), td:nth-child(2), th:nth-child(6), td:nth-child(6) { display: none; }
             .tabla-avatar { width: 26px; height: 26px; margin-right: 7px; }
             .tabla-avatar-initials { font-size: 10px; }
             .badge { font-size: 11px; padding: 4px 8px; }
@@ -1142,6 +1144,7 @@
                         <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
                         <th>N°</th>
                         <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Estudiante <span class="sort-arrow">↕</span></th>
+                        <th>Provincia</th>
                         <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
                         <th>Rank</th>
                         <th>Sede</th>
@@ -1652,6 +1655,7 @@ function cargarTabla() {
             <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
             <th>N°</th>
             <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${etiqueta} <span class="sort-arrow">↕</span></th>
+            <th>Provincia</th>
             <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
             <th>Rank</th>
             <th>Sede</th>`;
@@ -1696,7 +1700,7 @@ function renderizarTablaEstudiante(datos) {
     const tbody   = document.getElementById('cuerpo-tabla');
     const countEl = document.getElementById('tabla-count');
     if (!datos.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
         countEl.textContent = '0 resultados'; return;
     }
     const ord = _sortDatos(datos);
@@ -1717,6 +1721,7 @@ function renderizarTablaEstudiante(datos) {
                 r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                     ? 'foto' : 'modal'
             )}<strong>${r.nombre}</strong></div></td>
+            <td><span class="prov-badge">${r.prov || '—'}</span></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
             <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
@@ -1759,7 +1764,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
     const countEl = document.getElementById('tabla-count');
 
     if (!estudDatos.length && !profDatos.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
         countEl.textContent = '0 resultados'; return;
     }
 
@@ -1782,53 +1787,51 @@ function renderizarTablaTodos(estudDatos, profDatos) {
             .filter(r => r.año === año)
             .sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
 
-        // ── Bloque de estudiantes para este año ──
-        if (estudAño.length) {
-            rows += `<tr style="background:rgba(4,18,43,.04);">
-                <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(4,18,43,.12);">
-                    👨‍🎓 Estudiantes · Delegación ${año}
-                </td>
-            </tr>`;
-            let cnt = 0;
-            estudAño.forEach(r => {
-                cnt++;
-                const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
-                rows += `<tr class="${clase}">
+        const hayAlgo = estudAño.length || profAño.length;
+        if (!hayAlgo) return;
+
+        // ── Encabezado único de delegación para este año ──
+        rows += `<tr style="background:rgba(4,18,43,.06);">
+            <td colspan="7" style="padding:7px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--navy-light);border-top:2px solid rgba(4,18,43,.14);">
+                🏛️ Delegación ${año}
+            </td>
+        </tr>`;
+
+        // ── Filas de estudiantes para este año ──
+        let cnt = 0;
+        estudAño.forEach(r => {
+            cnt++;
+            const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+            rows += `<tr class="${clase}">
                     <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
                         r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
                             ? 'foto' : 'modal'
                     )}<strong>${r.nombre}</strong></div></td>
+                    <td><span class="prov-badge">${r.prov || '—'}</span></td>
                     <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
                     <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
                     <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
                 </tr>`;
-                numEstud++;
-            });
-        }
+            numEstud++;
+        });
 
-        // ── Bloque de profesores para este año ──
-        if (profAño.length) {
-            rows += `<tr style="background:rgba(59,130,246,.06);">
-                <td colspan="6" style="padding:6px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--navy-light);border-top:2px solid rgba(59,130,246,.2);">
-                    👨‍🏫 Profesores · Delegación ${año}
-                </td>
-            </tr>`;
-            let cntP = 0;
-            profAño.forEach(r => {
-                cntP++;
-                rows += `<tr class="fila-profesor">
+        // ── Filas de profesores para este año ──
+        let cntP = 0;
+        profAño.forEach(r => {
+            cntP++;
+            rows += `<tr class="fila-profesor">
                     <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cntP}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
+                    <td></td>
                     <td><span class="rol-tag">${r.rol || '—'}</span></td>
                     <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
                     <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
                 </tr>`;
-                numProf++;
-            });
-        }
+            numProf++;
+        });
     });
 
     tbody.innerHTML = rows;
