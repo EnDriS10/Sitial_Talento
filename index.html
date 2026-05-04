@@ -1045,8 +1045,8 @@
 <div id="menu-overlay" onclick="cerrarMenu()"></div>
 <div id="menu-panel">
     <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span>Inicio</span></button>
-    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Sitial de Talentos</span></button>
     <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span>Historial por Eventos</span></button>
+    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Historial por Medallas</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span>Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span>Noticias y Entrevistas</span></button>
     <div class="menu-pie">© 2026 · Sitial de Talentos Cubanos</div>
@@ -1059,15 +1059,15 @@
         </div>
 
         <div class="inicio-grid">
-            <div class="inicio-card" onclick="cambiarSeccion('sitial')">
-                <span class="inicio-card-icon">🏅</span>
-                <h3>Sitial de Talentos</h3>
-                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
-            </div>
             <div class="inicio-card" onclick="cambiarSeccion('eventos')">
                 <span class="inicio-card-icon">🔍</span>
                 <h3>Historial por Eventos</h3>
                 <p>Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
+            </div>
+            <div class="inicio-card" onclick="cambiarSeccion('sitial')">
+                <span class="inicio-card-icon">🏅</span>
+                <h3>Historial por Medallas</h3>
+                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('honor')">
                 <span class="inicio-card-icon">🎓</span>
@@ -1142,7 +1142,7 @@
                 <option value="icho">🌍 IChO — Internacional</option>
                 <option value="imcho">🧪 IMChO — Mendeleyev</option>
                 <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
-                <option value="ocacq">🌴 OCACQ — Centroam. y del Caribe</option>
+                <option value="ocacq">🌴 OCACQ — Centroamérica y del Caribe</option>
             </select>
             <label for="selector-rol"><strong>Rol:</strong></label>
             <select class="custom-select" id="selector-rol" onchange="cargarTabla()">
@@ -1746,7 +1746,7 @@ function renderizarTablaEstudiante(datos) {
         cnt[r.año] = (cnt[r.año] || 0) + 1;
         const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
         return `<tr class="${clase}">
-            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+            <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
             <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
             <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
                 r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
@@ -1780,7 +1780,7 @@ function renderizarTablaProfesor(datos) {
         cnt[r.año] = (cnt[r.año] || 0) + 1;
         const clase = edOrden[r.ed] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
         return `<tr class="${clase}">
-            <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+            <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
             <td style="color:var(--text-muted);font-size:13px;">${cnt[r.año]}</td>
             <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
             <td><span class="rol-tag">${r.rol || '—'}</span></td>
@@ -1838,7 +1838,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
         estudAño.forEach(r => {
             cnt++;
             rows += `<tr class="${claseDeleg}">
-                    <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+                    <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
                         r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
@@ -1857,7 +1857,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
         profAño.forEach(r => {
             cntP++;
             rows += `<tr class="${claseDeleg}">
-                    <td><strong>${r.año}</strong> <small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
+                    <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cntP}</td>
                     <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
                     <td></td>
@@ -1879,7 +1879,7 @@ function renderizarTabla(datos) { renderizarTablaEstudiante(datos); }
 // ════ NAVEGACIÓN CON TRANSICIÓN ════
 const _tituloSeccion = {
     inicio:   'Talentos Cubanos · Química',
-    sitial:   '🏅 Sitial de Talentos',
+    sitial:   '🏅 Historial por Medallas',
     eventos:  '🔍 Historial por Eventos',
     honor:    '🎓 Honor a quien Honor Merece',
     noticias: '📰 Noticias y Entrevistas'
@@ -2361,49 +2361,58 @@ function cerrarMenu() {
 })();
 
 // ════ TOOLTIP DE PROVINCIA ════
-(function() {
+// show/hide expuestos globalmente para uso directo si se necesita
+function _provShow(el) {
     const tt = document.getElementById('prov-tooltip');
     if (!tt) return;
+    const txt = el.dataset.prov;
+    if (!txt) return;
+    tt.textContent = txt;
+    tt.classList.remove('visible');
+    tt.style.display = 'block';
+    const r   = el.getBoundingClientRect();
+    const ttW = tt.offsetWidth;
+    const ttH = tt.offsetHeight;
+    let left = r.left + r.width / 2 - ttW / 2 + window.scrollX;
+    let top  = r.top  - ttH - 9 + window.scrollY;
+    left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
+    if (top < window.scrollY + 4) top = r.bottom + 8 + window.scrollY;
+    tt.style.left = left + 'px';
+    tt.style.top  = top  + 'px';
+    void tt.offsetWidth;
+    tt.classList.add('visible');
+}
+function _provHide() {
+    const tt = document.getElementById('prov-tooltip');
+    if (tt) tt.classList.remove('visible');
+}
 
-    function show(el) {
-        const txt = el.dataset.prov;
-        if (!txt) return;
-        tt.textContent = txt;
-        tt.classList.remove('visible');          // reset animation
-        tt.style.display = 'block';
-        const r   = el.getBoundingClientRect();
-        const ttW = tt.offsetWidth;
-        const ttH = tt.offsetHeight;
-        let left = r.left + r.width / 2 - ttW / 2 + window.scrollX;
-        let top  = r.top  - ttH - 9 + window.scrollY;
-        // keep inside viewport horizontally
-        left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
-        // flip below if not enough space above
-        if (top < window.scrollY + 4) top = r.bottom + 8 + window.scrollY;
-        tt.style.left = left + 'px';
-        tt.style.top  = top  + 'px';
-        // re-trigger animation
-        void tt.offsetWidth;
-        tt.classList.add('visible');
-    }
-
-    function hide() { tt.classList.remove('visible'); }
-
-    // Desktop hover
+(function() {
+    // ── Desktop: mostrar al entrar, ocultar al salir ──
     document.addEventListener('mouseover', e => {
         const el = e.target.closest('[data-prov]');
-        el && el.dataset.prov ? show(el) : hide();
+        if (el && el.dataset.prov) _provShow(el);
+    });
+    document.addEventListener('mouseout', e => {
+        const from = e.target.closest('[data-prov]');
+        const to   = e.relatedTarget ? e.relatedTarget.closest('[data-prov]') : null;
+        // ocultar solo cuando salimos de un [data-prov] y NO entramos en otro
+        if (from && from.dataset.prov && from !== to) _provHide();
     });
 
-    // Mobile tap + desktop click
+    // ── Mobile + desktop: toque/clic en CAPTURE para funcionar dentro del modal ──
+    // (captura dispara antes que el stopPropagation del tarjeta-modal-card)
     document.addEventListener('click', e => {
         const el = e.target.closest('[data-prov]');
-        if (el && el.dataset.prov) { show(el); }
-        else { hide(); }
-    });
+        if (el && el.dataset.prov) {
+            _provShow(el);
+        } else {
+            _provHide();
+        }
+    }, true);   // ← capture phase
 
-    // Hide on scroll
-    window.addEventListener('scroll', hide, { passive: true });
+    // Ocultar al hacer scroll
+    window.addEventListener('scroll', _provHide, { passive: true });
 })();
 </script>
 </body>
