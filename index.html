@@ -2361,14 +2361,18 @@ function cerrarMenu() {
 })();
 
 // ════ TOOLTIP DE PROVINCIA ════
-// show/hide expuestos globalmente para uso directo si se necesita
 function _provShow(el) {
     const tt = document.getElementById('prov-tooltip');
     if (!tt) return;
     const txt = el.dataset.prov;
     if (!txt) return;
     tt.textContent = txt;
+    // Limpiar estado previo completamente antes de medir
     tt.classList.remove('visible');
+    tt.style.removeProperty('display');
+    tt.style.removeProperty('left');
+    tt.style.removeProperty('top');
+    // Forzar display para poder medir dimensiones
     tt.style.display = 'block';
     const r   = el.getBoundingClientRect();
     const ttW = tt.offsetWidth;
@@ -2379,29 +2383,33 @@ function _provShow(el) {
     if (top < window.scrollY + 4) top = r.bottom + 8 + window.scrollY;
     tt.style.left = left + 'px';
     tt.style.top  = top  + 'px';
-    void tt.offsetWidth;
+    void tt.offsetWidth;           // flush para re-disparar animación
     tt.classList.add('visible');
 }
 function _provHide() {
     const tt = document.getElementById('prov-tooltip');
-    if (tt) tt.classList.remove('visible');
+    if (!tt) return;
+    tt.classList.remove('visible');
+    // ← LA CLAVE: limpiar el inline style display:block para que
+    //   el CSS display:none del selector base vuelva a tener efecto
+    tt.style.removeProperty('display');
 }
 
 (function() {
-    // ── Desktop: mostrar al entrar, ocultar al salir ──
+    // ── Desktop: mostrar al entrar al elemento, ocultar al salir ──
     document.addEventListener('mouseover', e => {
         const el = e.target.closest('[data-prov]');
         if (el && el.dataset.prov) _provShow(el);
     });
     document.addEventListener('mouseout', e => {
         const from = e.target.closest('[data-prov]');
-        const to   = e.relatedTarget ? e.relatedTarget.closest('[data-prov]') : null;
-        // ocultar solo cuando salimos de un [data-prov] y NO entramos en otro
-        if (from && from.dataset.prov && from !== to) _provHide();
+        if (!from || !from.dataset.prov) return;
+        const to = e.relatedTarget ? e.relatedTarget.closest('[data-prov]') : null;
+        if (from !== to) _provHide();   // salimos del elemento → ocultar
     });
 
-    // ── Mobile + desktop: toque/clic en CAPTURE para funcionar dentro del modal ──
-    // (captura dispara antes que el stopPropagation del tarjeta-modal-card)
+    // ── Click en fase de captura: funciona en desktop Y dentro del modal ──
+    // Se dispara antes del stopPropagation del tarjeta-modal-card.
     document.addEventListener('click', e => {
         const el = e.target.closest('[data-prov]');
         if (el && el.dataset.prov) {
@@ -2409,7 +2417,16 @@ function _provHide() {
         } else {
             _provHide();
         }
-    }, true);   // ← capture phase
+    }, true);
+
+    // ── Móvil: touchstart para ocultar al tocar fuera ──
+    // (el click en capture ya muestra; touchstart oculta inmediatamente al tocar otra zona)
+    document.addEventListener('touchstart', e => {
+        const el = e.target.closest('[data-prov]');
+        if (!el || !el.dataset.prov) {
+            _provHide();
+        }
+    }, { passive: true });
 
     // Ocultar al hacer scroll
     window.addEventListener('scroll', _provHide, { passive: true });
