@@ -1263,6 +1263,7 @@
 // Los datos se cargan dinámicamente desde honor_merece.html
 // ════════════════════════════════════════════════════
 let articulos = {};   // se puebla en tiempo de ejecución por cargarHonorData()
+window.articulosPorNombre = {};  // mapa nombre → id de artículo
 
 function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
@@ -1317,6 +1318,8 @@ async function cargarHonorData() {
                 nombre:    d.nombreArticulo,
                 contenido: generarContenidoArticulo(d)
             };
+            // Mapa nombre → id para abrir artículos desde cualquier tabla
+            if (d.nombre) window.articulosPorNombre[d.nombre.trim()] = d.id;
         });
         renderHonorGrid(data);
     } catch (err) {
@@ -1456,25 +1459,46 @@ const medallaLabel = { oro:'Medalla de Oro', plata:'Medalla de Plata', bronce:'M
 const medallaEmoji = { oro:'🥇', plata:'🥈', bronce:'🥉', mencion:'🎖', participante:'—' };
 function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase(); }
 
+// Abre artículo de honor si existe, sino zoom de foto, sino nada
+function abrirClickProfesor(nombre) {
+    const id = (window.articulosPorNombre || {})[nombre.trim()];
+    if (id) { abrirArticulo(id); return; }
+    const foto = (window.fotosPorNombreProfesor || {})[nombre];
+    if (foto) abrirFotoDirecta(foto, nombre);
+}
+
 function avatarHTML(nombre, mini = false, mode = 'modal') {
-    // mode='profesor' → foto de profesor (professor_data); nunca la de estudiante
-    // mode='modal'|'foto' → foto de estudiante (fotosPorNombre); nunca la de profesor
+    // mode='profesor' → foto profesor; click → artículo honor si existe, sino zoom foto
+    // mode='modal'    → foto estudiante; click → tarjeta sitial de honor
+    // mode='foto'     → foto estudiante; click → zoom foto directa
     const foto = (mode === 'profesor')
         ? ((window.fotosPorNombreProfesor || {})[nombre] || null)
         : (fotosPorNombre[nombre] || null);
     if (mini) {
         const nombreEsc = nombre.replace(/'/g, "\\'");
+
+        if (mode === 'profesor') {
+            const tieneArticulo = !!((window.articulosPorNombre || {})[nombre.trim()]);
+            const cursor = (tieneArticulo || foto) ? (tieneArticulo ? 'pointer' : 'zoom-in') : 'default';
+            const onclick = (tieneArticulo || foto) ? `onclick="abrirClickProfesor('${nombreEsc}')"` : '';
+            return `<span class="tabla-avatar" style="cursor:${cursor};" ${onclick}>${foto
+                ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>';">`
+                : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
+            }</span>`;
+        }
+
         if (mode === 'foto') {
-            // Participant: click opens photo directly if available, else no action
             if (foto) {
                 const fotoEsc = foto.replace(/'/g, "\\'");
-                return `<span class="tabla-avatar" style="cursor:zoom-in;" onclick="abrirFotoDirecta('${fotoEsc}','${nombreEsc}')"><img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(nombre)}</span>';"></span>`;
+                return `<span class="tabla-avatar" style="cursor:zoom-in;" onclick="abrirFotoDirecta('${fotoEsc}','${nombreEsc}')"><img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>';"></span>`;
             } else {
                 return `<span class="tabla-avatar"><span class="tabla-avatar-initials">${getIniciales(nombre)}</span></span>`;
             }
         }
+
+        // mode === 'modal'
         return `<span class="tabla-avatar" style="cursor:pointer;" onclick="abrirTarjetaModal('${nombreEsc}')">${foto
-            ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(nombre)}</span>'">`
+            ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>'">`
             : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
         }</span>`;
     }
