@@ -1143,6 +1143,7 @@
                 <option value="imcho">🧪 IMChO — Mendeleyev</option>
                 <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
                 <option value="ocacq">🌴 OCACQ — Centroamérica y del Caribe</option>
+                <option value="otras">🌐 Otras Olimpiadas</option>
             </select>
             <label for="selector-rol"><strong>Rol:</strong></label>
             <select class="custom-select" id="selector-rol" onchange="cargarTabla()">
@@ -1516,7 +1517,11 @@ function statsParaSitial() {
 }
 function statsParaEvento() {
     const ol = document.getElementById('selector-olimpiada').value;
-    calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
+    if (ol === 'otras') {
+        calcularStats(window.datosOtras || [], 'Resultados en Otras Olimpiadas');
+    } else {
+        calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
+    }
 }
 
 function construirSitial() {
@@ -1664,6 +1669,40 @@ function aplicarFiltros() {
 function cargarTabla() {
     const ol  = document.getElementById('selector-olimpiada').value;
     const rol = document.getElementById('selector-rol').value;
+
+    // Para "otras", usar datosOtras y una vista especializada
+    if (ol === 'otras') {
+        const selectorRol = document.getElementById('selector-rol');
+        if (selectorRol) selectorRol.style.display = 'none';
+        const labelRol = selectorRol ? selectorRol.previousElementSibling : null;
+        if (labelRol) labelRol.style.display = 'none';
+
+        const btnMedalla = document.getElementById('sort-medalla');
+        if (btnMedalla) btnMedalla.style.display = '';
+
+        const thead = document.getElementById('tabla-thead-row');
+        thead.innerHTML = `
+            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
+            <th>N°</th>
+            <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Estudiante <span class="sort-arrow">↕</span></th>
+            <th>Provincia</th>
+            <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
+            <th>Rank</th>
+            <th>Olimpiada</th>
+            <th>Sede</th>`;
+
+        renderizarTablaOtras(window.datosOtras || []);
+        document.getElementById('tabla-fuente').textContent = '';
+        if (document.getElementById('eventos').classList.contains('activa')) statsParaEvento();
+        return;
+    }
+
+    // Restaurar visibilidad del selector de rol si se cambió desde "otras"
+    const selectorRol = document.getElementById('selector-rol');
+    if (selectorRol) selectorRol.style.display = '';
+    const labelRol = selectorRol ? selectorRol.previousElementSibling : null;
+    if (labelRol) labelRol.style.display = '';
+
     const estudDatos = todasLasOlimpiadas[ol] || [];
     const profDatos  = (window.todasLosProfesores || {})[ol] || [];
 
@@ -1755,6 +1794,52 @@ function renderizarTablaEstudiante(datos) {
             <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
             <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
             <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
+            <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
+        </tr>`;
+    }).join('');
+    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
+}
+
+function renderizarTablaOtras(datos) {
+    const tbody   = document.getElementById('cuerpo-tabla');
+    const countEl = document.getElementById('tabla-count');
+    if (!datos.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
+        countEl.textContent = '0 resultados'; return;
+    }
+
+    // Ordenar: reutilizamos _sortDatos adaptado al shape de datosOtras
+    const ord = [...datos].sort((a, b) => {
+        if (ordenActual.campo === 'año')     return (a.año - b.año) * ordenActual.dir;
+        if (ordenActual.campo === 'nombre')  return a.nombre.localeCompare(b.nombre) * ordenActual.dir;
+        if (ordenActual.campo === 'medalla') return (medallaOrden[a.medalla] - medallaOrden[b.medalla]) * ordenActual.dir;
+        return 0;
+    });
+
+    // Color alternante por olimpiada (equivalente al "ed" en las otras tablas)
+    const olimpOrden = {};
+    let olimpIdx = 0;
+    ord.forEach(r => {
+        const key = r.Olimp + '|' + r.año;
+        if (!(key in olimpOrden)) olimpOrden[key] = olimpIdx++;
+    });
+
+    let cnt = {};
+    tbody.innerHTML = ord.map(r => {
+        const key = r.Olimp + '|' + r.año;
+        cnt[key] = (cnt[key] || 0) + 1;
+        const clase = olimpOrden[key] % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+        return `<tr class="${clase}">
+            <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed ?? '—'}</small></td>
+            <td style="color:var(--text-muted);font-size:13px;">${cnt[key]}</td>
+            <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
+                r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
+                    ? 'foto' : 'modal'
+            )}<strong>${r.nombre}</strong></div></td>
+            <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
+            <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
+            <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
+            <td style="font-size:12px;color:var(--text-muted);">${r.Olimp}<br><small>${r.Olimpiada}</small></td>
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
         </tr>`;
     }).join('');
