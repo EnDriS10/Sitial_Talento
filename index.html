@@ -1397,7 +1397,7 @@ function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
         `<p style="margin-bottom:${i < d.paragrafos.length - 1 ? '16px' : '0'};">${p}</p>`
     ).join('');
-    const act = calcularActividadProfesor(d.nombre);
+    const act = calcularActividadProfesor(d.nombreArticulo);
     const actividadHTML = act ? `
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:28px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1439,7 +1439,7 @@ function renderHonorGrid(data) {
     const conActividad = [];
     const sinActividad = [];
     data.forEach(d => {
-        const act = calcularActividadProfesor(d.nombre);
+        const act = calcularActividadProfesor(d.nombreArticulo);
         if (act) conActividad.push({ d, act });
         else sinActividad.push({ d, act: null });
     });
