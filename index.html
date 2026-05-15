@@ -824,16 +824,10 @@
         .icho-countdown-outer {
             display: flex;
             justify-content: center;
-            margin-top: 36px;
-            /* Permite salir del padding del contenedor en móvil */
-            margin-left: -20px;
-            margin-right: -20px;
+            margin-top: 20px;
         }
-        @media (min-width: 501px) {
-            .icho-countdown-outer {
-                margin-left: 0;
-                margin-right: 0;
-            }
+        @media (max-width: 500px) {
+            .icho-countdown-outer { margin-left: 4px; margin-right: 4px; }
         }
         .icho-countdown-wrap {
             background: linear-gradient(135deg, #f8f9ff 0%, #fff8f0 100%);
@@ -909,12 +903,100 @@
             font-size: 15px; color: var(--text-muted);
         }
         @media (max-width: 500px) {
-            .icho-countdown-outer { padding: 0; }
-            .icho-countdown-wrap  { width: 100%; border-radius: 0; border-left: none; border-right: none; padding: 20px 16px 18px; box-sizing: border-box; }
+            .icho-countdown-wrap  { width: 100%; border-radius: 16px; padding: 20px 16px 18px; box-sizing: border-box; }
             .icho-cd-cards        { gap: 8px; }
             .icho-cd-card         { flex: 1; min-width: 0; padding: 10px 8px 10px; }
             .icho-cd-num          { font-size: 30px; }
             .icho-cd-formula      { font-size: 9px; }
+        }
+
+        /* ═══════════════════════════════════════════
+           EN NÚMEROS
+        ═══════════════════════════════════════════ */
+        .en-numeros-outer {
+            margin-bottom: 20px;
+        }
+        .en-numeros-wrap {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 28px 28px;
+            box-shadow: 0 2px 16px rgba(4,18,43,.06);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Thin top accent line */
+        .en-numeros-wrap::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--cu-blue) 0%, var(--cu-white) 35%, var(--cu-red) 65%, var(--cu-blue) 100%);
+        }
+        .en-numeros-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .en-numeros-eyebrow {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .en-numeros-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px; font-weight: 900;
+            color: var(--navy);
+            line-height: 1.1;
+        }
+        .en-numeros-title em {
+            font-style: normal;
+            color: var(--accent);
+        }
+        .en-numeros-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            position: relative;
+        }
+        .en-numeros-item {
+            text-align: center;
+            padding: 16px 12px 14px;
+            position: relative;
+        }
+        /* Vertical separator between items */
+        .en-numeros-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 15%; bottom: 15%;
+            width: 1px;
+            background: var(--border);
+        }
+        .en-numeros-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 44px; font-weight: 900;
+            line-height: 1;
+            display: block;
+            letter-spacing: -1px;
+        }
+        .en-numeros-prefix { opacity: .75; }
+        .en-numeros-unit {
+            display: block;
+            font-size: 10px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.4px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        /* Colors: Rojo · Azul · Navy (legible on light bg) */
+        .en-numeros-item:nth-child(1) .en-numeros-num { color: var(--cu-red); }
+        .en-numeros-item:nth-child(2) .en-numeros-num { color: var(--cu-blue); }
+        .en-numeros-item:nth-child(3) .en-numeros-num { color: var(--navy); }
+
+        @media (max-width: 500px) {
+            .en-numeros-outer { margin-left: 4px; margin-right: 4px; }
+            .en-numeros-wrap  { padding: 24px 16px 20px; border-radius: 16px; }
+            .en-numeros-num   { font-size: 34px; }
+            .en-numeros-unit  { font-size: 9px; letter-spacing: 1px; }
+            .en-numeros-title { font-size: 20px; }
         }
     </style>
 </head>
@@ -1079,6 +1161,32 @@
                 <h3>Noticias y Entrevistas</h3>
                 <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
             </div>
+        </div>
+
+        <!-- ══ EN NÚMEROS ══ -->
+        <div class="en-numeros-outer">
+        <div class="en-numeros-wrap">
+            <div class="en-numeros-header">
+                <p class="en-numeros-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+                <h2 class="en-numeros-title">En <em>Números</em></h2>
+            </div>
+            <div class="en-numeros-grid">
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num">
+                        <span class="en-numeros-prefix">+</span><span id="en-medallas">—</span>
+                    </span>
+                    <span class="en-numeros-unit">Medallas</span>
+                </div>
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num" id="en-años">—</span>
+                    <span class="en-numeros-unit">Años de impacto</span>
+                </div>
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num" id="en-paises">—</span>
+                    <span class="en-numeros-unit">Países visitados</span>
+                </div>
+            </div>
+        </div>
         </div>
 
         <!-- IChO Countdown Banner -->
@@ -1406,6 +1514,7 @@ const _origInit = () => {
     construirSitial();
     cargarTabla();
     statsParaSitial();
+    calcularEnNumeros();
     inicializarNoticias();
 
     // Restaurar sección activa si el usuario recargó la página
@@ -1554,6 +1663,59 @@ function statsParaEvento() {
     } else {
         calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
     }
+}
+
+function calcularEnNumeros() {
+    // Reunir todos los datos de todas las olimpiadas
+    const todasEntradas = Object.values(todasLasOlimpiadas).flat();
+    const extras        = (typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) ? datosOtras : [];
+    const todas         = [...todasEntradas, ...extras];
+
+    // ── Medalas totales (oro + plata + bronce + mencion): M - (M mod 10)
+    const M = todas.filter(r => r.medalla && ['oro','plata','bronce','mencion'].includes(r.medalla)).length;
+    const medallasMostrar = M - (M % 10);
+
+    // ── Años de impacto: año actual - año mínimo en todos los registros
+    const añoActual = new Date().getFullYear();
+    const allAños   = todas.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
+    const añoMin    = allAños.length ? Math.min(...allAños) : añoActual;
+    const añosImpacto = añoActual - añoMin;
+
+    // ── Países anfitriones únicos (campo pais o sede)
+    const paisesSet = new Set();
+    todas.forEach(r => {
+        if (r.pais && r.pais.trim()) paisesSet.add(r.pais.trim());
+    });
+    const paisesCount = paisesSet.size;
+
+    // ── Animar contadores con easing
+    function animarContador(id, destino) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (destino === 0 || isNaN(destino)) { el.textContent = '—'; return; }
+        const dur = 1200, pasos = 40, intervalo = dur / pasos;
+        let paso = 0;
+        const timer = setInterval(() => {
+            paso++;
+            const ease = 1 - Math.pow(1 - paso / pasos, 4);
+            el.textContent = Math.round(destino * ease);
+            if (paso >= pasos) { el.textContent = destino; clearInterval(timer); }
+        }, intervalo);
+    }
+
+    // Usar IntersectionObserver para animar al entrar en viewport
+    const section = document.querySelector('.en-numeros-outer');
+    if (!section) return;
+    let animated = false;
+    const observer = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting || animated) return;
+        animated = true;
+        animarContador('en-medallas', medallasMostrar);
+        animarContador('en-años',     añosImpacto);
+        animarContador('en-paises',   paisesCount);
+        observer.disconnect();
+    }, { threshold: 0.2 });
+    observer.observe(section);
 }
 
 function construirSitial() {
@@ -2512,7 +2674,7 @@ const ICHO_AÑO    = 2026;                               // ← Año del evento
         const diff    = ICHO_FECHA - ahora;
         if (diff <= 0) {
             // Event has started / passed
-            if (elCards) elCards.innerHTML = `<div class="icho-cd-finished">🏆 ¡La IChO ${ICHO_AÑO} está en curso!</div>`;
+            if (elCards) elCards.innerHTML = `<div class="icho-cd-finished">🏆 It's IChO Time!</div>`;
             return;
         }
         const dias    = Math.floor(diff / 86400000);
