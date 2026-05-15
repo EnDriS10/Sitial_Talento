@@ -2,7 +2,7 @@ fotos :https://imgur.com/a/98WvY48
  
 página :https://endris10.github.io/Sitial_Talento/
 
-Nota 1: En la sección Honor a quien honor merece, añadir a los entrenadores los años en los que estuvo activo, es decir los años en los que participo en las olimpiadas. Al igual que en los estudiantes revisar su su nombre aparece en multiples olimpiadas ( como profesor, solo como profesor) y si lo hace anotar desde el año en el que aparece por primera vez hasta el último) ejemplo Profesor X: 2009- 2015. Además usar el ultimo año de actividad para organizar en orden decreciente (los más actuales primero) a los profesores según su actividad.
+
 
 Nota 2: Añadir colaboradores, universidades, logos a la página
 
