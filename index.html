@@ -507,6 +507,7 @@
         .honor-info h3 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; line-height: 1.3; }
         .honor-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 5px; }
         .honor-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .honor-años { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 5px; font-family: 'Playfair Display', serif; letter-spacing: .3px; }
 
         /* MODAL FULL SCREEN */
         #modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; overflow: hidden; }
@@ -1373,10 +1374,47 @@
 let articulos = {};   // se puebla en tiempo de ejecución por cargarHonorData()
 window.articulosPorNombre = {};  // mapa nombre → id de artículo
 
+// Busca en todasLosProfesores todas las apariciones de un nombre
+// y devuelve { añoMin, añoMax, totalEventos } o null si no hay registros
+function calcularActividadProfesor(nombre) {
+    const profs = window.todasLosProfesores || {};
+    const nombreNorm = nombre ? nombre.trim().toLowerCase() : '';
+    const registros = Object.values(profs).flat().filter(r => {
+        const rn = (r.nombre || '').trim().toLowerCase();
+        return rn === nombreNorm;
+    });
+    if (!registros.length) return null;
+    const años = registros.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
+    if (!años.length) return null;
+    return {
+        añoMin: Math.min(...años),
+        añoMax: Math.max(...años),
+        totalEventos: registros.length
+    };
+}
+
 function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
         `<p style="margin-bottom:${i < d.paragrafos.length - 1 ? '16px' : '0'};">${p}</p>`
     ).join('');
+    const act = calcularActividadProfesor(d.nombre);
+    const actividadHTML = act ? `
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:28px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:20px;">📅</span>
+                <div>
+                    <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Años en activo</p>
+                    <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:20px;">🏅</span>
+                <div>
+                    <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Eventos como entrenador</p>
+                    <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.totalEventos}</p>
+                </div>
+            </div>
+        </div>` : '';
     return `
         <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
             <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
@@ -1389,13 +1427,34 @@ function generarContenidoArticulo(d) {
                      style="width:140px;height:140px;object-fit:cover;border-radius:12px;border:3px solid var(--gold);display:block;">
             </div>
             ${parrafos}
+            ${actividadHTML}
         </div>`;
 }
 
 function renderHonorGrid(data) {
     const grid = document.getElementById('honor-grid');
     if (!grid) return;
-    grid.innerHTML = data.map(d => `
+
+    // Separar profesores con y sin datos de actividad
+    const conActividad = [];
+    const sinActividad = [];
+    data.forEach(d => {
+        const act = calcularActividadProfesor(d.nombre);
+        if (act) conActividad.push({ d, act });
+        else sinActividad.push({ d, act: null });
+    });
+
+    // Ordenar los que tienen actividad por último año de actividad (desc)
+    conActividad.sort((a, b) => b.act.añoMax - a.act.añoMax);
+
+    // Combinar: activos primero (ordenados), luego sin actividad (en orden de aparición original)
+    const ordenados = [...conActividad, ...sinActividad];
+
+    grid.innerHTML = ordenados.map(({ d, act }) => {
+        const añosTag = act
+            ? `<p class="honor-años">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>`
+            : '';
+        return `
         <div class="honor-card" onclick="abrirArticulo('${d.id}')">
             <div class="honor-avatar">
                 <img src="${d.foto}"
@@ -1406,10 +1465,11 @@ function renderHonorGrid(data) {
             <div class="honor-info">
                 <p class="honor-role">${d.role}</p>
                 <h3>${d.nombre}</h3>
+                ${añosTag}
                 <p class="honor-desc">${d.descripcionCorta} <span style="color:var(--accent);font-size:12px;">Leer más →</span></p>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 async function cargarHonorData() {
@@ -1544,8 +1604,8 @@ const _origInit = () => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await cargarDatosOlimpiadas();
-    await cargarHonorData();
     await cargarProfesoresData();
+    await cargarHonorData();
     _origInit();
 });
 
