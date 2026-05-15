@@ -1455,7 +1455,7 @@ function renderHonorGrid(data) {
             ? `<p class="honor-años">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>`
             : '';
         return `
-        <div class="honor-card" onclick="abrirArticulo('${d.id}')">
+        <div class="honor-card" onclick="abrirArticulo('${d.id}', 'honor')">
             <div class="honor-avatar">
                 <img src="${d.foto}"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -1486,8 +1486,9 @@ async function cargarHonorData() {
                 nombre:    d.nombreArticulo,
                 contenido: generarContenidoArticulo(d)
             };
-            // Mapa nombre → id para abrir artículos desde cualquier tabla
-            if (d.nombre) window.articulosPorNombre[d.nombre.trim()] = d.id;
+            // Mapear ambos campos → id para que coincida venga de donde venga el nombre
+            if (d.nombre)         window.articulosPorNombre[d.nombre.trim()]         = d.id;
+            if (d.nombreArticulo) window.articulosPorNombre[d.nombreArticulo.trim()] = d.id;
         });
         renderHonorGrid(data);
     } catch (err) {
@@ -1495,17 +1496,46 @@ async function cargarHonorData() {
     }
 }
 
-function abrirArticulo(id) {
+// Guarda el contexto desde el que se abrió el artículo (scroll + sección)
+let _articuloOrigen = null;
+
+function abrirArticulo(id, origen) {
     const art = articulos[id];
     if (!art) return;
+
+    // Guardar posición de scroll de la ventana
+    _articuloOrigen = {
+        seccion:   origen || null,
+        scrollY:   window.scrollY || window.pageYOffset || 0
+    };
+
     document.getElementById('modal-body').innerHTML = art.contenido;
+
+    // Actualizar texto del botón Volver según origen
+    const backBtn = document.getElementById('modal-back-btn');
+    if (backBtn) {
+        backBtn.textContent = origen === 'eventos' ? '← Volver a Eventos' : '← Volver';
+    }
+
     const overlay = document.getElementById('modal-overlay');
     overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    // Bloquear scroll sin perder posición (iOS-safe)
+    const scrollY = _articuloOrigen.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top      = `-${scrollY}px`;
+    document.body.style.width    = '100%';
 }
+
 function cerrarArticulo() {
     document.getElementById('modal-overlay').style.display = 'none';
+    // Restaurar scroll (iOS-safe)
+    const scrollY = _articuloOrigen ? _articuloOrigen.scrollY : 0;
+    document.body.style.position = '';
+    document.body.style.top      = '';
+    document.body.style.width    = '';
     document.body.style.overflow = '';
+    if (scrollY > 0) window.scrollTo({ top: scrollY, behavior: 'instant' });
+    _articuloOrigen = null;
 }
 </script>
 <script>
@@ -1629,9 +1659,10 @@ const medallaEmoji = { oro:'🥇', plata:'🥈', bronce:'🥉', mencion:'🎖', 
 function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase(); }
 
 // Abre artículo de honor si existe, sino zoom de foto, sino nada
+// Llamado siempre desde la tabla de Historial por Eventos → origen='eventos'
 function abrirClickProfesor(nombre) {
     const id = (window.articulosPorNombre || {})[nombre.trim()];
-    if (id) { abrirArticulo(id); return; }
+    if (id) { abrirArticulo(id, 'eventos'); return; }
     const foto = (window.fotosPorNombreProfesor || {})[nombre];
     if (foto) abrirFotoDirecta(foto, nombre);
 }
