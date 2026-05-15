@@ -1414,7 +1414,7 @@ function renderHonorGrid(data) {
 
 async function cargarHonorData() {
     try {
-        const resp = await fetch('honor_merece.html');
+        const resp = await fetch('Data/honor_merece.html');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const html = await resp.text();
         const doc  = new DOMParser().parseFromString(html, 'text/html');
@@ -1456,7 +1456,7 @@ function cerrarArticulo() {
 // Si el fetch falla (p.ej. en local sin servidor), la página muestra un aviso.
 async function cargarDatosOlimpiadas() {
     try {
-        const resp = await fetch('olympiad_data.html');
+        const resp = await fetch('Data/olympiad_data.html');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const html = await resp.text();
         const parser  = new DOMParser();
@@ -1487,7 +1487,7 @@ window.todasLosProfesores = {};
 
 async function cargarProfesoresData() {
     try {
-        const resp = await fetch('professor_data.html');
+        const resp = await fetch('Data/professor_data.html');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const html = await resp.text();
         const doc  = new DOMParser().parseFromString(html, 'text/html');
@@ -2614,7 +2614,7 @@ function renderFiltroAnios() {
 
 async function inicializarNoticias() {
     try {
-        const response = await fetch('newspapers.html');
+        const response = await fetch('Data/newspapers.html');
         if (!response.ok) return;
         const text = await response.text();
         const doc = new DOMParser().parseFromString(text, 'text/html');
