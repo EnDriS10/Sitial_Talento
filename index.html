@@ -916,6 +916,135 @@
             .icho-cd-num          { font-size: 30px; }
             .icho-cd-formula      { font-size: 9px; }
         }
+
+        /* ═══════════════════════════════════════════
+           EN NÚMEROS
+        ═══════════════════════════════════════════ */
+        .en-numeros-outer {
+            margin: 0 -20px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (min-width: 641px) {
+            .en-numeros-outer {
+                margin-left: 0; margin-right: 0;
+                border-radius: 20px;
+            }
+        }
+        .en-numeros-wrap {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #0d2e6b 100%);
+            padding: 44px 32px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Subtle dot grid */
+        .en-numeros-wrap::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,.07) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
+        /* Gold accent top line */
+        .en-numeros-wrap::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--cu-blue) 0%, var(--cu-white) 35%, var(--cu-red) 65%, var(--cu-blue) 100%);
+        }
+        .en-numeros-header {
+            text-align: center;
+            margin-bottom: 36px;
+            position: relative;
+        }
+        .en-numeros-eyebrow {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .en-numeros-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px; font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+        }
+        .en-numeros-title em {
+            font-style: normal;
+            color: var(--gold-light);
+        }
+        .en-numeros-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            position: relative;
+        }
+        .en-numeros-item {
+            text-align: center;
+            padding: 20px 16px 18px;
+            position: relative;
+        }
+        /* Vertical separator between items */
+        .en-numeros-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 20%; bottom: 20%;
+            width: 1px;
+            background: rgba(255,255,255,.12);
+        }
+        .en-numeros-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 46px; font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            display: block;
+            letter-spacing: -1px;
+        }
+        .en-numeros-prefix {
+            color: var(--gold-light);
+        }
+        .en-numeros-unit {
+            display: block;
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,.55);
+            margin-top: 8px;
+        }
+        .en-numeros-desc {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,.32);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        /* Color accents per item */
+        .en-numeros-item:nth-child(1) .en-numeros-num { color: #6aabff; }
+        .en-numeros-item:nth-child(2) .en-numeros-num { color: var(--gold-light); }
+        .en-numeros-item:nth-child(3) .en-numeros-num { color: #7adf9c; }
+        .en-numeros-item:nth-child(4) .en-numeros-num { color: #e88aff; }
+        .en-numeros-item:nth-child(1) .en-numeros-prefix,
+        .en-numeros-item:nth-child(2) .en-numeros-prefix { color: inherit; }
+
+        @media (max-width: 680px) {
+            .en-numeros-wrap { padding: 32px 16px 28px; }
+            .en-numeros-grid { grid-template-columns: repeat(2, 1fr); gap: 0; }
+            .en-numeros-item { padding: 16px 10px 14px; }
+            .en-numeros-item:nth-child(2)::after { display: none; }
+            .en-numeros-item:nth-child(odd)::after {
+                display: block;
+            }
+            /* Horizontal separator between rows */
+            .en-numeros-item:nth-child(1),
+            .en-numeros-item:nth-child(2) {
+                border-bottom: 1px solid rgba(255,255,255,.1);
+            }
+            .en-numeros-num { font-size: 36px; }
+            .en-numeros-title { font-size: 22px; }
+        }
+        @media (max-width: 360px) {
+            .en-numeros-num { font-size: 30px; }
+        }
     </style>
 </head>
 <body>
@@ -1079,6 +1208,42 @@
                 <h3>Noticias y Entrevistas</h3>
                 <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
             </div>
+        </div>
+
+        <!-- ══ EN NÚMEROS ══ -->
+        <div class="en-numeros-outer">
+        <div class="en-numeros-wrap">
+            <div class="en-numeros-header">
+                <p class="en-numeros-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+                <h2 class="en-numeros-title">En <em>Números</em></h2>
+            </div>
+            <div class="en-numeros-grid">
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num">
+                        <span class="en-numeros-prefix">+</span><span id="en-participaciones">—</span>
+                    </span>
+                    <span class="en-numeros-unit">Participaciones</span>
+                    <span class="en-numeros-desc">en olimpiadas internacionales</span>
+                </div>
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num">
+                        <span class="en-numeros-prefix">+</span><span id="en-medallas">—</span>
+                    </span>
+                    <span class="en-numeros-unit">Medallas</span>
+                    <span class="en-numeros-desc">oro, plata, bronce y menciones</span>
+                </div>
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num" id="en-años">—</span>
+                    <span class="en-numeros-unit">Años de impacto</span>
+                    <span class="en-numeros-desc">de excelencia científica ininterrumpida</span>
+                </div>
+                <div class="en-numeros-item">
+                    <span class="en-numeros-num" id="en-paises">—</span>
+                    <span class="en-numeros-unit">Países visitados</span>
+                    <span class="en-numeros-desc">sedes de olimpiadas internacionales</span>
+                </div>
+            </div>
+        </div>
         </div>
 
         <!-- IChO Countdown Banner -->
@@ -1406,6 +1571,7 @@ const _origInit = () => {
     construirSitial();
     cargarTabla();
     statsParaSitial();
+    calcularEnNumeros();
     inicializarNoticias();
 
     // Restaurar sección activa si el usuario recargó la página
@@ -1554,6 +1720,64 @@ function statsParaEvento() {
     } else {
         calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
     }
+}
+
+function calcularEnNumeros() {
+    // Reunir todos los datos de todas las olimpiadas
+    const todasEntradas = Object.values(todasLasOlimpiadas).flat();
+    const extras        = (typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) ? datosOtras : [];
+    const todas         = [...todasEntradas, ...extras];
+
+    // ── Participaciones: N - (N mod 10)
+    const N = todas.length;
+    const participacionesMostrar = N - (N % 10);
+
+    // ── Medallas totales (oro + plata + bronce + mencion): M - (M mod 10)
+    const M = todas.filter(r => r.medalla && ['oro','plata','bronce','mencion'].includes(r.medalla)).length;
+    const medallasMostrar = M - (M % 10);
+
+    // ── Años de impacto: año actual - año mínimo en todos los registros
+    const añoActual = new Date().getFullYear();
+    const allAños   = todas.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
+    const añoMin    = allAños.length ? Math.min(...allAños) : añoActual;
+    const añosImpacto = añoActual - añoMin;
+
+    // ── Países anfitriones únicos (campo pais o sede)
+    const paisesSet = new Set();
+    todas.forEach(r => {
+        if (r.pais && r.pais.trim()) paisesSet.add(r.pais.trim());
+    });
+    const paisesCount = paisesSet.size;
+
+    // ── Animar contadores con easing
+    function animarContador(id, destino) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (destino === 0 || isNaN(destino)) { el.textContent = '—'; return; }
+        const dur = 1200, pasos = 40, intervalo = dur / pasos;
+        let paso = 0;
+        const timer = setInterval(() => {
+            paso++;
+            const ease = 1 - Math.pow(1 - paso / pasos, 4);
+            el.textContent = Math.round(destino * ease);
+            if (paso >= pasos) { el.textContent = destino; clearInterval(timer); }
+        }, intervalo);
+    }
+
+    // Usar IntersectionObserver para animar al entrar en viewport
+    const section = document.querySelector('.en-numeros-outer');
+    if (!section) return;
+    let animated = false;
+    const observer = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting || animated) return;
+        animated = true;
+        animarContador('en-participaciones', participacionesMostrar);
+        animarContador('en-medallas',        medallasMostrar);
+        animarContador('en-años',            añosImpacto);
+        animarContador('en-paises',          paisesCount);
+        observer.disconnect();
+    }, { threshold: 0.2 });
+    observer.observe(section);
 }
 
 function construirSitial() {
