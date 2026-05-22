@@ -509,6 +509,239 @@
         .honor-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .honor-años { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 5px; font-family: 'Playfair Display', serif; letter-spacing: .3px; }
 
+        /* ═══════════════════════════════════════════
+           HONOR GATEWAY — dos tarjetas de entrada
+        ═══════════════════════════════════════════ */
+        #honor-gateway {
+            display: flex;
+            gap: 0;
+            min-height: calc(100vh - 200px);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(4,18,43,.22);
+        }
+        .honor-gate-card {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: flex .55s cubic-bezier(.4,0,.2,1);
+            min-height: 480px;
+        }
+        .honor-gate-card:hover { flex: 1.22; }
+
+        /* Backgrounds */
+        .honor-gate-coaches {
+            background:
+                radial-gradient(ellipse 70% 60% at 20% 80%, rgba(201,162,39,.18) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 50% at 80% 20%, rgba(26,111,181,.22) 0%, transparent 65%),
+                linear-gradient(150deg, #04122b 0%, #0b2150 55%, #152d6a 100%);
+        }
+        .honor-gate-scientists {
+            background:
+                radial-gradient(ellipse 70% 60% at 80% 80%, rgba(100,200,255,.12) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 50% at 20% 20%, rgba(140,80,200,.18) 0%, transparent 65%),
+                linear-gradient(150deg, #0d0820 0%, #1a0d3a 55%, #0e2a4a 100%);
+        }
+
+        /* Decorative glow orb */
+        .honor-gate-card::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity .4s, transform .5s;
+        }
+        .honor-gate-coaches::before {
+            background: radial-gradient(circle, rgba(201,162,39,.25) 0%, transparent 70%);
+            top: -160px; right: -160px;
+        }
+        .honor-gate-scientists::before {
+            background: radial-gradient(circle, rgba(80,160,255,.2) 0%, transparent 70%);
+            bottom: -160px; left: -160px;
+        }
+        .honor-gate-card:hover::before { opacity: 1.4; transform: scale(1.1); }
+
+        /* Fine grid texture overlay */
+        .honor-gate-card::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Content */
+        .honor-gate-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 48px 36px;
+            color: white;
+            max-width: 340px;
+        }
+        .honor-gate-icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 4px 16px rgba(0,0,0,.4));
+            transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+            line-height: 1;
+        }
+        .honor-gate-card:hover .honor-gate-icon { transform: scale(1.12) translateY(-6px); }
+
+        .honor-gate-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(18px, 2.4vw, 26px);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 14px;
+            letter-spacing: -.2px;
+        }
+        .honor-gate-coaches .honor-gate-content h2  { color: var(--gold-light); }
+        .honor-gate-scientists .honor-gate-content h2 { color: #90cbff; }
+
+        .honor-gate-content p {
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: rgba(255,255,255,.55);
+            margin-bottom: 22px;
+        }
+
+        .honor-gate-count {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            opacity: .6;
+        }
+        .honor-gate-coaches .honor-gate-count   { color: var(--gold-light); }
+        .honor-gate-scientists .honor-gate-count { color: #90cbff; }
+
+        .honor-gate-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 30px;
+            border-radius: 32px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .3px;
+            transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;
+        }
+        .honor-gate-coaches .honor-gate-cta {
+            background: linear-gradient(135deg, var(--gold) 0%, #e8b930 100%);
+            color: var(--navy);
+            box-shadow: 0 6px 20px rgba(201,162,39,.45);
+        }
+        .honor-gate-scientists .honor-gate-cta {
+            background: rgba(80,160,255,.18);
+            border: 1.5px solid rgba(100,180,255,.45);
+            color: #90cbff;
+            box-shadow: 0 6px 20px rgba(50,120,220,.2);
+        }
+        .honor-gate-card:hover .honor-gate-cta {
+            transform: translateY(-3px) scale(1.04);
+        }
+        .honor-gate-coaches:hover .honor-gate-cta {
+            box-shadow: 0 12px 32px rgba(201,162,39,.55);
+        }
+        .honor-gate-scientists:hover .honor-gate-cta {
+            box-shadow: 0 12px 32px rgba(50,120,220,.35);
+        }
+
+        /* Vertical divider */
+        .honor-gate-sep {
+            width: 1px;
+            background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,.12) 30%, rgba(255,255,255,.12) 70%, transparent 100%);
+            align-self: stretch;
+            flex-shrink: 0;
+            z-index: 3;
+            position: relative;
+        }
+
+        /* List view */
+        #honor-list-view { display: none; }
+        #honor-list-view.visible { display: block; animation: fadeIn .3s ease; }
+
+        /* Back header */
+        .honor-back-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .honor-back-btn {
+            background: var(--navy);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 9px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: background .2s, transform .18s;
+            flex-shrink: 0;
+        }
+        .honor-back-btn:hover { background: var(--navy-light); transform: translateX(-3px); }
+        .honor-back-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .honor-back-header .honor-cat-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+        .honor-cat-badge.coaches-badge {
+            background: rgba(201,162,39,.15);
+            color: #7a5500;
+            border: 1.5px solid rgba(201,162,39,.4);
+        }
+        .honor-cat-badge.scientists-badge {
+            background: rgba(26,111,181,.12);
+            color: #1a4a9a;
+            border: 1.5px solid rgba(26,111,181,.3);
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            #honor-gateway {
+                flex-direction: column;
+                min-height: auto;
+                border-radius: 14px;
+            }
+            .honor-gate-card {
+                flex: none;
+                min-height: 50vh;
+            }
+            .honor-gate-card:hover { flex: none; }
+            .honor-gate-sep { display: none; }
+            .honor-gate-icon { font-size: 48px; margin-bottom: 18px; }
+            .honor-gate-content { padding: 36px 24px; max-width: 100%; }
+        }
+
         /* MODAL FULL SCREEN */
         #modal-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; overflow: hidden; }
         #modal-topbar { background: var(--navy); display: flex; align-items: center; gap: 14px; padding: 14px 20px; flex-shrink: 0; }
@@ -1290,10 +1523,40 @@
     </div>
 
     <div id="honor" class="seccion">
-        <h2 class="section-title">Honor a quien Honor Merece</h2>
-        <p class="section-sub">Entrenadores y profesores que han forjado la excelencia de la Preselección Nacional de Química de Cuba</p>
-        <div class="honor-grid" id="honor-grid">
-            <!-- Cargado dinámicamente desde honor_merece.html -->
+
+        <!-- ══ GATEWAY: dos tarjetas de entrada ══ -->
+        <div id="honor-gateway">
+            <div class="honor-gate-card honor-gate-coaches" onclick="mostrarCategoriaHonor('entrenadores')">
+                <div class="honor-gate-content">
+                    <span class="honor-gate-icon">🏆</span>
+                    <h2>Entrenadores Nacionales</h2>
+                    <p>Los maestros que, olimpiada tras olimpiada, forjaron campeones y pusieron el nombre de Cuba en el podio de la química mundial.</p>
+                    <div class="honor-gate-count" id="gate-count-entrenadores">cargando…</div>
+                    <span class="honor-gate-cta">Conocer sus historias →</span>
+                </div>
+            </div>
+            <div class="honor-gate-sep"></div>
+            <div class="honor-gate-card honor-gate-scientists" onclick="mostrarCategoriaHonor('cientificos')">
+                <div class="honor-gate-content">
+                    <span class="honor-gate-icon">⚗️</span>
+                    <h2>Próceres de la Ciencia</h2>
+                    <p>Figuras cimeras cuyo trabajo científico y legado intelectual han iluminado el desarrollo de la química en Cuba y más allá de sus fronteras.</p>
+                    <div class="honor-gate-count" id="gate-count-cientificos">cargando…</div>
+                    <span class="honor-gate-cta">Descubrir su legado →</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ LIST VIEW: cuadrícula filtrada ══ -->
+        <div id="honor-list-view">
+            <div class="honor-back-header">
+                <button class="honor-back-btn" onclick="volverAlGatewayHonor()">← Volver</button>
+                <h3 id="honor-list-title">Entrenadores Nacionales</h3>
+                <span class="honor-cat-badge" id="honor-cat-badge"></span>
+            </div>
+            <div class="honor-grid" id="honor-grid">
+                <!-- Cargado dinámicamente desde honor_merece.html -->
+            </div>
         </div>
 
         <div id="modal-overlay">
@@ -1483,6 +1746,43 @@ function renderHonorGrid(data) {
     }).join('');
 }
 
+// Categoría activa
+let _honorCategoriaActual = null;
+let _honorDataGlobal = [];
+
+function mostrarCategoriaHonor(categoria) {
+    _honorCategoriaActual = categoria;
+    const gateway   = document.getElementById('honor-gateway');
+    const listView  = document.getElementById('honor-list-view');
+    const titleEl   = document.getElementById('honor-list-title');
+    const badgeEl   = document.getElementById('honor-cat-badge');
+
+    if (gateway)  gateway.style.display  = 'none';
+    if (listView) { listView.classList.add('visible'); }
+
+    const esEntrenador = categoria === 'entrenadores';
+    const filtered = _honorDataGlobal.filter(d => esEntrenador
+        ? String(d.Entrenador) === '1'
+        : String(d.Entrenador) === '0'
+    );
+
+    if (titleEl) titleEl.textContent = esEntrenador ? 'Entrenadores Nacionales' : 'Próceres de la Ciencia';
+    if (badgeEl) {
+        badgeEl.textContent = esEntrenador ? 'Entrenadores' : 'Científicos';
+        badgeEl.className = 'honor-cat-badge ' + (esEntrenador ? 'coaches-badge' : 'scientists-badge');
+    }
+    renderHonorGrid(filtered);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function volverAlGatewayHonor() {
+    _honorCategoriaActual = null;
+    const gateway  = document.getElementById('honor-gateway');
+    const listView = document.getElementById('honor-list-view');
+    if (gateway)  gateway.style.display = '';
+    if (listView) listView.classList.remove('visible');
+}
+
 async function cargarHonorData() {
     try {
         const resp = await fetch('Data/honor_merece.html');
@@ -1492,6 +1792,8 @@ async function cargarHonorData() {
         const el   = doc.getElementById('honor-data');
         if (!el) throw new Error('No se encontró #honor-data en honor_merece.html');
         const data = JSON.parse(el.textContent);
+        _honorDataGlobal = data;
+
         data.forEach(d => {
             articulos[d.id] = {
                 nombre:    d.nombreArticulo,
@@ -1500,7 +1802,15 @@ async function cargarHonorData() {
             // Mapa nombre → id para abrir artículos desde cualquier tabla
             if (d.nombre) window.articulosPorNombre[d.nombre.trim()] = d.id;
         });
-        renderHonorGrid(data);
+
+        // Actualizar contadores del gateway
+        const nEntrenadores = data.filter(d => String(d.Entrenador) === '1').length;
+        const nCientificos  = data.filter(d => String(d.Entrenador) === '0').length;
+        const ce = document.getElementById('gate-count-entrenadores');
+        const cc = document.getElementById('gate-count-cientificos');
+        if (ce) ce.textContent = nEntrenadores + (nEntrenadores === 1 ? ' perfil' : ' perfiles');
+        if (cc) cc.textContent = nCientificos  + (nCientificos  === 1 ? ' perfil' : ' perfiles');
+
     } catch (err) {
         console.warn('honor_merece.html no encontrado o error al leer:', err);
     }
@@ -2410,6 +2720,14 @@ function cambiarSeccion(p) {
         // Stats & data for new section
         if (p === 'sitial' || p === 'honor' || p === 'noticias' || p === 'inicio') statsParaSitial();
         else if (p === 'eventos') { statsParaEvento(); cargarTabla(); }
+        // Al entrar a Honor, mostrar siempre el gateway
+        if (p === 'honor') {
+            const gateway  = document.getElementById('honor-gateway');
+            const listView = document.getElementById('honor-list-view');
+            if (gateway)  gateway.style.display = '';
+            if (listView) listView.classList.remove('visible');
+            _honorCategoriaActual = null;
+        }
         entrar();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         // Persistir sección activa para sobrevivir recargas
