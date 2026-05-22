@@ -2,7 +2,7 @@ fotos :https://imgur.com/a/98WvY48
  
 página :https://endris10.github.io/Sitial_Talento/
 
-
+Nota 1: Hacer que dentro de honor a quien honor merece, dentro de un articulo de un entrenador, dode diga eventos como entrenador tenga una flecha triangular hacia abajo y cuando se toque se despliegue los nombres ejemplo IChO 2025 IChO 2026
 
 Nota 2: Añadir colaboradores, universidades, logos a la página
 
