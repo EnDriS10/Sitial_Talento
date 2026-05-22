@@ -1375,20 +1375,31 @@ let articulos = {};   // se puebla en tiempo de ejecución por cargarHonorData()
 window.articulosPorNombre = {};  // mapa nombre → id de artículo
 
 // Busca en todasLosProfesores todas las apariciones de un nombre
-// y devuelve { añoMin, añoMax, totalEventos } o null si no hay registros
-function calcularActividadProfesor(nombre) {
+// y devuelve { añoMin, añoMax, totalEventos } o null si no hay registros.
+// Si se pasa fechaInicio (año numérico), se toma el mínimo entre ese valor
+// y el mínimo derivado de las olimpiadas (sin afectar añoMax ni totalEventos).
+function calcularActividadProfesor(nombre, fechaInicio) {
     const profs = window.todasLosProfesores || {};
     const nombreNorm = nombre ? nombre.trim().toLowerCase() : '';
     const registros = Object.values(profs).flat().filter(r => {
         const rn = (r.nombre || '').trim().toLowerCase();
         return rn === nombreNorm;
     });
-    if (!registros.length) return null;
     const años = registros.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
-    if (!años.length) return null;
+
+    // fechaInicio explícita del JSON de honor_merece (opcional)
+    const fiNum = fechaInicio ? Number(fechaInicio) : NaN;
+    const tieneFI = !isNaN(fiNum) && fiNum > 1900;
+
+    if (!años.length && !tieneFI) return null;
+
+    const añoMinOlimp = años.length ? Math.min(...años) : Infinity;
+    const añoMin = tieneFI ? Math.min(añoMinOlimp, fiNum) : añoMinOlimp;
+    const añoMax = años.length ? Math.max(...años) : fiNum;   // si solo hay fechaInicio, mostrar ese año
+
     return {
-        añoMin: Math.min(...años),
-        añoMax: Math.max(...años),
+        añoMin,
+        añoMax,
         totalEventos: registros.length
     };
 }
@@ -1397,7 +1408,7 @@ function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
         `<p style="margin-bottom:${i < d.paragrafos.length - 1 ? '16px' : '0'};">${p}</p>`
     ).join('');
-    const act = calcularActividadProfesor(d.nombreArticulo);
+    const act = calcularActividadProfesor(d.nombreArticulo, d.fechaInicio);
     const actividadHTML = act ? `
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:28px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1439,7 +1450,7 @@ function renderHonorGrid(data) {
     const conActividad = [];
     const sinActividad = [];
     data.forEach(d => {
-        const act = calcularActividadProfesor(d.nombreArticulo);
+        const act = calcularActividadProfesor(d.nombreArticulo, d.fechaInicio);
         if (act) conActividad.push({ d, act });
         else sinActividad.push({ d, act: null });
     });
