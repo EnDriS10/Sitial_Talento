@@ -1643,10 +1643,14 @@ window.articulosPorNombre = {};  // mapa nombre → id de artículo
 function calcularActividadProfesor(nombre, rawFechaInicio) {
     const profs = window.todasLosProfesores || {};
     const nombreNorm = nombre ? nombre.trim().toLowerCase() : '';
-    const registros = Object.values(profs).flat().filter(r => {
-        const rn = (r.nombre || '').trim().toLowerCase();
-        return rn === nombreNorm;
-    });
+    // Aplanar adjuntando la clave padre como _olimpKey (p.ej: 'IChO', 'IMChO'...)
+    // así siempre se sabe la olimpiada aunque r.Olimp esté vacío
+    const registros = Object.entries(profs).flatMap(([olimpKey, recs]) =>
+        (Array.isArray(recs) ? recs : []).filter(r => {
+            const rn = (r.nombre || '').trim().toLowerCase();
+            return rn === nombreNorm;
+        }).map(r => ({ ...r, _olimpKey: olimpKey }))
+    );
     const años = registros.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
 
     // Acepta tanto "fechaInicio" como "fecha inicio" (con espacio en la clave JSON)
@@ -1667,8 +1671,8 @@ function calcularActividadProfesor(nombre, rawFechaInicio) {
         const oA = olimpOrder[(a.Olimp || '').toUpperCase().replace('ICHO','IChO').trim()] || 99;
         const oB = olimpOrder[(b.Olimp || '').toUpperCase().replace('ICHO','IChO').trim()] || 99;
         // Normalize keys for lookup
-        const keyA = Object.keys(olimpOrder).find(k => k.toLowerCase() === (a.Olimp || '').toLowerCase()) || null;
-        const keyB = Object.keys(olimpOrder).find(k => k.toLowerCase() === (b.Olimp || '').toLowerCase()) || null;
+        const keyA = Object.keys(olimpOrder).find(k => k.toLowerCase() === (a.Olimp || a._olimpKey || '').toLowerCase()) || null;
+        const keyB = Object.keys(olimpOrder).find(k => k.toLowerCase() === (b.Olimp || b._olimpKey || '').toLowerCase()) || null;
         return (keyA ? olimpOrder[keyA] : 99) - (keyB ? olimpOrder[keyB] : 99);
     });
 
@@ -1693,7 +1697,7 @@ function generarContenidoArticulo(d) {
     if (act) {
         // Construir filas del desplegable de eventos
         const filaEventos = act.registros.map(r => {
-            const olimp = r.Olimp || r.olimpiada || '';
+            const olimp = r.Olimp || r.olimpiada || r._olimpKey || '';
             const año   = r.año   || '';
             const sede  = r.sede  || '';
             const pais  = r.pais  || '';
