@@ -1659,8 +1659,18 @@ function calcularActividadProfesor(nombre, rawFechaInicio) {
     const añoMin = tieneFI ? Math.min(añoMinOlimp, fiNum) : añoMinOlimp;
     const añoMax = años.length ? Math.max(...años) : fiNum;
 
-    // Ordenar registros por año desc para el desplegable
-    const registrosOrdenados = [...registros].sort((a, b) => Number(b.año) - Number(a.año));
+    // Ordenar registros: 1) año DESC, 2) orden olímpico IChO > IMChO > OIAQ > OCACQ
+    const olimpOrder = { 'IChO': 1, 'IMChO': 2, 'OIAQ': 3, 'OCACQ': 4 };
+    const registrosOrdenados = [...registros].sort((a, b) => {
+        const añoDiff = Number(b.año) - Number(a.año);
+        if (añoDiff !== 0) return añoDiff;
+        const oA = olimpOrder[(a.Olimp || '').toUpperCase().replace('ICHO','IChO').trim()] || 99;
+        const oB = olimpOrder[(b.Olimp || '').toUpperCase().replace('ICHO','IChO').trim()] || 99;
+        // Normalize keys for lookup
+        const keyA = Object.keys(olimpOrder).find(k => k.toLowerCase() === (a.Olimp || '').toLowerCase()) || null;
+        const keyB = Object.keys(olimpOrder).find(k => k.toLowerCase() === (b.Olimp || '').toLowerCase()) || null;
+        return (keyA ? olimpOrder[keyA] : 99) - (keyB ? olimpOrder[keyB] : 99);
+    });
 
     return {
         añoMin,
@@ -1685,13 +1695,22 @@ function generarContenidoArticulo(d) {
         const filaEventos = act.registros.map(r => {
             const olimp = r.Olimp || r.olimpiada || '';
             const año   = r.año   || '';
-            const rol   = r.rol   || '';
             const sede  = r.sede  || '';
             const pais  = r.pais  || '';
-            return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(4,18,43,.07);font-size:13px;">
-                <span style="font-weight:700;color:var(--navy);min-width:80px;">${olimp} ${año}</span>
-                ${rol  ? `<span style="background:rgba(26,111,181,.1);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${rol}</span>` : ''}
-                ${sede ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais} ${sede}</span>` : ''}
+            // Color del badge según olimpiada
+            const olimpColors = {
+                'IChO':  { bg: 'rgba(26,111,181,.13)', color: '#1a4a9a' },
+                'IMChO': { bg: 'rgba(140,60,200,.1)',  color: '#6b2fa0' },
+                'OIAQ':  { bg: 'rgba(201,162,39,.13)', color: '#7a5500' },
+                'OCACQ': { bg: 'rgba(22,160,100,.1)',  color: '#0e6640' },
+            };
+            const key = Object.keys(olimpColors).find(k => k.toLowerCase() === olimp.toLowerCase()) || null;
+            const col = key ? olimpColors[key] : { bg: 'rgba(4,18,43,.07)', color: 'var(--text-muted)' };
+            const badgeLabel = key || olimp;
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(4,18,43,.06);font-size:13px;">
+                <span style="font-weight:700;color:var(--navy);min-width:36px;">${año}</span>
+                ${badgeLabel ? `<span style="background:${col.bg};color:${col.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;">${badgeLabel}</span>` : ''}
+                ${sede ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais ? pais + ' · ' : ''}${sede}</span>` : (pais ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais}</span>` : '')}
             </div>`;
         }).join('');
 
@@ -1763,7 +1782,8 @@ function renderHonorGrid(data) {
     const conActividad = [];
     const sinActividad = [];
     data.forEach(d => {
-        const act = calcularActividadProfesor(d.nombreArticulo, d.fechaInicio);
+        const fechaIni = d['fecha inicio'] || d.fechaInicio || null;
+        const act = calcularActividadProfesor(d.nombreArticulo, fechaIni);
         if (act) conActividad.push({ d, act });
         else sinActividad.push({ d, act: null });
     });
