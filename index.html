@@ -1638,10 +1638,9 @@ let articulos = {};   // se puebla en tiempo de ejecución por cargarHonorData()
 window.articulosPorNombre = {};  // mapa nombre → id de artículo
 
 // Busca en todasLosProfesores todas las apariciones de un nombre
-// y devuelve { añoMin, añoMax, totalEventos } o null si no hay registros.
-// Si se pasa fechaInicio (año numérico), se toma el mínimo entre ese valor
-// y el mínimo derivado de las olimpiadas (sin afectar añoMax ni totalEventos).
-function calcularActividadProfesor(nombre, fechaInicio) {
+// y devuelve { añoMin, añoMax, totalEventos, registros } o null si no hay registros.
+// rawFechaInicio puede ser "fecha inicio" (con espacio) leído del JSON.
+function calcularActividadProfesor(nombre, rawFechaInicio) {
     const profs = window.todasLosProfesores || {};
     const nombreNorm = nombre ? nombre.trim().toLowerCase() : '';
     const registros = Object.values(profs).flat().filter(r => {
@@ -1650,20 +1649,24 @@ function calcularActividadProfesor(nombre, fechaInicio) {
     });
     const años = registros.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
 
-    // fechaInicio explícita del JSON de honor_merece (opcional)
-    const fiNum = fechaInicio ? Number(fechaInicio) : NaN;
+    // Acepta tanto "fechaInicio" como "fecha inicio" (con espacio en la clave JSON)
+    const fiNum = rawFechaInicio ? Number(rawFechaInicio) : NaN;
     const tieneFI = !isNaN(fiNum) && fiNum > 1900;
 
     if (!años.length && !tieneFI) return null;
 
     const añoMinOlimp = años.length ? Math.min(...años) : Infinity;
     const añoMin = tieneFI ? Math.min(añoMinOlimp, fiNum) : añoMinOlimp;
-    const añoMax = años.length ? Math.max(...años) : fiNum;   // si solo hay fechaInicio, mostrar ese año
+    const añoMax = años.length ? Math.max(...años) : fiNum;
+
+    // Ordenar registros por año desc para el desplegable
+    const registrosOrdenados = [...registros].sort((a, b) => Number(b.año) - Number(a.año));
 
     return {
         añoMin,
         añoMax,
-        totalEventos: registros.length
+        totalEventos: registros.length,
+        registros: registrosOrdenados
     };
 }
 
@@ -1671,24 +1674,62 @@ function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
         `<p style="margin-bottom:${i < d.paragrafos.length - 1 ? '16px' : '0'};">${p}</p>`
     ).join('');
-    const act = calcularActividadProfesor(d.nombreArticulo, d.fechaInicio);
-    const actividadHTML = act ? `
-        <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:28px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:20px;">📅</span>
-                <div>
-                    <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Años en activo</p>
-                    <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>
+
+    // Leer "fecha inicio" (con espacio) O "fechaInicio" (camelCase)
+    const fechaInicioVal = d['fecha inicio'] || d.fechaInicio || null;
+    const act = calcularActividadProfesor(d.nombreArticulo, fechaInicioVal);
+
+    let actividadHTML = '';
+    if (act) {
+        // Construir filas del desplegable de eventos
+        const filaEventos = act.registros.map(r => {
+            const olimp = r.Olimp || r.olimpiada || '';
+            const año   = r.año   || '';
+            const rol   = r.rol   || '';
+            const sede  = r.sede  || '';
+            const pais  = r.pais  || '';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(4,18,43,.07);font-size:13px;">
+                <span style="font-weight:700;color:var(--navy);min-width:80px;">${olimp} ${año}</span>
+                ${rol  ? `<span style="background:rgba(26,111,181,.1);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${rol}</span>` : ''}
+                ${sede ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais} ${sede}</span>` : ''}
+            </div>`;
+        }).join('');
+
+        const listaId = 'ev-lista-' + d.id;
+        const arrowId = 'ev-arrow-' + d.id;
+        const tieneEventos = act.registros.length > 0;
+
+        actividadHTML = `
+        <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+            <div style="display:flex;gap:28px;flex-wrap:wrap;margin-bottom:${tieneEventos ? '14px' : '0'};">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">📅</span>
+                    <div>
+                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Años en activo</p>
+                        <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">🏅</span>
+                    <div>
+                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Eventos como entrenador</p>
+                        ${tieneEventos
+                          ? `<button onclick="toggleEventosEntrenador('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">
+                                ${act.totalEventos}
+                                <span id="${arrowId}" style="font-size:13px;transition:transform .25s;display:inline-block;">▼</span>
+                             </button>`
+                          : `<p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.totalEventos}</p>`
+                        }
+                    </div>
                 </div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:20px;">🏅</span>
-                <div>
-                    <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Eventos como entrenador</p>
-                    <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.totalEventos}</p>
-                </div>
-            </div>
-        </div>` : '';
+            ${tieneEventos ? `
+            <div id="${listaId}" style="display:none;margin-top:4px;border:1px solid var(--border);border-radius:10px;padding:8px 14px;background:#fafbff;">
+                ${filaEventos}
+            </div>` : ''}
+        </div>`;
+    }
+
     return `
         <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
             <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
@@ -1703,6 +1744,15 @@ function generarContenidoArticulo(d) {
             ${parrafos}
             ${actividadHTML}
         </div>`;
+}
+
+function toggleEventosEntrenador(id) {
+    const lista  = document.getElementById('ev-lista-' + id);
+    const arrow  = document.getElementById('ev-arrow-' + id);
+    if (!lista) return;
+    const abierto = lista.style.display !== 'none';
+    lista.style.display = abierto ? 'none' : 'block';
+    if (arrow) arrow.style.transform = abierto ? '' : 'rotate(180deg)';
 }
 
 function renderHonorGrid(data) {
