@@ -596,9 +596,12 @@
             .modal-avatar-initials-big { font-size: 34px; }
             #tarjeta-modal-nombre { font-size: 18px; }
             #foto-zoom-nombre { font-size: 13px; padding: 6px 16px; bottom: 20px; }
-            /* Breadcrumb compact */
-            #breadcrumb-bar { padding: 6px 12px; font-size: 11px; }
-            .util-btn { padding: 3px 8px; font-size: 10px; }
+            /* Topbar compact on mobile */
+            #topbar-home-btn { font-size: 12px; padding: 5px 6px 5px 2px; }
+            #topbar-sep { font-size: 11px; }
+            #topbar-titulo-seccion { font-size: 11px; }
+            .topbar-util-btn { padding: 3px 6px; font-size: 10px; gap: 3px; }
+            #hamburger-btn { padding: 7px 6px; }
             /* Noticia stack */
             .noticia-full { flex-direction: column; }
             .foto-noticia-wrap { width: 100%; min-width: 0; height: 160px; min-height: 0; }
@@ -612,76 +615,8 @@
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
 
-        /* ═══════════════════════════════════════════
-           BREADCRUMB / ACTIVE SECTION INDICATOR
-        ═══════════════════════════════════════════ */
-        #breadcrumb-bar {
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            padding: 7px 20px;
-            display: flex;
-            align-items: center;
-            gap: 0;
-            font-size: 12px;
-            color: var(--text-muted);
-            overflow-x: auto;
-            scrollbar-width: none;
-            white-space: nowrap;
-            transition: background .3s;
-        }
-        #breadcrumb-bar::-webkit-scrollbar { display: none; }
-        .bc-home { color: var(--accent); font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity .18s; }
-        .bc-home:hover { opacity: .7; }
-        .bc-sep { margin: 0 6px; opacity: .4; font-size: 11px; }
-        .bc-current {
-            color: var(--text);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .bc-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--gold);
-            display: inline-block;
-            flex-shrink: 0;
-        }
-
-        /* ═══════════════════════════════════════════
-           DARK MODE TOGGLE + LANGUAGE TOGGLE
-        ═══════════════════════════════════════════ */
-        #utility-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-            flex-shrink: 0;
-        }
-        .util-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1.5px solid var(--border);
-            background: var(--card-bg);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all .2s;
-            white-space: nowrap;
-        }
-        .util-btn:hover { border-color: var(--navy-light); color: var(--text); }
-        .util-btn.active { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
-        #theme-toggle .icon-sun  { display: inline; }
-        #theme-toggle .icon-moon { display: none; }
-        [data-theme="dark"] #theme-toggle .icon-sun  { display: none; }
-        [data-theme="dark"] #theme-toggle .icon-moon { display: inline; }
-        /* Language flag */
-        .lang-flag { font-size: 14px; line-height: 1; }
+        /* ── Dark mode topbar ── */
+        [data-theme="dark"] #topbar-hamburger { background: #10161e; }
 
 
         /* ═══════════════════════════════════════════
@@ -1194,37 +1129,112 @@
             z-index: 200;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 12px 0 16px;
             height: 52px;
             border-bottom: 1px solid rgba(255,255,255,.07);
+            cursor: pointer;
+            gap: 0;
+            user-select: none;
         }
-        #topbar-titulo-seccion {
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,.75);
+        /* HOME button — left anchor */
+        #topbar-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gold-light);
             font-family: 'DM Sans', sans-serif;
-            letter-spacing: .2px;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 8px 6px 4px;
+            border-radius: 8px;
+            transition: background .18s, color .18s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1;
         }
+        #topbar-home-btn:hover { background: rgba(255,255,255,.1); }
+        #topbar-home-btn:active { background: rgba(255,255,255,.18); }
+        /* Separator arrow */
+        #topbar-sep {
+            color: rgba(255,255,255,.28);
+            font-size: 13px;
+            margin: 0 2px;
+            flex-shrink: 0;
+            display: none;
+        }
+        #topbar-sep.visible { display: block; }
+        /* Current section label */
+        #topbar-titulo-seccion {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,.65);
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: .1px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+        /* Right-side utility controls */
+        #topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        /* Util buttons inside topbar */
+        .topbar-util-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(255,255,255,.2);
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,.7);
+            cursor: pointer;
+            transition: all .18s;
+            white-space: nowrap;
+        }
+        .topbar-util-btn:hover { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.08); }
+        .topbar-util-btn:active { background: rgba(255,255,255,.15); }
+        #theme-toggle .icon-sun  { display: inline; }
+        #theme-toggle .icon-moon { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-sun  { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-moon { display: inline; }
         #hamburger-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 9px;
+            padding: 9px 8px;
             display: flex;
             flex-direction: column;
             gap: 5px;
             border-radius: 8px;
             transition: background .2s;
+            margin-left: 2px;
         }
         #hamburger-btn:hover { background: rgba(255,255,255,.1); }
         #hamburger-btn span {
             display: block;
-            width: 22px;
+            width: 20px;
             height: 2px;
             background: rgba(255,255,255,.85);
             border-radius: 2px;
+            transition: transform .22s, opacity .18s;
         }
+        /* Hamburger → X when open */
+        #topbar-hamburger.menu-abierto #hamburger-btn span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        #topbar-hamburger.menu-abierto #hamburger-btn span:nth-child(2) { opacity: 0; }
+        #topbar-hamburger.menu-abierto #hamburger-btn span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         #menu-overlay {
             display: none;
             position: fixed;
@@ -1650,29 +1660,26 @@
     </div>
 </header>
 
-<div id="topbar-hamburger" onclick="toggleMenu()" style="cursor:pointer;">
-    <span id="topbar-titulo-seccion">Talentos Cubanos · Química</span>
-    <button id="hamburger-btn" onclick="event.stopPropagation();toggleMenu()" aria-label="Abrir/cerrar menú">
-        <span></span><span></span><span></span>
+<div id="topbar-hamburger" onclick="toggleMenu()">
+    <!-- HOME button: navigates to inicio, does NOT open menu -->
+    <button id="topbar-home-btn" onclick="event.stopPropagation(); cambiarSeccion('inicio')" aria-label="Inicio">
+        🏠 <span data-i18n="nav.home">Inicio</span>
     </button>
-</div>
-
-<!-- BREADCRUMB + UTILITY BAR -->
-<div id="breadcrumb-bar">
-    <span class="bc-home" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></span>
-    <span class="bc-sep" id="bc-sep" style="display:none;">›</span>
-    <span class="bc-current" id="bc-current" style="display:none;">
-        <span class="bc-dot"></span>
-        <span id="bc-current-text"></span>
-    </span>
-    <div id="utility-bar">
-        <button class="util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
+    <!-- Separator + current section (hidden on inicio) -->
+    <span id="topbar-sep">›</span>
+    <span id="topbar-titulo-seccion"></span>
+    <!-- Right: theme, lang, hamburger -->
+    <div id="topbar-right" onclick="event.stopPropagation()">
+        <button class="topbar-util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
             <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
-            <span class="icon-label" data-i18n-sun="Dark" data-i18n-moon="Light">Dark</span>
+            <span class="icon-label">Dark</span>
         </button>
-        <button class="util-btn" id="lang-toggle" onclick="toggleLang()">
-            <span class="lang-flag" id="lang-flag">🇬🇧</span>
+        <button class="topbar-util-btn" id="lang-toggle" onclick="toggleLang()">
+            <span id="lang-flag">🇬🇧</span>
             <span id="lang-label">EN</span>
+        </button>
+        <button id="hamburger-btn" onclick="event.stopPropagation(); toggleMenu()" aria-label="Abrir/cerrar menú">
+            <span></span><span></span><span></span>
         </button>
     </div>
 </div>
@@ -2410,7 +2417,7 @@ const _origInit = () => {
         if (secEl && inicioEl) {
             inicioEl.classList.remove('activa');
             secEl.classList.add('activa');
-            document.getElementById('topbar-titulo-seccion').textContent = _tituloSeccion[seccionGuardada] || seccionGuardada;
+            actualizarBreadcrumb(seccionGuardada);
             document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('activo'));
             const menuBtn = document.getElementById('menu-btn-' + seccionGuardada);
             if (menuBtn) menuBtn.classList.add('activo');
@@ -3176,8 +3183,8 @@ function cambiarSeccion(p) {
     const nuevaEl   = document.getElementById(p);
     if (!nuevaEl || actualEl === nuevaEl) return;
 
-    // Update topbar title using i18n
-    document.getElementById('topbar-titulo-seccion').textContent = T(_tituloSeccion[p] || 'nav.' + p);
+    // Update topbar via breadcrumb (i18n-aware)
+    // actualizarBreadcrumb is called by the patch wrapper before this function runs
 
     // Update menu items
     document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('activo'));
@@ -3626,10 +3633,13 @@ function abrirMenu() {
     }
     panel.classList.add('abierto');
     overlay.classList.add('abierto');
+    if (topbar) topbar.classList.add('menu-abierto');
 }
 function cerrarMenu() {
     document.getElementById('menu-panel').classList.remove('abierto');
     document.getElementById('menu-overlay').classList.remove('abierto');
+    const topbar = document.getElementById('topbar-hamburger');
+    if (topbar) topbar.classList.remove('menu-abierto');
     document.body.style.overflow = '';
 }
 // Cerrar menú al hacer scroll
@@ -4125,17 +4135,17 @@ function _refreshDynamic() {
     }
 
     // Re-render sitial grid (chips use medallaLabel)
-    if (window._estudiantesTodos && window._estudiantesTodos.length) {
+    if (window._appReady && window._estudiantesTodos && window._estudiantesTodos.length) {
         aplicarFiltros();
     }
 
-    // Re-render table headers + badge labels (always, so switching lang while on another section works)
-    if (window.todasLasOlimpiadas) {
+    // Re-render table headers + badge labels — only when data is loaded
+    if (window._appReady && typeof todasLasOlimpiadas !== 'undefined') {
         cargarTabla();
     }
 
     // Re-render honor grid if visible
-    if (window._honorCategoriaActual && window._honorDataGlobal && window._honorDataGlobal.length) {
+    if (window._appReady && window._honorCategoriaActual && window._honorDataGlobal && window._honorDataGlobal.length) {
         const esE = window._honorCategoriaActual === 'entrenadores';
         const filtered = window._honorDataGlobal.filter(d => esE
             ? String(d.Entrenador) === '1' : String(d.Entrenador) === '0');
@@ -4198,25 +4208,22 @@ const _bcKeys = {
 
 function actualizarBreadcrumb(seccion) {
     window._seccionActual = seccion;
-    const sep    = document.getElementById('bc-sep');
-    const cur    = document.getElementById('bc-current');
-    const curTxt = document.getElementById('bc-current-text');
-    const bcHome = document.querySelector('.bc-home');
-    if (bcHome) bcHome.innerHTML = '🏠 ' + T('bc.home');
-    if (!sep || !cur || !curTxt) return;
-    if (!seccion || seccion === 'inicio') {
-        sep.style.display = 'none';
-        cur.style.display = 'none';
-    } else {
-        sep.style.display = '';
-        cur.style.display = '';
-        curTxt.textContent = T(_bcKeys[seccion] || 'nav.' + seccion);
+    const sep      = document.getElementById('topbar-sep');
+    const titleEl  = document.getElementById('topbar-titulo-seccion');
+    const homeBtn  = document.getElementById('topbar-home-btn');
+
+    // Update home button text (for language switch)
+    if (homeBtn) {
+        const span = homeBtn.querySelector('[data-i18n="nav.home"]');
+        if (span) span.textContent = T('nav.home');
     }
-    // Topbar section title
-    const topEl = document.getElementById('topbar-titulo-seccion');
-    if (topEl) {
-        const key = _bcKeys[seccion] || 'nav.' + seccion;
-        topEl.textContent = seccion === 'inicio' ? T('topbar.title') : T(key);
+
+    if (!seccion || seccion === 'inicio') {
+        if (sep) sep.classList.remove('visible');
+        if (titleEl) titleEl.textContent = '';
+    } else {
+        if (sep) sep.classList.add('visible');
+        if (titleEl) titleEl.textContent = T(_bcKeys[seccion] || 'nav.' + seccion);
     }
 }
 
