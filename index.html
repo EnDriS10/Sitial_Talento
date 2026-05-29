@@ -3726,7 +3726,11 @@ function _provHide() {
         }
     }, { passive: true });
 
-    // ════════════════════════════════════════
+    // Ocultar al hacer scroll
+    window.addEventListener('scroll', _provHide, { passive: true });
+})();
+
+// ════════════════════════════════════════
 // DARK MODE TOGGLE
 // ════════════════════════════════════════
 (function() {
