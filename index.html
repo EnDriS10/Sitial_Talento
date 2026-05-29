@@ -1942,7 +1942,24 @@
                         <span class="contacto-row-icon">✉️</span>
                         <div class="contacto-row-text">
                             <div class="contacto-row-label" id="contacto-email-label-el">Correo electrónico</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px;">Telegram Chemistry Olympiad · César Acosta Martínez</div>
                             <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>
+                        </div>
+                    </div>
+                    <div class="contacto-row" style="margin-top:10px;">
+                        <span class="contacto-row-icon">✉️</span>
+                        <div class="contacto-row-text">
+                            <div class="contacto-row-label">Presidente de la Sociedad Cubana de Química</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px;">Dr. Julieta Coro Bermello</div>
+                            <a href="mailto:corobermellojulieta@gmail.com">corobermellojulieta@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contacto-row" style="margin-top:10px;">
+                        <span class="contacto-row-icon">✉️</span>
+                        <div class="contacto-row-text">
+                            <div class="contacto-row-label">Comité Científico de la Olimpiada Cubana de Química</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px;">Dr. Gerardo Manuel Ojeda Carralero</div>
+                            <a href="mailto:gmojedac@gmail.com">gmojedac@gmail.com</a>
                         </div>
                     </div>
                 </div>
@@ -2290,12 +2307,14 @@ function volverAlGatewayHonor() {
 
 async function cargarHonorData() {
     try {
-        const resp = await fetch('Data/honor_merece.html');
+        const lang = window._lang || 'es';
+        const archivo = lang === 'en' ? 'Data/honor_merece_EN.html' : 'Data/honor_merece_ES.html';
+        const resp = await fetch(archivo);
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const html = await resp.text();
         const doc  = new DOMParser().parseFromString(html, 'text/html');
         const el   = doc.getElementById('honor-data');
-        if (!el) throw new Error('No se encontró #honor-data en honor_merece.html');
+        if (!el) throw new Error('No se encontró #honor-data en ' + archivo);
         const data = JSON.parse(el.textContent);
         _honorDataGlobal = data;
 
@@ -4190,6 +4209,21 @@ function toggleLang() {
     const next = (window._lang === 'es') ? 'en' : 'es';
     try { localStorage.setItem('lang', next); } catch(e) {}
     applyI18n(next);
+    // Recargar datos de honor en el nuevo idioma
+    if (window._appReady) {
+        articulos = {};
+        window.articulosPorNombre = {};
+        _honorDataGlobal = [];
+        cargarHonorData().then(() => {
+            // Si la cuadrícula de honor está visible, re-renderizarla
+            if (window._honorCategoriaActual && window._honorDataGlobal && window._honorDataGlobal.length) {
+                const esE = window._honorCategoriaActual === 'entrenadores';
+                const filtered = window._honorDataGlobal.filter(d => esE
+                    ? String(d.Entrenador) === '1' : String(d.Entrenador) === '0');
+                renderHonorGrid(filtered);
+            }
+        });
+    }
 }
 
 // ════════════════════════════════════════════════════════════════════
