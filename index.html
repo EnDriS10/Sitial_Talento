@@ -27,9 +27,108 @@
             --cu-blue:  #002a8f;
             --cu-white: #f2f2f2;
             --cu-red:   #cc0001;
+            /* Typography scale */
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            /* Max reading width */
+            --prose-max: 72ch;
         }
+
+        /* ═══════════════════════════════════════════
+           DARK MODE
+        ═══════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --navy: #d0e0ff;
+            --navy-mid: #1a2840;
+            --navy-light: #3a5a9a;
+            --gold: #d4a82a;
+            --gold-light: #f5d060;
+            --accent: #5ba3e8;
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            --cu-blue: #4070d0;
+            --cu-white: #c8d4e8;
+            --cu-red: #e05050;
+        }
+        [data-theme="dark"] header {
+            background: #070c16;
+        }
+        [data-theme="dark"] nav,
+        [data-theme="dark"] #topbar-hamburger,
+        [data-theme="dark"] #menu-panel {
+            background: #10161e;
+        }
+        [data-theme="dark"] .tabla-wrapper,
+        [data-theme="dark"] table {
+            background: var(--card-bg);
+        }
+        [data-theme="dark"] th {
+            background: #1c2a40;
+        }
+        [data-theme="dark"] th:hover {
+            background: #263550;
+        }
+        [data-theme="dark"] tr:hover td { background: #1e2631; }
+        [data-theme="dark"] tr.fila-ed-par td  { background: var(--card-bg); }
+        [data-theme="dark"] tr.fila-ed-impar td { background: rgba(90,160,255,0.06); }
+        [data-theme="dark"] tr.fila-ed-par:hover td  { background: #1e2631; }
+        [data-theme="dark"] tr.fila-ed-impar:hover td { background: rgba(90,160,255,0.12); }
+        [data-theme="dark"] tr.fila-del-par td { background: var(--card-bg); }
+        [data-theme="dark"] tr.fila-del-impar td { background: rgba(90,160,255,0.06); }
+        [data-theme="dark"] .custom-select,
+        [data-theme="dark"] .sort-btn,
+        [data-theme="dark"] .filtro-btn,
+        [data-theme="dark"] .search-input,
+        [data-theme="dark"] .year-navigator,
+        [data-theme="dark"] #año-input,
+        [data-theme="dark"] .filtro-año-btn,
+        [data-theme="dark"] #filtro-años-wrapper { background: #1c2430; color: var(--text); }
+        [data-theme="dark"] .contacto-enlace-item,
+        [data-theme="dark"] .contacto-row,
+        [data-theme="dark"] .contacto-colab-card { background: #1c2430; }
+        [data-theme="dark"] .icho-cd-card { background: #1c2430; }
+        [data-theme="dark"] .en-numeros-wrap { background: var(--card-bg); }
+        [data-theme="dark"] .icho-countdown-wrap { background: linear-gradient(135deg, #161c28 0%, #1a1810 100%); }
+        [data-theme="dark"] .chip-oro   { background: #2a1f00; color: #f5d060; border-color: #a07a10; }
+        [data-theme="dark"] .chip-plata { background: #1e2230; color: #a0b4c8; border-color: #506080; }
+        [data-theme="dark"] .chip-bronce { background: #2a1408; color: #d09060; border-color: #905030; }
+        [data-theme="dark"] .chip-mencion { background: #0e1a30; color: #6090d0; border-color: #305090; }
+        [data-theme="dark"] .badge-oro   { background: #2a1f00; color: #f5d060; }
+        [data-theme="dark"] .badge-plata { background: #1e2230; color: #a0b4c8; }
+        [data-theme="dark"] .badge-bronce { background: #2a1408; color: #d09060; }
+        [data-theme="dark"] .badge-mencion { background: #0e1a30; color: #6090d0; }
+        [data-theme="dark"] .badge-participante { background: #1e2230; color: #8b949e; }
+        [data-theme="dark"] .inicio-card:hover { border-color: var(--gold); }
+        [data-theme="dark"] footer { background: #070c16; }
+        [data-theme="dark"] .honor-back-header { border-bottom-color: var(--border); }
+        [data-theme="dark"] #honor-list-view .honor-grid .honor-card { background: var(--card-bg); }
+        [data-theme="dark"] .menu-item:hover { background: rgba(255,255,255,.06); }
+        [data-theme="dark"] #menu-overlay { background: rgba(0,0,0,.6); }
+        [data-theme="dark"] #tarjeta-modal-card,
+        [data-theme="dark"] #tarjeta-modal-close { background: var(--card-bg); color: var(--text); }
+        [data-theme="dark"] #tarjeta-modal-nombre { color: var(--text); }
+        [data-theme="dark"] #tarjeta-modal-close { background: #1c2430; }
+        [data-theme="dark"] .tabla-footer { background: #0d1117; }
+        [data-theme="dark"] .noticia-full { background: var(--card-bg); }
+        [data-theme="dark"] .video-item { background: var(--card-bg); }
+        [data-theme="dark"] .rol-tag { background: rgba(90,160,255,0.12); }
+        [data-theme="dark"] .prov-badge { background: rgba(200,160,40,0.15); }
+        [data-theme="dark"] #modal-body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] #modal-body > div:last-child { color: var(--text) !important; background: var(--bg) !important; }
+        [data-theme="dark"] .honor-cat-badge.coaches-badge { background: rgba(200,160,40,.12); color: #d4a82a; }
+        [data-theme="dark"] .honor-cat-badge.scientists-badge { background: rgba(90,160,255,.1); color: #5ba3e8; }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
         /* ═══════════════════════════════════════════
            HEADER
@@ -296,8 +395,8 @@
         /* LAYOUT */
         .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
-        .section-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -.2px; line-height: 1.2; }
+        .section-sub { font-size: var(--font-base); color: var(--text-muted); margin-bottom: 32px; max-width: 68ch; line-height: 1.65; }
 
         /* CARDS */
         .cuadricula-sitial { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
@@ -380,7 +479,22 @@
         .sort-btn { padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 4px; transition: all .2s; }
         .sort-btn:hover { border-color: var(--navy-light); color: var(--navy); }
         .sort-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
-        .tabla-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 16px rgba(4,18,43,.07); }
+        .tabla-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 16px rgba(4,18,43,.07); position: relative; }
+        /* Horizontal scroll fade hint on mobile */
+        @media (max-width: 640px) {
+            .tabla-wrapper::after {
+                content: '';
+                position: absolute;
+                top: 0; right: 0; bottom: 0;
+                width: 32px;
+                background: linear-gradient(to right, transparent, rgba(255,255,255,.85));
+                pointer-events: none;
+                border-radius: 0 var(--radius) var(--radius) 0;
+            }
+            [data-theme="dark"] .tabla-wrapper::after {
+                background: linear-gradient(to right, transparent, rgba(22,27,34,.85));
+            }
+        }
         table { width: 100%; border-collapse: collapse; }
         th { background: var(--navy); color: rgba(255,255,255,.85); padding: 14px 18px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; cursor: pointer; user-select: none; white-space: nowrap; }
         th:hover { background: var(--navy-light); }
@@ -452,7 +566,7 @@
             nav::-webkit-scrollbar { display: none; }
             nav button { padding: 14px 16px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
             .contenedor { padding: 24px 14px 60px; }
-            .section-title { font-size: 22px; }
+            .section-title { font-size: clamp(1.3rem, 5vw, 1.6rem); }
             .section-sub { font-size: 13px; margin-bottom: 20px; }
             .cuadricula-sitial { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .tarjeta { padding: 18px 12px 14px; }
@@ -496,6 +610,13 @@
             .modal-avatar-initials-big { font-size: 34px; }
             #tarjeta-modal-nombre { font-size: 18px; }
             #foto-zoom-nombre { font-size: 13px; padding: 6px 16px; bottom: 20px; }
+            /* Breadcrumb compact */
+            #breadcrumb-bar { padding: 6px 12px; font-size: 11px; }
+            .util-btn { padding: 3px 8px; font-size: 10px; }
+            /* Noticia stack */
+            .noticia-full { flex-direction: column; }
+            .foto-noticia-wrap { width: 100%; min-width: 0; height: 160px; min-height: 0; }
+            .info-noticia { padding: 14px 16px; }
         }
 
         /* FOOTER */
@@ -504,6 +625,77 @@
         footer a:hover { opacity: .75; }
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
+
+        /* ═══════════════════════════════════════════
+           BREADCRUMB / ACTIVE SECTION INDICATOR
+        ═══════════════════════════════════════════ */
+        #breadcrumb-bar {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 7px 20px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            transition: background .3s;
+        }
+        #breadcrumb-bar::-webkit-scrollbar { display: none; }
+        .bc-home { color: var(--accent); font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity .18s; }
+        .bc-home:hover { opacity: .7; }
+        .bc-sep { margin: 0 6px; opacity: .4; font-size: 11px; }
+        .bc-current {
+            color: var(--text);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .bc-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════
+           DARK MODE TOGGLE + LANGUAGE TOGGLE
+        ═══════════════════════════════════════════ */
+        #utility-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .util-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .util-btn:hover { border-color: var(--navy-light); color: var(--text); }
+        .util-btn.active { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
+        #theme-toggle .icon-sun  { display: inline; }
+        #theme-toggle .icon-moon { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-sun  { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-moon { display: inline; }
+        /* Language flag */
+        .lang-flag { font-size: 14px; line-height: 1; }
 
 
         /* ═══════════════════════════════════════════
@@ -992,16 +1184,20 @@
         }
         .subtitulo-seccion {
             font-family: 'Playfair Display', serif;
-            font-size: 20px;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
             color: var(--navy);
             margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -.1px;
         }
         .titulo-seccion {
             font-family: 'Playfair Display', serif;
-            font-size: 28px;
+            font-size: clamp(1.55rem, 3vw, 2rem);
             font-weight: 700;
             color: var(--navy);
             margin-bottom: 6px;
+            line-height: 1.2;
+            letter-spacing: -.2px;
         }
 
         /* ── HAMBURGER TOPBAR ── */
@@ -1093,9 +1289,9 @@
 
         /* ── SECCIÓN INICIO ── */
         .inicio-bienvenida {
-            text-align: center; max-width: 660px;
+            text-align: center; max-width: 68ch;
             margin: 0 auto 48px;
-            font-size: 16px; color: var(--text-muted); line-height: 1.72;
+            font-size: var(--font-lg); color: var(--text-muted); line-height: 1.75;
         }
         .inicio-bienvenida strong { color: var(--navy); }
         .inicio-grid {
@@ -1360,7 +1556,7 @@
             <span></span><span></span><span></span><span></span><span></span>
         </div>
 
-        <p class="periodic-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+        <p class="periodic-eyebrow" data-i18n="header.eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
 
         <div class="periodic-title">
 
@@ -1428,41 +1624,41 @@
                 </div>
             </div>
 
-        </div><p class="periodic-subtitle">
+        </div><p class="periodic-subtitle" data-i18n="header.subtitle">
             Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>
         </p>
 
         <div class="stats-bar">
             <div class="stat">
                 <div class="stat-num" id="stat-total">—</div>
-                <div class="stat-label">Participaciones</div>
+                <div class="stat-label" data-i18n="stats.participations">Participaciones</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-estudiantes">—</div>
-                <div class="stat-label">Estudiantes</div>
+                <div class="stat-label" data-i18n="stats.students">Estudiantes</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-oro">—</div>
-                <div class="stat-label">Oro 🥇</div>
+                <div class="stat-label" data-i18n="stats.gold">Oro 🥇</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-plata">—</div>
-                <div class="stat-label">Plata 🥈</div>
+                <div class="stat-label" data-i18n="stats.silver">Plata 🥈</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-bronce">—</div>
-                <div class="stat-label">Bronce 🥉</div>
+                <div class="stat-label" data-i18n="stats.bronze">Bronce 🥉</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-mencion">—</div>
-                <div class="stat-label">Menciones 🎖</div>
+                <div class="stat-label" data-i18n="stats.mention">Menciones 🎖</div>
             </div>
-            <div class="stats-context" id="stats-context">Totales en todas las olimpiadas</div>
+            <div class="stats-context" id="stats-context" data-i18n="stats.context">Totales en todas las olimpiadas</div>
         </div>
 
     </div>
@@ -1475,43 +1671,63 @@
     </button>
 </div>
 
+<!-- BREADCRUMB + UTILITY BAR -->
+<div id="breadcrumb-bar">
+    <span class="bc-home" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></span>
+    <span class="bc-sep" id="bc-sep" style="display:none;">›</span>
+    <span class="bc-current" id="bc-current" style="display:none;">
+        <span class="bc-dot"></span>
+        <span id="bc-current-text"></span>
+    </span>
+    <div id="utility-bar">
+        <button class="util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
+            <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+            <span class="icon-label" data-i18n-sun="Dark" data-i18n-moon="Light">Dark</span>
+        </button>
+        <button class="util-btn" id="lang-toggle" onclick="toggleLang()">
+            <span class="lang-flag" id="lang-flag">🇬🇧</span>
+            <span id="lang-label">EN</span>
+        </button>
+    </div>
+</div>
+
 <div id="menu-overlay" onclick="cerrarMenu()"></div>
 <div id="menu-panel">
-    <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span>Inicio</span></button>
-    <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span>Historial por Eventos</span></button>
-    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Historial por Medallas</span></button>
-    <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span>Honor a quien Honor Merece</span></button>
-    <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span>Noticias y Entrevistas</span></button>
-    <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span>Enlaces y Contacto</span></button>
-    <div class="menu-pie">© 2026 · Sitial de Talentos Cubanos</div>
+    <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></button>
+    <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span data-i18n="nav.eventos">Historial por Eventos</span></button>
+    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span data-i18n="nav.sitial">Historial por Medallas</span></button>
+    <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
+    <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
+    <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span data-i18n="nav.contacto">Enlaces y Contacto</span></button>
+    <div class="menu-pie" data-i18n="footer.copy">© 2026 · Sitial de Talentos Cubanos</div>
 </div>
 
 <div class="contenedor">
     <div id="inicio" class="seccion activa">
         <div class="inicio-bienvenida">
-            <p>Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
+            <p data-i18n="home.welcome">Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
         </div>
 
         <div class="inicio-grid">
             <div class="inicio-card" onclick="cambiarSeccion('eventos')">
                 <span class="inicio-card-icon">🔍</span>
-                <h3>Historial por Eventos</h3>
-                <p>Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
+                <h3 data-i18n="nav.eventos">Historial por Eventos</h3>
+                <p data-i18n="home.card.eventos">Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('sitial')">
                 <span class="inicio-card-icon">🏅</span>
-                <h3>Historial por Medallas</h3>
-                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
+                <h3 data-i18n="nav.sitial">Historial por Medallas</h3>
+                <p data-i18n="home.card.sitial">Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('honor')">
                 <span class="inicio-card-icon">🎓</span>
-                <h3>Honor a quien Honor Merece</h3>
-                <p>Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
+                <h3 data-i18n="nav.honor">Honor a quien Honor Merece</h3>
+                <p data-i18n="home.card.honor">Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('noticias')">
                 <span class="inicio-card-icon">📰</span>
-                <h3>Noticias y Entrevistas</h3>
-                <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
+                <h3 data-i18n="nav.noticias">Noticias y Entrevistas</h3>
+                <p data-i18n="home.card.noticias">Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
             </div>
         </div>
 
@@ -1519,23 +1735,23 @@
         <div class="en-numeros-outer">
         <div class="en-numeros-wrap">
             <div class="en-numeros-header">
-                <p class="en-numeros-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
-                <h2 class="en-numeros-title">En <em>Números</em></h2>
+                <p class="en-numeros-eyebrow" data-i18n="header.eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+                <h2 class="en-numeros-title" data-i18n="home.innumbers">En <em>Números</em></h2>
             </div>
             <div class="en-numeros-grid">
                 <div class="en-numeros-item">
                     <span class="en-numeros-num">
                         <span class="en-numeros-prefix">+</span><span id="en-medallas">—</span>
                     </span>
-                    <span class="en-numeros-unit">Medallas</span>
+                    <span class="en-numeros-unit" data-i18n="stats.medals">Medallas</span>
                 </div>
                 <div class="en-numeros-item">
                     <span class="en-numeros-num" id="en-años">—</span>
-                    <span class="en-numeros-unit">Años de impacto</span>
+                    <span class="en-numeros-unit" data-i18n="home.yearsimpact">Años de impacto</span>
                 </div>
                 <div class="en-numeros-item">
                     <span class="en-numeros-num" id="en-paises">—</span>
-                    <span class="en-numeros-unit">Países visitados</span>
+                    <span class="en-numeros-unit" data-i18n="home.countries">Países visitados</span>
                 </div>
             </div>
         </div>
@@ -1552,25 +1768,25 @@
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">H₂O</span>
                     <span class="icho-cd-num c-blue"   id="cd-days">--</span>
-                    <span class="icho-cd-unit">Días</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.days">Días</span>
                     <div  class="icho-cd-bar" style="background:#3b6ef0"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">CO₂</span>
                     <span class="icho-cd-num c-green"  id="cd-hours">--</span>
-                    <span class="icho-cd-unit">Horas</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.hours">Horas</span>
                     <div  class="icho-cd-bar" style="background:#22c065"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">NaCl</span>
                     <span class="icho-cd-num c-orange" id="cd-mins">--</span>
-                    <span class="icho-cd-unit">Minutos</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.minutes">Minutos</span>
                     <div  class="icho-cd-bar" style="background:#f77b24"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">C₆H₁₂O₆</span>
                     <span class="icho-cd-num c-purple" id="cd-secs">--</span>
-                    <span class="icho-cd-unit">Segundos</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.seconds">Segundos</span>
                     <div  class="icho-cd-bar" style="background:#9b59d6"></div>
                 </div>
             </div>
@@ -3510,9 +3726,202 @@ function _provHide() {
         }
     }, { passive: true });
 
-    // Ocultar al hacer scroll
-    window.addEventListener('scroll', _provHide, { passive: true });
+    // ════════════════════════════════════════
+// DARK MODE TOGGLE
+// ════════════════════════════════════════
+(function() {
+    const saved = (() => { try { return localStorage.getItem('theme'); } catch(e) { return null; } })();
+    if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 })();
+
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    // Update label
+    const labelEl = document.querySelector('#theme-toggle .icon-label');
+    if (labelEl) {
+        const lang = window._lang || 'es';
+        labelEl.textContent = next === 'dark'
+            ? (lang === 'en' ? 'Light' : 'Claro')
+            : (lang === 'en' ? 'Dark' : 'Oscuro');
+    }
+}
+
+// ════════════════════════════════════════
+// INTERNATIONALISATION (ES ↔ EN)
+// ════════════════════════════════════════
+window._lang = (function() {
+    try { return localStorage.getItem('lang') || 'es'; } catch(e) { return 'es'; }
+})();
+
+const _i18n = {
+    es: {
+        'header.eyebrow':       'Olimpiadas de Química · Cuba',
+        'header.subtitle':      'Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>',
+        'nav.home':             'Inicio',
+        'nav.eventos':          'Historial por Eventos',
+        'nav.sitial':           'Historial por Medallas',
+        'nav.honor':            'Honor a quien Honor Merece',
+        'nav.noticias':         'Noticias y Entrevistas',
+        'nav.contacto':         'Enlaces y Contacto',
+        'stats.participations': 'Participaciones',
+        'stats.students':       'Estudiantes',
+        'stats.gold':           'Oro 🥇',
+        'stats.silver':         'Plata 🥈',
+        'stats.bronze':         'Bronce 🥉',
+        'stats.mention':        'Menciones 🎖',
+        'stats.medals':         'Medallas',
+        'stats.context':        'Totales en todas las olimpiadas',
+        'home.welcome':         'Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.',
+        'home.card.eventos':    'Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ',
+        'home.card.sitial':     'Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química',
+        'home.card.honor':      'Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas',
+        'home.card.noticias':   'Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas',
+        'home.innumbers':       'En <em>Números</em>',
+        'home.yearsimpact':     'Años de impacto',
+        'home.countries':       'Países visitados',
+        'countdown.days':       'Días',
+        'countdown.hours':      'Horas',
+        'countdown.minutes':    'Minutos',
+        'countdown.seconds':    'Segundos',
+        'footer.copy':          '© 2026 · Sitial de Talentos Cubanos',
+        'bc.eventos':           'Historial por Eventos',
+        'bc.sitial':            'Historial por Medallas',
+        'bc.honor':             'Honor',
+        'bc.noticias':          'Noticias y Entrevistas',
+        'bc.contacto':          'Enlaces y Contacto',
+        'lang.btn':             'EN',
+        'lang.flag':            '🇬🇧',
+        'theme.dark':           'Oscuro',
+        'theme.light':          'Claro',
+    },
+    en: {
+        'header.eyebrow':       'Chemistry Olympiads · Cuba',
+        'header.subtitle':      'Recognising the excellence of Cuban students in <strong>International Chemistry Olympiads</strong>',
+        'nav.home':             'Home',
+        'nav.eventos':          'Results by Event',
+        'nav.sitial':           'Hall of Medals',
+        'nav.honor':            'Hall of Fame',
+        'nav.noticias':         'News & Interviews',
+        'nav.contacto':         'Links & Contact',
+        'stats.participations': 'Participations',
+        'stats.students':       'Students',
+        'stats.gold':           'Gold 🥇',
+        'stats.silver':         'Silver 🥈',
+        'stats.bronze':         'Bronze 🥉',
+        'stats.mention':        'Mentions 🎖',
+        'stats.medals':         'Medals',
+        'stats.context':        'Totals across all olympiads',
+        'home.welcome':         'Welcome to the official record of Cuban students who have represented Cuba at the leading <strong>international chemistry olympiads</strong>. Explore medals, stories, and legacies from decades of scientific excellence.',
+        'home.card.eventos':    'Detailed results by olympiad: IChO, IMChO, OIAQ, and OCACQ',
+        'home.card.sitial':     'All Cuban medal-winning and commended students at international chemistry olympiads',
+        'home.card.honor':      'The coaches and teachers who forged Cuban chemistry excellence across decades',
+        'home.card.noticias':   'Chronicles, interviews and videos about Cuban chemistry olympiads',
+        'home.innumbers':       'By the <em>Numbers</em>',
+        'home.yearsimpact':     'Years of impact',
+        'home.countries':       'Countries visited',
+        'countdown.days':       'Days',
+        'countdown.hours':      'Hours',
+        'countdown.minutes':    'Minutes',
+        'countdown.seconds':    'Seconds',
+        'footer.copy':          '© 2026 · Cuban Talent Olympiad Registry',
+        'bc.eventos':           'Results by Event',
+        'bc.sitial':            'Hall of Medals',
+        'bc.honor':             'Hall of Fame',
+        'bc.noticias':          'News & Interviews',
+        'bc.contacto':          'Links & Contact',
+        'lang.btn':             'ES',
+        'lang.flag':            '🇨🇺',
+        'theme.dark':           'Dark',
+        'theme.light':          'Light',
+    }
+};
+
+function applyI18n(lang) {
+    const t = _i18n[lang] || _i18n.es;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    // Lang button
+    const flagEl = document.getElementById('lang-flag');
+    const labelEl = document.getElementById('lang-label');
+    if (flagEl) flagEl.textContent = t['lang.flag'] || (lang === 'en' ? '🇨🇺' : '🇬🇧');
+    if (labelEl) labelEl.textContent = t['lang.btn'] || (lang === 'en' ? 'ES' : 'EN');
+    // Theme button label
+    const themeLabel = document.querySelector('#theme-toggle .icon-label');
+    if (themeLabel) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        themeLabel.textContent = isDark ? t['theme.light'] : t['theme.dark'];
+    }
+    // Breadcrumb home text
+    const bcHome = document.querySelector('.bc-home');
+    if (bcHome) bcHome.innerHTML = '🏠 ' + (t['nav.home'] || 'Inicio');
+    // Update breadcrumb current text if visible
+    actualizarBreadcrumb(window._seccionActual || 'inicio');
+    // Update document language
+    document.documentElement.lang = lang;
+}
+
+function toggleLang() {
+    const next = (window._lang === 'es') ? 'en' : 'es';
+    window._lang = next;
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    applyI18n(next);
+}
+
+// ════════════════════════════════════════
+// BREADCRUMB
+// ════════════════════════════════════════
+window._seccionActual = 'inicio';
+
+function actualizarBreadcrumb(seccion) {
+    window._seccionActual = seccion;
+    const sep    = document.getElementById('bc-sep');
+    const cur    = document.getElementById('bc-current');
+    const curTxt = document.getElementById('bc-current-text');
+    if (!sep || !cur || !curTxt) return;
+
+    if (seccion === 'inicio') {
+        sep.style.display = 'none';
+        cur.style.display = 'none';
+        return;
+    }
+    const lang = window._lang || 'es';
+    const t = _i18n[lang] || _i18n.es;
+    const labels = {
+        eventos:  t['bc.eventos'],
+        sitial:   t['bc.sitial'],
+        honor:    t['bc.honor'],
+        noticias: t['bc.noticias'],
+        contacto: t['bc.contacto'],
+    };
+    sep.style.display = '';
+    cur.style.display = '';
+    curTxt.textContent = labels[seccion] || seccion;
+}
+
+// Patch cambiarSeccion to also update breadcrumb
+(function() {
+    const _orig = window.cambiarSeccion;
+    window.cambiarSeccion = function(p) {
+        actualizarBreadcrumb(p);
+        _orig(p);
+    };
+})();
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+    applyI18n(window._lang);
+    // Apply saved theme label
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const themeLabel = document.querySelector('#theme-toggle .icon-label');
+    const lang = window._lang || 'es';
+    const t = _i18n[lang] || _i18n.es;
+    if (themeLabel) themeLabel.textContent = isDark ? (t['theme.light']) : (t['theme.dark']);
+});
 </script>
 </body>
 </html>
