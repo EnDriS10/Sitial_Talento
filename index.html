@@ -27,9 +27,108 @@
             --cu-blue:  #002a8f;
             --cu-white: #f2f2f2;
             --cu-red:   #cc0001;
+            /* Typography scale */
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            /* Max reading width */
+            --prose-max: 72ch;
         }
+
+        /* ═══════════════════════════════════════════
+           DARK MODE
+        ═══════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --navy: #d0e0ff;
+            --navy-mid: #1a2840;
+            --navy-light: #3a5a9a;
+            --gold: #d4a82a;
+            --gold-light: #f5d060;
+            --accent: #5ba3e8;
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --border: #30363d;
+            --cu-blue: #4070d0;
+            --cu-white: #c8d4e8;
+            --cu-red: #e05050;
+        }
+        [data-theme="dark"] header {
+            background: #070c16;
+        }
+        [data-theme="dark"] nav,
+        [data-theme="dark"] #topbar-hamburger,
+        [data-theme="dark"] #menu-panel {
+            background: #10161e;
+        }
+        [data-theme="dark"] .tabla-wrapper,
+        [data-theme="dark"] table {
+            background: var(--card-bg);
+        }
+        [data-theme="dark"] th {
+            background: #1c2a40;
+        }
+        [data-theme="dark"] th:hover {
+            background: #263550;
+        }
+        [data-theme="dark"] tr:hover td { background: #1e2631; }
+        [data-theme="dark"] tr.fila-ed-par td  { background: var(--card-bg); }
+        [data-theme="dark"] tr.fila-ed-impar td { background: rgba(90,160,255,0.06); }
+        [data-theme="dark"] tr.fila-ed-par:hover td  { background: #1e2631; }
+        [data-theme="dark"] tr.fila-ed-impar:hover td { background: rgba(90,160,255,0.12); }
+        [data-theme="dark"] tr.fila-del-par td { background: var(--card-bg); }
+        [data-theme="dark"] tr.fila-del-impar td { background: rgba(90,160,255,0.06); }
+        [data-theme="dark"] .custom-select,
+        [data-theme="dark"] .sort-btn,
+        [data-theme="dark"] .filtro-btn,
+        [data-theme="dark"] .search-input,
+        [data-theme="dark"] .year-navigator,
+        [data-theme="dark"] #año-input,
+        [data-theme="dark"] .filtro-año-btn,
+        [data-theme="dark"] #filtro-años-wrapper { background: #1c2430; color: var(--text); }
+        [data-theme="dark"] .contacto-enlace-item,
+        [data-theme="dark"] .contacto-row,
+        [data-theme="dark"] .contacto-colab-card { background: #1c2430; }
+        [data-theme="dark"] .icho-cd-card { background: #1c2430; }
+        [data-theme="dark"] .en-numeros-wrap { background: var(--card-bg); }
+        [data-theme="dark"] .icho-countdown-wrap { background: linear-gradient(135deg, #161c28 0%, #1a1810 100%); }
+        [data-theme="dark"] .chip-oro   { background: #2a1f00; color: #f5d060; border-color: #a07a10; }
+        [data-theme="dark"] .chip-plata { background: #1e2230; color: #a0b4c8; border-color: #506080; }
+        [data-theme="dark"] .chip-bronce { background: #2a1408; color: #d09060; border-color: #905030; }
+        [data-theme="dark"] .chip-mencion { background: #0e1a30; color: #6090d0; border-color: #305090; }
+        [data-theme="dark"] .badge-oro   { background: #2a1f00; color: #f5d060; }
+        [data-theme="dark"] .badge-plata { background: #1e2230; color: #a0b4c8; }
+        [data-theme="dark"] .badge-bronce { background: #2a1408; color: #d09060; }
+        [data-theme="dark"] .badge-mencion { background: #0e1a30; color: #6090d0; }
+        [data-theme="dark"] .badge-participante { background: #1e2230; color: #8b949e; }
+        [data-theme="dark"] .inicio-card:hover { border-color: var(--gold); }
+        [data-theme="dark"] footer { background: #070c16; }
+        [data-theme="dark"] .honor-back-header { border-bottom-color: var(--border); }
+        [data-theme="dark"] #honor-list-view .honor-grid .honor-card { background: var(--card-bg); }
+        [data-theme="dark"] .menu-item:hover { background: rgba(255,255,255,.06); }
+        [data-theme="dark"] #menu-overlay { background: rgba(0,0,0,.6); }
+        [data-theme="dark"] #tarjeta-modal-card,
+        [data-theme="dark"] #tarjeta-modal-close { background: var(--card-bg); color: var(--text); }
+        [data-theme="dark"] #tarjeta-modal-nombre { color: var(--text); }
+        [data-theme="dark"] #tarjeta-modal-close { background: #1c2430; }
+        [data-theme="dark"] .tabla-footer { background: #0d1117; }
+        [data-theme="dark"] .noticia-full { background: var(--card-bg); }
+        [data-theme="dark"] .video-item { background: var(--card-bg); }
+        [data-theme="dark"] .rol-tag { background: rgba(90,160,255,0.12); }
+        [data-theme="dark"] .prov-badge { background: rgba(200,160,40,0.15); }
+        [data-theme="dark"] #modal-body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] #modal-body > div:last-child { color: var(--text) !important; background: var(--bg) !important; }
+        [data-theme="dark"] .honor-cat-badge.coaches-badge { background: rgba(200,160,40,.12); color: #d4a82a; }
+        [data-theme="dark"] .honor-cat-badge.scientists-badge { background: rgba(90,160,255,.1); color: #5ba3e8; }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
         /* ═══════════════════════════════════════════
            HEADER
@@ -296,8 +395,8 @@
         /* LAYOUT */
         .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
-        .section-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -.2px; line-height: 1.2; }
+        .section-sub { font-size: var(--font-base); color: var(--text-muted); margin-bottom: 32px; max-width: 68ch; line-height: 1.65; }
 
         /* CARDS */
         .cuadricula-sitial { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px; }
@@ -380,7 +479,8 @@
         .sort-btn { padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 4px; transition: all .2s; }
         .sort-btn:hover { border-color: var(--navy-light); color: var(--navy); }
         .sort-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
-        .tabla-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: 0 2px 16px rgba(4,18,43,.07); }
+        .tabla-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 2px 16px rgba(4,18,43,.07); position: relative; }
+        /* Remove the static ::after fade - it scrolled with nothing and looked broken on mobile */
         table { width: 100%; border-collapse: collapse; }
         th { background: var(--navy); color: rgba(255,255,255,.85); padding: 14px 18px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; cursor: pointer; user-select: none; white-space: nowrap; }
         th:hover { background: var(--navy-light); }
@@ -452,7 +552,7 @@
             nav::-webkit-scrollbar { display: none; }
             nav button { padding: 14px 16px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
             .contenedor { padding: 24px 14px 60px; }
-            .section-title { font-size: 22px; }
+            .section-title { font-size: clamp(1.3rem, 5vw, 1.6rem); }
             .section-sub { font-size: 13px; margin-bottom: 20px; }
             .cuadricula-sitial { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .tarjeta { padding: 18px 12px 14px; }
@@ -496,6 +596,13 @@
             .modal-avatar-initials-big { font-size: 34px; }
             #tarjeta-modal-nombre { font-size: 18px; }
             #foto-zoom-nombre { font-size: 13px; padding: 6px 16px; bottom: 20px; }
+            /* Breadcrumb compact */
+            #breadcrumb-bar { padding: 6px 12px; font-size: 11px; }
+            .util-btn { padding: 3px 8px; font-size: 10px; }
+            /* Noticia stack */
+            .noticia-full { flex-direction: column; }
+            .foto-noticia-wrap { width: 100%; min-width: 0; height: 160px; min-height: 0; }
+            .info-noticia { padding: 14px 16px; }
         }
 
         /* FOOTER */
@@ -504,6 +611,77 @@
         footer a:hover { opacity: .75; }
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
+
+        /* ═══════════════════════════════════════════
+           BREADCRUMB / ACTIVE SECTION INDICATOR
+        ═══════════════════════════════════════════ */
+        #breadcrumb-bar {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 7px 20px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            transition: background .3s;
+        }
+        #breadcrumb-bar::-webkit-scrollbar { display: none; }
+        .bc-home { color: var(--accent); font-weight: 600; cursor: pointer; text-decoration: none; transition: opacity .18s; }
+        .bc-home:hover { opacity: .7; }
+        .bc-sep { margin: 0 6px; opacity: .4; font-size: 11px; }
+        .bc-current {
+            color: var(--text);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .bc-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════════
+           DARK MODE TOGGLE + LANGUAGE TOGGLE
+        ═══════════════════════════════════════════ */
+        #utility-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .util-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+        .util-btn:hover { border-color: var(--navy-light); color: var(--text); }
+        .util-btn.active { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
+        #theme-toggle .icon-sun  { display: inline; }
+        #theme-toggle .icon-moon { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-sun  { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-moon { display: inline; }
+        /* Language flag */
+        .lang-flag { font-size: 14px; line-height: 1; }
 
 
         /* ═══════════════════════════════════════════
@@ -992,16 +1170,20 @@
         }
         .subtitulo-seccion {
             font-family: 'Playfair Display', serif;
-            font-size: 20px;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
             color: var(--navy);
             margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -.1px;
         }
         .titulo-seccion {
             font-family: 'Playfair Display', serif;
-            font-size: 28px;
+            font-size: clamp(1.55rem, 3vw, 2rem);
             font-weight: 700;
             color: var(--navy);
             margin-bottom: 6px;
+            line-height: 1.2;
+            letter-spacing: -.2px;
         }
 
         /* ── HAMBURGER TOPBAR ── */
@@ -1093,9 +1275,9 @@
 
         /* ── SECCIÓN INICIO ── */
         .inicio-bienvenida {
-            text-align: center; max-width: 660px;
+            text-align: center; max-width: 68ch;
             margin: 0 auto 48px;
-            font-size: 16px; color: var(--text-muted); line-height: 1.72;
+            font-size: var(--font-lg); color: var(--text-muted); line-height: 1.75;
         }
         .inicio-bienvenida strong { color: var(--navy); }
         .inicio-grid {
@@ -1360,7 +1542,7 @@
             <span></span><span></span><span></span><span></span><span></span>
         </div>
 
-        <p class="periodic-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+        <p class="periodic-eyebrow" data-i18n="header.eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
 
         <div class="periodic-title">
 
@@ -1428,41 +1610,41 @@
                 </div>
             </div>
 
-        </div><p class="periodic-subtitle">
+        </div><p class="periodic-subtitle" data-i18n="header.subtitle">
             Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>
         </p>
 
         <div class="stats-bar">
             <div class="stat">
                 <div class="stat-num" id="stat-total">—</div>
-                <div class="stat-label">Participaciones</div>
+                <div class="stat-label" data-i18n="stats.participations">Participaciones</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-estudiantes">—</div>
-                <div class="stat-label">Estudiantes</div>
+                <div class="stat-label" data-i18n="stats.students">Estudiantes</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-oro">—</div>
-                <div class="stat-label">Oro 🥇</div>
+                <div class="stat-label" data-i18n="stats.gold">Oro 🥇</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-plata">—</div>
-                <div class="stat-label">Plata 🥈</div>
+                <div class="stat-label" data-i18n="stats.silver">Plata 🥈</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-bronce">—</div>
-                <div class="stat-label">Bronce 🥉</div>
+                <div class="stat-label" data-i18n="stats.bronze">Bronce 🥉</div>
             </div>
             <div class="stat-divider"></div>
             <div class="stat">
                 <div class="stat-num" id="stat-mencion">—</div>
-                <div class="stat-label">Menciones 🎖</div>
+                <div class="stat-label" data-i18n="stats.mention">Menciones 🎖</div>
             </div>
-            <div class="stats-context" id="stats-context">Totales en todas las olimpiadas</div>
+            <div class="stats-context" id="stats-context" data-i18n="stats.context">Totales en todas las olimpiadas</div>
         </div>
 
     </div>
@@ -1475,43 +1657,63 @@
     </button>
 </div>
 
+<!-- BREADCRUMB + UTILITY BAR -->
+<div id="breadcrumb-bar">
+    <span class="bc-home" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></span>
+    <span class="bc-sep" id="bc-sep" style="display:none;">›</span>
+    <span class="bc-current" id="bc-current" style="display:none;">
+        <span class="bc-dot"></span>
+        <span id="bc-current-text"></span>
+    </span>
+    <div id="utility-bar">
+        <button class="util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
+            <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+            <span class="icon-label" data-i18n-sun="Dark" data-i18n-moon="Light">Dark</span>
+        </button>
+        <button class="util-btn" id="lang-toggle" onclick="toggleLang()">
+            <span class="lang-flag" id="lang-flag">🇬🇧</span>
+            <span id="lang-label">EN</span>
+        </button>
+    </div>
+</div>
+
 <div id="menu-overlay" onclick="cerrarMenu()"></div>
 <div id="menu-panel">
-    <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span>Inicio</span></button>
-    <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span>Historial por Eventos</span></button>
-    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Historial por Medallas</span></button>
-    <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span>Honor a quien Honor Merece</span></button>
-    <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span>Noticias y Entrevistas</span></button>
-    <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span>Enlaces y Contacto</span></button>
-    <div class="menu-pie">© 2026 · Sitial de Talentos Cubanos</div>
+    <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></button>
+    <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span data-i18n="nav.eventos">Historial por Eventos</span></button>
+    <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span data-i18n="nav.sitial">Historial por Medallas</span></button>
+    <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
+    <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
+    <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span data-i18n="nav.contacto">Enlaces y Contacto</span></button>
+    <div class="menu-pie" data-i18n="footer.copy">© 2026 · Sitial de Talentos Cubanos</div>
 </div>
 
 <div class="contenedor">
     <div id="inicio" class="seccion activa">
         <div class="inicio-bienvenida">
-            <p>Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
+            <p data-i18n="home.welcome">Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.</p>
         </div>
 
         <div class="inicio-grid">
             <div class="inicio-card" onclick="cambiarSeccion('eventos')">
                 <span class="inicio-card-icon">🔍</span>
-                <h3>Historial por Eventos</h3>
-                <p>Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
+                <h3 data-i18n="nav.eventos">Historial por Eventos</h3>
+                <p data-i18n="home.card.eventos">Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('sitial')">
                 <span class="inicio-card-icon">🏅</span>
-                <h3>Historial por Medallas</h3>
-                <p>Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
+                <h3 data-i18n="nav.sitial">Historial por Medallas</h3>
+                <p data-i18n="home.card.sitial">Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('honor')">
                 <span class="inicio-card-icon">🎓</span>
-                <h3>Honor a quien Honor Merece</h3>
-                <p>Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
+                <h3 data-i18n="nav.honor">Honor a quien Honor Merece</h3>
+                <p data-i18n="home.card.honor">Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('noticias')">
                 <span class="inicio-card-icon">📰</span>
-                <h3>Noticias y Entrevistas</h3>
-                <p>Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
+                <h3 data-i18n="nav.noticias">Noticias y Entrevistas</h3>
+                <p data-i18n="home.card.noticias">Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
             </div>
         </div>
 
@@ -1519,23 +1721,23 @@
         <div class="en-numeros-outer">
         <div class="en-numeros-wrap">
             <div class="en-numeros-header">
-                <p class="en-numeros-eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
-                <h2 class="en-numeros-title">En <em>Números</em></h2>
+                <p class="en-numeros-eyebrow" data-i18n="header.eyebrow">Olimpiadas de Química &nbsp;·&nbsp; Cuba</p>
+                <h2 class="en-numeros-title" data-i18n="home.innumbers">En <em>Números</em></h2>
             </div>
             <div class="en-numeros-grid">
                 <div class="en-numeros-item">
                     <span class="en-numeros-num">
                         <span class="en-numeros-prefix">+</span><span id="en-medallas">—</span>
                     </span>
-                    <span class="en-numeros-unit">Medallas</span>
+                    <span class="en-numeros-unit" data-i18n="stats.medals">Medallas</span>
                 </div>
                 <div class="en-numeros-item">
                     <span class="en-numeros-num" id="en-años">—</span>
-                    <span class="en-numeros-unit">Años de impacto</span>
+                    <span class="en-numeros-unit" data-i18n="home.yearsimpact">Años de impacto</span>
                 </div>
                 <div class="en-numeros-item">
                     <span class="en-numeros-num" id="en-paises">—</span>
-                    <span class="en-numeros-unit">Países visitados</span>
+                    <span class="en-numeros-unit" data-i18n="home.countries">Países visitados</span>
                 </div>
             </div>
         </div>
@@ -1552,25 +1754,25 @@
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">H₂O</span>
                     <span class="icho-cd-num c-blue"   id="cd-days">--</span>
-                    <span class="icho-cd-unit">Días</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.days">Días</span>
                     <div  class="icho-cd-bar" style="background:#3b6ef0"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">CO₂</span>
                     <span class="icho-cd-num c-green"  id="cd-hours">--</span>
-                    <span class="icho-cd-unit">Horas</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.hours">Horas</span>
                     <div  class="icho-cd-bar" style="background:#22c065"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">NaCl</span>
                     <span class="icho-cd-num c-orange" id="cd-mins">--</span>
-                    <span class="icho-cd-unit">Minutos</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.minutes">Minutos</span>
                     <div  class="icho-cd-bar" style="background:#f77b24"></div>
                 </div>
                 <div class="icho-cd-card">
                     <span class="icho-cd-formula">C₆H₁₂O₆</span>
                     <span class="icho-cd-num c-purple" id="cd-secs">--</span>
-                    <span class="icho-cd-unit">Segundos</span>
+                    <span class="icho-cd-unit" data-i18n="countdown.seconds">Segundos</span>
                     <div  class="icho-cd-bar" style="background:#9b59d6"></div>
                 </div>
             </div>
@@ -1579,10 +1781,10 @@
     </div>
 
     <div id="sitial" class="seccion">
-        <h2 class="section-title">Sitial de Honor</h2>
-        <p class="section-sub">Estudiantes cubanos y sus logros históricos en olimpiadas de química</p>
+        <h2 class="section-title" id="section-title-sitial">Sitial de Honor</h2>
+        <p class="section-sub" id="section-sub-sitial">Estudiantes cubanos y sus logros históricos en olimpiadas de química</p>
         <div class="filtros-sitial">
-            <button class="filtro-btn activo" onclick="filtrarSitial('todos', this)">Todos</button>
+            <button class="filtro-btn activo" data-filter="todos" onclick="filtrarSitial('todos', this)">Todos</button>
             <button class="filtro-btn" onclick="filtrarSitial('oro', this)">🥇 Oro</button>
             <button class="filtro-btn" onclick="filtrarSitial('plata', this)">🥈 Plata</button>
             <button class="filtro-btn" onclick="filtrarSitial('bronce', this)">🥉 Bronce</button>
@@ -1594,10 +1796,10 @@
     </div>
 
     <div id="eventos" class="seccion">
-        <h2 class="section-title">Resultados por Evento</h2>
-        <p class="section-sub">Historial completo de participaciones y medallas por olimpiada</p>
+        <h2 class="section-title" id="section-title-eventos">Resultados por Evento</h2>
+        <p class="section-sub" id="section-sub-eventos">Historial completo de participaciones y medallas por olimpiada</p>
         <div class="controles-evento">
-            <label for="selector-olimpiada"><strong>Olimpiada:</strong></label>
+            <label for="selector-olimpiada"><strong id="lbl-olimpiada">Olimpiada:</strong></label>
             <select class="custom-select" id="selector-olimpiada" onchange="cargarTabla()">
                 <option value="icho">🌍 IChO — Internacional</option>
                 <option value="imcho">🧪 IMChO — Mendeléiev</option>
@@ -1605,17 +1807,17 @@
                 <option value="ocacq">🌴 OCACQ — Centroamérica y del Caribe</option>
                 <option value="otras">🌐 Otras Olimpiadas</option>
             </select>
-            <label for="selector-rol"><strong>Rol:</strong></label>
+            <label for="selector-rol"><strong id="lbl-rol">Rol:</strong></label>
             <select class="custom-select" id="selector-rol" onchange="cargarTabla()">
                 <option value="estudiante">👨‍🎓 Estudiante</option>
                 <option value="profesor">👨‍🏫 Profesor</option>
                 <option value="todos">🏛️ Delegación</option>
             </select>
             <div class="sort-controls">
-                <span class="sort-label">Ordenar:</span>
-                <button class="sort-btn activo" id="sort-año" onclick="ordenarTabla('año', this)">Año <span class="sort-icon">↓</span></button>
-                <button class="sort-btn" id="sort-nombre" onclick="ordenarTabla('nombre', this)">Nombre <span class="sort-icon">↕</span></button>
-                <button class="sort-btn" id="sort-medalla" onclick="ordenarTabla('medalla', this)">Medalla <span class="sort-icon">↕</span></button>
+                <span class="sort-label" id="sort-label-el">Ordenar:</span>
+                <button class="sort-btn activo" id="sort-año" onclick="ordenarTabla('año', this)"><span id="sort-año-label">Año</span> <span class="sort-icon">↓</span></button>
+                <button class="sort-btn" id="sort-nombre" onclick="ordenarTabla('nombre', this)"><span id="sort-nombre-label">Nombre</span> <span class="sort-icon">↕</span></button>
+                <button class="sort-btn" id="sort-medalla" onclick="ordenarTabla('medalla', this)"><span id="sort-medalla-label">Medalla</span> <span class="sort-icon">↕</span></button>
             </div>
         </div>
         <div class="tabla-wrapper">
@@ -1647,20 +1849,20 @@
             <div class="honor-gate-card honor-gate-coaches" onclick="mostrarCategoriaHonor('entrenadores')">
                 <div class="honor-gate-content">
                     <span class="honor-gate-icon">🏆</span>
-                    <h2>Entrenadores Nacionales</h2>
-                    <p>Los maestros que, olimpiada tras olimpiada, forjaron campeones y pusieron el nombre de Cuba en el podio de la química mundial.</p>
-                    <div class="honor-gate-count" id="gate-count-entrenadores">cargando…</div>
-                    <span class="honor-gate-cta">Conocer sus historias →</span>
+                    <h2 id="honor-gate-coaches-title">Entrenadores Nacionales</h2>
+                    <p id="honor-gate-coaches-desc">Los maestros que, olimpiada tras olimpiada, forjaron campeones y pusieron el nombre de Cuba en el podio de la química mundial.</p>
+                    <div class="honor-gate-count" id="gate-count-entrenadores">${T('honor.loading')}</div>
+                    <span class="honor-gate-cta" id="honor-gate-coaches-cta">Conocer sus historias →</span>
                 </div>
             </div>
             <div class="honor-gate-sep"></div>
             <div class="honor-gate-card honor-gate-scientists" onclick="mostrarCategoriaHonor('cientificos')">
                 <div class="honor-gate-content">
                     <span class="honor-gate-icon">⚗️</span>
-                    <h2>Próceres de la Ciencia</h2>
-                    <p>Figuras cimeras cuyo trabajo científico y legado intelectual han iluminado el desarrollo de la química en Cuba y más allá de sus fronteras.</p>
-                    <div class="honor-gate-count" id="gate-count-cientificos">cargando…</div>
-                    <span class="honor-gate-cta">Descubrir su legado →</span>
+                    <h2 id="honor-gate-scientists-title">Próceres de la Ciencia</h2>
+                    <p id="honor-gate-scientists-desc">Figuras cimeras cuyo trabajo científico y legado intelectual han iluminado el desarrollo de la química en Cuba y más allá de sus fronteras.</p>
+                    <div class="honor-gate-count" id="gate-count-cientificos">${T('honor.loading')}</div>
+                    <span class="honor-gate-cta" id="honor-gate-scientists-cta">Descubrir su legado →</span>
                 </div>
             </div>
         </div>
@@ -1668,7 +1870,7 @@
         <!-- ══ LIST VIEW: cuadrícula filtrada ══ -->
         <div id="honor-list-view">
             <div class="honor-back-header">
-                <button class="honor-back-btn" onclick="volverAlGatewayHonor()">← Volver</button>
+                <button class="honor-back-btn" id="honor-back-btn-el" onclick="volverAlGatewayHonor()">← Volver</button>
                 <h3 id="honor-list-title">Entrenadores Nacionales</h3>
                 <span class="honor-cat-badge" id="honor-cat-badge"></span>
             </div>
@@ -1691,27 +1893,27 @@
     <div id="noticias" class="seccion">
         <article id="noticias-inner" class="seccion-contenido">
             <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px; flex-wrap:wrap;">
-                <h2 class="titulo-seccion" style="margin-bottom:0;">Noticias y Entrevistas</h2>
+                <h2 class="titulo-seccion" id="noticias-title-el" style="margin-bottom:0;">Noticias y Entrevistas</h2>
                 <div style="flex:1"></div>
                 <div id="filtro-años-wrapper"></div>
             </div>
 
             <div id="seccion-articulos">
-                <h3 class="subtitulo-seccion">Prensa y Crónicas</h3>
+                <h3 class="subtitulo-seccion" id="noticias-press-el">Prensa y Crónicas</h3>
                 <div id="lista-noticias" class="contenedor-dinamico"></div>
                 <button class="btn-ver-mas" id="btn-mas-noticias" style="display:none;">Ver más noticias</button>
             </div>
 
             <div id="seccion-multimedia" style="margin-top: 60px;">
-                <h3 class="subtitulo-seccion">Videos</h3>
+                <h3 class="subtitulo-seccion" id="noticias-videos-el">Videos</h3>
                 <div id="lista-videos" class="grid-videos"></div>
                 <button class="btn-ver-mas" id="btn-mas-videos" style="display:none;">Ver más videos</button>
             </div>
 
             <div class="proximamente" style="margin-top:60px; border-top: 1px solid var(--border); padding-top: 40px;">
                 <div class="empty-icon">📰</div>
-                <p>Esta sección albergará noticias, crónicas y entrevistas con los concursantes.</p>
-                <p>¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
+                <p id="noticias-empty-el">Esta sección albergará noticias, crónicas y entrevistas con los concursantes.</p>
+                <p id="noticias-contrib-el">¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
             </div>
         </article>
     </div><!-- /#noticias -->
@@ -1721,18 +1923,18 @@
     <!-- ══════════════════════════════════════ -->
     <div id="contacto" class="seccion">
         <article class="seccion-contenido">
-            <h2 class="titulo-seccion" style="margin-bottom:4px;">📌 Enlaces y Contacto</h2>
-            <p class="section-sub" style="margin-bottom:36px;">Recursos de interés y vías de comunicación</p>
+            <h2 class="titulo-seccion" id="contacto-title-el" style="margin-bottom:4px;">📌 Enlaces y Contacto</h2>
+            <p class="section-sub" id="contacto-sub-el" style="margin-bottom:36px;">Recursos de interés y vías de comunicación</p>
 
             <div style="max-width:640px; margin: 0 auto; display:flex; flex-direction:column; gap:32px;">
 
                 <!-- ── Correo ── -->
                 <div>
-                    <h3 class="subtitulo-seccion">Contacto</h3>
+                    <h3 class="subtitulo-seccion" id="contacto-contact-el">Contacto</h3>
                     <div class="contacto-row">
                         <span class="contacto-row-icon">✉️</span>
                         <div class="contacto-row-text">
-                            <div class="contacto-row-label">Correo electrónico</div>
+                            <div class="contacto-row-label" id="contacto-email-label-el">Correo electrónico</div>
                             <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>
                         </div>
                     </div>
@@ -1740,7 +1942,7 @@
 
                 <!-- ── Enlaces de interés ── -->
                 <div>
-                    <h3 class="subtitulo-seccion">Enlaces de Interés</h3>
+                    <h3 class="subtitulo-seccion" id="contacto-links-el">Enlaces de Interés</h3>
                     <div style="display:flex; flex-direction:column; gap:8px;">
                         <a class="contacto-enlace-item" href="https://scqcuba.org/" target="_blank" rel="noopener">
                             <span class="contacto-enlace-icon">🔬</span>
@@ -1779,7 +1981,7 @@
 
                 <!-- ── Colaboradores ── -->
                 <div>
-                    <h3 class="subtitulo-seccion">Colaboradores</h3>
+                    <h3 class="subtitulo-seccion" id="contacto-colabs-el">Colaboradores</h3>
                     <div class="contacto-colab-grid">
                         <div class="contacto-colab-card" onclick="abrirLogoZoom('Assets/logos/CNQ_logo.png','Concurso Nacional de Química')">
                             <img class="contacto-colab-img" src="Assets/logos/CNQ_logo.png" alt="Concurso Nacional de Química" onerror="this.style.display='none'">
@@ -1842,12 +2044,10 @@
 
 <footer>
     <div class="footer-links">
-        <a href="#" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
-        <a href="#" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
+        <a href="#" class="footer-link-noticias" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
+        <a href="#" class="footer-link-contacto" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
     </div>
-
-
-    <p style="font-size:12px;opacity:.5;margin-top:6px;">
+    <p id="footer-copy-el" style="font-size:12px;opacity:.5;margin-top:6px;">
         © 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química
     </p>
 </footer>
@@ -1952,14 +2152,14 @@ function generarContenidoArticulo(d) {
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:20px;">📅</span>
                     <div>
-                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Años en activo</p>
+                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.years.active')}</p>
                         <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:20px;">🏅</span>
                     <div>
-                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Eventos como entrenador</p>
+                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.events.as.coach')}</p>
                         ${tieneEventos
                           ? `<button onclick="toggleEventosEntrenador('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">
                                 ${act.totalEventos}
@@ -1979,7 +2179,7 @@ function generarContenidoArticulo(d) {
 
     return `
         <div style="background:var(--navy);padding:36px 40px 28px;color:#fff;flex-shrink:0;">
-            <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">Honor a quien Honor Merece</p>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold-light);margin-bottom:8px;">${T('honor.honorlabel')}</p>
             <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.15;margin-bottom:8px;">${d.nombreArticulo}</h2>
             <p style="font-size:13px;color:rgba(255,255,255,.6);font-weight:300;">${d.subtituloArticulo}</p>
         </div>
@@ -2038,7 +2238,7 @@ function renderHonorGrid(data) {
                 <p class="honor-role">${d.role}</p>
                 <h3>${d.nombre}</h3>
                 ${añosTag}
-                <p class="honor-desc">${d.descripcionCorta} <span style="color:var(--accent);font-size:12px;">Leer más →</span></p>
+                <p class="honor-desc">${d.descripcionCorta} <span style="color:var(--accent);font-size:12px;">${T('honor.readmore')}</span></p>
             </div>
         </div>`;
     }).join('');
@@ -2064,9 +2264,9 @@ function mostrarCategoriaHonor(categoria) {
         : String(d.Entrenador) === '0'
     );
 
-    if (titleEl) titleEl.textContent = esEntrenador ? 'Entrenadores Nacionales' : 'Próceres de la Ciencia';
+    if (titleEl) titleEl.textContent = esEntrenador ? T('honor.coaches.title') : T('honor.scientists.title');
     if (badgeEl) {
-        badgeEl.textContent = esEntrenador ? 'Entrenadores' : 'Científicos';
+        badgeEl.textContent = esEntrenador ? T('honor.coaches.badge') : T('honor.scientists.badge');
         badgeEl.className = 'honor-cat-badge ' + (esEntrenador ? 'coaches-badge' : 'scientists-badge');
     }
     renderHonorGrid(filtered);
@@ -2106,8 +2306,10 @@ async function cargarHonorData() {
         const nCientificos  = data.filter(d => String(d.Entrenador) === '0').length;
         const ce = document.getElementById('gate-count-entrenadores');
         const cc = document.getElementById('gate-count-cientificos');
-        if (ce) ce.textContent = nEntrenadores + (nEntrenadores === 1 ? ' perfil' : ' perfiles');
-        if (cc) cc.textContent = nCientificos  + (nCientificos  === 1 ? ' perfil' : ' perfiles');
+        window._honorCountEntrenadores = nEntrenadores;
+        if (ce) ce.textContent = nEntrenadores + (nEntrenadores === 1 ? T('honor.profiles.one') : T('honor.profiles.many'));
+        window._honorCountCientificos = nCientificos;
+        if (cc) cc.textContent = nCientificos  + (nCientificos  === 1 ? T('honor.profiles.one') : T('honor.profiles.many'));
 
     } catch (err) {
         console.warn('honor_merece.html no encontrado o error al leer:', err);
@@ -2331,16 +2533,16 @@ function statsParaSitial() {
     const nombresBase = new Set(estudBase.map(r => r.nombre?.trim()));
     // Estudiantes nuevos = los de otras que no están ya en las principales
     const estudNuevos = otrasEstud.filter(r => r.nombre && !nombresBase.has(r.nombre.trim()));
-    calcularStats([...estudBase, ...estudNuevos], 'Totales en todas las olimpiadas', otrasEstud.length - estudNuevos.length);
+    calcularStats([...estudBase, ...estudNuevos], T('stats.context.all'), otrasEstud.length - estudNuevos.length);
 }
 function statsParaEvento() {
     const ol = document.getElementById('selector-olimpiada').value;
     if (ol === 'otras') {
         const estudOtras = (typeof datosOtras !== 'undefined') ? datosOtras : [];
         const profOtras  = (window.todasLosProfesores || {}).otras || [];
-        calcularStats(estudOtras, 'Resultados en Otras Olimpiadas', profOtras.length);
+        calcularStats(estudOtras, T('stats.context.otras'), profOtras.length);
     } else {
-        calcularStats(todasLasOlimpiadas[ol]||[], 'Resultados de ' + (nombreOlimpiada[ol]||ol));
+        calcularStats(todasLasOlimpiadas[ol]||[], T('stats.context.evento') + (nombreOlimpiada[ol]||ol));
     }
 }
 
@@ -2476,7 +2678,7 @@ function renderizarSitial(lista) {
     if (_sitialObserver) { _sitialObserver.disconnect(); _sitialObserver = null; }
 
     if (!lista.length) {
-        grid.innerHTML = '<div class="no-results">No se encontraron estudiantes.</div>';
+        grid.innerHTML = '<div class="no-results">${T('sitial.noresults')}</div>';
         wrap.innerHTML = ''; return;
     }
 
@@ -2554,23 +2756,23 @@ function cargarTabla() {
         const thead = document.getElementById('tabla-thead-row');
         if (rol === 'profesor') {
             thead.innerHTML = `
-                <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
-                <th>N°</th>
-                <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Profesor <span class="sort-arrow">↕</span></th>
-                <th>Rol</th>
-                <th>Olimpiada</th>
-                <th>Sede</th>`;
+                <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">${T('th.year')} <span class="sort-arrow">↓</span></th>
+                <th>${T('th.num')}</th>
+                <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${T('th.teacher')} <span class="sort-arrow">↕</span></th>
+                <th>${T('th.role')}</th>
+                <th>${T('th.olympiad')}</th>
+                <th>${T('th.venue')}</th>`;
         } else {
-            const etiqueta = (rol === 'todos') ? 'Participante' : 'Estudiante';
+            const etiqueta = (rol === 'todos') ? T('th.participant') : T('th.student');
             thead.innerHTML = `
-                <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
-                <th>N°</th>
+                <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">${T('th.year')} <span class="sort-arrow">↓</span></th>
+                <th>${T('th.num')}</th>
                 <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${etiqueta} <span class="sort-arrow">↕</span></th>
-                <th>Provincia</th>
-                <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
-                <th>Rank</th>
-                <th>Olimpiada</th>
-                <th>Sede</th>`;
+                <th>${T('th.province')}</th>
+                <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">${T('th.medal')} <span class="sort-arrow">↕</span></th>
+                <th>${T('th.rank')}</th>
+                <th>${T('th.olympiad')}</th>
+                <th>${T('th.venue')}</th>`;
         }
 
         renderizarTablaOtras(rol, estudDatosOtras, profDatosOtras);
@@ -2590,21 +2792,21 @@ function cargarTabla() {
     const thead = document.getElementById('tabla-thead-row');
     if (rol === 'profesor') {
         thead.innerHTML = `
-            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
-            <th>N°</th>
-            <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">Profesor <span class="sort-arrow">↕</span></th>
-            <th>Rol</th>
-            <th>Sede</th>`;
+            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">${T('th.year')} <span class="sort-arrow">↓</span></th>
+            <th>${T('th.num')}</th>
+            <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${T('th.teacher')} <span class="sort-arrow">↕</span></th>
+            <th>${T('th.role')}</th>
+            <th>${T('th.venue')}</th>`;
     } else {
-        const etiqueta = (rol === 'todos') ? 'Participante' : 'Estudiante';
+        const etiqueta = (rol === 'todos') ? T('th.participant') : T('th.student');
         thead.innerHTML = `
-            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">Año <span class="sort-arrow">↓</span></th>
-            <th>N°</th>
+            <th onclick="ordenarTabla('año', document.getElementById('sort-año'))">${T('th.year')} <span class="sort-arrow">↓</span></th>
+            <th>${T('th.num')}</th>
             <th onclick="ordenarTabla('nombre', document.getElementById('sort-nombre'))">${etiqueta} <span class="sort-arrow">↕</span></th>
-            <th>Provincia</th>
-            <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">Medalla <span class="sort-arrow">↕</span></th>
-            <th>Rank</th>
-            <th>Sede</th>`;
+            <th>${T('th.province')}</th>
+            <th onclick="ordenarTabla('medalla', document.getElementById('sort-medalla'))">${T('th.medal')} <span class="sort-arrow">↕</span></th>
+            <th>${T('th.rank')}</th>
+            <th>${T('th.venue')}</th>`;
     }
 
     if (rol === 'estudiante') {
@@ -2646,8 +2848,8 @@ function renderizarTablaEstudiante(datos) {
     const tbody   = document.getElementById('cuerpo-tabla');
     const countEl = document.getElementById('tabla-count');
     if (!datos.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
-        countEl.textContent = '0 resultados'; return;
+        tbody.innerHTML = `<tr><td colspan="7" class="no-results">${T('tabla.nodata')}</td></tr>`;
+        countEl.textContent = '0' + T('tabla.results.many'); return;
     }
     const ord = _sortDatos(datos);
 
@@ -2673,7 +2875,7 @@ function renderizarTablaEstudiante(datos) {
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
         </tr>`;
     }).join('');
-    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
+    countEl.textContent = datos.length + (datos.length !== 1 ? T('tabla.results.many') : T('tabla.results.one'));
 }
 
 function renderizarTablaOtras(rol, estudDatos, profDatos) {
@@ -2686,8 +2888,8 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
     // ── SOLO ESTUDIANTES ──────────────────────────────────────────────────
     if (rol === 'estudiante') {
         if (!estudDatos.length) {
-            tbody.innerHTML = `<tr><td colspan="8" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
-            countEl.textContent = '0 resultados'; return;
+            tbody.innerHTML = `<tr><td colspan="8" class="no-results">${T('tabla.nodata')}</td></tr>`;
+            countEl.textContent = '0' + T('tabla.results.many'); return;
         }
         const ord = [...estudDatos].sort((a, b) => {
             if (ordenActual.campo === 'año')     return (a.año - b.año) * ordenActual.dir;
@@ -2712,15 +2914,15 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
                 <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
             </tr>`;
         }).join('');
-        countEl.textContent = `${estudDatos.length} resultado${estudDatos.length !== 1 ? 's' : ''}`;
+        countEl.textContent = estudDatos.length + (estudDatos.length !== 1 ? T('tabla.results.many') : T('tabla.results.one'));
         return;
     }
 
     // ── SOLO PROFESORES ───────────────────────────────────────────────────
     if (rol === 'profesor') {
         if (!profDatos.length) {
-            tbody.innerHTML = `<tr><td colspan="6" class="no-results">📋 Sin datos de profesores para esta olimpiada</td></tr>`;
-            countEl.textContent = '0 resultados'; return;
+            tbody.innerHTML = `<tr><td colspan="6" class="no-results">${T('tabla.noteachers')}</td></tr>`;
+            countEl.textContent = '0' + T('tabla.results.many'); return;
         }
         const ord = [...profDatos].sort((a, b) => {
             if (ordenActual.campo === 'año')    return (a.año - b.año) * ordenActual.dir;
@@ -2742,14 +2944,14 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
                 <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
             </tr>`;
         }).join('');
-        countEl.textContent = `${profDatos.length} resultado${profDatos.length !== 1 ? 's' : ''}`;
+        countEl.textContent = profDatos.length + (profDatos.length !== 1 ? T('tabla.results.many') : T('tabla.results.one'));
         return;
     }
 
     // ── TODOS (estudiantes + profesores) ─────────────────────────────────
     if (!estudDatos.length && !profDatos.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
-        countEl.textContent = '0 resultados'; return;
+        tbody.innerHTML = `<tr><td colspan="8" class="no-results">${T('tabla.nodata')}</td></tr>`;
+        countEl.textContent = '0' + T('tabla.results.many'); return;
     }
 
     // Agrupar por evento (Olimp + año), respetando orden
@@ -2818,15 +3020,15 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
     });
 
     tbody.innerHTML = rows;
-    countEl.textContent = `${totalFilas} resultado${totalFilas !== 1 ? 's' : ''}`;
+    countEl.textContent = totalFilas + (totalFilas !== 1 ? T('tabla.results.many') : T('tabla.results.one'));
 }
 
 function renderizarTablaProfesor(datos) {
     const tbody   = document.getElementById('cuerpo-tabla');
     const countEl = document.getElementById('tabla-count');
     if (!datos.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="no-results">📋 Sin datos de profesores para esta olimpiada</td></tr>`;
-        countEl.textContent = '0 resultados'; return;
+        tbody.innerHTML = `<tr><td colspan="5" class="no-results">${T('tabla.noteachers')}</td></tr>`;
+        countEl.textContent = '0' + T('tabla.results.many'); return;
     }
     const ord = _sortDatos(datos);
 
@@ -2847,7 +3049,7 @@ function renderizarTablaProfesor(datos) {
             <td><span class="sede-flag">${r.pais}</span>${r.sede}</td>
         </tr>`;
     }).join('');
-    countEl.textContent = `${datos.length} resultado${datos.length !== 1 ? 's' : ''}`;
+    countEl.textContent = datos.length + (datos.length !== 1 ? T('tabla.results.many') : T('tabla.results.one'));
 }
 
 function renderizarTablaTodos(estudDatos, profDatos) {
@@ -2855,8 +3057,8 @@ function renderizarTablaTodos(estudDatos, profDatos) {
     const countEl = document.getElementById('tabla-count');
 
     if (!estudDatos.length && !profDatos.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="no-results">⚗️ Datos próximamente disponibles</td></tr>`;
-        countEl.textContent = '0 resultados'; return;
+        tbody.innerHTML = `<tr><td colspan="7" class="no-results">${T('tabla.nodata')}</td></tr>`;
+        countEl.textContent = '0' + T('tabla.results.many'); return;
     }
 
     // Ordenar estudiantes globalmente (para color alternante por edición)
@@ -2889,7 +3091,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
         // ── Encabezado único de delegación para este año ──
         rows += `<tr style="background:rgba(4,18,43,.06);">
             <td colspan="7" style="padding:7px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--navy-light);border-top:2px solid rgba(4,18,43,.14);">
-                🏛️ Delegación ${año}
+                ${T('tabla.delegation')}${año}
             </td>
         </tr>`;
 
@@ -2930,7 +3132,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
     });
 
     tbody.innerHTML = rows;
-    countEl.textContent = `${numEstud} estudiante${numEstud !== 1 ? 's' : ''} · ${numProf} profesor${numProf !== 1 ? 'es' : ''}`;
+    countEl.textContent = numEstud + (numEstud !== 1 ? T('tabla.students.many') : T('tabla.students.one')) + ' · ' + numProf + (numProf !== 1 ? T('tabla.teachers.many') : T('tabla.teachers.one'));
 }
 
 // Alias legacy (usado en otros lugares)
@@ -2938,12 +3140,12 @@ function renderizarTabla(datos) { renderizarTablaEstudiante(datos); }
 
 // ════ NAVEGACIÓN CON TRANSICIÓN ════
 const _tituloSeccion = {
-    inicio:   'Talentos Cubanos · Química',
-    sitial:   '🏅 Historial por Medallas',
-    eventos:  '🔍 Historial por Eventos',
-    honor:    '🎓 Honor a quien Honor Merece',
-    noticias: '📰 Noticias y Entrevistas',
-    contacto: '📌 Enlaces y Contacto'
+    inicio:   'topbar.title',
+    sitial:   'nav.sitial',
+    eventos:  'nav.eventos',
+    honor:    'nav.honor',
+    noticias: 'nav.noticias',
+    contacto: 'nav.contacto'
 };
 let _transicionEnCurso = false;
 
@@ -2974,8 +3176,8 @@ function cambiarSeccion(p) {
     const nuevaEl   = document.getElementById(p);
     if (!nuevaEl || actualEl === nuevaEl) return;
 
-    // Update topbar title
-    document.getElementById('topbar-titulo-seccion').textContent = _tituloSeccion[p] || p;
+    // Update topbar title using i18n
+    document.getElementById('topbar-titulo-seccion').textContent = T(_tituloSeccion[p] || 'nav.' + p);
 
     // Update menu items
     document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('activo'));
@@ -3513,6 +3715,524 @@ function _provHide() {
     // Ocultar al hacer scroll
     window.addEventListener('scroll', _provHide, { passive: true });
 })();
+
+// ════════════════════════════════════════════════════════════════════
+// DARK MODE
+// ════════════════════════════════════════════════════════════════════
+(function() {
+    try { if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e) {}
+})();
+
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    _actualizarBotonesUtilidad();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INTERNACIONALIZACIÓN COMPLETA  (ES ↔ EN)
+// ════════════════════════════════════════════════════════════════════
+window._lang = (function() {
+    try { return localStorage.getItem('lang') || 'es'; } catch(e) { return 'es'; }
+})();
+
+// T() — función global de traducción usada en toda la app
+function T(key) {
+    return (_i18n[window._lang] || _i18n.es)[key] || (_i18n.es)[key] || key;
+}
+
+const _i18n = {
+    // ─────────────────────────────────────────
+    es: {
+        // Metadata
+        'page.title':               'Talentos Cubanos — Olimpiadas de Química',
+        'page.lang':                'es',
+        // Header
+        'header.eyebrow':           'Olimpiadas de Química · Cuba',
+        'header.subtitle':          'Reconociendo la excelencia de estudiantes cubanos en <strong>Olimpiadas de Química</strong>',
+        // Nav / secciones
+        'nav.home':                 'Inicio',
+        'nav.eventos':              'Historial por Eventos',
+        'nav.sitial':               'Historial por Medallas',
+        'nav.honor':                'Honor a quien Honor Merece',
+        'nav.noticias':             'Noticias y Entrevistas',
+        'nav.contacto':             'Enlaces y Contacto',
+        // Stats bar
+        'stats.participations':     'Participaciones',
+        'stats.students':           'Estudiantes',
+        'stats.gold':               'Oro 🥇',
+        'stats.silver':             'Plata 🥈',
+        'stats.bronze':             'Bronce 🥉',
+        'stats.mention':            'Menciones 🎖',
+        'stats.medals':             'Medallas',
+        'stats.context.all':        'Totales en todas las olimpiadas',
+        'stats.context.otras':      'Resultados en Otras Olimpiadas',
+        'stats.context.evento':     'Resultados de ',
+        // Inicio
+        'home.welcome':             'Bienvenido al registro oficial de estudiantes cubanos que han representado a Cuba en las principales <strong>olimpiadas internacionales de química</strong>. Explora medallas, historias y legados de décadas de excelencia científica.',
+        'home.card.eventos':        'Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ',
+        'home.card.sitial':         'Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química',
+        'home.card.honor':          'Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas',
+        'home.card.noticias':       'Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas',
+        'home.innumbers':           'En <em>Números</em>',
+        'home.yearsimpact':         'Años de impacto',
+        'home.countries':           'Países visitados',
+        // Countdown
+        'countdown.days':           'Días',
+        'countdown.hours':          'Horas',
+        'countdown.minutes':        'Minutos',
+        'countdown.seconds':        'Segundos',
+        // Sitial
+        'sitial.title':             'Sitial de Honor',
+        'sitial.sub':               'Estudiantes cubanos y sus logros históricos en olimpiadas de química',
+        'sitial.filter.all':        'Todos',
+        'sitial.search.placeholder':'🔎 Buscar estudiante…',
+        'sitial.noresults':         'No se encontraron estudiantes.',
+        // Tabla eventos
+        'eventos.title':            'Resultados por Evento',
+        'eventos.sub':              'Historial completo de participaciones y medallas por olimpiada',
+        'eventos.label.olimpiada':  'Olimpiada:',
+        'eventos.label.rol':        'Rol:',
+        'eventos.sort':             'Ordenar:',
+        'eventos.sort.year':        'Año',
+        'eventos.sort.name':        'Nombre',
+        'eventos.sort.medal':       'Medalla',
+        'eventos.rol.estudiante':   '👨‍🎓 Estudiante',
+        'eventos.rol.profesor':     '👨‍🏫 Profesor',
+        'eventos.rol.todos':        '🏛️ Delegación',
+        // Tabla encabezados
+        'th.year':                  'Año',
+        'th.num':                   'N°',
+        'th.student':               'Estudiante',
+        'th.participant':           'Participante',
+        'th.teacher':               'Profesor',
+        'th.province':              'Provincia',
+        'th.medal':                 'Medalla',
+        'th.rank':                  'Rank',
+        'th.venue':                 'Sede',
+        'th.role':                  'Rol',
+        'th.olympiad':              'Olimpiada',
+        // Tabla contenido
+        'medal.gold':               'Medalla de Oro',
+        'medal.silver':             'Medalla de Plata',
+        'medal.bronze':             'Medalla de Bronce',
+        'medal.mention':            'Mención Honorífica',
+        'medal.participant':        'Participante',
+        'tabla.nodata':             '⚗️ Datos próximamente disponibles',
+        'tabla.noteachers':         '📋 Sin datos de profesores para esta olimpiada',
+        'tabla.results.one':        ' resultado',
+        'tabla.results.many':       ' resultados',
+        'tabla.delegation':         '🏛️ Delegación ',
+        'tabla.students.one':       ' estudiante',
+        'tabla.students.many':      ' estudiantes',
+        'tabla.teachers.one':       ' profesor',
+        'tabla.teachers.many':      ' profesores',
+        // Honor
+        'honor.coaches.title':      'Entrenadores Nacionales',
+        'honor.coaches.desc':       'Los maestros que, olimpiada tras olimpiada, forjaron campeones y pusieron el nombre de Cuba en el podio de la química mundial.',
+        'honor.coaches.cta':        'Conocer sus historias →',
+        'honor.coaches.badge':      'Entrenadores',
+        'honor.scientists.title':   'Próceres de la Ciencia',
+        'honor.scientists.desc':    'Figuras cimeras cuyo trabajo científico y legado intelectual han iluminado el desarrollo de la química en Cuba y más allá de sus fronteras.',
+        'honor.scientists.cta':     'Descubrir su legado →',
+        'honor.scientists.badge':   'Científicos',
+        'honor.loading':            'cargando…',
+        'honor.profiles.one':       ' perfil',
+        'honor.profiles.many':      ' perfiles',
+        'honor.readmore':           '${T('honor.readmore')}',
+        'honor.back':               '← Volver',
+        'honor.modal.title':        'Honor a quien Honor Merece',
+        'honor.years.active':       'Años en activo',
+        'honor.events.as.coach':    'Eventos como entrenador',
+        'honor.honorlabel':         'Honor a quien Honor Merece',
+        // Noticias
+        'noticias.title':           'Noticias y Entrevistas',
+        'noticias.press':           'Prensa y Crónicas',
+        'noticias.videos':          'Videos',
+        'noticias.more.news':       'Ver más noticias',
+        'noticias.more.videos':     'Ver más videos',
+        'noticias.empty':           'Esta sección albergará noticias, crónicas y entrevistas con los concursantes.',
+        'noticias.contribute':      '¿Tienes una historia que contar? Escríbenos a ',
+        // Contacto
+        'contacto.title':           '📌 Enlaces y Contacto',
+        'contacto.sub':             'Recursos de interés y vías de comunicación',
+        'contacto.contact':         'Contacto',
+        'contacto.email.label':     'Correo electrónico',
+        'contacto.links':           'Enlaces de Interés',
+        'contacto.colabs':          'Colaboradores',
+        // Filtros año
+        'filtro.year.placeholder':  'Año',
+        'filtro.year.label':        'Año:',
+        // Footer
+        'footer.news':              '📰 Noticias y Entrevistas',
+        'footer.contact':           '📌 Enlaces y Contacto',
+        'footer.copy':              '© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química',
+        // Breadcrumb
+        'bc.home':                  'Inicio',
+        // Topbar
+        'topbar.title':             'Talentos Cubanos · Química',
+        // Utility
+        'lang.btn':                 'EN',
+        'lang.flag':                '🇬🇧',
+        'theme.dark':               'Oscuro',
+        'theme.light':              'Claro',
+    },
+    // ─────────────────────────────────────────
+    en: {
+        'page.title':               'Cuban Talents — Chemistry Olympiads',
+        'page.lang':                'en',
+        'header.eyebrow':           'Chemistry Olympiads · Cuba',
+        'header.subtitle':          'Recognising the excellence of Cuban students in <strong>International Chemistry Olympiads</strong>',
+        'nav.home':                 'Home',
+        'nav.eventos':              'Results by Event',
+        'nav.sitial':               'Hall of Medals',
+        'nav.honor':                'Hall of Fame',
+        'nav.noticias':             'News & Interviews',
+        'nav.contacto':             'Links & Contact',
+        'stats.participations':     'Participations',
+        'stats.students':           'Students',
+        'stats.gold':               'Gold 🥇',
+        'stats.silver':             'Silver 🥈',
+        'stats.bronze':             'Bronze 🥉',
+        'stats.mention':            'Mentions 🎖',
+        'stats.medals':             'Medals',
+        'stats.context.all':        'Totals across all olympiads',
+        'stats.context.otras':      'Results in Other Olympiads',
+        'stats.context.evento':     'Results for ',
+        'home.welcome':             'Welcome to the official record of Cuban students who have represented Cuba at the leading <strong>international chemistry olympiads</strong>. Explore medals, stories and legacies from decades of scientific excellence.',
+        'home.card.eventos':        'Detailed results by olympiad: IChO, IMChO, OIAQ and OCACQ',
+        'home.card.sitial':         'All Cuban medal-winning and commended students at international chemistry olympiads',
+        'home.card.honor':          'The coaches and teachers who forged Cuban chemistry excellence across decades',
+        'home.card.noticias':       'Chronicles, interviews and videos about Cuban chemistry olympiads',
+        'home.innumbers':           'By the <em>Numbers</em>',
+        'home.yearsimpact':         'Years of impact',
+        'home.countries':           'Countries visited',
+        'countdown.days':           'Days',
+        'countdown.hours':          'Hours',
+        'countdown.minutes':        'Minutes',
+        'countdown.seconds':        'Seconds',
+        'sitial.title':             'Hall of Fame',
+        'sitial.sub':               'Cuban students and their historic achievements at chemistry olympiads',
+        'sitial.filter.all':        'All',
+        'sitial.search.placeholder':'🔎 Search student…',
+        'sitial.noresults':         'No students found.',
+        'eventos.title':            'Results by Event',
+        'eventos.sub':              'Complete history of participations and medals by olympiad',
+        'eventos.label.olimpiada':  'Olympiad:',
+        'eventos.label.rol':        'Role:',
+        'eventos.sort':             'Sort:',
+        'eventos.sort.year':        'Year',
+        'eventos.sort.name':        'Name',
+        'eventos.sort.medal':       'Medal',
+        'eventos.rol.estudiante':   '👨‍🎓 Student',
+        'eventos.rol.profesor':     '👨‍🏫 Teacher',
+        'eventos.rol.todos':        '🏛️ Delegation',
+        'th.year':                  'Year',
+        'th.num':                   'N°',
+        'th.student':               'Student',
+        'th.participant':           'Participant',
+        'th.teacher':               'Teacher',
+        'th.province':              'Province',
+        'th.medal':                 'Medal',
+        'th.rank':                  'Rank',
+        'th.venue':                 'Venue',
+        'th.role':                  'Role',
+        'th.olympiad':              'Olympiad',
+        'medal.gold':               'Gold Medal',
+        'medal.silver':             'Silver Medal',
+        'medal.bronze':             'Bronze Medal',
+        'medal.mention':            'Honourable Mention',
+        'medal.participant':        'Participant',
+        'tabla.nodata':             '⚗️ Data coming soon',
+        'tabla.noteachers':         '📋 No teacher data for this olympiad',
+        'tabla.results.one':        ' result',
+        'tabla.results.many':       ' results',
+        'tabla.delegation':         '🏛️ Delegation ',
+        'tabla.students.one':       ' student',
+        'tabla.students.many':      ' students',
+        'tabla.teachers.one':       ' teacher',
+        'tabla.teachers.many':      ' teachers',
+        'honor.coaches.title':      'National Coaches',
+        'honor.coaches.desc':       'The mentors who, olympiad after olympiad, forged champions and put Cuba on the podium of world chemistry.',
+        'honor.coaches.cta':        'Discover their stories →',
+        'honor.coaches.badge':      'Coaches',
+        'honor.scientists.title':   'Pillars of Science',
+        'honor.scientists.desc':    'Towering figures whose scientific work and intellectual legacy have illuminated the development of chemistry in Cuba and beyond its borders.',
+        'honor.scientists.cta':     'Explore their legacy →',
+        'honor.scientists.badge':   'Scientists',
+        'honor.loading':            'loading…',
+        'honor.profiles.one':       ' profile',
+        'honor.profiles.many':      ' profiles',
+        'honor.readmore':           'Read more →',
+        'honor.back':               '← Back',
+        'honor.modal.title':        'Hall of Fame',
+        'honor.years.active':       'Years active',
+        'honor.events.as.coach':    'Events as coach',
+        'honor.honorlabel':         'Hall of Fame',
+        'noticias.title':           'News & Interviews',
+        'noticias.press':           'Press & Chronicles',
+        'noticias.videos':          'Videos',
+        'noticias.more.news':       'Load more news',
+        'noticias.more.videos':     'Load more videos',
+        'noticias.empty':           'This section will host news, chronicles and interviews with competitors.',
+        'noticias.contribute':      'Have a story to share? Write to us at ',
+        'contacto.title':           '📌 Links & Contact',
+        'contacto.sub':             'Useful resources and ways to get in touch',
+        'contacto.contact':         'Contact',
+        'contacto.email.label':     'Email address',
+        'contacto.links':           'Links of Interest',
+        'contacto.colabs':          'Collaborators',
+        'filtro.year.placeholder':  'Year',
+        'filtro.year.label':        'Year:',
+        'footer.news':              '📰 News & Interviews',
+        'footer.contact':           '📌 Links & Contact',
+        'footer.copy':              '© 2026 · Cuban Talent Olympiad Registry',
+        'bc.home':                  'Home',
+        'topbar.title':             'Cuban Talents · Chemistry',
+        'lang.btn':                 'ES',
+        'lang.flag':                '🇨🇺',
+        'theme.dark':               'Dark',
+        'theme.light':              'Light',
+    }
+};
+
+// ─── Apply i18n to static HTML elements (data-i18n) ─────────────────
+function _applyStaticI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const val = T(key);
+        if (val !== undefined) el.innerHTML = val;
+    });
+}
+
+// ─── Re-render all dynamic sections ──────────────────────────────────
+function _refreshDynamic() {
+    // medallaLabel is used in table rendering — refresh it
+    medallaLabel.oro         = T('medal.gold');
+    medallaLabel.plata       = T('medal.silver');
+    medallaLabel.bronce      = T('medal.bronze');
+    medallaLabel.mencion     = T('medal.mention');
+    medallaLabel.participante= T('medal.participant');
+
+    // Section titles & subtitles
+    _setTextById('section-title-sitial',  T('sitial.title'));
+    _setTextById('section-sub-sitial',    T('sitial.sub'));
+    _setTextById('section-title-eventos', T('eventos.title'));
+    _setTextById('section-sub-eventos',   T('eventos.sub'));
+
+    // Sitial search placeholder
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) searchInput.placeholder = T('sitial.search.placeholder');
+
+    // Sitial "Todos" filter button
+    const todosBtn = document.querySelector('.filtro-btn[data-filter="todos"]');
+    if (todosBtn) todosBtn.textContent = T('sitial.filter.all');
+
+    // Sort controls
+    _setTextById('sort-año-label',    T('eventos.sort.year'));
+    _setTextById('sort-nombre-label', T('eventos.sort.name'));
+    _setTextById('sort-medalla-label',T('eventos.sort.medal'));
+    const sortLabelEl = document.getElementById('sort-label-el');
+    if (sortLabelEl) sortLabelEl.textContent = T('eventos.sort');
+
+    // Eventos dropdowns labels
+    const lblOlimp = document.getElementById('lbl-olimpiada');
+    if (lblOlimp) lblOlimp.textContent = T('eventos.label.olimpiada');
+    const lblRol = document.getElementById('lbl-rol');
+    if (lblRol) lblRol.textContent = T('eventos.label.rol');
+
+    // Role selector options
+    _setOptionText('selector-rol', 'estudiante', T('eventos.rol.estudiante'));
+    _setOptionText('selector-rol', 'profesor',   T('eventos.rol.profesor'));
+    _setOptionText('selector-rol', 'todos',      T('eventos.rol.todos'));
+
+    // Honor gateway texts
+    _setTextById('honor-gate-coaches-title',    T('honor.coaches.title'));
+    _setTextById('honor-gate-coaches-desc',     T('honor.coaches.desc'));
+    _setTextById('honor-gate-coaches-cta',      T('honor.coaches.cta'));
+    _setTextById('honor-gate-scientists-title', T('honor.scientists.title'));
+    _setTextById('honor-gate-scientists-desc',  T('honor.scientists.desc'));
+    _setTextById('honor-gate-scientists-cta',   T('honor.scientists.cta'));
+
+    // Honor list title (only if visible)
+    const honorListTitle = document.getElementById('honor-list-title');
+    if (honorListTitle && window._honorCategoriaActual) {
+        honorListTitle.textContent = window._honorCategoriaActual === 'entrenadores'
+            ? T('honor.coaches.title') : T('honor.scientists.title');
+    }
+    const honorBadge = document.getElementById('honor-cat-badge');
+    if (honorBadge && window._honorCategoriaActual) {
+        honorBadge.textContent = window._honorCategoriaActual === 'entrenadores'
+            ? T('honor.coaches.badge') : T('honor.scientists.badge');
+    }
+
+    // Honor back button + modal title
+    const backBtn = document.getElementById('honor-back-btn-el');
+    if (backBtn) backBtn.textContent = T('honor.back');
+    const modalTitle = document.getElementById('modal-topbar-title');
+    if (modalTitle) modalTitle.textContent = T('honor.modal.title');
+    const modalBack = document.getElementById('modal-back-btn');
+    if (modalBack) modalBack.textContent = T('honor.back');
+
+    // Noticias
+    _setTextById('noticias-title-el',   T('noticias.title'));
+    _setTextById('noticias-press-el',   T('noticias.press'));
+    _setTextById('noticias-videos-el',  T('noticias.videos'));
+    const morNews = document.getElementById('btn-mas-noticias');
+    if (morNews) morNews.textContent = T('noticias.more.news');
+    const morVid = document.getElementById('btn-mas-videos');
+    if (morVid) morVid.textContent = T('noticias.more.videos');
+    _setInnerById('noticias-empty-el',  T('noticias.empty'));
+    _setInnerById('noticias-contrib-el',T('noticias.contribute') + '<a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>');
+
+    // Contacto
+    _setInnerById('contacto-title-el',  T('contacto.title'));
+    _setTextById('contacto-sub-el',     T('contacto.sub'));
+    _setTextById('contacto-contact-el', T('contacto.contact'));
+    _setTextById('contacto-email-label-el', T('contacto.email.label'));
+    _setTextById('contacto-links-el',   T('contacto.links'));
+    _setTextById('contacto-colabs-el',  T('contacto.colabs'));
+
+    // Footer links
+    const footerLinks = document.querySelectorAll('.footer-link-noticias');
+    footerLinks.forEach(el => el.textContent = T('footer.news'));
+    const footerLinksC = document.querySelectorAll('.footer-link-contacto');
+    footerLinksC.forEach(el => el.textContent = T('footer.contact'));
+    _setInnerById('footer-copy-el', T('footer.copy'));
+
+    // Page title & lang
+    document.title = T('page.title');
+    document.documentElement.lang = T('page.lang');
+
+    // Topbar title (when on inicio)
+    const topbarTitle = document.getElementById('topbar-titulo-seccion');
+    if (topbarTitle && (window._seccionActual === 'inicio' || !window._seccionActual)) {
+        topbarTitle.textContent = T('topbar.title');
+    }
+
+    // Honor gate count text (re-apply if already loaded)
+    if (window._honorCountEntrenadores !== undefined) {
+        const n = window._honorCountEntrenadores;
+        const ce = document.getElementById('gate-count-entrenadores');
+        if (ce) ce.textContent = n + (n === 1 ? T('honor.profiles.one') : T('honor.profiles.many'));
+    }
+    if (window._honorCountCientificos !== undefined) {
+        const n = window._honorCountCientificos;
+        const cc = document.getElementById('gate-count-cientificos');
+        if (cc) cc.textContent = n + (n === 1 ? T('honor.profiles.one') : T('honor.profiles.many'));
+    }
+
+    // Re-render sitial grid (chips use medallaLabel)
+    if (window._estudiantesTodos && window._estudiantesTodos.length) {
+        aplicarFiltros();
+    }
+
+    // Re-render table headers + badge labels (always, so switching lang while on another section works)
+    if (window.todasLasOlimpiadas) {
+        cargarTabla();
+    }
+
+    // Re-render honor grid if visible
+    if (window._honorCategoriaActual && window._honorDataGlobal && window._honorDataGlobal.length) {
+        const esE = window._honorCategoriaActual === 'entrenadores';
+        const filtered = window._honorDataGlobal.filter(d => esE
+            ? String(d.Entrenador) === '1' : String(d.Entrenador) === '0');
+        renderHonorGrid(filtered);
+    }
+}
+
+function _setTextById(id, txt) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+}
+function _setInnerById(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
+function _setOptionText(selectId, value, text) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    const opt = sel.querySelector('option[value="' + value + '"]');
+    if (opt) opt.textContent = text;
+}
+
+function _actualizarBotonesUtilidad() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const themeLabel = document.querySelector('#theme-toggle .icon-label');
+    if (themeLabel) themeLabel.textContent = isDark ? T('theme.light') : T('theme.dark');
+    const flagEl = document.getElementById('lang-flag');
+    const labelEl = document.getElementById('lang-label');
+    if (flagEl) flagEl.textContent = T('lang.flag');
+    if (labelEl) labelEl.textContent = T('lang.btn');
+}
+
+function applyI18n(lang) {
+    window._lang = lang;
+    _applyStaticI18n();
+    _actualizarBotonesUtilidad();
+    actualizarBreadcrumb(window._seccionActual || 'inicio');
+    _refreshDynamic();
+}
+
+function toggleLang() {
+    const next = (window._lang === 'es') ? 'en' : 'es';
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    applyI18n(next);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// BREADCRUMB
+// ════════════════════════════════════════════════════════════════════
+window._seccionActual = 'inicio';
+
+const _bcKeys = {
+    inicio:   null,
+    eventos:  'nav.eventos',
+    sitial:   'nav.sitial',
+    honor:    'nav.honor',
+    noticias: 'nav.noticias',
+    contacto: 'nav.contacto',
+};
+
+function actualizarBreadcrumb(seccion) {
+    window._seccionActual = seccion;
+    const sep    = document.getElementById('bc-sep');
+    const cur    = document.getElementById('bc-current');
+    const curTxt = document.getElementById('bc-current-text');
+    const bcHome = document.querySelector('.bc-home');
+    if (bcHome) bcHome.innerHTML = '🏠 ' + T('bc.home');
+    if (!sep || !cur || !curTxt) return;
+    if (!seccion || seccion === 'inicio') {
+        sep.style.display = 'none';
+        cur.style.display = 'none';
+    } else {
+        sep.style.display = '';
+        cur.style.display = '';
+        curTxt.textContent = T(_bcKeys[seccion] || 'nav.' + seccion);
+    }
+    // Topbar section title
+    const topEl = document.getElementById('topbar-titulo-seccion');
+    if (topEl) {
+        const key = _bcKeys[seccion] || 'nav.' + seccion;
+        topEl.textContent = seccion === 'inicio' ? T('topbar.title') : T(key);
+    }
+}
+
+// Patch cambiarSeccion to also update breadcrumb
+(function() {
+    const _orig = window.cambiarSeccion;
+    window.cambiarSeccion = function(p) {
+        actualizarBreadcrumb(p);
+        _orig(p);
+    };
+})();
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+    applyI18n(window._lang);
+});
 </script>
 </body>
 </html>
