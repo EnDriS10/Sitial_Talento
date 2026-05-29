@@ -345,6 +345,14 @@
         #foto-zoom-close:hover { background: rgba(255,255,255,.25); }
         #foto-zoom-nombre { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.55); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; white-space: nowrap; backdrop-filter: blur(4px); }
 
+        /* LOGO ZOOM — fondo blanco para logos sin fondo */
+        #logo-zoom-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,.97); z-index: 900; align-items: center; justify-content: center; flex-direction: column; cursor: zoom-out; }
+        #logo-zoom-overlay.abierto { display: flex; animation: fadeIn .2s ease; }
+        #logo-zoom-img { max-width: 72vw; max-height: 68vh; object-fit: contain; animation: zoomIn .22s cubic-bezier(.34,1.36,.64,1); }
+        #logo-zoom-close { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,.07); border: none; color: #333; border-radius: 50%; width: 42px; height: 42px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; z-index: 1; }
+        #logo-zoom-close:hover { background: rgba(0,0,0,.14); }
+        #logo-zoom-nombre { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.07); color: #333; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; white-space: nowrap; }
+
         /* TOOLTIP */
         .chip-tooltip-wrap { position: relative; display: inline-flex; }
         .chip-tooltip-wrap .medalla-chip { cursor: pointer; transition: transform .15s, box-shadow .15s; }
@@ -1773,25 +1781,25 @@
                 <div>
                     <h3 class="subtitulo-seccion">Colaboradores</h3>
                     <div class="contacto-colab-grid">
-                        <div class="contacto-colab-card" onclick="abrirFotoDirecta('Assets/logos/CNQ_logo.png','Concurso Nacional de Química')">
+                        <div class="contacto-colab-card" onclick="abrirLogoZoom('Assets/logos/CNQ_logo.png','Concurso Nacional de Química')">
                             <img class="contacto-colab-img" src="Assets/logos/CNQ_logo.png" alt="Concurso Nacional de Química" onerror="this.style.display='none'">
                             <div class="contacto-colab-info">
                                 <div class="contacto-colab-name">Concurso Nacional de Química</div>
                             </div>
                         </div>
-                        <div class="contacto-colab-card" onclick="abrirFotoDirecta('Assets/logos/FQ_logo.png','Fac. Química — Univ. de La Habana')">
+                        <div class="contacto-colab-card" onclick="abrirLogoZoom('Assets/logos/FQ_logo.png','Fac. Química — Univ. de La Habana')">
                             <img class="contacto-colab-img" src="Assets/logos/FQ_logo.png" alt="Facultad de Química UH" onerror="this.style.display='none'">
                             <div class="contacto-colab-info">
                                 <div class="contacto-colab-name">Fac. Química — Univ. de La Habana</div>
                             </div>
                         </div>
-                        <div class="contacto-colab-card" onclick="abrirFotoDirecta('Assets/logos/MINED_logo.png','Ministerio de Educación')">
+                        <div class="contacto-colab-card" onclick="abrirLogoZoom('Assets/logos/MINED_logo.png','Ministerio de Educación')">
                             <img class="contacto-colab-img" src="Assets/logos/MINED_logo.png" alt="Ministerio de Educación" onerror="this.style.display='none'">
                             <div class="contacto-colab-info">
                                 <div class="contacto-colab-name">Ministerio de Educación</div>
                             </div>
                         </div>
-                        <div class="contacto-colab-card" onclick="abrirFotoDirecta('Assets/logos/SCQ_logo.png','Sociedad Cubana de Química')">
+                        <div class="contacto-colab-card" onclick="abrirLogoZoom('Assets/logos/SCQ_logo.png','Sociedad Cubana de Química')">
                             <img class="contacto-colab-img" src="Assets/logos/SCQ_logo.png" alt="Sociedad Cubana de Química" onerror="this.style.display='none'">
                             <div class="contacto-colab-info">
                                 <div class="contacto-colab-name">Sociedad Cubana de Química</div>
@@ -1822,6 +1830,12 @@
     <button id="foto-zoom-close" onclick="cerrarFotoZoom()" aria-label="Cerrar">✕</button>
     <img id="foto-zoom-img" src="" alt="">
     <div id="foto-zoom-nombre"></div>
+</div>
+
+<div id="logo-zoom-overlay" onclick="cerrarLogoZoom()">
+    <button id="logo-zoom-close" onclick="cerrarLogoZoom()" aria-label="Cerrar">✕</button>
+    <img id="logo-zoom-img" src="" alt="">
+    <div id="logo-zoom-nombre"></div>
 </div>
 
 <div id="prov-tooltip"></div>
@@ -3122,9 +3136,22 @@ function cerrarFotoZoom() {
     document.getElementById('foto-zoom-overlay').classList.remove('abierto');
 }
 
+// Abre logo sobre fondo blanco
+function abrirLogoZoom(src, nombre) {
+    document.getElementById('logo-zoom-img').src = src;
+    document.getElementById('logo-zoom-img').alt = nombre;
+    document.getElementById('logo-zoom-nombre').textContent = nombre;
+    document.getElementById('logo-zoom-overlay').classList.add('abierto');
+}
+function cerrarLogoZoom() {
+    document.getElementById('logo-zoom-overlay').classList.remove('abierto');
+}
+
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        if (document.getElementById('foto-zoom-overlay').classList.contains('abierto')) {
+        if (document.getElementById('logo-zoom-overlay').classList.contains('abierto')) {
+            cerrarLogoZoom();
+        } else if (document.getElementById('foto-zoom-overlay').classList.contains('abierto')) {
             cerrarFotoZoom();
         } else if (document.getElementById('tarjeta-modal-overlay').classList.contains('abierto')) {
             cerrarTarjetaModal(null, true);
