@@ -2685,7 +2685,7 @@ function renderizarSitial(lista) {
     if (_sitialObserver) { _sitialObserver.disconnect(); _sitialObserver = null; }
 
     if (!lista.length) {
-        grid.innerHTML = '<div class="no-results">${T('sitial.noresults')}</div>';
+        grid.innerHTML = `<div class="no-results">${T('sitial.noresults')}</div>`;
         wrap.innerHTML = ''; return;
     }
 
@@ -3851,7 +3851,7 @@ const _i18n = {
         'honor.loading':            'cargando…',
         'honor.profiles.one':       ' perfil',
         'honor.profiles.many':      ' perfiles',
-        'honor.readmore':           '${T('honor.readmore')}',
+        'honor.readmore':           'Leer más →',
         'honor.back':               '← Volver',
         'honor.modal.title':        'Honor a quien Honor Merece',
         'honor.years.active':       'Años en activo',
