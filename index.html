@@ -519,9 +519,8 @@
             width: 52px; height: 52px;
             object-fit: contain;
             border-radius: 8px;
-            background: rgba(255,255,255,.07);
-            padding: 4px;
-            filter: brightness(.95) saturate(.85);
+            background: #ffffff;
+            padding: 5px;
             transition: filter .2s;
         }
         .footer-logo-item:hover .footer-logo-img { filter: brightness(1.05) saturate(1); }
@@ -547,63 +546,9 @@
         }
 
         /* ═══════════════════════════════════════════
-           MODAL ENLACES Y CONTACTO
+           SECCIÓN ENLACES Y CONTACTO
         ═══════════════════════════════════════════ */
-        #contacto-modal-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(4,18,43,.72);
-            z-index: 600;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        #contacto-modal-overlay.abierto { display: flex; animation: fadeIn .25s ease; }
-        #contacto-modal-card {
-            background: var(--card-bg);
-            border-radius: 22px;
-            max-width: 520px;
-            width: 100%;
-            max-height: 88vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 32px 80px rgba(4,18,43,.4);
-            animation: cardPop .28s cubic-bezier(.34,1.56,.64,1);
-        }
-        .contacto-modal-header {
-            background: var(--navy);
-            border-radius: 22px 22px 0 0;
-            padding: 32px 32px 26px;
-            position: relative;
-        }
-        .contacto-modal-header::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--cu-blue) 0%, var(--cu-white) 35%, var(--cu-red) 65%, var(--cu-blue) 100%);
-            border-radius: 22px 22px 0 0;
-        }
-        .contacto-modal-header h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 22px; font-weight: 900;
-            color: #fff; margin-bottom: 4px;
-        }
-        .contacto-modal-header p {
-            font-size: 12px; color: rgba(255,255,255,.45);
-            text-transform: uppercase; letter-spacing: 1.5px;
-        }
-        #contacto-modal-close {
-            position: absolute; top: 14px; right: 14px;
-            background: rgba(255,255,255,.1); border: none;
-            border-radius: 50%; width: 34px; height: 34px;
-            cursor: pointer; font-size: 16px;
-            display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,.7);
-            transition: background .2s, transform .15s;
-        }
-        #contacto-modal-close:hover { background: rgba(255,255,255,.2); transform: scale(1.1); }
-        .contacto-modal-body { padding: 28px 32px 32px; }
+        #contacto.seccion { padding-bottom: 60px; }
 
         /* Contact row */
         .contacto-row {
@@ -688,8 +633,9 @@
             object-fit: contain;
             border-radius: 8px;
             flex-shrink: 0;
-            background: var(--bg);
-            padding: 3px;
+            background: #ffffff;
+            padding: 4px;
+            border: 1px solid var(--border);
         }
         .contacto-colab-info { min-width: 0; }
         .contacto-colab-name {
@@ -703,8 +649,6 @@
             margin-top: 2px;
         }
         @media (max-width: 520px) {
-            .contacto-modal-body { padding: 20px 18px 24px; }
-            .contacto-modal-header { padding: 24px 20px 20px; }
             .contacto-colab-grid { grid-template-columns: 1fr; }
         }
 
@@ -1576,6 +1520,7 @@
     <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span>Historial por Medallas</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span>Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span>Noticias y Entrevistas</span></button>
+    <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span>Enlaces y Contacto</span></button>
     <div class="menu-pie">© 2026 · Sitial de Talentos Cubanos</div>
 </div>
 
@@ -1807,8 +1752,105 @@
                 <p>¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
             </div>
         </article>
-    </div>
-</div>
+    </div><!-- /#noticias -->
+
+    <!-- ══════════════════════════════════════ -->
+    <!--       SECCIÓN: ENLACES Y CONTACTO      -->
+    <!-- ══════════════════════════════════════ -->
+    <div id="contacto" class="seccion">
+        <article class="seccion-contenido">
+            <h2 class="titulo-seccion" style="margin-bottom:4px;">📌 Enlaces y Contacto</h2>
+            <p class="section-sub" style="margin-bottom:36px;">Recursos de interés y vías de comunicación</p>
+
+            <div style="max-width:640px; margin: 0 auto; display:flex; flex-direction:column; gap:32px;">
+
+                <!-- ── Correo ── -->
+                <div>
+                    <h3 class="subtitulo-seccion">Contacto</h3>
+                    <div class="contacto-row">
+                        <span class="contacto-row-icon">✉️</span>
+                        <div class="contacto-row-text">
+                            <div class="contacto-row-label">Correo electrónico</div>
+                            <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Enlaces de interés ── -->
+                <div>
+                    <h3 class="subtitulo-seccion">Enlaces de Interés</h3>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <a class="contacto-enlace-item" href="https://scqcuba.org/" target="_blank" rel="noopener">
+                            <span class="contacto-enlace-icon">🔬</span>
+                            <div>
+                                <div class="contacto-enlace-name">Sociedad Cubana de Química</div>
+                                <div class="contacto-enlace-url">scqcuba.org</div>
+                            </div>
+                            <span class="contacto-enlace-arrow">→</span>
+                        </a>
+                        <a class="contacto-enlace-item" href="https://www.icho-official.org/" target="_blank" rel="noopener">
+                            <span class="contacto-enlace-icon">🌍</span>
+                            <div>
+                                <div class="contacto-enlace-name">International Chemistry Olympiad</div>
+                                <div class="contacto-enlace-url">icho-official.org</div>
+                            </div>
+                            <span class="contacto-enlace-arrow">→</span>
+                        </a>
+                        <a class="contacto-enlace-item" href="https://icho.sk/" target="_blank" rel="noopener">
+                            <span class="contacto-enlace-icon">📡</span>
+                            <div>
+                                <div class="contacto-enlace-name">IChO Information Center</div>
+                                <div class="contacto-enlace-url">icho.sk</div>
+                            </div>
+                            <span class="contacto-enlace-arrow">→</span>
+                        </a>
+                        <a class="contacto-enlace-item" href="https://www.ichosc.org/" target="_blank" rel="noopener">
+                            <span class="contacto-enlace-icon">🏛️</span>
+                            <div>
+                                <div class="contacto-enlace-name">IChO Steering Committee</div>
+                                <div class="contacto-enlace-url">ichosc.org</div>
+                            </div>
+                            <span class="contacto-enlace-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ── Colaboradores ── -->
+                <div>
+                    <h3 class="subtitulo-seccion">Colaboradores</h3>
+                    <div class="contacto-colab-grid">
+                        <div class="contacto-colab-card">
+                            <img class="contacto-colab-img" src="Assets/logos/CNQ_logo.png" alt="Concurso Nacional de Química" onerror="this.style.display='none'">
+                            <div class="contacto-colab-info">
+                                <div class="contacto-colab-name">Concurso Nacional de Química</div>
+                            </div>
+                        </div>
+                        <div class="contacto-colab-card">
+                            <img class="contacto-colab-img" src="Assets/logos/FQ_logo.png" alt="Facultad de Química UH" onerror="this.style.display='none'">
+                            <div class="contacto-colab-info">
+                                <div class="contacto-colab-name">Fac. Química — Univ. de La Habana</div>
+                            </div>
+                        </div>
+                        <div class="contacto-colab-card">
+                            <img class="contacto-colab-img" src="Assets/logos/MINED_logo.png" alt="Ministerio de Educación" onerror="this.style.display='none'">
+                            <div class="contacto-colab-info">
+                                <div class="contacto-colab-name">Ministerio de Educación</div>
+                            </div>
+                        </div>
+                        <div class="contacto-colab-card">
+                            <img class="contacto-colab-img" src="Assets/logos/SCQ_logo.png" alt="Sociedad Cubana de Química" onerror="this.style.display='none'">
+                            <div class="contacto-colab-info">
+                                <div class="contacto-colab-name">Sociedad Cubana de Química</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </article>
+    </div><!-- /#contacto -->
+
+</div><!-- /.contenedor -->
 
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
@@ -1833,7 +1875,7 @@
 <footer>
     <div class="footer-links">
         <a href="#" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
-        <a href="#" onclick="abrirContacto();return false;">📌 Enlaces y Contacto</a>
+        <a href="#" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
     </div>
 
     <!-- Collaborator logos -->
@@ -1861,96 +1903,6 @@
     </p>
 </footer>
 
-<!-- ═══════ MODAL ENLACES Y CONTACTO ═══════ -->
-<div id="contacto-modal-overlay" onclick="cerrarContacto(event)">
-    <div id="contacto-modal-card" onclick="event.stopPropagation()">
-        <div class="contacto-modal-header">
-            <button id="contacto-modal-close" onclick="cerrarContacto(null, true)" aria-label="Cerrar">✕</button>
-            <p>Talentos Cubanos · Química</p>
-            <h2>📌 Enlaces y Contacto</h2>
-        </div>
-        <div class="contacto-modal-body">
-
-            <!-- Contacto -->
-            <div class="contacto-row">
-                <span class="contacto-row-icon">✉️</span>
-                <div class="contacto-row-text">
-                    <div class="contacto-row-label">Correo electrónico</div>
-                    <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>
-                </div>
-            </div>
-
-            <!-- Enlaces de interés -->
-            <div class="contacto-enlaces-title">Enlaces de Interés</div>
-
-            <a class="contacto-enlace-item" href="https://scqcuba.org/" target="_blank" rel="noopener">
-                <span class="contacto-enlace-icon">🔬</span>
-                <div>
-                    <div class="contacto-enlace-name">Sociedad Cubana de Química</div>
-                    <div class="contacto-enlace-url">scqcuba.org</div>
-                </div>
-                <span class="contacto-enlace-arrow">→</span>
-            </a>
-
-            <a class="contacto-enlace-item" href="https://www.icho-official.org/" target="_blank" rel="noopener">
-                <span class="contacto-enlace-icon">🌍</span>
-                <div>
-                    <div class="contacto-enlace-name">International Chemistry Olympiad</div>
-                    <div class="contacto-enlace-url">icho-official.org</div>
-                </div>
-                <span class="contacto-enlace-arrow">→</span>
-            </a>
-
-            <a class="contacto-enlace-item" href="https://icho.sk/" target="_blank" rel="noopener">
-                <span class="contacto-enlace-icon">📡</span>
-                <div>
-                    <div class="contacto-enlace-name">IChO Information Center</div>
-                    <div class="contacto-enlace-url">icho.sk</div>
-                </div>
-                <span class="contacto-enlace-arrow">→</span>
-            </a>
-
-            <a class="contacto-enlace-item" href="https://www.ichosc.org/" target="_blank" rel="noopener">
-                <span class="contacto-enlace-icon">🏛️</span>
-                <div>
-                    <div class="contacto-enlace-name">IChO Steering Committee</div>
-                    <div class="contacto-enlace-url">ichosc.org</div>
-                </div>
-                <span class="contacto-enlace-arrow">→</span>
-            </a>
-
-            <!-- Colaboradores -->
-            <div class="contacto-colab-title">Colaboradores</div>
-            <div class="contacto-colab-grid">
-                <div class="contacto-colab-card">
-                    <img class="contacto-colab-img" src="Assets/logos/CNQ_logo.png" alt="Concurso Nacional de Química" onerror="this.style.display='none'">
-                    <div class="contacto-colab-info">
-                        <div class="contacto-colab-name">Concurso Nacional de Química</div>
-                    </div>
-                </div>
-                <div class="contacto-colab-card">
-                    <img class="contacto-colab-img" src="Assets/logos/FQ_logo.png" alt="Facultad de Química UH" onerror="this.style.display='none'">
-                    <div class="contacto-colab-info">
-                        <div class="contacto-colab-name">Fac. Química — Univ. de La Habana</div>
-                    </div>
-                </div>
-                <div class="contacto-colab-card">
-                    <img class="contacto-colab-img" src="Assets/logos/MINED_logo.png" alt="Ministerio de Educación" onerror="this.style.display='none'">
-                    <div class="contacto-colab-info">
-                        <div class="contacto-colab-name">Ministerio de Educación</div>
-                    </div>
-                </div>
-                <div class="contacto-colab-card">
-                    <img class="contacto-colab-img" src="Assets/logos/SCQ_logo.png" alt="Sociedad Cubana de Química" onerror="this.style.display='none'">
-                    <div class="contacto-colab-info">
-                        <div class="contacto-colab-name">Sociedad Cubana de Química</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 <script>
 // ════════════════════════════════════════════════════
@@ -3041,7 +2993,8 @@ const _tituloSeccion = {
     sitial:   '🏅 Historial por Medallas',
     eventos:  '🔍 Historial por Eventos',
     honor:    '🎓 Honor a quien Honor Merece',
-    noticias: '📰 Noticias y Entrevistas'
+    noticias: '📰 Noticias y Entrevistas',
+    contacto: '📌 Enlaces y Contacto'
 };
 let _transicionEnCurso = false;
 
@@ -3487,23 +3440,6 @@ const ICHO_AÑO    = 2026;                               // ← Año del evento
         run();
     }
 })();
-
-// ════ MODAL ENLACES Y CONTACTO ════
-function abrirContacto() {
-    document.getElementById('contacto-modal-overlay').classList.add('abierto');
-    document.body.style.overflow = 'hidden';
-}
-function cerrarContacto(e, forzar) {
-    if (!forzar && e && e.target !== document.getElementById('contacto-modal-overlay')) return;
-    document.getElementById('contacto-modal-overlay').classList.remove('abierto');
-    document.body.style.overflow = '';
-}
-// Cerrar con Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        cerrarContacto(null, true);
-    }
-});
 
 // ════ MENÚ HAMBURGUESA ════
 function toggleMenu() {
