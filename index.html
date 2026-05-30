@@ -2034,14 +2034,14 @@
             <!-- Filtros de grado y año -->
             <div class="controles-evento" style="margin-bottom:20px; flex-wrap:wrap; gap:10px;">
                 <label><strong id="cnq-lbl-grado" data-i18n="cnq.label.grade">Grado:</strong></label>
-                <select class="custom-select" id="cnq-selector-grado" onchange="renderCNQRanking()">
+                <select class="custom-select" id="cnq-selector-grado" onchange="_cnqFiltroChanged()">
                     <option value="todos" data-i18n-opt="cnq.grade.all">Todos</option>
                     <option value="décimo" data-i18n-opt="cnq.grade.10">Décimo</option>
                     <option value="onceno" data-i18n-opt="cnq.grade.11">Onceno</option>
                     <option value="duodécimo" data-i18n-opt="cnq.grade.12">Duodécimo</option>
                 </select>
                 <label><strong id="cnq-lbl-año" data-i18n="cnq.label.year">Año:</strong></label>
-                <select class="custom-select" id="cnq-selector-año" onchange="renderCNQRanking()">
+                <select class="custom-select" id="cnq-selector-año" onchange="_cnqFiltroChanged()">
                     <option value="todos" data-i18n-opt="cnq.year.all">Todos</option>
                 </select>
                 <div class="sort-controls" style="margin-left:auto;">
@@ -2643,27 +2643,18 @@ async function cargarCNQData() {
         const doc  = new DOMParser().parseFromString(html, 'text/html');
         const s    = doc.getElementById('cnq-data');
         if (!s) throw new Error('No se encontró #cnq-data');
-
-        // El script usa `const` locales; inyectarlos con createElement los aisla
-        // en su propio scope y window nunca los ve.
-        // Usamos new Function() para ejecutarlos en scope global sin el aislamiento
-        // de módulo, añadiendo al final asignaciones explícitas a window.
-        const exportBlock = `
-if (typeof datosCNQ          !== 'undefined') window.datosCNQ          = datosCNQ;
-if (typeof añosCNQ           !== 'undefined') window.añosCNQ           = añosCNQ;
-if (typeof nombreProvincia   !== 'undefined') window.nombreProvincia   = nombreProvincia;
-if (typeof fotosCNQPorNombre !== 'undefined') window.fotosCNQPorNombre = fotosCNQPorNombre;
-`;
-        // eslint-disable-next-line no-new-func
-        (new Function(s.textContent + exportBlock))();
+        // Execute the script to populate datosCNQ etc.
+        const se = document.createElement('script');
+        se.textContent = s.textContent;
+        document.head.appendChild(se);
     } catch(err) {
-        console.warn('CNQ_data.html no encontrado o error al ejecutar:', err.message);
+        console.warn('CNQ_data.html no encontrado:', err.message);
     }
 }
 
 // ─── Gate navigation ───────────────────────────────
 async function mostrarSubseccionCNQ(sub) {
-    document.getElementById('cnq-gateway').style.display    = 'none';
+    document.getElementById('cnq-gateway').style.display       = 'none';
     document.getElementById('cnq-ranking-view').style.display  = 'none';
     document.getElementById('cnq-concurso-view').style.display = 'none';
 
@@ -2686,7 +2677,8 @@ function volverAlGatewayCNQ() {
 }
 
 // ─── Ranking ───────────────────────────────────────
-let _cnqSortCampo = 'rank';
+// 'auto' = ordenación semántica automática según filtros activos
+let _cnqSortCampo = 'auto';
 let _cnqSortDir   = 1;
 
 function cnqOrdenar(campo, btn) {
@@ -2694,10 +2686,18 @@ function cnqOrdenar(campo, btn) {
         _cnqSortDir = -_cnqSortDir;
     } else {
         _cnqSortCampo = campo;
-        _cnqSortDir = 1;
+        _cnqSortDir = (campo === 'pts') ? -1 : 1; // pts: mayor primero por defecto
     }
     document.querySelectorAll('[id^="cnq-sort-"]').forEach(b => b.classList.remove('activo'));
     if (btn) btn.classList.add('activo');
+    renderCNQRanking();
+}
+
+// Al cambiar selector de filtro, volver a orden automático
+function _cnqFiltroChanged() {
+    _cnqSortCampo = 'auto';
+    _cnqSortDir   = 1;
+    document.querySelectorAll('[id^="cnq-sort-"]').forEach(b => b.classList.remove('activo'));
     renderCNQRanking();
 }
 
@@ -2730,15 +2730,39 @@ function renderCNQRanking() {
         return okG && okA;
     });
 
-    // Sort
+    // ── Ordenación automática según filtros activos ──────────────────
+    // Si el usuario pulsó un botón de ordenar, respetar su elección.
+    // Si no (_cnqSortCampo === 'auto'), aplicar regla semántica:
+    //   • todos/todos   → año DESC, luego pts DESC (nota)
+    //   • grado/todos   → año DESC, luego pts DESC dentro del año
+    //   • todos/AÑO     → pts DESC (nota)
+    //   • grado/AÑO     → pts DESC (nota)
+    const autoSort = (_cnqSortCampo === 'auto');
+
     filtrados = [...filtrados].sort((a, b) => {
-        if (_cnqSortCampo === 'rank') {
-            const diff = (a.rank - b.rank) || (b.año - a.año);
-            return diff * _cnqSortDir;
+        if (!autoSort) {
+            // Ordenación manual
+            if (_cnqSortCampo === 'rank') {
+                return ((a.rank - b.rank) || (b.año - a.año)) * _cnqSortDir;
+            }
+            if (_cnqSortCampo === 'pts') {
+                return ((b.pts - a.pts) || (a.rank - b.rank)) * _cnqSortDir;
+            }
+            if (_cnqSortCampo === 'nombre') {
+                return (a.nombre || '').localeCompare(b.nombre || '') * _cnqSortDir;
+            }
+            return 0;
         }
-        if (_cnqSortCampo === 'pts')  return ((b.pts - a.pts) || (a.rank - b.rank)) * _cnqSortDir;
-        if (_cnqSortCampo === 'nombre') return (a.nombre || '').localeCompare(b.nombre || '') * _cnqSortDir;
-        return 0;
+        // Ordenación automática
+        const añoFijo = (año !== 'todos');
+        if (!añoFijo) {
+            // Año libre → año DESC primero, luego pts DESC
+            if (b.año !== a.año) return b.año - a.año;
+            return b.pts - a.pts;
+        } else {
+            // Año fijo → sólo por pts DESC
+            return b.pts - a.pts;
+        }
     });
 
     const prov = window.nombreProvincia || {};
@@ -2770,30 +2794,41 @@ function renderCNQRanking() {
     if (thPSN) thPSN.textContent = T('cnq.th.psn');
 
     // Alternating row color by year+grade group
-    const grupos = [];
     let prevKey = null, grupoIdx = 0;
 
-    tbody.innerHTML = filtrados.map((r, i) => {
+    tbody.innerHTML = filtrados.map((r) => {
         const key = r.año + '|' + r.grado;
         if (key !== prevKey) { grupoIdx++; prevKey = key; }
         const clsPar = grupoIdx % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
 
         const provNombre = prov[r.prov] || r.prov || '';
-        const foto  = (window.fotosCNQPorNombre || {})[r.nombre];
-        const nombreEsc = r.nombre.replace(/'/g, "\\'");
+        const foto       = (window.fotosCNQPorNombre || {})[r.nombre];
+        const nombreEsc  = r.nombre.replace(/'/g, "\\'");
 
-        // Avatar (clickable if foto)
+        // Avatar: si tiene medallas internacionales → abrir tarjeta sitial
+        //         si tiene foto sin internacionales  → zoom foto
+        //         si no tiene foto                   → initials sin click
+        const tieneInternacional = !!(window._estudiantesTodos || []).find(
+            e => e.nombre === r.nombre
+        );
         let avatarHTML;
-        if (foto) {
+        if (tieneInternacional) {
+            // Abre tarjeta del sitial de honor internacional
+            if (foto) {
+                avatarHTML = `<span class="tabla-avatar" style="cursor:pointer;" title="${r.nombre}" onclick="abrirTarjetaModal('${nombreEsc}')"><img src="${foto}" alt="${r.nombre}" onerror="this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(r.nombre)}</span>';"></span>`;
+            } else {
+                avatarHTML = `<span class="tabla-avatar" style="cursor:pointer;" title="${r.nombre}" onclick="abrirTarjetaModal('${nombreEsc}')"><span class="tabla-avatar-initials">${getIniciales(r.nombre)}</span></span>`;
+            }
+        } else if (foto) {
+            // Solo zoom de foto
             avatarHTML = `<span class="tabla-avatar" style="cursor:zoom-in;" onclick="abrirFotoDirecta('${foto.replace(/'/g,"\\'")}','${nombreEsc}')"><img src="${foto}" alt="${r.nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(r.nombre)}</span>';"></span>`;
         } else {
-            avatarHTML = `<span class="tabla-avatar" style="cursor:default;"><span class="tabla-avatar-initials">${getIniciales(r.nombre)}</span></span>`;
+            avatarHTML = `<span class="tabla-avatar"><span class="tabla-avatar-initials">${getIniciales(r.nombre)}</span></span>`;
         }
 
         const medallaClass = {oro:'badge-oro', plata:'badge-plata', bronce:'badge-bronce', mencion:'badge-mencion'}[r.medalla] || 'badge-participante';
         const medallaText  = T('medal.'+r.medalla) || r.medalla;
-        const medallaEmoji_= {oro:'🥇',plata:'🥈',bronce:'🥉',mencion:'🎖'}[r.medalla] || '';
-        const dotClass = {oro:'dot-oro',plata:'dot-plata',bronce:'dot-bronce',mencion:'dot-mencion'}[r.medalla] || 'dot-participante';
+        const dotClass     = {oro:'dot-oro',plata:'dot-plata',bronce:'dot-bronce',mencion:'dot-mencion'}[r.medalla] || 'dot-participante';
 
         const gradoStr = gradoLabel[r.grado] || r.grado;
 
@@ -2809,7 +2844,7 @@ function renderCNQRanking() {
             <td><span class="prov-badge" data-prov="${provNombre}" title="${provNombre}">${r.prov}</span></td>
             <td style="font-size:12px;color:var(--text-muted);">${r.escuela || '—'}</td>
             <td style="font-weight:700;text-align:center;">${r.pts}</td>
-            <td><span class="badge ${medallaClass}"><span class="badge-dot ${dotClass}"></span>${medallaEmoji_} ${medallaText}</span></td>
+            <td><span class="badge ${medallaClass}"><span class="badge-dot ${dotClass}"></span>${medallaText}</span></td>
             <td style="text-align:center;">${psnHTML}</td>
         </tr>`;
     }).join('');
@@ -2819,23 +2854,21 @@ function renderCNQRanking() {
 }
 
 // ─── Concurso Nacional ──────────────────────────────
-// Años candidatos a mostrar (se filtran los que no existan en el repo)
+// Años candidatos (se filtran con HEAD antes de mostrar botones)
 const _cnqYearsCandidatos = [2017,2018,2019,2020,2021,2022,2023,2024,2025];
-let _cnqYearsReal        = [];   // años que realmente tienen archivos
-let _cnqSelectedYear     = null; // se fija al primer año disponible
-let _cnqSelectedCat      = 'preparatorio';
-// Caché de archivos existentes: Map<año, Set<filename>>
-const _cnqExistsCache    = new Map();
+let _cnqYearsReal    = [];
+let _cnqSelectedYear = null;
+let _cnqSelectedCat  = 'preparatorio';
+
+// Caché HEAD: path → true|false
+const _cnqExistsCache = new Map();
 
 function _getLang() {
     return (window._lang || 'es') === 'es' ? 'ES' : 'EN';
 }
+function _cnqBaseUrl(año) { return `Assets/CNQ/${año}/`; }
 
-function _cnqBaseUrl(año) {
-    return `Assets/CNQ/${año}/`;
-}
-
-// Comprueba si un archivo existe con HEAD; usa caché
+// HEAD probe con caché
 async function _cnqFileExists(path) {
     if (_cnqExistsCache.has(path)) return _cnqExistsCache.get(path);
     try {
@@ -2849,48 +2882,63 @@ async function _cnqFileExists(path) {
     }
 }
 
-// Devuelve los archivos candidatos para un año, con soporte Day1 por grado
+// Devuelve la primera ruta de la lista que exista, o null
+async function _cnqFirstExists(paths) {
+    for (const p of paths) {
+        if (await _cnqFileExists(p)) return p;
+    }
+    return null;
+}
+
+// Extensiones a intentar en orden: pdf primero, luego docx, luego doc
+function _cnqVariants(base) {
+    return [`${base}.pdf`, `${base}.docx`, `${base}.doc`];
+}
+
+// Construye el mapa de archivos para un año, resolviendo extensiones y Day1
 async function _cnqFilesForYear(año) {
     const l    = _getLang();
     const base = _cnqBaseUrl(año);
 
     // Day1: intentar común primero, luego por grado
-    const commonDay1 = `${base}Day1_common_exam_${l}.pdf`;
-    const hasCommon  = await _cnqFileExists(commonDay1);
-    const day1_src   = hasCommon ? commonDay1 : null;
-    const day1_10    = hasCommon ? commonDay1 : `${base}Day1_10grade_${l}.pdf`;
-    const day1_11    = hasCommon ? commonDay1 : `${base}Day1_11grade_${l}.pdf`;
-    const day1_12    = hasCommon ? commonDay1 : `${base}Day1_12grade_${l}.pdf`;
+    const commonDay1 = await _cnqFirstExists(_cnqVariants(`${base}Day1_common_exam_${l}`));
+    const isCommonDay1 = !!commonDay1;
+
+    // Para cada grado: si existe common lo reutilizamos, si no buscamos el específico
+    const day1_10 = isCommonDay1 ? commonDay1
+        : await _cnqFirstExists(_cnqVariants(`${base}Day1_10grade_${l}`));
+    const day1_11 = isCommonDay1 ? commonDay1
+        : await _cnqFirstExists(_cnqVariants(`${base}Day1_11grade_${l}`));
+    const day1_12 = isCommonDay1 ? commonDay1
+        : await _cnqFirstExists(_cnqVariants(`${base}Day1_12grade_${l}`));
 
     return {
-        prep_prob:  `${base}Preparatory_Problems_${l}.pdf`,
-        prep_sol:   `${base}Preparatory_Solutions_${l}.pdf`,
-        day1:       day1_src,          // puede ser null si no existe ninguno
+        isCommonDay1,                       // bool: si day1 es el examen común
+        prep_prob:  await _cnqFirstExists(_cnqVariants(`${base}Preparatory_Problems_${l}`)),
+        prep_sol:   await _cnqFirstExists(_cnqVariants(`${base}Preparatory_Solutions_${l}`)),
         day1_10,
         day1_11,
         day1_12,
-        day2_10:   `${base}Day2_10grade_${l}.pdf`,
-        day2_11:   `${base}Day2_11grade_${l}.pdf`,
-        day2_12:   `${base}Day2_12grade_${l}.pdf`,
-        solutions: `${base}Solutions_${l}.pdf`,
-        results:   `${base}Results_${l}.pdf`,
-        enlace:    `${base}enlace.txt`,
+        day2_10:    await _cnqFirstExists(_cnqVariants(`${base}Day2_10grade_${l}`)),
+        day2_11:    await _cnqFirstExists(_cnqVariants(`${base}Day2_11grade_${l}`)),
+        day2_12:    await _cnqFirstExists(_cnqVariants(`${base}Day2_12grade_${l}`)),
+        solutions:  await _cnqFirstExists(_cnqVariants(`${base}Solutions_${l}`)),
+        results:    await _cnqFirstExists(_cnqVariants(`${base}Results_${l}`)),
     };
 }
 
-// Determina si un año tiene al menos un archivo de examen/resultados
+// Un año "tiene contenido" si al menos uno de los archivos clave existe
 async function _cnqYearHasContent(año) {
     const l    = _getLang();
     const base = _cnqBaseUrl(año);
-    const candidates = [
-        `${base}Preparatory_Problems_${l}.pdf`,
-        `${base}Day1_common_exam_${l}.pdf`,
-        `${base}Day1_10grade_${l}.pdf`,
-        `${base}Solutions_${l}.pdf`,
-        `${base}Results_${l}.pdf`,
+    const keys = [
+        'Preparatory_Problems', 'Day1_common_exam', 'Day1_10grade',
+        'Solutions', 'Results'
     ];
-    for (const f of candidates) {
-        if (await _cnqFileExists(f)) return true;
+    for (const k of keys) {
+        for (const ext of ['pdf','docx','doc']) {
+            if (await _cnqFileExists(`${base}${k}_${l}.${ext}`)) return true;
+        }
     }
     return false;
 }
@@ -2898,22 +2946,19 @@ async function _cnqYearHasContent(año) {
 async function _inicializarBotonesAñosConcurso() {
     const container = document.getElementById('cnq-concurso-años-btns');
     if (!container) return;
+    const lang = window._lang || 'es';
+    container.innerHTML = `<span style="color:var(--text-muted);font-size:13px;">⏳ ${lang==='es'?'Detectando ediciones…':'Detecting editions…'}</span>`;
 
-    // Mostrar spinner mientras se detectan años
-    container.innerHTML = `<span style="color:var(--text-muted);font-size:13px;">⏳ ${window._lang === 'es' ? 'Detectando ediciones…' : 'Detecting editions…'}</span>`;
-
-    // Probar cada año candidato en paralelo
     const checks = await Promise.all(
         _cnqYearsCandidatos.map(async a => ({ año: a, ok: await _cnqYearHasContent(a) }))
     );
     _cnqYearsReal = checks.filter(c => c.ok).map(c => c.año);
 
     if (!_cnqYearsReal.length) {
-        container.innerHTML = `<span style="color:var(--text-muted);font-size:13px;">— ${window._lang === 'es' ? 'Sin ediciones disponibles' : 'No editions available'}</span>`;
+        container.innerHTML = `<span style="color:var(--text-muted);font-size:13px;">— ${lang==='es'?'Sin ediciones disponibles':'No editions available'}</span>`;
         return;
     }
 
-    // Seleccionar el año más reciente disponible por defecto
     if (!_cnqSelectedYear || !_cnqYearsReal.includes(_cnqSelectedYear)) {
         _cnqSelectedYear = _cnqYearsReal[_cnqYearsReal.length - 1];
     }
@@ -2935,17 +2980,17 @@ function cnqSeleccionarAño(año, btn) {
 }
 
 async function _cargarFuenteEnlace(año) {
-    const enlaceEl = document.getElementById('cnq-source-link');
-    if (!enlaceEl) return;
+    const el = document.getElementById('cnq-source-link');
+    if (!el) return;
     try {
-        const resp = await fetch(_cnqBaseUrl(año) + 'enlace.txt');
-        if (!resp.ok) throw new Error();
-        const url = (await resp.text()).trim();
-        enlaceEl.href = url;
-        enlaceEl.style.display = 'flex';
+        const r = await fetch(_cnqBaseUrl(año) + 'enlace.txt');
+        if (!r.ok) throw new Error();
+        const url = (await r.text()).trim();
+        el.href = url;
+        el.style.display = 'flex';
     } catch(e) {
-        enlaceEl.href = '#';
-        enlaceEl.style.display = 'none';
+        el.href = '#';
+        el.style.display = 'none';
     }
 }
 
@@ -2956,17 +3001,23 @@ function cnqSeleccionarCat(cat, btn) {
     _renderCNQConcurso();
 }
 
-// Render asíncrono: primero muestra spinner, luego sólo los PDFs que existen
 async function _renderCNQConcurso() {
     const area = document.getElementById('cnq-pdf-area');
     if (!area || !_cnqSelectedYear) return;
     const lang = window._lang || 'es';
 
-    area.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-muted);font-size:14px;">⏳ ${lang === 'es' ? 'Verificando archivos…' : 'Checking files…'}</div>`;
+    area.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-muted);font-size:14px;">⏳ ${lang==='es'?'Verificando archivos…':'Checking files…'}</div>`;
 
     const files = await _cnqFilesForYear(_cnqSelectedYear);
 
-    // Definir candidatos según categoría
+    // Título para el Day1 según si es examen común o específico del grado
+    const day1TitleFor = (grade) => {
+        if (files.isCommonDay1) {
+            return (lang==='es' ? 'Examen Día 1 — Común' : 'Day 1 Exam — Common');
+        }
+        return (lang==='es' ? `Examen Día 1 — ${grade}°` : `Day 1 Exam — ${grade}th`);
+    };
+
     let candidates = [];
     if (_cnqSelectedCat === 'preparatorio') {
         candidates = [
@@ -2975,18 +3026,18 @@ async function _renderCNQConcurso() {
         ];
     } else if (_cnqSelectedCat === '10') {
         candidates = [
-            { file: files.day1_10,   title: T('cnq.pdf.day1'),              badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_10,   title: T('cnq.pdf.day2') + ' — 10°',   badge: lang==='es'?'Día 2':'Day 2' },
+            { file: files.day1_10, title: day1TitleFor(10), badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_10, title: (lang==='es'?'Examen Día 2 — 10°':'Day 2 Exam — 10th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === '11') {
         candidates = [
-            { file: files.day1_11,   title: T('cnq.pdf.day1'),              badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_11,   title: T('cnq.pdf.day2') + ' — 11°',   badge: lang==='es'?'Día 2':'Day 2' },
+            { file: files.day1_11, title: day1TitleFor(11), badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_11, title: (lang==='es'?'Examen Día 2 — 11°':'Day 2 Exam — 11th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === '12') {
         candidates = [
-            { file: files.day1_12,   title: T('cnq.pdf.day1'),              badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_12,   title: T('cnq.pdf.day2') + ' — 12°',   badge: lang==='es'?'Día 2':'Day 2' },
+            { file: files.day1_12, title: day1TitleFor(12), badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_12, title: (lang==='es'?'Examen Día 2 — 12°':'Day 2 Exam — 12th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === 'soluciones') {
         candidates = [
@@ -2995,10 +3046,8 @@ async function _renderCNQConcurso() {
         ];
     }
 
-    // Filtrar solo los que realmente existen (en paralelo)
-    const existence = await Promise.all(candidates.map(c => c.file ? _cnqFileExists(c.file) : Promise.resolve(false)));
-    const available = candidates.filter((_, i) => existence[i]);
-
+    // Solo mostrar los que existen (file !== null)
+    const available = candidates.filter(c => c.file);
     if (!available.length) {
         area.innerHTML = `<div class="cnq-not-available">📄 ${T('cnq.pdf.nofile')}</div>`;
         return;
@@ -3007,27 +3056,43 @@ async function _renderCNQConcurso() {
     area.innerHTML = available.map(item => _cnqPdfBlock(item)).join('');
 }
 
+// Detecta extensión del archivo para renderizado apropiado
+function _cnqFileType(path) {
+    if (!path) return 'unknown';
+    const ext = path.split('.').pop().toLowerCase();
+    if (ext === 'pdf') return 'pdf';
+    if (ext === 'docx' || ext === 'doc') return 'word';
+    return 'unknown';
+}
+
 function _cnqPdfBlock({ file, title, badge }) {
-    const safe = file.replace(/'/g, "\\'");
+    const safe     = file.replace(/'/g, "\\'");
+    const type     = _cnqFileType(file);
+    const icon     = type === 'word' ? '📝' : '📄';
+    const dlLabel  = type === 'word'
+        ? T('cnq.pdf.download') + ' Word'
+        : T('cnq.pdf.download') + ' PDF';
+
+    // Para Word usamos Google Docs Viewer directamente (sin iframe raw)
+    const previewBtn = `<button class="cnq-pdf-btn" onclick="_cnqTogglePreview(this, '${safe}', '${type}')">
+        ${T('cnq.pdf.preview')}
+    </button>`;
+
     return `<div class="cnq-pdf-block">
         <div class="cnq-pdf-header">
-            <span class="cnq-pdf-header-icon">📄</span>
+            <span class="cnq-pdf-header-icon">${icon}</span>
             <span class="cnq-pdf-header-title">${title} — ${_cnqSelectedYear}</span>
             <span class="cnq-pdf-header-badge">${badge}</span>
         </div>
         <div class="cnq-pdf-actions">
-            <a class="cnq-pdf-btn primary" href="${file}" download target="_blank" rel="noopener">
-                ${T('cnq.pdf.download')} PDF
-            </a>
-            <button class="cnq-pdf-btn" onclick="_cnqTogglePreview(this, '${safe}')">
-                ${T('cnq.pdf.preview')}
-            </button>
+            <a class="cnq-pdf-btn primary" href="${file}" download target="_blank" rel="noopener">${dlLabel}</a>
+            ${previewBtn}
         </div>
-        <div class="cnq-pdf-preview-area" data-file="${file}" style="display:none;"></div>
+        <div class="cnq-pdf-preview-area" style="display:none;"></div>
     </div>`;
 }
 
-function _cnqTogglePreview(btn, file) {
+function _cnqTogglePreview(btn, file, type) {
     const block = btn.closest('.cnq-pdf-block');
     const area  = block.querySelector('.cnq-pdf-preview-area');
     if (!area) return;
@@ -3036,22 +3101,28 @@ function _cnqTogglePreview(btn, file) {
         area.style.display = 'none';
         area.innerHTML = '';
         btn.textContent = T('cnq.pdf.preview');
+        return;
+    }
+    area.style.display = 'block';
+    btn.textContent = '▲ ' + (window._lang === 'es' ? 'Ocultar' : 'Hide');
+
+    if (type === 'word') {
+        // Word docs: siempre Google Docs Viewer (no se pueden embeber nativamente)
+        const viewer = `https://docs.google.com/viewerng/viewer?url=${encodeURIComponent(location.origin + '/' + file)}&embedded=true`;
+        area.innerHTML = `<div class="cnq-pdf-embed-wrap"><iframe src="${viewer}"></iframe></div>`;
     } else {
-        area.style.display = 'block';
-        btn.textContent = '▲ ' + (window._lang === 'es' ? 'Ocultar' : 'Hide');
-        // Try direct embed; fallback to Google Viewer
-        area.innerHTML = `<div class="cnq-pdf-embed-wrap">
-            <iframe src="${file}" onload="_cnqIframeOk(this)" onerror="_cnqIframeFail(this, '${file.replace(/'/g,"\\'")}')"></iframe>
+        // PDF: intentar directo; el iframe onerror es cross-origin así que usamos
+        // un fallback en timeout (no hay evento fiable para 404 en iframe)
+        const viewer = `https://docs.google.com/viewerng/viewer?url=${encodeURIComponent(location.origin + '/' + file)}&embedded=true`;
+        area.innerHTML = `<div class="cnq-pdf-embed-wrap" id="_cnqFrame_${Date.now()}">
+            <iframe src="${file}"
+                onload="this.dataset.loaded='1'"
+                onerror="_cnqIframeFail(this,'${file.replace(/'/g,"\\'")}')"></iframe>
         </div>`;
     }
 }
 
-function _cnqIframeOk(iframe) {
-    // Check if it loaded content (can't know cross-origin, so we just leave it)
-}
-
 function _cnqIframeFail(iframe, file) {
-    // Fall back to Google Docs viewer
     const wrap = iframe.closest('.cnq-pdf-embed-wrap');
     if (wrap) {
         const viewer = `https://docs.google.com/viewerng/viewer?url=${encodeURIComponent(location.origin + '/' + file)}&embedded=true`;
@@ -3061,40 +3132,29 @@ function _cnqIframeFail(iframe, file) {
 
 // ─── i18n refresh for CNQ ──────────────────────────
 function _refreshCNQ() {
-    // Update grade selector labels
     const gradeSel = document.getElementById('cnq-selector-grado');
     if (gradeSel) {
         const map = { todos: T('cnq.grade.all'), 'décimo': T('cnq.grade.10'), 'onceno': T('cnq.grade.11'), 'duodécimo': T('cnq.grade.12') };
-        Array.from(gradeSel.options).forEach(opt => {
-            if (map[opt.value]) opt.textContent = map[opt.value];
-        });
+        Array.from(gradeSel.options).forEach(opt => { if (map[opt.value]) opt.textContent = map[opt.value]; });
     }
     const yearSel = document.getElementById('cnq-selector-año');
     if (yearSel) {
         const firstOpt = yearSel.querySelector('option[value="todos"]');
         if (firstOpt) firstOpt.textContent = T('cnq.year.all');
     }
-    // Update cat buttons text
     document.querySelectorAll('.cnq-cat-btn').forEach(btn => {
         const span = btn.querySelector('[data-i18n]');
-        if (span) {
-            const key = span.getAttribute('data-i18n');
-            span.textContent = T(key);
-        }
+        if (span) span.textContent = T(span.getAttribute('data-i18n'));
     });
-    // Si el concurso view está abierto, re-renderizar (async — limpia caché de lang)
     const cv = document.getElementById('cnq-concurso-view');
     if (cv && cv.style.display !== 'none') {
-        // Limpiar la caché de archivos porque el idioma cambia las rutas (_EN/_ES)
+        // Limpiar caché: el idioma cambia las rutas _ES → _EN
         _cnqExistsCache.clear();
-        _cargarFuenteEnlace(_cnqSelectedYear);
-        _renderCNQConcurso();
+        _cnqYearsReal = [];
+        _inicializarBotonesAñosConcurso();
     }
-    // Si el ranking view está abierto, re-renderizar
     const rv = document.getElementById('cnq-ranking-view');
-    if (rv && rv.style.display !== 'none') {
-        renderCNQRanking();
-    }
+    if (rv && rv.style.display !== 'none') renderCNQRanking();
 }
 </script>
 <script>
