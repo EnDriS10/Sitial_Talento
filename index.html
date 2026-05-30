@@ -2607,8 +2607,8 @@ async function cargarHonorData() {
                 nombre:    d.nombreArticulo,
                 contenido: generarContenidoArticulo(d)
             };
-            // Mapa nombre → id para abrir artículos desde cualquier tabla
-            if (d.nombre) window.articulosPorNombre[d.nombre.trim()] = d.id;
+            // Mapa nombreArticulo → id para abrir artículos desde cualquier tabla
+            if (d.nombreArticulo) window.articulosPorNombre[d.nombreArticulo.trim()] = d.id;
         });
 
         // Actualizar contadores del gateway
