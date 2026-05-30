@@ -2245,6 +2245,21 @@
                             </div>
                             <span class="contacto-enlace-arrow">→</span>
                         </a>
+                        <a class="contacto-enlace-item" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener">
+                            <span class="contacto-enlace-icon" style="font-size:20px;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
+                                    <circle cx="12" cy="12" r="12" fill="#29A8E4"/>
+                                    <path d="M5.5 11.8l2.7 1 1.05 3.4c.07.2.32.27.49.13l1.5-1.22a.36.36 0 01.44-.02l2.7 1.96c.19.14.46.03.5-.2l1.85-8.9c.05-.25-.18-.46-.42-.37L5.37 11.15c-.27.1-.26.5.13.65z" fill="#fff"/>
+                                    <path d="M8.2 12.8l.27 2.9c.03.24.34.3.46.1l1.18-1.5" fill="#D2E5F1"/>
+                                    <path d="M8.2 12.8l5.3-3.3" stroke="#fff" stroke-width=".5" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="contacto-enlace-name">Canal de Telegram del Concurso</div>
+                                <div class="contacto-enlace-url">t.me/Concursantes_Quimica</div>
+                            </div>
+                            <span class="contacto-enlace-arrow">→</span>
+                        </a>
                         <a class="contacto-enlace-item" href="https://www.icho-official.org/" target="_blank" rel="noopener">
                             <span class="contacto-enlace-icon">🌍</span>
                             <div>
@@ -3352,6 +3367,7 @@ const medallaEmoji = { oro:'🥇', plata:'🥈', bronce:'🥉', mencion:'🎖', 
 function getIniciales(n) { return n.split(' ').slice(0,2).map(p=>p[0]).join('').toUpperCase(); }
 
 // Abre artículo de honor si existe, sino zoom de foto, sino nada
+// Versión original para el modo 'profesor' (rol=profesor en historial por eventos)
 function abrirClickProfesor(nombre) {
     const id = (window.articulosPorNombre || {})[nombre.trim()];
     if (id) { abrirArticulo(id); return; }
@@ -3359,13 +3375,56 @@ function abrirClickProfesor(nombre) {
     if (foto) abrirFotoDirecta(foto, nombre);
 }
 
+// Abre artículo de honor o tarjeta sitial según el contexto:
+//   rolActivo: 'estudiante' → tarjeta sitial de honor
+//   rolActivo: 'profesor'   → artículo "Honor a quien Honor Merece" (o zoom foto)
+//   rolActivo: 'todos'      → si es mentor: artículo honor; si no: tarjeta sitial (o zoom foto)
+function abrirClickPersona(nombre, rolActivo, esMentor) {
+    const articulo = (window.articulosPorNombre || {})[nombre.trim()];
+    const foto     = (window.fotosPorNombreProfesor || {})[nombre]
+                   || (window.fotosPorNombre        || {})[nombre];
+
+    if (rolActivo === 'estudiante') {
+        // Rol estudiante → siempre tarjeta sitial de honor
+        abrirTarjetaModal(nombre);
+        return;
+    }
+
+    if (rolActivo === 'profesor') {
+        // Rol profesor → artículo honor si existe, sino zoom foto
+        if (articulo) { abrirArticulo(articulo); return; }
+        if (foto) abrirFotoDirecta(foto, nombre);
+        return;
+    }
+
+    // rolActivo === 'todos' (Delegación)
+    if (esMentor) {
+        // Es mentor/profesor en la tabla todos → artículo honor si existe, sino zoom foto
+        if (articulo) { abrirArticulo(articulo); return; }
+        if (foto) abrirFotoDirecta(foto, nombre);
+    } else {
+        // Es estudiante en la tabla todos → tarjeta sitial si existe, sino zoom foto estudiante
+        const enSitial = (window._estudiantesTodos || []).find(e => e.nombre === nombre);
+        if (enSitial) { abrirTarjetaModal(nombre); return; }
+        const fotoEst = (window.fotosPorNombre || {})[nombre];
+        if (fotoEst) abrirFotoDirecta(fotoEst, nombre);
+    }
+}
+
 function avatarHTML(nombre, mini = false, mode = 'modal') {
-    // mode='profesor' → foto profesor; click → artículo honor si existe, sino zoom foto
-    // mode='modal'    → foto estudiante; click → tarjeta sitial de honor
-    // mode='foto'     → foto estudiante; click → zoom foto directa
-    const foto = (mode === 'profesor')
-        ? ((window.fotosPorNombreProfesor || {})[nombre] || null)
-        : (fotosPorNombre[nombre] || null);
+    // mode='profesor'   → foto profesor; click → artículo honor si existe, sino zoom foto
+    // mode='modal'      → foto estudiante; click → tarjeta sitial de honor
+    // mode='foto'       → foto estudiante; click → zoom foto directa
+    // mode='delProf'    → en vista Delegación, fila de profesor/mentor:
+    //                     si tiene artículo honor → abrir artículo; sino → zoom foto
+    // mode='delEstud'   → en vista Delegación, fila de estudiante:
+    //                     si está en sitial → tarjeta sitial; sino → zoom foto estudiante
+    const fotoProfesor = (window.fotosPorNombreProfesor || {})[nombre] || null;
+    const fotoEstudiante = (fotosPorNombre || {})[nombre] || null;
+    const foto = (mode === 'profesor' || mode === 'delProf')
+        ? (fotoProfesor || fotoEstudiante)
+        : fotoEstudiante;
+
     if (mini) {
         const nombreEsc = nombre.replace(/'/g, "\\'");
 
@@ -3377,6 +3436,33 @@ function avatarHTML(nombre, mini = false, mode = 'modal') {
                 ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>';">`
                 : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
             }</span>`;
+        }
+
+        if (mode === 'delProf') {
+            // Profesor/mentor en vista Delegación: honor article → else zoom foto
+            const tieneArticulo = !!((window.articulosPorNombre || {})[nombre.trim()]);
+            const cursor = (tieneArticulo || foto) ? (tieneArticulo ? 'pointer' : 'zoom-in') : 'default';
+            const onclick = (tieneArticulo || foto) ? `onclick="abrirClickPersona('${nombreEsc}','todos',true)"` : '';
+            return `<span class="tabla-avatar" style="cursor:${cursor};" ${onclick}>${foto
+                ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>';">`
+                : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
+            }</span>`;
+        }
+
+        if (mode === 'delEstud') {
+            // Estudiante en vista Delegación: tarjeta sitial si existe, sino zoom foto
+            const enSitial = !!(window._estudiantesTodos || []).find(e => e.nombre === nombre);
+            if (enSitial) {
+                return `<span class="tabla-avatar" style="cursor:pointer;" onclick="abrirTarjetaModal('${nombreEsc}')">${foto
+                    ? `<img src="${foto}" alt="${nombre}" onerror="this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>'">`
+                    : `<span class="tabla-avatar-initials">${getIniciales(nombre)}</span>`
+                }</span>`;
+            } else if (foto) {
+                const fotoEsc = foto.replace(/'/g, "\\'");
+                return `<span class="tabla-avatar" style="cursor:zoom-in;" onclick="abrirFotoDirecta('${fotoEsc}','${nombreEsc}')"><img src="${foto}" alt="${nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\\'tabla-avatar-initials\\\'>${getIniciales(nombre)}</span>';"></span>`;
+            } else {
+                return `<span class="tabla-avatar"><span class="tabla-avatar-initials">${getIniciales(nombre)}</span></span>`;
+            }
         }
 
         if (mode === 'foto') {
@@ -3895,7 +3981,7 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
             rows += `<tr class="${clase}">
                 <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed ?? '—'}</small></td>
                 <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
-                <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'modal')}<strong>${r.nombre}</strong></div></td>
+                <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'delEstud')}<strong>${r.nombre}</strong></div></td>
                 <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
                 <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
                 <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
@@ -3910,7 +3996,7 @@ function renderizarTablaOtras(rol, estudDatos, profDatos) {
             rows += `<tr class="${clase}" style="opacity:.88;">
                 <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed ?? '—'}</small></td>
                 <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
-                <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
+                <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'delProf')}<strong>${r.nombre}</strong></div></td>
                 <td></td>
                 <td><span class="rol-tag">${r.rol || '—'}</span></td>
                 <td style="color:var(--text-muted);font-size:13px;text-align:center;">—</td>
@@ -4004,10 +4090,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
             rows += `<tr class="${claseDeleg}">
                     <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cnt}</td>
-                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true,
-                        r.medalla === 'participante' && !(window._estudiantesTodos||[]).find(e=>e.nombre===r.nombre)
-                            ? 'foto' : 'modal'
-                    )}<strong>${r.nombre}</strong></div></td>
+                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'delEstud')}<strong>${r.nombre}</strong></div></td>
                     <td><span class="prov-badge" data-prov="${PROVINCIAS[r.prov] || ''}">${r.prov || '—'}</span></td>
                     <td><span class="badge badge-${r.medalla}"><span class="badge-dot dot-${r.medalla}"></span>${medallaLabel[r.medalla]}</span></td>
                     <td style="color:var(--text-muted);font-size:13px;text-align:center;">${r.rank ?? '—'}</td>
@@ -4023,7 +4106,7 @@ function renderizarTablaTodos(estudDatos, profDatos) {
             rows += `<tr class="${claseDeleg}">
                     <td><strong>${r.año}</strong><br><small style="color:var(--text-muted);font-size:11px;">Ed.${r.ed}</small></td>
                     <td style="color:var(--text-muted);font-size:13px;">${cntP}</td>
-                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'profesor')}<strong>${r.nombre}</strong></div></td>
+                    <td><div class="estudiante-cell">${avatarHTML(r.nombre, true, 'delProf')}<strong>${r.nombre}</strong></div></td>
                     <td></td>
                     <td><span class="rol-tag">${r.rol || '—'}</span></td>
                     <td></td>
