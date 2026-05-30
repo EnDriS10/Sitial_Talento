@@ -2639,16 +2639,58 @@ async function cargarCNQData() {
     try {
         const resp = await fetch('Data/CNQ_data.html');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const html = await resp.text();
-        const doc  = new DOMParser().parseFromString(html, 'text/html');
-        const s    = doc.getElementById('cnq-data');
-        if (!s) throw new Error('No se encontró #cnq-data');
-        // Execute the script to populate datosCNQ etc.
-        const se = document.createElement('script');
-        se.textContent = s.textContent;
-        document.head.appendChild(se);
+        const text = await resp.text();
+
+        // ── 1. Extraer datosCNQ ──────────────────────────────────
+        // Busca el bloque: const datosCNQ = [ ... ];
+        // Usamos un enfoque de conteo de corchetes para capturar el array completo
+        const arrStart = text.indexOf('const datosCNQ = [');
+        if (arrStart === -1) throw new Error('No se encontró datosCNQ en CNQ_data.html');
+
+        let depth = 0, i = text.indexOf('[', arrStart), start = i;
+        for (; i < text.length; i++) {
+            if (text[i] === '[') depth++;
+            else if (text[i] === ']') { depth--; if (depth === 0) break; }
+        }
+        const arrStr = text.slice(start, i + 1);
+
+        // Convertir JS object literal a JSON válido:
+        // 1) quitar comentarios de línea (//.*)
+        // 2) quitar trailing commas antes de ] o }
+        // 3) convertir claves sin comillas a "clave":
+        const jsonStr = arrStr
+            .replace(/\/\/[^\n]*/g, '')                         // quitar comentarios
+            .replace(/,(\s*[\]\}])/g, '$1')                     // trailing commas
+            .replace(/([{,]\s*)([a-záéíóúüñA-ZÁÉÍÓÚÜÑ_]\w*)(\s*:)/g, '$1"$2"$3'); // claves sin quotes
+
+        window.datosCNQ = JSON.parse(jsonStr);
+
+        // ── 2. Extraer nombreProvincia ───────────────────────────
+        const provStart = text.indexOf('const nombreProvincia = {');
+        if (provStart !== -1) {
+            let d = 0, j = text.indexOf('{', provStart), ps = j;
+            for (; j < text.length; j++) {
+                if (text[j] === '{') d++;
+                else if (text[j] === '}') { d--; if (d === 0) break; }
+            }
+            const provStr = text.slice(ps, j + 1)
+                .replace(/\/\/[^\n]*/g, '')
+                .replace(/,(\s*[\]\}])/g, '$1')
+                .replace(/([{,]\s*)([A-Za-z_]\w*)(\s*:)/g, '$1"$2"$3');
+            window.nombreProvincia = JSON.parse(provStr);
+        }
+
+        // ── 3. Derivar fotosCNQPorNombre y añosCNQ ──────────────
+        window.fotosCNQPorNombre = {};
+        window.datosCNQ.forEach(r => {
+            if (r.foto && !window.fotosCNQPorNombre[r.nombre])
+                window.fotosCNQPorNombre[r.nombre] = r.foto;
+        });
+        window.añosCNQ = [...new Set(window.datosCNQ.map(r => r.año))].sort((a, b) => b - a);
+
+        console.log(`CNQ: ${window.datosCNQ.length} registros, ${window.añosCNQ.length} ediciones cargadas.`);
     } catch(err) {
-        console.warn('CNQ_data.html no encontrado:', err.message);
+        console.error('Error cargando CNQ_data.html:', err.message);
     }
 }
 
@@ -2912,16 +2954,25 @@ async function _cnqFilesForYear(año) {
     const day1_12 = isCommonDay1 ? commonDay1
         : await _cnqFirstExists(_cnqVariants(`${base}Day1_12grade_${l}`));
 
+    // Day2: intentar por grado primero; si ninguno existe buscar Day2_exam unificado
+    const day2_10_sep = await _cnqFirstExists(_cnqVariants(`${base}Day2_10grade_${l}`));
+    const day2_11_sep = await _cnqFirstExists(_cnqVariants(`${base}Day2_11grade_${l}`));
+    const day2_12_sep = await _cnqFirstExists(_cnqVariants(`${base}Day2_12grade_${l}`));
+    const day2_unified = (!day2_10_sep && !day2_11_sep && !day2_12_sep)
+        ? await _cnqFirstExists(_cnqVariants(`${base}Day2_exam_${l}`))
+        : null;
+
     return {
-        isCommonDay1,                       // bool: si day1 es el examen común
+        isCommonDay1,
+        day2_unified,   // si no-null: un solo archivo para todos los grados en día 2
         prep_prob:  await _cnqFirstExists(_cnqVariants(`${base}Preparatory_Problems_${l}`)),
         prep_sol:   await _cnqFirstExists(_cnqVariants(`${base}Preparatory_Solutions_${l}`)),
         day1_10,
         day1_11,
         day1_12,
-        day2_10:    await _cnqFirstExists(_cnqVariants(`${base}Day2_10grade_${l}`)),
-        day2_11:    await _cnqFirstExists(_cnqVariants(`${base}Day2_11grade_${l}`)),
-        day2_12:    await _cnqFirstExists(_cnqVariants(`${base}Day2_12grade_${l}`)),
+        day2_10: day2_10_sep,
+        day2_11: day2_11_sep,
+        day2_12: day2_12_sep,
         solutions:  await _cnqFirstExists(_cnqVariants(`${base}Solutions_${l}`)),
         results:    await _cnqFirstExists(_cnqVariants(`${base}Results_${l}`)),
     };
@@ -2933,7 +2984,7 @@ async function _cnqYearHasContent(año) {
     const base = _cnqBaseUrl(año);
     const keys = [
         'Preparatory_Problems', 'Day1_common_exam', 'Day1_10grade',
-        'Solutions', 'Results'
+        'Day2_exam', 'Solutions', 'Results'
     ];
     for (const k of keys) {
         for (const ext of ['pdf','docx','doc']) {
@@ -3011,12 +3062,14 @@ async function _renderCNQConcurso() {
     const files = await _cnqFilesForYear(_cnqSelectedYear);
 
     // Título para el Day1 según si es examen común o específico del grado
-    const day1TitleFor = (grade) => {
-        if (files.isCommonDay1) {
-            return (lang==='es' ? 'Examen Día 1 — Común' : 'Day 1 Exam — Common');
-        }
-        return (lang==='es' ? `Examen Día 1 — ${grade}°` : `Day 1 Exam — ${grade}th`);
-    };
+    const day1TitleFor = (grade) => files.isCommonDay1
+        ? (lang==='es' ? 'Examen Día 1 — Común' : 'Day 1 Exam — Common')
+        : (lang==='es' ? `Examen Día 1 — ${grade}°` : `Day 1 Exam — ${grade}th`);
+
+    // Título para el Day2: si es unificado, indica que contiene todos los grados
+    const day2UnifiedTitle = lang==='es'
+        ? 'Examen Día 2 — Todos los grados'
+        : 'Day 2 Exam — All grades';
 
     let candidates = [];
     if (_cnqSelectedCat === 'preparatorio') {
@@ -3027,17 +3080,23 @@ async function _renderCNQConcurso() {
     } else if (_cnqSelectedCat === '10') {
         candidates = [
             { file: files.day1_10, title: day1TitleFor(10), badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_10, title: (lang==='es'?'Examen Día 2 — 10°':'Day 2 Exam — 10th'), badge: lang==='es'?'Día 2':'Day 2' },
+            files.day2_unified
+                ? { file: files.day2_unified, title: day2UnifiedTitle, badge: lang==='es'?'Día 2':'Day 2' }
+                : { file: files.day2_10, title: (lang==='es'?'Examen Día 2 — 10°':'Day 2 Exam — 10th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === '11') {
         candidates = [
             { file: files.day1_11, title: day1TitleFor(11), badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_11, title: (lang==='es'?'Examen Día 2 — 11°':'Day 2 Exam — 11th'), badge: lang==='es'?'Día 2':'Day 2' },
+            files.day2_unified
+                ? { file: files.day2_unified, title: day2UnifiedTitle, badge: lang==='es'?'Día 2':'Day 2' }
+                : { file: files.day2_11, title: (lang==='es'?'Examen Día 2 — 11°':'Day 2 Exam — 11th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === '12') {
         candidates = [
             { file: files.day1_12, title: day1TitleFor(12), badge: lang==='es'?'Día 1':'Day 1' },
-            { file: files.day2_12, title: (lang==='es'?'Examen Día 2 — 12°':'Day 2 Exam — 12th'), badge: lang==='es'?'Día 2':'Day 2' },
+            files.day2_unified
+                ? { file: files.day2_unified, title: day2UnifiedTitle, badge: lang==='es'?'Día 2':'Day 2' }
+                : { file: files.day2_12, title: (lang==='es'?'Examen Día 2 — 12°':'Day 2 Exam — 12th'), badge: lang==='es'?'Día 2':'Day 2' },
         ];
     } else if (_cnqSelectedCat === 'soluciones') {
         candidates = [
