@@ -615,6 +615,153 @@
         .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
         .footer-links a { font-size: 13px; font-weight: 500; }
 
+        /* ═══════════════════════════════════════════
+           CNQ — OLIMPIADA CUBANA DE QUÍMICA
+        ═══════════════════════════════════════════ */
+        #cnq-gateway { animation: fadeIn .3s ease; }
+        .cnq-gate-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 8px;
+        }
+        .cnq-gate-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .22s, box-shadow .22s, border-color .22s;
+            box-shadow: 0 2px 18px rgba(4,18,43,.07);
+            position: relative;
+            overflow: hidden;
+        }
+        .cnq-gate-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(26,111,181,.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .cnq-gate-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(4,18,43,.15);
+            border-color: var(--accent);
+        }
+        .cnq-gate-card:active { transform: scale(.97); }
+        .cnq-gate-icon { font-size: 52px; display: block; margin-bottom: 18px; line-height: 1; filter: drop-shadow(0 4px 10px rgba(4,18,43,.12)); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+        .cnq-gate-card:hover .cnq-gate-icon { transform: scale(1.1) translateY(-4px); }
+        .cnq-gate-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .cnq-gate-card p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+
+        /* PDF Viewer Area */
+        .cnq-pdf-block {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 14px rgba(4,18,43,.06);
+        }
+        .cnq-pdf-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--navy);
+            color: #fff;
+        }
+        .cnq-pdf-header-icon { font-size: 20px; }
+        .cnq-pdf-header-title { font-weight: 600; font-size: 14px; flex: 1; }
+        .cnq-pdf-header-badge {
+            font-size: 11px;
+            background: rgba(255,255,255,.15);
+            padding: 3px 10px;
+            border-radius: 12px;
+            letter-spacing: .5px;
+        }
+        .cnq-pdf-actions {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .cnq-pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .18s;
+            text-decoration: none;
+        }
+        .cnq-pdf-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(26,111,181,.06); }
+        .cnq-pdf-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+        .cnq-pdf-btn.primary:hover { background: var(--navy-light); border-color: var(--navy-light); color: #fff; }
+        .cnq-pdf-embed-wrap { position: relative; width: 100%; height: 0; padding-bottom: 75%; background: #f8f9ff; }
+        .cnq-pdf-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+        .cnq-pdf-fallback {
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .cnq-pdf-fallback a { color: var(--accent); font-weight: 600; text-decoration: none; }
+        .cnq-pdf-fallback a:hover { text-decoration: underline; }
+        .cnq-not-available {
+            padding: 48px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 15px;
+            background: var(--card-bg);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+        }
+
+        /* Grade badge */
+        .cnq-grado-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(26,111,181,.12);
+            color: var(--accent);
+        }
+        .cnq-psn-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #0e6640;
+            background: rgba(22,160,100,.12);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        [data-theme="dark"] .cnq-gate-card { background: var(--card-bg); }
+        [data-theme="dark"] .cnq-gate-card h3 { color: var(--navy); }
+        [data-theme="dark"] .cnq-pdf-actions,
+        [data-theme="dark"] .cnq-pdf-btn { background: var(--card-bg); color: var(--text); }
+        [data-theme="dark"] .cnq-pdf-embed-wrap { background: #1a2030; }
+
+        @media (max-width: 640px) {
+            .cnq-gate-cards { grid-template-columns: 1fr; gap: 14px; }
+            .cnq-gate-card { padding: 26px 18px 22px; }
+            .cnq-gate-icon { font-size: 40px; }
+            .cnq-pdf-embed-wrap { padding-bottom: 100%; }
+        }
+
         /* ── Dark mode topbar ── */
         [data-theme="dark"] #topbar-hamburger { background: #10161e; }
 
@@ -1689,6 +1836,7 @@
     <button class="menu-item activo" id="menu-btn-inicio" onclick="cambiarSeccion('inicio')">🏠 <span data-i18n="nav.home">Inicio</span></button>
     <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span data-i18n="nav.eventos">Historial por Eventos</span></button>
     <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span data-i18n="nav.sitial">Historial por Medallas</span></button>
+    <button class="menu-item" id="menu-btn-cnq" onclick="cambiarSeccion('cnq')">🧪 <span data-i18n="nav.cnq">Olimpiada Cubana de Química</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
     <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span data-i18n="nav.contacto">Enlaces y Contacto</span></button>
@@ -1711,6 +1859,11 @@
                 <span class="inicio-card-icon">🏅</span>
                 <h3 data-i18n="nav.sitial">Historial por Medallas</h3>
                 <p data-i18n="home.card.sitial">Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química</p>
+            </div>
+            <div class="inicio-card" onclick="cambiarSeccion('cnq')">
+                <span class="inicio-card-icon">🧪</span>
+                <h3 data-i18n="nav.cnq">Olimpiada Cubana de Química</h3>
+                <p data-i18n="home.card.cnq">Rankings y exámenes del Concurso Nacional de Química — décimo, onceno y duodécimo grado</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('honor')">
                 <span class="inicio-card-icon">🎓</span>
@@ -1848,6 +2001,122 @@
             </div>
         </div>
     </div>
+
+    <div id="cnq" class="seccion">
+
+        <!-- ══ CNQ GATEWAY ══ -->
+        <div id="cnq-gateway">
+            <h2 class="section-title" id="cnq-section-title" data-i18n="cnq.title">Olimpiada Cubana de Química</h2>
+            <p class="section-sub" id="cnq-section-sub" data-i18n="cnq.sub">Concurso Nacional de Química · Cuba — décimo, onceno y duodécimo grado</p>
+            <p class="section-sub" style="font-size:13px; margin-top:-18px; margin-bottom:28px;" id="cnq-note" data-i18n="cnq.note">¹ Resultados de las últimas ediciones del Concurso Nacional de Química (CNQ) disponibles a partir de 2017.</p>
+
+            <div class="cnq-gate-cards">
+                <div class="cnq-gate-card" id="cnq-btn-ranking" onclick="mostrarSubseccionCNQ('ranking')">
+                    <span class="cnq-gate-icon">🏆</span>
+                    <h3 id="cnq-btn-ranking-title" data-i18n="cnq.btn.ranking">Ranking de Resultados</h3>
+                    <p id="cnq-btn-ranking-desc" data-i18n="cnq.btn.ranking.desc">Tabla completa de medallistas y puntajes por grado y año</p>
+                </div>
+                <div class="cnq-gate-card" id="cnq-btn-concurso" onclick="mostrarSubseccionCNQ('concurso')">
+                    <span class="cnq-gate-icon">📄</span>
+                    <h3 id="cnq-btn-concurso-title" data-i18n="cnq.btn.concurso">Concurso Nacional</h3>
+                    <p id="cnq-btn-concurso-desc" data-i18n="cnq.btn.concurso.desc">Exámenes, soluciones y resultados oficiales por edición</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ RANKING VIEW ══ -->
+        <div id="cnq-ranking-view" style="display:none;">
+            <div class="honor-back-header">
+                <button class="honor-back-btn" onclick="volverAlGatewayCNQ()">← <span data-i18n="honor.back2">Volver</span></button>
+                <h3 id="cnq-ranking-view-title" data-i18n="cnq.ranking.title">Ranking — Concurso Nacional de Química</h3>
+            </div>
+
+            <!-- Filtros de grado y año -->
+            <div class="controles-evento" style="margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                <label><strong id="cnq-lbl-grado" data-i18n="cnq.label.grade">Grado:</strong></label>
+                <select class="custom-select" id="cnq-selector-grado" onchange="renderCNQRanking()">
+                    <option value="todos" data-i18n-opt="cnq.grade.all">Todos</option>
+                    <option value="décimo" data-i18n-opt="cnq.grade.10">Décimo</option>
+                    <option value="onceno" data-i18n-opt="cnq.grade.11">Onceno</option>
+                    <option value="duodécimo" data-i18n-opt="cnq.grade.12">Duodécimo</option>
+                </select>
+                <label><strong id="cnq-lbl-año" data-i18n="cnq.label.year">Año:</strong></label>
+                <select class="custom-select" id="cnq-selector-año" onchange="renderCNQRanking()">
+                    <option value="todos" data-i18n-opt="cnq.year.all">Todos</option>
+                </select>
+                <div class="sort-controls" style="margin-left:auto;">
+                    <span class="sort-label" id="cnq-sort-label" data-i18n="eventos.sort">Ordenar:</span>
+                    <button class="sort-btn activo" id="cnq-sort-rank" onclick="cnqOrdenar('rank', this)"><span data-i18n="cnq.sort.rank">Rank</span> <span class="sort-icon">↑</span></button>
+                    <button class="sort-btn" id="cnq-sort-pts" onclick="cnqOrdenar('pts', this)"><span data-i18n="cnq.sort.pts">Puntaje</span> <span class="sort-icon">↕</span></button>
+                    <button class="sort-btn" id="cnq-sort-nombre" onclick="cnqOrdenar('nombre', this)"><span data-i18n="eventos.sort.name">Nombre</span> <span class="sort-icon">↕</span></button>
+                </div>
+            </div>
+
+            <div class="tabla-wrapper">
+                <table id="cnq-tabla">
+                    <thead>
+                        <tr id="cnq-tabla-thead">
+                            <th>Año</th>
+                            <th>N°</th>
+                            <th id="cnq-th-student">Estudiante</th>
+                            <th id="cnq-th-grade">Grado</th>
+                            <th id="cnq-th-province">Provincia</th>
+                            <th id="cnq-th-school">Escuela</th>
+                            <th id="cnq-th-pts">Puntos</th>
+                            <th id="cnq-th-medal">Medalla</th>
+                            <th id="cnq-th-psn">PSN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cnq-tabla-body"></tbody>
+                </table>
+                <div class="tabla-footer">
+                    <span id="cnq-tabla-count">— resultados</span>
+                    <span style="font-size:11px;" id="cnq-tabla-fuente">Fuente: Comité Científico CNQ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ CONCURSO VIEW ══ -->
+        <div id="cnq-concurso-view" style="display:none;">
+            <div class="honor-back-header">
+                <button class="honor-back-btn" onclick="volverAlGatewayCNQ()">← <span data-i18n="honor.back2">Volver</span></button>
+                <h3 id="cnq-concurso-view-title" data-i18n="cnq.concurso.title">Concurso Nacional — Exámenes y Soluciones</h3>
+            </div>
+
+            <!-- Selector de año -->
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:28px; flex-wrap:wrap;">
+                <label><strong id="cnq-concurso-lbl-año" data-i18n="cnq.label.edition">Edición:</strong></label>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;" id="cnq-concurso-años-btns"></div>
+                <!-- Source link -->
+                <a id="cnq-source-link" href="#" target="_blank" rel="noopener" style="margin-left:auto; font-size:13px; color:var(--accent); font-weight:600; text-decoration:none; display:flex; align-items:center; gap:5px;">
+                    <span id="cnq-source-link-text" data-i18n="cnq.source.link">🔗 Ver fuente original →</span>
+                </a>
+            </div>
+
+            <!-- Botones de categoría -->
+            <div style="display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap;" id="cnq-cat-btns">
+                <button class="filtro-btn cnq-cat-btn activo" data-cat="preparatorio" onclick="cnqSeleccionarCat('preparatorio', this)">
+                    📘 <span data-i18n="cnq.cat.prep">Problemas Preparatorios</span>
+                </button>
+                <button class="filtro-btn cnq-cat-btn" data-cat="10" onclick="cnqSeleccionarCat('10', this)">
+                    🔟 <span data-i18n="cnq.cat.10">10° Grado</span>
+                </button>
+                <button class="filtro-btn cnq-cat-btn" data-cat="11" onclick="cnqSeleccionarCat('11', this)">
+                    1️⃣1️⃣ <span data-i18n="cnq.cat.11">11° Grado</span>
+                </button>
+                <button class="filtro-btn cnq-cat-btn" data-cat="12" onclick="cnqSeleccionarCat('12', this)">
+                    1️⃣2️⃣ <span data-i18n="cnq.cat.12">12° Grado</span>
+                </button>
+                <button class="filtro-btn cnq-cat-btn" data-cat="soluciones" onclick="cnqSeleccionarCat('soluciones', this)">
+                    ✅ <span data-i18n="cnq.cat.sol">Soluciones y Resultados</span>
+                </button>
+            </div>
+
+            <!-- Área de PDFs -->
+            <div id="cnq-pdf-area"></div>
+        </div>
+
+    </div><!-- /#cnq -->
 
     <div id="honor" class="seccion">
 
@@ -2357,6 +2626,394 @@ function cerrarArticulo() {
 </script>
 <script>
 // ════════════════════════════════════════════════════
+// OLIMPIADA CUBANA DE QUÍMICA (CNQ)
+// ════════════════════════════════════════════════════
+
+// ── Datos CNQ (cargados desde Data/CNQ_data.html) ──
+window.datosCNQ          = [];
+window.añosCNQ           = [];
+window.nombreProvincia   = {};
+window.fotosCNQPorNombre = {};
+
+async function cargarCNQData() {
+    try {
+        const resp = await fetch('Data/CNQ_data.html');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const html = await resp.text();
+        const doc  = new DOMParser().parseFromString(html, 'text/html');
+        const s    = doc.getElementById('cnq-data');
+        if (!s) throw new Error('No se encontró #cnq-data');
+        // Execute the script to populate datosCNQ etc.
+        const se = document.createElement('script');
+        se.textContent = s.textContent;
+        document.head.appendChild(se);
+    } catch(err) {
+        console.warn('CNQ_data.html no encontrado:', err.message);
+    }
+}
+
+// ─── Gate navigation ───────────────────────────────
+function mostrarSubseccionCNQ(sub) {
+    document.getElementById('cnq-gateway').style.display    = 'none';
+    document.getElementById('cnq-ranking-view').style.display  = 'none';
+    document.getElementById('cnq-concurso-view').style.display = 'none';
+
+    if (sub === 'ranking') {
+        document.getElementById('cnq-ranking-view').style.display = 'block';
+        _inicializarSelectorAñosCNQ();
+        renderCNQRanking();
+    } else if (sub === 'concurso') {
+        document.getElementById('cnq-concurso-view').style.display = 'block';
+        _inicializarBotonesAñosConcurso();
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function volverAlGatewayCNQ() {
+    document.getElementById('cnq-gateway').style.display    = '';
+    document.getElementById('cnq-ranking-view').style.display  = 'none';
+    document.getElementById('cnq-concurso-view').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Ranking ───────────────────────────────────────
+let _cnqSortCampo = 'rank';
+let _cnqSortDir   = 1;
+
+function cnqOrdenar(campo, btn) {
+    if (_cnqSortCampo === campo) {
+        _cnqSortDir = -_cnqSortDir;
+    } else {
+        _cnqSortCampo = campo;
+        _cnqSortDir = 1;
+    }
+    document.querySelectorAll('[id^="cnq-sort-"]').forEach(b => b.classList.remove('activo'));
+    if (btn) btn.classList.add('activo');
+    renderCNQRanking();
+}
+
+function _inicializarSelectorAñosCNQ() {
+    const sel = document.getElementById('cnq-selector-año');
+    if (!sel) return;
+    const años = window.añosCNQ && window.añosCNQ.length
+        ? window.añosCNQ
+        : [...new Set((window.datosCNQ || []).map(r => r.año))].sort((a,b)=>b-a);
+    // Clear old options keeping first "Todos"
+    while (sel.options.length > 1) sel.remove(1);
+    años.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        sel.appendChild(opt);
+    });
+}
+
+function renderCNQRanking() {
+    const datos  = window.datosCNQ || [];
+    if (!datos.length) return;
+
+    const grado  = document.getElementById('cnq-selector-grado')?.value || 'todos';
+    const año    = document.getElementById('cnq-selector-año')?.value   || 'todos';
+
+    let filtrados = datos.filter(r => {
+        const okG = (grado === 'todos') || (r.grado === grado);
+        const okA = (año === 'todos')   || (String(r.año) === String(año));
+        return okG && okA;
+    });
+
+    // Sort
+    filtrados = [...filtrados].sort((a, b) => {
+        if (_cnqSortCampo === 'rank') {
+            const diff = (a.rank - b.rank) || (b.año - a.año);
+            return diff * _cnqSortDir;
+        }
+        if (_cnqSortCampo === 'pts')  return ((b.pts - a.pts) || (a.rank - b.rank)) * _cnqSortDir;
+        if (_cnqSortCampo === 'nombre') return (a.nombre || '').localeCompare(b.nombre || '') * _cnqSortDir;
+        return 0;
+    });
+
+    const prov = window.nombreProvincia || {};
+    const lang = window._lang || 'es';
+    const gradoLabel = {
+        'décimo':    lang==='en' ? '10th' : 'Décimo',
+        'onceno':    lang==='en' ? '11th' : 'Onceno',
+        'duodécimo': lang==='en' ? '12th' : 'Duodécimo',
+        'noveno':    lang==='en' ? '9th'  : 'Noveno',
+    };
+
+    const tbody = document.getElementById('cnq-tabla-body');
+    if (!tbody) return;
+
+    // Update table headers
+    const thStudent = document.getElementById('cnq-th-student');
+    if (thStudent) thStudent.textContent = T('th.student');
+    const thGrade = document.getElementById('cnq-th-grade');
+    if (thGrade) thGrade.textContent = T('cnq.th.grade');
+    const thProv = document.getElementById('cnq-th-province');
+    if (thProv) thProv.textContent = T('th.province');
+    const thSchool = document.getElementById('cnq-th-school');
+    if (thSchool) thSchool.textContent = T('cnq.th.school');
+    const thPts = document.getElementById('cnq-th-pts');
+    if (thPts) thPts.textContent = T('cnq.th.pts');
+    const thMedal = document.getElementById('cnq-th-medal');
+    if (thMedal) thMedal.textContent = T('th.medal');
+    const thPSN = document.getElementById('cnq-th-psn');
+    if (thPSN) thPSN.textContent = T('cnq.th.psn');
+
+    // Alternating row color by year+grade group
+    const grupos = [];
+    let prevKey = null, grupoIdx = 0;
+
+    tbody.innerHTML = filtrados.map((r, i) => {
+        const key = r.año + '|' + r.grado;
+        if (key !== prevKey) { grupoIdx++; prevKey = key; }
+        const clsPar = grupoIdx % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
+
+        const provNombre = prov[r.prov] || r.prov || '';
+        const foto  = (window.fotosCNQPorNombre || {})[r.nombre];
+        const nombreEsc = r.nombre.replace(/'/g, "\\'");
+
+        // Avatar (clickable if foto)
+        let avatarHTML;
+        if (foto) {
+            avatarHTML = `<span class="tabla-avatar" style="cursor:zoom-in;" onclick="abrirFotoDirecta('${foto.replace(/'/g,"\\'")}','${nombreEsc}')"><img src="${foto}" alt="${r.nombre}" onerror="this.parentElement.style.cursor='default';this.parentElement.onclick=null;this.parentElement.innerHTML='<span class=\\'tabla-avatar-initials\\'>${getIniciales(r.nombre)}</span>';"></span>`;
+        } else {
+            avatarHTML = `<span class="tabla-avatar" style="cursor:default;"><span class="tabla-avatar-initials">${getIniciales(r.nombre)}</span></span>`;
+        }
+
+        const medallaClass = {oro:'badge-oro', plata:'badge-plata', bronce:'badge-bronce', mencion:'badge-mencion'}[r.medalla] || 'badge-participante';
+        const medallaText  = T('medal.'+r.medalla) || r.medalla;
+        const medallaEmoji_= {oro:'🥇',plata:'🥈',bronce:'🥉',mencion:'🎖'}[r.medalla] || '';
+        const dotClass = {oro:'dot-oro',plata:'dot-plata',bronce:'dot-bronce',mencion:'dot-mencion'}[r.medalla] || 'dot-participante';
+
+        const gradoStr = gradoLabel[r.grado] || r.grado;
+
+        const psnHTML = r.psn
+            ? `<span class="cnq-psn-badge">✓ PSN</span>`
+            : `<span style="color:var(--text-muted);font-size:12px;">—</span>`;
+
+        return `<tr class="${clsPar}">
+            <td style="font-weight:600;white-space:nowrap;">${r.año}</td>
+            <td style="text-align:center;font-size:12px;color:var(--text-muted);">${r.rank}</td>
+            <td><div class="estudiante-cell">${avatarHTML}<span>${r.nombre}</span></div></td>
+            <td><span class="cnq-grado-badge">${gradoStr}</span></td>
+            <td><span class="prov-badge" data-prov="${provNombre}" title="${provNombre}">${r.prov}</span></td>
+            <td style="font-size:12px;color:var(--text-muted);">${r.escuela || '—'}</td>
+            <td style="font-weight:700;text-align:center;">${r.pts}</td>
+            <td><span class="badge ${medallaClass}"><span class="badge-dot ${dotClass}"></span>${medallaEmoji_} ${medallaText}</span></td>
+            <td style="text-align:center;">${psnHTML}</td>
+        </tr>`;
+    }).join('');
+
+    const count = document.getElementById('cnq-tabla-count');
+    if (count) count.textContent = filtrados.length + (filtrados.length === 1 ? T('tabla.results.one') : T('tabla.results.many'));
+}
+
+// ─── Concurso Nacional ──────────────────────────────
+// File structure: Assets/CNQ/{año}/Day1_common_exam_{lang}.pdf, etc.
+// lang: ES (español) or EN (inglés)
+const _cnqYearsAvailable = [2017,2018,2019,2020,2021,2022,2023,2024,2025];
+let _cnqSelectedYear     = 2025;
+let _cnqSelectedCat      = 'preparatorio';
+
+function _getLang() {
+    return (window._lang || 'es') === 'es' ? 'ES' : 'EN';
+}
+
+function _cnqBaseUrl(año) {
+    return `Assets/CNQ/${año}/`;
+}
+
+function _cnqFiles(año) {
+    const l = _getLang();
+    const base = _cnqBaseUrl(año);
+    return {
+        prep_prob: `${base}Preparatory_Problems_${l}.pdf`,
+        prep_sol:  `${base}Preparatory_Solutions_${l}.pdf`,
+        day1:      `${base}Day1_common_exam_${l}.pdf`,
+        day2_10:   `${base}Day2_10grade_${l}.pdf`,
+        day2_11:   `${base}Day2_11grade_${l}.pdf`,
+        day2_12:   `${base}Day2_12grade_${l}.pdf`,
+        solutions: `${base}Solutions_${l}.pdf`,
+        results:   `${base}Results_${l}.pdf`,
+        enlace:    `${base}enlace.txt`,
+    };
+}
+
+function _inicializarBotonesAñosConcurso() {
+    const container = document.getElementById('cnq-concurso-años-btns');
+    if (!container) return;
+    container.innerHTML = _cnqYearsAvailable.map(a =>
+        `<button class="filtro-btn${a === _cnqSelectedYear ? ' activo' : ''}" onclick="cnqSeleccionarAño(${a}, this)">${a}</button>`
+    ).join('');
+    _cargarFuenteEnlace(_cnqSelectedYear);
+    _renderCNQConcurso();
+}
+
+function cnqSeleccionarAño(año, btn) {
+    _cnqSelectedYear = año;
+    document.querySelectorAll('#cnq-concurso-años-btns .filtro-btn').forEach(b => b.classList.remove('activo'));
+    if (btn) btn.classList.add('activo');
+    _cargarFuenteEnlace(año);
+    _renderCNQConcurso();
+}
+
+async function _cargarFuenteEnlace(año) {
+    const enlaceEl = document.getElementById('cnq-source-link');
+    if (!enlaceEl) return;
+    try {
+        const resp = await fetch(_cnqBaseUrl(año) + 'enlace.txt');
+        if (!resp.ok) throw new Error();
+        const url = (await resp.text()).trim();
+        enlaceEl.href = url;
+        enlaceEl.style.display = 'flex';
+    } catch(e) {
+        enlaceEl.href = '#';
+        enlaceEl.style.display = 'none';
+    }
+}
+
+function cnqSeleccionarCat(cat, btn) {
+    _cnqSelectedCat = cat;
+    document.querySelectorAll('.cnq-cat-btn').forEach(b => b.classList.remove('activo'));
+    if (btn) btn.classList.add('activo');
+    _renderCNQConcurso();
+}
+
+function _renderCNQConcurso() {
+    const area = document.getElementById('cnq-pdf-area');
+    if (!area) return;
+    const files = _cnqFiles(_cnqSelectedYear);
+    const lang  = window._lang || 'es';
+
+    let pdfItems = [];
+
+    if (_cnqSelectedCat === 'preparatorio') {
+        pdfItems = [
+            { file: files.prep_prob, title: T('cnq.pdf.prep.prob'), badge: lang==='es'?'ES':'EN' },
+            { file: files.prep_sol,  title: T('cnq.pdf.prep.sol'),  badge: lang==='es'?'ES':'EN', optional: true },
+        ];
+    } else if (_cnqSelectedCat === '10') {
+        pdfItems = [
+            { file: files.day1,   title: T('cnq.pdf.day1'),           badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_10, title: T('cnq.pdf.day2') + ' — 10°', badge: lang==='es'?'Día 2':'Day 2' },
+        ];
+    } else if (_cnqSelectedCat === '11') {
+        pdfItems = [
+            { file: files.day1,   title: T('cnq.pdf.day1'),           badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_11, title: T('cnq.pdf.day2') + ' — 11°', badge: lang==='es'?'Día 2':'Day 2' },
+        ];
+    } else if (_cnqSelectedCat === '12') {
+        pdfItems = [
+            { file: files.day1,   title: T('cnq.pdf.day1'),           badge: lang==='es'?'Día 1':'Day 1' },
+            { file: files.day2_12, title: T('cnq.pdf.day2') + ' — 12°', badge: lang==='es'?'Día 2':'Day 2' },
+        ];
+    } else if (_cnqSelectedCat === 'soluciones') {
+        pdfItems = [
+            { file: files.solutions, title: T('cnq.pdf.solutions'), badge: lang==='es'?'Soluciones':'Solutions' },
+            { file: files.results,   title: T('cnq.pdf.results'),   badge: lang==='es'?'Resultados':'Results' },
+        ];
+    }
+
+    area.innerHTML = pdfItems.map(item => _cnqPdfBlock(item)).join('');
+}
+
+function _cnqPdfBlock({ file, title, badge, optional }) {
+    const downloadUrl = file;
+    const viewerUrl = `https://docs.google.com/viewerng/viewer?url=${encodeURIComponent(location.origin + '/' + file)}&embedded=true`;
+    const fallbackMsg = optional
+        ? `<div class="cnq-pdf-fallback">📄 ${T('cnq.pdf.nofile')}</div>`
+        : `<div class="cnq-pdf-fallback">📄 ${T('cnq.pdf.nofile')} <a href="${downloadUrl}" target="_blank" rel="noopener">${T('cnq.pdf.download')}</a></div>`;
+
+    return `<div class="cnq-pdf-block">
+        <div class="cnq-pdf-header">
+            <span class="cnq-pdf-header-icon">📄</span>
+            <span class="cnq-pdf-header-title">${title} — ${_cnqSelectedYear}</span>
+            <span class="cnq-pdf-header-badge">${badge}</span>
+        </div>
+        <div class="cnq-pdf-actions">
+            <a class="cnq-pdf-btn primary" href="${downloadUrl}" download target="_blank" rel="noopener">
+                ${T('cnq.pdf.download')} PDF
+            </a>
+            <button class="cnq-pdf-btn" onclick="_cnqTogglePreview(this, '${file.replace(/'/g,"\\'")}')">
+                ${T('cnq.pdf.preview')}
+            </button>
+        </div>
+        <div class="cnq-pdf-preview-area" data-file="${file}" style="display:none;"></div>
+    </div>`;
+}
+
+function _cnqTogglePreview(btn, file) {
+    const block = btn.closest('.cnq-pdf-block');
+    const area  = block.querySelector('.cnq-pdf-preview-area');
+    if (!area) return;
+    const visible = area.style.display !== 'none';
+    if (visible) {
+        area.style.display = 'none';
+        area.innerHTML = '';
+        btn.textContent = T('cnq.pdf.preview');
+    } else {
+        area.style.display = 'block';
+        btn.textContent = '▲ ' + (window._lang === 'es' ? 'Ocultar' : 'Hide');
+        // Try direct embed; fallback to Google Viewer
+        area.innerHTML = `<div class="cnq-pdf-embed-wrap">
+            <iframe src="${file}" onload="_cnqIframeOk(this)" onerror="_cnqIframeFail(this, '${file.replace(/'/g,"\\'")}')"></iframe>
+        </div>`;
+    }
+}
+
+function _cnqIframeOk(iframe) {
+    // Check if it loaded content (can't know cross-origin, so we just leave it)
+}
+
+function _cnqIframeFail(iframe, file) {
+    // Fall back to Google Docs viewer
+    const wrap = iframe.closest('.cnq-pdf-embed-wrap');
+    if (wrap) {
+        const viewer = `https://docs.google.com/viewerng/viewer?url=${encodeURIComponent(location.origin + '/' + file)}&embedded=true`;
+        wrap.innerHTML = `<iframe src="${viewer}"></iframe>`;
+    }
+}
+
+// ─── i18n refresh for CNQ ──────────────────────────
+function _refreshCNQ() {
+    // Update grade selector labels
+    const gradeSel = document.getElementById('cnq-selector-grado');
+    if (gradeSel) {
+        const map = { todos: T('cnq.grade.all'), 'décimo': T('cnq.grade.10'), 'onceno': T('cnq.grade.11'), 'duodécimo': T('cnq.grade.12') };
+        Array.from(gradeSel.options).forEach(opt => {
+            if (map[opt.value]) opt.textContent = map[opt.value];
+        });
+    }
+    const yearSel = document.getElementById('cnq-selector-año');
+    if (yearSel) {
+        const firstOpt = yearSel.querySelector('option[value="todos"]');
+        if (firstOpt) firstOpt.textContent = T('cnq.year.all');
+    }
+    // Update cat buttons text
+    document.querySelectorAll('.cnq-cat-btn').forEach(btn => {
+        const cat = btn.dataset.cat;
+        const span = btn.querySelector('[data-i18n]');
+        if (span) {
+            const key = span.getAttribute('data-i18n');
+            span.textContent = T(key);
+        }
+    });
+    // If concurso view is open, re-render PDFs to update language
+    const cv = document.getElementById('cnq-concurso-view');
+    if (cv && cv.style.display !== 'none') {
+        _cargarFuenteEnlace(_cnqSelectedYear);
+        _renderCNQConcurso();
+    }
+    // If ranking view is open, re-render
+    const rv = document.getElementById('cnq-ranking-view');
+    if (rv && rv.style.display !== 'none') {
+        renderCNQRanking();
+    }
+}
+</script>
+<script>
+// ════════════════════════════════════════════════════
 // CARGA ASÍNCRONA DE BASE DE DATOS DESDE olympiad_data.html
 // ════════════════════════════════════════════════════
 // Los datos viven en olympiad_data.html en la misma carpeta del repositorio.
@@ -2428,7 +3085,7 @@ const _origInit = () => {
     const seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    const secciones = ['inicio','sitial','eventos','honor','noticias'];
+    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias'];
     if (seccionGuardada && secciones.includes(seccionGuardada) && seccionGuardada !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
         const secEl = document.getElementById(seccionGuardada);
@@ -2453,6 +3110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarDatosOlimpiadas();
     await cargarProfesoresData();
     await cargarHonorData();
+    await cargarCNQData();
     _origInit();
 });
 
@@ -3247,6 +3905,10 @@ function cambiarSeccion(p) {
         // Stats & data for new section
         if (p === 'sitial' || p === 'honor' || p === 'noticias' || p === 'inicio') statsParaSitial();
         else if (p === 'eventos') { statsParaEvento(); cargarTabla(); }
+        // Al entrar a CNQ, mostrar siempre el gateway
+        if (p === 'cnq') {
+            volverAlGatewayCNQ();
+        }
         // Al entrar a Honor, mostrar siempre el gateway
         if (p === 'honor') {
             const gateway  = document.getElementById('honor-gateway');
@@ -3788,6 +4450,49 @@ const _i18n = {
         'nav.honor':                'Honor a quien Honor Merece',
         'nav.noticias':             'Noticias y Entrevistas',
         'nav.contacto':             'Enlaces y Contacto',
+        // CNQ
+        'nav.cnq':                  'Olimpiada Cubana de Química',
+        'cnq.title':                'Olimpiada Cubana de Química',
+        'cnq.sub':                  'Concurso Nacional de Química · Cuba — décimo, onceno y duodécimo grado',
+        'cnq.note':                 '¹ Resultados de las últimas ediciones del Concurso Nacional de Química (CNQ) disponibles a partir de 2017.',
+        'cnq.btn.ranking':          'Ranking de Resultados',
+        'cnq.btn.ranking.desc':     'Tabla completa de medallistas y puntajes por grado y año',
+        'cnq.btn.concurso':         'Concurso Nacional',
+        'cnq.btn.concurso.desc':    'Exámenes, soluciones y resultados oficiales por edición',
+        'cnq.ranking.title':        'Ranking — Concurso Nacional de Química',
+        'cnq.concurso.title':       'Concurso Nacional — Exámenes y Soluciones',
+        'cnq.label.grade':          'Grado:',
+        'cnq.label.year':           'Año:',
+        'cnq.label.edition':        'Edición:',
+        'cnq.grade.all':            'Todos',
+        'cnq.grade.10':             'Décimo',
+        'cnq.grade.11':             'Onceno',
+        'cnq.grade.12':             'Duodécimo',
+        'cnq.year.all':             'Todos',
+        'cnq.sort.rank':            'Rank',
+        'cnq.sort.pts':             'Puntaje',
+        'cnq.cat.prep':             'Problemas Preparatorios',
+        'cnq.cat.10':               '10° Grado',
+        'cnq.cat.11':               '11° Grado',
+        'cnq.cat.12':               '12° Grado',
+        'cnq.cat.sol':              'Soluciones y Resultados',
+        'cnq.source.link':          '🔗 Ver fuente original →',
+        'cnq.pdf.prep.prob':        'Problemas Preparatorios',
+        'cnq.pdf.prep.sol':         'Soluciones Preparatorias',
+        'cnq.pdf.day1':             'Examen Día 1 (Común)',
+        'cnq.pdf.day2':             'Examen Día 2',
+        'cnq.pdf.solutions':        'Soluciones Generales',
+        'cnq.pdf.results':          'Resultados',
+        'cnq.pdf.download':         '⬇ Descargar',
+        'cnq.pdf.preview':          '👁 Previsualizar',
+        'cnq.pdf.nofile':           'Archivo no disponible para esta edición.',
+        'cnq.psn':                  'Preselección',
+        'cnq.th.grade':             'Grado',
+        'cnq.th.school':            'Escuela',
+        'cnq.th.pts':               'Puntos',
+        'cnq.th.psn':               'PSN',
+        'home.card.cnq':            'Rankings y exámenes del Concurso Nacional de Química — décimo, onceno y duodécimo grado',
+        'honor.back2':              'Volver',
         // Stats bar
         'stats.participations':     'Participaciones',
         'stats.students':           'Estudiantes',
@@ -3920,6 +4625,49 @@ const _i18n = {
         'nav.honor':                'Hall of Fame',
         'nav.noticias':             'News & Interviews',
         'nav.contacto':             'Links & Contact',
+        // CNQ
+        'nav.cnq':                  'Cuban Chemistry Olympiad',
+        'cnq.title':                'Cuban Chemistry Olympiad',
+        'cnq.sub':                  'National Chemistry Contest · Cuba — 10th, 11th and 12th grade',
+        'cnq.note':                 '¹ Results from the most recent editions of the Cuban National Chemistry Contest (CNQ) available from 2017 onward.',
+        'cnq.btn.ranking':          'Results Ranking',
+        'cnq.btn.ranking.desc':     'Full table of medal winners and scores by grade and year',
+        'cnq.btn.concurso':         'National Contest',
+        'cnq.btn.concurso.desc':    'Exams, solutions and official results by edition',
+        'cnq.ranking.title':        'Ranking — Cuban National Chemistry Contest',
+        'cnq.concurso.title':       'National Contest — Exams & Solutions',
+        'cnq.label.grade':          'Grade:',
+        'cnq.label.year':           'Year:',
+        'cnq.label.edition':        'Edition:',
+        'cnq.grade.all':            'All',
+        'cnq.grade.10':             '10th',
+        'cnq.grade.11':             '11th',
+        'cnq.grade.12':             '12th',
+        'cnq.year.all':             'All',
+        'cnq.sort.rank':            'Rank',
+        'cnq.sort.pts':             'Score',
+        'cnq.cat.prep':             'Preparatory Problems',
+        'cnq.cat.10':               '10th Grade',
+        'cnq.cat.11':               '11th Grade',
+        'cnq.cat.12':               '12th Grade',
+        'cnq.cat.sol':              'Solutions & Results',
+        'cnq.source.link':          '🔗 View original source →',
+        'cnq.pdf.prep.prob':        'Preparatory Problems',
+        'cnq.pdf.prep.sol':         'Preparatory Solutions',
+        'cnq.pdf.day1':             'Day 1 Exam (Common)',
+        'cnq.pdf.day2':             'Day 2 Exam',
+        'cnq.pdf.solutions':        'General Solutions',
+        'cnq.pdf.results':          'Results',
+        'cnq.pdf.download':         '⬇ Download',
+        'cnq.pdf.preview':          '👁 Preview',
+        'cnq.pdf.nofile':           'File not available for this edition.',
+        'cnq.psn':                  'National Pre-selection',
+        'cnq.th.grade':             'Grade',
+        'cnq.th.school':            'School',
+        'cnq.th.pts':               'Score',
+        'cnq.th.psn':               'PSN',
+        'home.card.cnq':            'Rankings and exams from the Cuban National Chemistry Contest — 10th, 11th and 12th grade',
+        'honor.back2':              'Back',
         'stats.participations':     'Participations',
         'stats.students':           'Students',
         'stats.gold':               'Gold 🥇',
@@ -4170,6 +4918,9 @@ function _refreshDynamic() {
             ? String(d.Entrenador) === '1' : String(d.Entrenador) === '0');
         renderHonorGrid(filtered);
     }
+
+    // CNQ section refresh
+    if (typeof _refreshCNQ === 'function') _refreshCNQ();
 }
 
 function _setTextById(id, txt) {
@@ -4223,6 +4974,8 @@ function toggleLang() {
                 renderHonorGrid(filtered);
             }
         });
+        // Refresh CNQ section if open
+        if (typeof _refreshCNQ === 'function') _refreshCNQ();
     }
 }
 
@@ -4235,6 +4988,7 @@ const _bcKeys = {
     inicio:   null,
     eventos:  'nav.eventos',
     sitial:   'nav.sitial',
+    cnq:      'nav.cnq',
     honor:    'nav.honor',
     noticias: 'nav.noticias',
     contacto: 'nav.contacto',
