@@ -2607,8 +2607,11 @@ async function cargarHonorData() {
                 nombre:    d.nombreArticulo,
                 contenido: generarContenidoArticulo(d)
             };
-            // Mapa nombreArticulo → id para abrir artículos desde cualquier tabla
+            // Mapa nombre → id: indexar por nombreArticulo (para profesores en professor_data)
+            // y también por nombre (para estudiantes en sitial)
             if (d.nombreArticulo) window.articulosPorNombre[d.nombreArticulo.trim()] = d.id;
+            if (d.nombre && d.nombre.trim() !== (d.nombreArticulo || '').trim())
+                window.articulosPorNombre[d.nombre.trim()] = d.id;
         });
 
         // Actualizar contadores del gateway
