@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="cnq-data">
+
+// ════════════════════════════════════════════════════
+// CNQ — Concurso Nacional de Química de Cuba
+// ════════════════════════════════════════════════════
+// Campos:
+//   año     : edición del concurso
+//   grado   : "décimo" | "onceno" | "duodécimo" | "noveno"
+//   nombre  : nombre completo del participante
+//   prov    : código de provincia
+//   escuela : nombre del IPVCE / IPU
+//   pts     : puntuación obtenida
+//   medalla : "oro" | "plata" | "bronce" | "mencion"
+//   psn     : true si obtuvo Preselección Nacional
+//   rank    : posición dentro de su grado en ese año (1 = mejor puntaje)
+//   foto    : URL de foto
+// ════════════════════════════════════════════════════
+
+const datosCNQ = [
+
+    // ──────────────────────────────────────────────────
+    // 2025 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2025, grado: "décimo",    nombre: "Nathán David Rivadeneira Martínez",         prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  54, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2025, grado: "décimo",    nombre: "Adolfo Jorge Díaz Morgado",                 prov: "CA", escuela: "IPU Pedro Valdivia",                 pts:  53, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2025, grado: "décimo",    nombre: "Miguel Antonio Ortega Rodríguez",           prov: "PR", escuela: "IPVCE Federico Engels",              pts:  41, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2025, grado: "décimo",    nombre: "Melany González González",                  prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  39, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2025, grado: "décimo",    nombre: "Diana Cirelli Sánchez",                     prov: "LH", escuela: "IPU Saúl Delgado",                   pts:  37, medalla: "oro",    psn: true,  rank:  5 },
+    { año: 2025, grado: "décimo",    nombre: "Roynel Pacheco Hernández",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  35, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2025, grado: "décimo",    nombre: "Diego Ernesto Figueredo Hernández",         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  35, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2025, grado: "décimo",    nombre: "Andy Enrique Rodríguez Concepción",         prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  33, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2025, grado: "décimo",    nombre: "Leoanny Dorgis Morales La Villa",           prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  31, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2025, grado: "décimo",    nombre: "Roxana Beatriz Miranda Lavin",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  30, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2025, grado: "décimo",    nombre: "Sofía Alvarez Barrios",                     prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "Melissa de los Ángeles Negrín Fernández",   prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "José Julián Díaz Chirino",                  prov: "PR", escuela: "IPVCE Federico Engels",              pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "Dóminic Domenech de la Cruz",               prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "Hebe Adriana Betancourt Vera",              prov: "HO", escuela: "IPVCE José Martí Pérez",             pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "Diana Laura Landrove Mayo",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  28, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "décimo",    nombre: "Rodrigo Pino Perdomo",                      prov: "CF", escuela: "IPVCE Carlos Roloff",                pts:  23, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2025, grado: "décimo",    nombre: "Lyannis Lozada Diéguez",                    prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  23, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2025, grado: "décimo",    nombre: "Kenia Mary García Gutiérrez",               prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts:  21, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2025, grado: "décimo",    nombre: "Katherine Yordy Díaz",                      prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  20, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2025, grado: "décimo",    nombre: "Brianna de la Caridad Sarmiento Columbié",  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts:  20, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2025, grado: "décimo",    nombre: "Mary Karla Caraballo Rodríguez",            prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts:  19, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2025, grado: "décimo",    nombre: "Anahí Alejandra Olalla Veliz",              prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  17, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2025, grado: "décimo",    nombre: "Marcos Ernesto Sánchez Alcolea",            prov: "HO", escuela: "IPVCE José Martí Pérez",             pts:  17, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2025, grado: "décimo",    nombre: "Jorge Luis Sánchez Sánchez",                prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts:  17, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2025, grado: "décimo",    nombre: "Ángel Ernesto Rodríguez Camejo",            prov: "PR", escuela: "IPVCE Federico Engels",              pts:  16, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2025, grado: "décimo",    nombre: "Alejandro Díaz Gutierrez",                  prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts:  16, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2025, grado: "décimo",    nombre: "Yennifer Karla Ramos Palacio",              prov: "SC", escuela: "IPU Rafael María de Mendive",        pts:  16, medalla: "bronce", psn: false, rank: 26 },
+
+    // ──────────────────────────────────────────────────
+    // 2025 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2025, grado: "onceno",    nombre: "Ernesto Alejandro Barrera Ramírez",         prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  88, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/u8A8ELp.png" },
+    { año: 2025, grado: "onceno",    nombre: "Leticia María Merlo Alfonso",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  81, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/YPY8dOY.png" },
+    { año: 2025, grado: "onceno",    nombre: "Lauren García Ferreira",                    prov: "MT", escuela: "IPVCE Carlos Marx",                  pts:  59, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2025, grado: "onceno",    nombre: "Alejandro Murad Alcina Salazar",            prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  58, medalla: "oro",    psn: true,  rank:  4, foto: "https://i.imgur.com/r1nKRLO.png" },
+    { año: 2025, grado: "onceno",    nombre: "Carlos Daniel Asin López",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  56, medalla: "oro",    psn: true,  rank:  5 },
+    { año: 2025, grado: "onceno",    nombre: "Bárbaro Eriel Rodríguez Gil",               prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  56, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/OkSdhzZ.png" },
+    { año: 2025, grado: "onceno",    nombre: "Carlos Manuel Hernández Machín",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  46, medalla: "plata",  psn: true,  rank:  7, foto: "https://i.imgur.com/VmT7du4.png" },
+    { año: 2025, grado: "onceno",    nombre: "Jennifer González González",                prov: "SC", escuela: "IPU Rafael María de Mendive",        pts:  45, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2025, grado: "onceno",    nombre: "Jennifer García González",                  prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  44, medalla: "plata",  psn: true,  rank:  9, foto: "https://i.imgur.com/G1vNHoE.png" },
+    { año: 2025, grado: "onceno",    nombre: "Claudia Maria Ruiz Galvez",                 prov: "PR", escuela: "IPVCE Federico Engels",              pts:  37, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2025, grado: "onceno",    nombre: "Marcos Montes de Oca Mangas",               prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  37, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2025, grado: "onceno",    nombre: "Christopher Vásquez Ponce de León",         prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  37, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2025, grado: "onceno",    nombre: "Brayan Tejeda Marrero",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  37, medalla: "plata",  psn: true,  rank: 10, foto: "https://i.imgur.com/pMlRC8I.png" },
+    { año: 2025, grado: "onceno",    nombre: "Nairelis Lorena González Pérez",            prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  32, medalla: "plata",  psn: false, rank: 14 },
+    { año: 2025, grado: "onceno",    nombre: "Camila Alejandra Santiesteban Ramírez",     prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  32, medalla: "plata",  psn: false, rank: 14 },
+    { año: 2025, grado: "onceno",    nombre: "Lianet de la Caridad Borroto Fernández",    prov: "PR", escuela: "IPVCE Federico Engels",              pts:  28, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2025, grado: "onceno",    nombre: "Mariana Ramos Martínez",                    prov: "PR", escuela: "IPVCE Federico Engels",              pts:  28, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2025, grado: "onceno",    nombre: "Rosalía del Cármen González Magaña",        prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  27, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2025, grado: "onceno",    nombre: "Alex Daniel López Álvarez",                 prov: "GR", escuela: "IPU Julio Antonio Mella",            pts:  26, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2025, grado: "onceno",    nombre: "Carolina Machado Reyes",                    prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  26, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2025, grado: "onceno",    nombre: "Christopher Naite Romero",                  prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts:  24, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2025, grado: "onceno",    nombre: "Susnheri Cruz Toledo",                      prov: "MY", escuela: "IPVCE Félix Varela y Morales",       pts:  24, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2025, grado: "onceno",    nombre: "Byan Alejandro Piedra Santana",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  24, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2025, grado: "onceno",    nombre: "Daniel Alejandro La O Valdés",              prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  20, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2025, grado: "onceno",    nombre: "Abraham González Blanco",                   prov: "LH", escuela: "IPU Lázaro Peña",                    pts:  20, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2025, grado: "onceno",    nombre: "César Camilo Chacón Carballido",            prov: "HO", escuela: "IPVCE José Martí Pérez",             pts:  20, medalla: "bronce", psn: false, rank: 24 },
+
+    // ──────────────────────────────────────────────────
+    // 2025 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2025, grado: "duodécimo", nombre: "Juan Carlos Yepe Muñiz",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  90, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/wKFCREW.png" },
+    { año: 2025, grado: "duodécimo", nombre: "Osmani Lázaro Hernández Fiallo",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  82, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/GEXpJTK.png" },
+    { año: 2025, grado: "duodécimo", nombre: "Marco Antonio Asin López",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  74, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/xlmBneM.jpeg" },
+    { año: 2025, grado: "duodécimo", nombre: "Roy Roger González Faxas",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  72, medalla: "oro",    psn: true,  rank:  4, foto: "https://i.imgur.com/TH8Tpzh.png" },
+    { año: 2025, grado: "duodécimo", nombre: "Melissa María Reyes Pérez",                 prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  67, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/V3W9HBw.png" },
+    { año: 2025, grado: "duodécimo", nombre: "Britany Fonseca Castillo",                  prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts:  63, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2025, grado: "duodécimo", nombre: "Brenda Fonseca Castillo",                   prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts:  58, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2025, grado: "duodécimo", nombre: "Pedro Alexis Rodríguez Ferrer",             prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  57, medalla: "plata",  psn: true,  rank:  8, foto: "https://i.imgur.com/a7WVV84.png" },
+    { año: 2025, grado: "duodécimo", nombre: "Cynthia Maria Rodríguez Pérez",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  52, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2025, grado: "duodécimo", nombre: "Amanda Fuentes Sánchez",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  42, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2025, grado: "duodécimo", nombre: "Gabriela Guevara Rodríguez",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  41, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2025, grado: "duodécimo", nombre: "Renny Alejandro Beltrán Dávila",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts:  38, medalla: "plata",  psn: true,  rank: 12 },
+    { año: 2025, grado: "duodécimo", nombre: "Yotuels Sierra Gálvez",                     prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts:  38, medalla: "plata",  psn: true,  rank: 12 },
+    { año: 2025, grado: "duodécimo", nombre: "Diego Loiré Morales Báez",                  prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  34, medalla: "plata",  psn: true,  rank: 14 },
+    { año: 2025, grado: "duodécimo", nombre: "Victor Eduardo Granado Oduardo",            prov: "MT", escuela: "IPVCE Carlos Marx",                  pts:  30, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2025, grado: "duodécimo", nombre: "Karen Marrero Aguiar",                      prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  29, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2025, grado: "duodécimo", nombre: "Hany Garcés Rueda",                         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  29, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2025, grado: "duodécimo", nombre: "Liusmar Borroto Milanés",                   prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  27, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2025, grado: "duodécimo", nombre: "Julio Casí León",                           prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  26, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2025, grado: "duodécimo", nombre: "Samantha Morales Céspedes",                 prov: "HO", escuela: "IPVCE José Martí Pérez",             pts:  26, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2025, grado: "duodécimo", nombre: "Dayan González Delgado",                    prov: "MY", escuela: "IPVCE Félix Varela y Morales",       pts:  24, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2025, grado: "duodécimo", nombre: "Luis Ángel Sánchez Castro",                 prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  23, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2025, grado: "duodécimo", nombre: "Beatriz Medina García",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  21, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2025, grado: "duodécimo", nombre: "Yairel Felipe Fernández",                   prov: "LH", escuela: "Colegio Universidad de La Habana",   pts:  21, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2025, grado: "duodécimo", nombre: "Efrendy Frontela Esquivel",                 prov: "PR", escuela: "IPVCE Federico Engels",              pts:  20, medalla: "bronce", psn: false, rank: 25 },
+    { año: 2025, grado: "duodécimo", nombre: "María Karla Pérez Matos",                   prov: "GT", escuela: "IPVCE Antonio Maceo Grajales",       pts:  18, medalla: "bronce", psn: false, rank: 26 },
+
+    // ──────────────────────────────────────────────────
+    // 2025 — Noveno grado (invitados)
+    // ──────────────────────────────────────────────────
+    { año: 2025, grado: "noveno",    nombre: "Cristhian Alejandro Olivera Torres",        prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts:  41, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2025, grado: "noveno",    nombre: "Amanda Lisbeth Vargas Mustelier",           prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  27, medalla: "plata",  psn: false, rank:  2 },
+    { año: 2025, grado: "noveno",    nombre: "José Gabriel Loria Hernández",              prov: "PR", escuela: "IPVCE Federico Engels",              pts:  22, medalla: "plata",  psn: false, rank:  3 },
+    { año: 2025, grado: "noveno",    nombre: "Cristian Nápoles Viñas",                    prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts:  20, medalla: "plata",  psn: false, rank:  4 },
+    { año: 2025, grado: "noveno",    nombre: "Ernesto Martín Izquierdo",                  prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts:  18, medalla: "bronce", psn: false, rank:  5 },
+    { año: 2025, grado: "noveno",    nombre: "Jhon Luis Vaquero Carballido",              prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  17, medalla: "bronce", psn: false, rank:  6 },
+    { año: 2025, grado: "noveno",    nombre: "Wilfredo Carrera Ramos",                    prov: "PR", escuela: "IPVCE Federico Engels",              pts:  15, medalla: "bronce", psn: false, rank:  7 },
+    { año: 2025, grado: "noveno",    nombre: "Javier Ernesto Hernández Pérez",            prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts:  12, medalla: "bronce", psn: false, rank:  8 },
+    { año: 2025, grado: "noveno",    nombre: "Kamila Fernández Urquiza",                  prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts:  12, medalla: "bronce", psn: false, rank:  8 },
+
+    // ──────────────────────────────────────────────────
+    // 2024 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2024, grado: "décimo",    nombre: "Ernesto Alejandro Barrera Ramírez",         prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 80.5, medalla: "oro",    psn: false, rank:  1, foto: "https://i.imgur.com/u8A8ELp.png" },
+    { año: 2024, grado: "décimo",    nombre: "Leticia María Merlo Alfonso",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 71.0, medalla: "oro",    psn: false, rank:  2, foto: "https://i.imgur.com/YPY8dOY.png" },
+    { año: 2024, grado: "décimo",    nombre: "Lauren García Ferreira",                    prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 69.8, medalla: "oro",    psn: false, rank:  3 },
+    { año: 2024, grado: "décimo",    nombre: "Carlos Daniel Asin López",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 65.1, medalla: "oro",    psn: false, rank:  4 },
+    { año: 2024, grado: "décimo",    nombre: "Jennifer García González",                  prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 63.6, medalla: "oro",    psn: false, rank:  5, foto: "https://i.imgur.com/G1vNHoE.png" },
+    { año: 2024, grado: "décimo",    nombre: "Bárbaro Eriel Rodríguez Gil",               prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 59.4, medalla: "oro",    psn: false, rank:  6, foto: "https://i.imgur.com/OkSdhzZ.png" },
+    { año: 2024, grado: "décimo",    nombre: "Carlos Manuel Hernández Machín",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 53.3, medalla: "plata",  psn: false, rank:  7, foto: "https://i.imgur.com/VmT7du4.png" },
+    { año: 2024, grado: "décimo",    nombre: "Brayan Tejeda Marrero",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 51.8, medalla: "plata",  psn: false, rank:  8, foto: "https://i.imgur.com/pMlRC8I.png" },
+    { año: 2024, grado: "décimo",    nombre: "Camila Alejandra Santiesteban Ramírez",     prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 48.8, medalla: "plata",  psn: false, rank:  9 },
+    { año: 2024, grado: "décimo",    nombre: "Byan Alejandro Piedra Santana",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 47.9, medalla: "plata",  psn: false, rank: 10 },
+    { año: 2024, grado: "décimo",    nombre: "Jennifer González González",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 47.8, medalla: "plata",  psn: false, rank: 11 },
+    { año: 2024, grado: "décimo",    nombre: "Claudia María Ruiz Gálvez",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 46.1, medalla: "plata",  psn: false, rank: 12 },
+    { año: 2024, grado: "décimo",    nombre: "Carolina Machado Reyes",                    prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 45.6, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2024, grado: "décimo",    nombre: "Alejandro Murad Alcina Salazar",            prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 41.3, medalla: "bronce", psn: false, rank: 14, foto: "https://i.imgur.com/r1nKRLO.png" },
+    { año: 2024, grado: "décimo",    nombre: "Nairelis Lorena González Pérez",            prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 39.5, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2024, grado: "décimo",    nombre: "Nathalié Rábago Brito",                     prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 39.0, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2024, grado: "décimo",    nombre: "Patricia González de la Cruz",              prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 38.4, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2024, grado: "décimo",    nombre: "Rosalía del Carmen González Magaña",        prov: "LH", escuela: "IPU Mártires 12 de Septiembre",      pts: 37.8, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2024, grado: "décimo",    nombre: "Mariana Ramos Martínez",                    prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 37.3, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2024, grado: "décimo",    nombre: "Daniela Morán Pupo",                        prov: "PR", escuela: "IPVCE Federico Engels",              pts: 34.8, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2024, grado: "décimo",    nombre: "Juan Alejandro Alfonso Rodríguez",          prov: "HO", escuela: "IPVCE José Martí",                   pts: 33.3, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2024, grado: "décimo",    nombre: "María Karla Prieto Marrero",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 32.9, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2024, grado: "décimo",    nombre: "Lianet de la Caridad Borroto Fernández",    prov: "PR", escuela: "IPVCE Federico Engels",              pts: 32.3, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2024, grado: "décimo",    nombre: "Ángel Luis González Lascano",               prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 32.1, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2024, grado: "décimo",    nombre: "Ener Méndez Rodríguez",                     prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 29.8, medalla: "mencion", psn: false, rank: 25 },
+    { año: 2024, grado: "décimo",    nombre: "Nalva Dalay Galano Antunes",                prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 28.9, medalla: "mencion", psn: false, rank: 26 },
+    { año: 2024, grado: "décimo",    nombre: "Jazmín Herrera Mejías",                     prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 28.6, medalla: "mencion", psn: false, rank: 27 },
+    { año: 2024, grado: "décimo",    nombre: "David Aguirre Pasarín",                     prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 28.1, medalla: "mencion", psn: false, rank: 28 },
+    { año: 2024, grado: "décimo",    nombre: "Alex Daniel López Álvarez",                 prov: "GR", escuela: "IPU Julio Antonio Mella",            pts: 27.6, medalla: "mencion", psn: false, rank: 29 },
+    { año: 2024, grado: "décimo",    nombre: "Cristopher Naite Romero",                   prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 26.8, medalla: "mencion", psn: false, rank: 30 },
+    { año: 2024, grado: "décimo",    nombre: "Addison Pérez Brito",                       prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 26.1, medalla: "mencion", psn: false, rank: 31 },
+    { año: 2024, grado: "décimo",    nombre: "Dainet Rondón Álvarez",                     prov: "HO", escuela: "IPVCE José Martí",                   pts: 23.6, medalla: "mencion", psn: false, rank: 32 },
+
+    // ──────────────────────────────────────────────────
+    // 2024 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2024, grado: "onceno",    nombre: "Juan Carlos Yepe Muñiz",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 67.1, medalla: "oro",    psn: false, rank:  1, foto: "https://i.imgur.com/wKFCREW.png" },
+    { año: 2024, grado: "onceno",    nombre: "Marco Antonio Asin López",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 63.6, medalla: "oro",    psn: false, rank:  2, foto: "https://i.imgur.com/xlmBneM.jpeg" },
+    { año: 2024, grado: "onceno",    nombre: "Roy Roger González Faxas",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 55.8, medalla: "oro",    psn: false, rank:  3, foto: "https://i.imgur.com/TH8Tpzh.png" },
+    { año: 2024, grado: "onceno",    nombre: "Osmani Lázaro Hernández Fiallo",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 54.4, medalla: "oro",    psn: false, rank:  4, foto: "https://i.imgur.com/GEXpJTK.png" },
+    { año: 2024, grado: "onceno",    nombre: "Cynthia María Rodríguez Pérez",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 50.2, medalla: "oro",    psn: false, rank:  5 },
+    { año: 2024, grado: "onceno",    nombre: "Pedro Alexis Rodríguez Ferrer",             prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 46.4, medalla: "plata",  psn: false, rank:  6, foto: "https://i.imgur.com/a7WVV84.png" },
+    { año: 2024, grado: "onceno",    nombre: "Melissa Reyes Pérez",                       prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 45.8, medalla: "plata",  psn: false, rank:  7, foto: "https://i.imgur.com/V3W9HBw.png" },
+    { año: 2024, grado: "onceno",    nombre: "Renny Alejandro Beltrán Dávila",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 43.6, medalla: "plata",  psn: false, rank:  8 },
+    { año: 2024, grado: "onceno",    nombre: "Amanda Fuentes Sánchez",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 43.3, medalla: "plata",  psn: false, rank:  9 },
+    { año: 2024, grado: "onceno",    nombre: "Diego Loiré Morales Báez",                  prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 38.5, medalla: "plata",  psn: false, rank: 10 },
+    { año: 2024, grado: "onceno",    nombre: "Hany Garcés Rueda",                         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 37.6, medalla: "plata",  psn: false, rank: 11 },
+    { año: 2024, grado: "onceno",    nombre: "Orlando Mauricio Rodríguez Fuentes",        prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 35.9, medalla: "plata",  psn: false, rank: 12 },
+    { año: 2024, grado: "onceno",    nombre: "Estefanía Delgado Marqués",                 prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 35.0, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2024, grado: "onceno",    nombre: "Yotuels Sierra Gálvez",                     prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 33.0, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2024, grado: "onceno",    nombre: "Gabriela Guevara Rodríguez",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 31.6, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2024, grado: "onceno",    nombre: "Isabela de la Caridad León Causilla",       prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 31.2, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2024, grado: "onceno",    nombre: "Victor Eduardo Granado Oduardo",            prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 30.8, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2024, grado: "onceno",    nombre: "Efrendy Frontela Esquivel",                 prov: "PR", escuela: "IPVCE Federico Engels",              pts: 29.8, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2024, grado: "onceno",    nombre: "Julio de Jesús Casí León",                  prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 28.4, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2024, grado: "onceno",    nombre: "Rosleidy Alvarez Hernández",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 27.5, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2024, grado: "onceno",    nombre: "Jorge Luis Infante Muchuli",                prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 27.5, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2024, grado: "onceno",    nombre: "Beatriz Medina García",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 26.8, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2024, grado: "onceno",    nombre: "Karen Marrero Aguilar",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 25.3, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2024, grado: "onceno",    nombre: "Britany de la Caridad Fonseca Castillo",    prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 22.9, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2024, grado: "onceno",    nombre: "Samantha Morales Céspedes",                 prov: "HO", escuela: "IPVCE José Martí",                   pts: 22.8, medalla: "bronce", psn: false, rank: 25 },
+    { año: 2024, grado: "onceno",    nombre: "Leonardo Garcell Rizo",                     prov: "CA", escuela: "IPVCE Cándido González Morales",     pts: 22.5, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2024, grado: "onceno",    nombre: "Brenda Emelina Fonseca Castillo",           prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 21.9, medalla: "bronce", psn: false, rank: 27 },
+    { año: 2024, grado: "onceno",    nombre: "Amalia Paneque Guilarte",                   prov: "MY", escuela: "EMCC",                               pts: 21.0, medalla: "bronce", psn: false, rank: 28 },
+
+    // ──────────────────────────────────────────────────
+    // 2024 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2024, grado: "duodécimo", nombre: "Hector Manuel Domínguez Pérez",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 80.4, medalla: "oro",    psn: false, rank:  1, foto: "https://i.imgur.com/AsW4kw3.png" },
+    { año: 2024, grado: "duodécimo", nombre: "Mario Luis Pérez Brito",                    prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 61.1, medalla: "oro",    psn: false, rank:  2, foto: "https://i.imgur.com/SbIVid2.png" },
+    { año: 2024, grado: "duodécimo", nombre: "Natalie Meriño González",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 38.9, medalla: "plata",  psn: false, rank:  3 },
+    { año: 2024, grado: "duodécimo", nombre: "Brayan Alberto Barbosa Brito",              prov: "PR", escuela: "IPVCE Federico Engels",              pts: 37.6, medalla: "plata",  psn: false, rank:  4 },
+    { año: 2024, grado: "duodécimo", nombre: "Ernesto Dannyel Santrayll González",        prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 35.7, medalla: "plata",  psn: false, rank:  5 },
+    { año: 2024, grado: "duodécimo", nombre: "Bárbara Lesyani Hernández Paneque",         prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 34.4, medalla: "plata",  psn: false, rank:  6 },
+    { año: 2024, grado: "duodécimo", nombre: "Lorena Tamayo Díaz",                        prov: "HO", escuela: "IPVCE José Martí",                   pts: 31.1, medalla: "plata",  psn: false, rank:  7 },
+    { año: 2024, grado: "duodécimo", nombre: "Hugo Mustelier Soto",                       prov: "UH", escuela: "Colegio Universitario",              pts: 26.5, medalla: "bronce", psn: false, rank:  8 },
+    { año: 2024, grado: "duodécimo", nombre: "Melissa Valledor Rodríguez",                prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 25.6, medalla: "bronce", psn: false, rank:  9 },
+    { año: 2024, grado: "duodécimo", nombre: "Juan Luis Shuet Carrillo",                  prov: "VC", escuela: "Colegio Universitario",              pts: 25.5, medalla: "bronce", psn: false, rank: 10 },
+    { año: 2024, grado: "duodécimo", nombre: "Cristian Alejandro Casañas Rodríguez",      prov: "PR", escuela: "IPVCE Ernesto Che Guevara",          pts: 25.1, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2024, grado: "duodécimo", nombre: "Dairon Mujica Benítez",                     prov: "AR", escuela: "IPVCE Federico Engels",              pts: 25.0, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2024, grado: "duodécimo", nombre: "Samuel Espinosa Hernández",                 prov: "GR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 24.7, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2024, grado: "duodécimo", nombre: "Iván José Lolo Marrero",                    prov: "LH", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 20.7, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2024, grado: "duodécimo", nombre: "Anthony Alvarez Montero",                   prov: "MT", escuela: "IPVCE Vladimir Lenin",               pts: 18.4, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2024, grado: "duodécimo", nombre: "Ernesto Blanco Guerrero",                   prov: "HO", escuela: "IPVCE Carlos Marx",                  pts: 17.4, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2024, grado: "duodécimo", nombre: "Alain David Velázquez Pupo",                prov: "HO", escuela: "IPVCE José Martí",                   pts: 14.9, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2024, grado: "duodécimo", nombre: "Freddy Manuel Batista González",            prov: "CF", escuela: "IPVCE José Martí",                   pts: 13.8, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2024, grado: "duodécimo", nombre: "Rodrigo Boada Salgado",                     prov: "PR", escuela: "IPVCE Carlos Roloff",                pts: 13.8, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2024, grado: "duodécimo", nombre: "Claudia Labrador Toledo",                   prov: "PR", escuela: "IPVCE Federico Engels",              pts: 13.3, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2024, grado: "duodécimo", nombre: "Cristian Miguel Baez Ricardo",              prov: "UH", escuela: "Colegio Universitario",              pts: 12.8, medalla: "bronce", psn: false, rank: 21 },
+
+    // ──────────────────────────────────────────────────
+    // 2024 — Noveno grado (invitados)
+    // ──────────────────────────────────────────────────
+    { año: 2024, grado: "noveno",    nombre: "Nathan David Rivadeneira Martínez",         prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts: 34.0, medalla: "bronce", psn: false, rank:  1 },
+    { año: 2024, grado: "noveno",    nombre: "Diego Ernesto Figueredo Hernández",         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 31.9, medalla: "bronce", psn: false, rank:  2 },
+    { año: 2024, grado: "noveno",    nombre: "Diana Laura Landrove Mayo",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 26.6, medalla: "bronce", psn: false, rank:  3 },
+    { año: 2024, grado: "noveno",    nombre: "Dominic Domenech de La Cruz",               prov: "VC", escuela: "IPVCE Eusebio Olivera",              pts: 25.1, medalla: "bronce", psn: false, rank:  4 },
+    { año: 2024, grado: "noveno",    nombre: "Melissa de los Ángeles Negrín Fernández",   prov: "CM", escuela: "Julio Pino Machado",                 pts: 22.0, medalla: "bronce", psn: false, rank:  5 },
+
+    // ──────────────────────────────────────────────────
+    // 2023 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2023, grado: "décimo",    nombre: "Melissa Reyes Pérez",                       prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 81.4, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/V3W9HBw.png" },
+    { año: 2023, grado: "décimo",    nombre: "Marcos Antonio Asin López",                 prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 79.5, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/xlmBneM.jpeg" },
+    { año: 2023, grado: "décimo",    nombre: "Amanda Fuentes Sánchez",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 74.0, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2023, grado: "décimo",    nombre: "Juan C. Yepe Muñiz",                        prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 71.3, medalla: "oro",    psn: true,  rank:  4, foto: "https://i.imgur.com/wKFCREW.png" },
+    { año: 2023, grado: "décimo",    nombre: "Osmani Lázaro Hernández Fiallo",            prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 69.0, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/GEXpJTK.png" },
+    { año: 2023, grado: "décimo",    nombre: "Cinthia Rodríguez Pérez",                   prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 61.3, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2023, grado: "décimo",    nombre: "Pedro A. Rodríguez Ferrer",                 prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 59.6, medalla: "plata",  psn: true,  rank:  7, foto: "https://i.imgur.com/a7WVV84.png" },
+    { año: 2023, grado: "décimo",    nombre: "Yairel Felipe Fernández",                   prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 59.4, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2023, grado: "décimo",    nombre: "Renny Alejandro Beltrán Davila",            prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 59.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2023, grado: "décimo",    nombre: "Julio de Jesús Casí León",                  prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 57.0, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2023, grado: "décimo",    nombre: "Diego Morales Baez",                        prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 53.6, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2023, grado: "décimo",    nombre: "Manuel A. Montes de Oca Alfonso",           prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 52.8, medalla: "plata",  psn: true,  rank: 12 },
+    { año: 2023, grado: "décimo",    nombre: "Víctor E. Granado Oduardo",                 prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 51.8, medalla: "plata",  psn: true,  rank: 13 },
+    { año: 2023, grado: "décimo",    nombre: "Jorge Luis Infante Muchuli",                prov: "AR", escuela: "IPVCE Mártires de Humbolt 7",        pts: 50.8, medalla: "plata",  psn: true,  rank: 14 },
+    { año: 2023, grado: "décimo",    nombre: "Gabriela Guevara Rodríguez",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 50.8, medalla: "plata",  psn: true,  rank: 14 },
+    { año: 2023, grado: "décimo",    nombre: "Estephanía Delgado Márquez",                prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 48.6, medalla: "plata",  psn: true,  rank: 16 },
+    { año: 2023, grado: "décimo",    nombre: "Karen Marrero Aguiar",                      prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 45.0, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2023, grado: "décimo",    nombre: "Gilberto Capote González",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 44.5, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2023, grado: "décimo",    nombre: "Yonimiler Moreno Garrido",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 43.8, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2023, grado: "décimo",    nombre: "Efrendy Frontela Esquivel",                 prov: "PR", escuela: "IPVCE Federico Engels",              pts: 42.3, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2023, grado: "décimo",    nombre: "Danilo Landrove Mayo",                      prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 42.1, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2023, grado: "décimo",    nombre: "Marcela Trujillo Martin",                   prov: "MT", escuela: "IPU Martín Klein",                   pts: 41.0, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2023, grado: "décimo",    nombre: "Britany Fonseca Castillo",                  prov: "SC", escuela: "IPVCE Antonio Maceo",                pts: 41.0, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2023, grado: "décimo",    nombre: "Luismar Borroto Milanés",                   prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 40.1, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2023, grado: "décimo",    nombre: "Hany Gacés Rueda",                          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 40.1, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2023, grado: "décimo",    nombre: "Mario Cesar Bello Cruz",                    prov: "MT", escuela: "IPU Martín Klein",                   pts: 39.8, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2023, grado: "décimo",    nombre: "Yotuels Sierra Gálvez",                     prov: "GT", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 39.0, medalla: "bronce", psn: false, rank: 27 },
+    { año: 2023, grado: "décimo",    nombre: "Lyan Portal Martínez",                      prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 37.4, medalla: "bronce", psn: false, rank: 28 },
+    { año: 2023, grado: "décimo",    nombre: "Amalia Paneque Guilarte",                   prov: "MY", escuela: "EMCC",                               pts: 36.8, medalla: "bronce", psn: false, rank: 29 },
+    { año: 2023, grado: "décimo",    nombre: "Tiana Reguiferos Despaigne",                prov: "SC", escuela: "IPVCE Antonio Maceo",                pts: 36.5, medalla: "bronce", psn: false, rank: 30 },
+    { año: 2023, grado: "décimo",    nombre: "Enmanuel Ernesto Ochoa Tejera",             prov: "SC", escuela: "IPVCE Antonio Maceo",                pts: 36.4, medalla: "bronce", psn: false, rank: 31 },
+
+    // ──────────────────────────────────────────────────
+    // 2023 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2023, grado: "onceno",    nombre: "Héctor Manuel Domínguez Pérez",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 68.8, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/AsW4kw3.png" },
+    { año: 2023, grado: "onceno",    nombre: "Lianet Leonard García",                     prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 58.8, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2023, grado: "onceno",    nombre: "Natalie Meriño González",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 50.3, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2023, grado: "onceno",    nombre: "Mario Luis Pérez Brito",                    prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 49.3, medalla: "oro",    psn: true,  rank:  4, foto: "https://i.imgur.com/SbIVid2.png" },
+    { año: 2023, grado: "onceno",    nombre: "Bárbara Lesyani Hernández Paneque",         prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 46.3, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2023, grado: "onceno",    nombre: "Dairon Mujica Benítez",                     prov: "PR", escuela: "IPVCE Federico Engels",              pts: 44.4, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2023, grado: "onceno",    nombre: "Melissa Valledor Rodríguez",                prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 38.6, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2023, grado: "onceno",    nombre: "Ernesto Santrayll González",                prov: "SC", escuela: "IPVCE Antonio Maceo",                pts: 30.5, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2023, grado: "onceno",    nombre: "Brayan Alberto Barbosa Brito",              prov: "PR", escuela: "IPVCE Federico Engels",              pts: 30.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2023, grado: "onceno",    nombre: "Cristian Miguel Báez Ricardo",              prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 29.8, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2023, grado: "onceno",    nombre: "Cristian A. Casañas Rodríguez",             prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 26.9, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2023, grado: "onceno",    nombre: "Hugo Mustelier Soto",                       prov: "CA", escuela: "IPVCE Cándido González",             pts: 26.8, medalla: "plata",  psn: true,  rank: 12 },
+    { año: 2023, grado: "onceno",    nombre: "Samuel Espinosa Hernández",                 prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 25.3, medalla: "plata",  psn: true,  rank: 13 },
+    { año: 2023, grado: "onceno",    nombre: "Yamilet Vargas Rodríguez",                  prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 22.9, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2023, grado: "onceno",    nombre: "Jeans C. Figueredo Cruzada",                prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 22.7, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2023, grado: "onceno",    nombre: "Claudia Labrador Toledo",                   prov: "PR", escuela: "IPVCE Federico Engels",              pts: 20.6, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2023, grado: "onceno",    nombre: "Alain David Velázquez Pupo",                prov: "HO", escuela: "IPVCE José Martí",                   pts: 20.3, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2023, grado: "onceno",    nombre: "Antonhy Álvarez Montero",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 18.3, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2023, grado: "onceno",    nombre: "Iván José Lolo Marrero",                    prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 17.5, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2023, grado: "onceno",    nombre: "Lorena Tamayo Díaz",                        prov: "HO", escuela: "IPVCE José Martí",                   pts: 15.8, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2023, grado: "onceno",    nombre: "Freddy M. Batista González",                prov: "HO", escuela: "IPVCE José Martí",                   pts: 15.6, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2023, grado: "onceno",    nombre: "Juan M. Mederos Camejo",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 15.6, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2023, grado: "onceno",    nombre: "Ana Carla Carrión Téllez",                  prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 15.0, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2023, grado: "onceno",    nombre: "Joyce de la Rosa Alfaisie Betharte",        prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 14.3, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2023, grado: "onceno",    nombre: "Eduardo R. Guillama Mena",                  prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 12.9, medalla: "bronce", psn: false, rank: 25 },
+    { año: 2023, grado: "onceno",    nombre: "Teresa Elena Atala Fernández",              prov: "SC", escuela: "IPU Cuqui Bosh",                     pts: 11.5, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2023, grado: "onceno",    nombre: "Ernesto Blanco Guerrero",                   prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 11.4, medalla: "bronce", psn: false, rank: 27 },
+
+    // ──────────────────────────────────────────────────
+    // 2023 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2023, grado: "duodécimo", nombre: "César Endris Acosta Martínez",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 80.3, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/pDUJxyy.png" },
+    { año: 2023, grado: "duodécimo", nombre: "Erick Jordan Valdés Abreu",                 prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 74.5, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/C2Gl4I3.jpeg" },
+    { año: 2023, grado: "duodécimo", nombre: "Royman Ramos Pérez",                        prov: "VC", escuela: "IPU Osvaldo Herrera",                 pts: 66.5, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/a35Z8PJ.png" },
+    { año: 2023, grado: "duodécimo", nombre: "Diego Armando Martínez Ramírez",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 51.5, medalla: "oro",    psn: true,  rank:  4, foto: "https://i.imgur.com/fnAWp0b.png" },
+    { año: 2023, grado: "duodécimo", nombre: "Daniela de la Caridad Piñero Díaz",         prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 35.8, medalla: "oro",    psn: true,  rank:  5 },
+    { año: 2023, grado: "duodécimo", nombre: "Ernesto Alejandro Jorgen Ruz",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 29.0, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2023, grado: "duodécimo", nombre: "Jadiel Bernal Osorio",                      prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 28.0, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2023, grado: "duodécimo", nombre: "Adriana Mercedes Chibas Cuevas",            prov: "CF", escuela: "IPVCE Carlos Roloff",                pts: 21.8, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2023, grado: "duodécimo", nombre: "Amanda Gabriela Garrido Licea",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 20.8, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2023, grado: "duodécimo", nombre: "Kenia López Pérez",                         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 20.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2023, grado: "duodécimo", nombre: "Jaddiel J. Alonso López",                   prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 20.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2023, grado: "duodécimo", nombre: "Walter Ortíz Valdéz",                       prov: "PR", escuela: "IPVCE Federico Engels",              pts: 19.3, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2023, grado: "duodécimo", nombre: "Leynier Ábalos Parrado",                    prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 16.8, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2023, grado: "duodécimo", nombre: "Marco de J. García Marrero",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 15.8, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2023, grado: "duodécimo", nombre: "Elizabeth Ontivero Linares",                prov: "MY", escuela: "IPVCE Amistad Cuba-Suecia",          pts: 12.8, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2023, grado: "duodécimo", nombre: "Breylis Osmar Herrera Gonzalez",            prov: "SC", escuela: "IPU Mario Maceo",                    pts: 12.3, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2023, grado: "duodécimo", nombre: "Jorge Lazaro Martínez Hernández",           prov: "PR", escuela: "IPVCE Federico Engels",              pts: 11.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2023, grado: "duodécimo", nombre: "Katherine de la Caridad Calderon Conde",    prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 10.3, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2023, grado: "duodécimo", nombre: "René Alejandro Rodríguez",                  prov: "MY", escuela: "IPVCE Amistad Cuba-Suecia",          pts: 10.0, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2023, grado: "duodécimo", nombre: "Yorisell Anaya Blanco",                     prov: "MY", escuela: "IPVCE Amistad Cuba-Suecia",          pts:  9.6, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2023, grado: "duodécimo", nombre: "Francisco Beltran Quiala",                  prov: "SC", escuela: "IPU Rafael María de Mendive",        pts:  8.8, medalla: "bronce", psn: false, rank: 21 },
+
+    // ──────────────────────────────────────────────────
+    // 2023 — Noveno grado (invitados)
+    // ──────────────────────────────────────────────────
+    { año: 2023, grado: "noveno",    nombre: "Ernesto Alejandro Barrera Ramírez",         prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts: 71.1, medalla: "oro",    psn: false, rank:  1, foto: "https://i.imgur.com/u8A8ELp.png" },
+    { año: 2023, grado: "noveno",    nombre: "Bárbaro Eriel Rodríguez Gil",               prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 56.0, medalla: "plata",  psn: false, rank:  2, foto: "https://i.imgur.com/OkSdhzZ.png" },
+    { año: 2023, grado: "noveno",    nombre: "Pedro Alejandro Conrado Medinilla",         prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts: 50.9, medalla: "plata",  psn: false, rank:  3 },
+    { año: 2023, grado: "noveno",    nombre: "Carlos Manuel Hernández Machín",            prov: "SS", escuela: "IPVCE Eusebio Olivera",              pts: 49.8, medalla: "plata",  psn: false, rank:  4, foto: "https://i.imgur.com/VmT7du4.png" },
+    { año: 2023, grado: "noveno",    nombre: "Brayan Tejda Marrero",                      prov: "VC", escuela: "Julio Pino Machado",                 pts: 47.3, medalla: "bronce", psn: false, rank:  5, foto: "https://i.imgur.com/pMlRC8I.png" },
+
+    // ──────────────────────────────────────────────────
+    // 2022 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2022, grado: "décimo",    nombre: "Héctor Manuel Domínguez Pérez",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 69.0, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/AsW4kw3.png" },
+    { año: 2022, grado: "décimo",    nombre: "Lianet Leonard García",                     prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 58.3, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2022, grado: "décimo",    nombre: "Massiel de la Fe Rivero",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 48.5, medalla: "plata",  psn: true,  rank:  3 },
+    { año: 2022, grado: "décimo",    nombre: "Alejandro José Pino Miranda",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 47.3, medalla: "plata",  psn: true,  rank:  4 },
+    { año: 2022, grado: "décimo",    nombre: "Natalie Meriño González",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 46.8, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2022, grado: "décimo",    nombre: "Bárbara Lesyani Hernández Paneque",         prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 45.3, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2022, grado: "décimo",    nombre: "Carlos D. Chaviano González",               prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 42.3, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2022, grado: "décimo",    nombre: "Melissa Valledor Rodríguez",                prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 40.0, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2022, grado: "décimo",    nombre: "Cristiam A. Casañas Rodríguez",             prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 38.3, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2022, grado: "décimo",    nombre: "Mario Luis Pérez Brito",                    prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 37.3, medalla: "plata",  psn: true,  rank: 10, foto: "https://i.imgur.com/SbIVid2.png" },
+    { año: 2022, grado: "décimo",    nombre: "Dairon Mujica Benítez",                     prov: "PR", escuela: "IPVCE Federico Engels",              pts: 33.5, medalla: "bronce", psn: true,  rank: 11 },
+    { año: 2022, grado: "décimo",    nombre: "Jéssica Margarita Hernández García",        prov: "MY", escuela: "IPVCE Amistad Cuba Suecia",          pts: 30.0, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2022, grado: "décimo",    nombre: "Ray Daniel Jomarrón Yance",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 29.3, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2022, grado: "décimo",    nombre: "Samuel Espinosa Hernández",                 prov: "AR", escuela: "IPVCE Mártires de Humbolt VII",      pts: 27.5, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2022, grado: "décimo",    nombre: "Eliobel Morell Rodríguez",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 26.3, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2022, grado: "décimo",    nombre: "Iván Lolo Marrero",                         prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 23.8, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2022, grado: "décimo",    nombre: "Brayan Jesús Santos",                       prov: "PR", escuela: "IPVCE Federico Engels",              pts: 21.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2022, grado: "décimo",    nombre: "Claudia Labrador Toledo",                   prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 21.0, medalla: "bronce", psn: false, rank: 18 },
+
+    // ──────────────────────────────────────────────────
+    // 2022 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2022, grado: "onceno",    nombre: "César Endris Acosta Martínez",              prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 62.5, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/pDUJxyy.png" },
+    { año: 2022, grado: "onceno",    nombre: "Royman Ramos Reyes",                        prov: "VC", escuela: "IPU Osvaldo Herrera",                 pts: 59.0, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/a35Z8PJ.png" },
+    { año: 2022, grado: "onceno",    nombre: "Alejandro Daniel Martínez Suffos",          prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 57.0, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2022, grado: "onceno",    nombre: "Lázaro José Lavandeira Hernández",          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 55.5, medalla: "plata",  psn: true,  rank:  4 },
+    { año: 2022, grado: "onceno",    nombre: "Diego Armando Martínez Ramírez",            prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 50.5, medalla: "plata",  psn: true,  rank:  5, foto: "https://i.imgur.com/fnAWp0b.png" },
+    { año: 2022, grado: "onceno",    nombre: "Ernesto Alejandro Jorge Ruz",               prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 47.5, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2022, grado: "onceno",    nombre: "Jadiel Bernal Osorios",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 45.0, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2022, grado: "onceno",    nombre: "Roberto Ramón Beritán",                     prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 44.0, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2022, grado: "onceno",    nombre: "Daniela de la Caridad Piñero Díaz",         prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 40.5, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2022, grado: "onceno",    nombre: "Erik Jordan Valdés Abreu",                  prov: "AR", escuela: "IPVCE Mártires de Humbolt VII",      pts: 35.0, medalla: "bronce", psn: true,  rank: 10, foto: "https://i.imgur.com/C2Gl4I3.jpeg" },
+    { año: 2022, grado: "onceno",    nombre: "Jaddiel José Alonso Pérez",                 prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 34.5, medalla: "bronce", psn: true,  rank: 11 },
+    { año: 2022, grado: "onceno",    nombre: "Leynier Ávalos Parrado",                    prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 32.0, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2022, grado: "onceno",    nombre: "Williams Eddy Ricardo Rodríguez",           prov: "CM", escuela: "IPVCE Máximo Gómez",                 pts: 27.0, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2022, grado: "onceno",    nombre: "Jorge Lázaro Martínez Hernández",           prov: "PR", escuela: "IPVCE Federico Engels",              pts: 27.0, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2022, grado: "onceno",    nombre: "Kenia López Pérez",                         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 26.0, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2022, grado: "onceno",    nombre: "Wartes Ortiz Valdés",                       prov: "PR", escuela: "IPVCE Federico Engels",              pts: 23.5, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2022, grado: "onceno",    nombre: "Amanda Gabriela Garrido Licea",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 21.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2022, grado: "onceno",    nombre: "Elizabeth Ontivero Linares",                prov: "MY", escuela: "IPVCE Amistad Cuba Suecia",          pts: 21.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2022, grado: "onceno",    nombre: "Adriana Mercedes Chibás Cuevas",            prov: "CF", escuela: "IPVCE Carlos Roloff Mialofsky",      pts: 21.0, medalla: "bronce", psn: false, rank: 19 },
+
+    // ──────────────────────────────────────────────────
+    // 2022 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2022, grado: "duodécimo", nombre: "Dahysmer Hernández Ricardo",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 66.3, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/BIkAonq.png" },
+    { año: 2022, grado: "duodécimo", nombre: "Geiler Esteban López Corría",               prov: "LH", escuela: "IPVCE Federico Engels",              pts: 57.0, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/dE7VglW.png" },
+    { año: 2022, grado: "duodécimo", nombre: "Ana Sabrina Salvador Pérez",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 50.5, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/v10MAno.png" },
+    { año: 2022, grado: "duodécimo", nombre: "Brenda María Zayas Hernández",              prov: "SS", escuela: "IPVCE Eusebio Olivera Labra",        pts: 49.5, medalla: "plata",  psn: true,  rank:  4, foto: "https://i.imgur.com/gYcLy7z.png" },
+    { año: 2022, grado: "duodécimo", nombre: "Diego Hernández Barreras",                  prov: "PR", escuela: "IPVCE Federico Engels",              pts: 49.0, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2022, grado: "duodécimo", nombre: "Ariel Espino Martínez",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 48.3, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2022, grado: "duodécimo", nombre: "Daniel Alejandro González Guzmán",          prov: "SC", escuela: "IPU Cuqui Bosh Soto",                pts: 47.8, medalla: "plata",  psn: true,  rank:  7, foto: "https://i.imgur.com/kmf4O27.png" },
+    { año: 2022, grado: "duodécimo", nombre: "Laisset Martínez Domínguez",                prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 43.0, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2022, grado: "duodécimo", nombre: "Yan Carlos Llamarett Gómez",                prov: "UH", escuela: "Colegio Universitario",              pts: 39.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2022, grado: "duodécimo", nombre: "Thalía Rivera Cobas",                       prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 35.0, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2022, grado: "duodécimo", nombre: "Reidel Guerra Cardoso",                     prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 32.5, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2022, grado: "duodécimo", nombre: "Sheylla Legón Guevara",                     prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 29.5, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2022, grado: "duodécimo", nombre: "Eliecer Tejeda González",                   prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 28.5, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2022, grado: "duodécimo", nombre: "Raúl David Jomarrón Yance",                 prov: "UH", escuela: "Colegio Universitario",              pts: 27.0, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2022, grado: "duodécimo", nombre: "Jorge Remón Tur",                           prov: "UH", escuela: "Colegio Universitario",              pts: 20.0, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2022, grado: "duodécimo", nombre: "Yadrián de Jesús Falcón Ramírez",           prov: "UH", escuela: "Colegio Universitario",              pts: 19.0, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2022, grado: "duodécimo", nombre: "Yoselin Almarales Londres",                 prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 16.0, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2022, grado: "duodécimo", nombre: "Emanuel Cepero Machado",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 16.0, medalla: "bronce", psn: false, rank: 17 },
+
+    // ──────────────────────────────────────────────────
+    // 2020 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2020, grado: "décimo",    nombre: "Diego Hernández Barreras",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 89.5, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2020, grado: "décimo",    nombre: "Dahysmer Hernández Ricardo",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 76.5, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/BIkAonq.png" },
+    { año: 2020, grado: "décimo",    nombre: "Brenda M. Zayas Hernández",                 prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 72.3, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/gYcLy7z.png" },
+    { año: 2020, grado: "décimo",    nombre: "Karel Daniel Agüeyes González",             prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 71.8, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2020, grado: "décimo",    nombre: "Daniel A. González Guzmán",                 prov: "SC", escuela: "IPU Cuqui Bocsh Soto",               pts: 70.5, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/kmf4O27.png" },
+    { año: 2020, grado: "décimo",    nombre: "Yordan A. Conde Saucedo",                   prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 59.0, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2020, grado: "décimo",    nombre: "Reidel Guerra Cardoso",                     prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 51.9, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2020, grado: "décimo",    nombre: "Thalía Rivera Cobas",                       prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 48.9, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2020, grado: "décimo",    nombre: "Daniela Hernández Rodríguez",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 48.3, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2020, grado: "décimo",    nombre: "Cristian Adrian Isaac Argote",              prov: "SC", escuela: "IPU Cuqui Bocsh Soto",               pts: 47.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2020, grado: "décimo",    nombre: "Yadrian Falcón Ramírez",                    prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 46.3, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2020, grado: "décimo",    nombre: "Laritza Gómez Vicente",                     prov: "SC", escuela: "IPU Cuqui Bosch Soto",               pts: 45.9, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2020, grado: "décimo",    nombre: "Sheylla Legón Guevara",                     prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 45.8, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2020, grado: "décimo",    nombre: "Geisler Esteban López García",              prov: "PR", escuela: "IPVCE Federico Engels",              pts: 45.3, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2020, grado: "décimo",    nombre: "Ariel Espino Martinez",                     prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 43.8, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2020, grado: "décimo",    nombre: "Randy José Soto de la Cruz",                prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 43.4, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2020, grado: "décimo",    nombre: "Jorge Ramón Tur",                           prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 43.1, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2020, grado: "décimo",    nombre: "Enmanuel Cepero Machado",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 42.3, medalla: "bronce", psn: false, rank: 18 },
+
+    // ──────────────────────────────────────────────────
+    // 2020 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2020, grado: "onceno",    nombre: "Francesco Foroni Valdivia",                 prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 80.0, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2020, grado: "onceno",    nombre: "Anthony Cruz García",                       prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 73.5, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2020, grado: "onceno",    nombre: "Jonathan González García",                  prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 70.5, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2020, grado: "onceno",    nombre: "Nicolàs Antonio García Álvarez",            prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 69.8, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2020, grado: "onceno",    nombre: "Francisco M Moreno Perdomo",                prov: "VC", escuela: "IPU Osvaldo Herrera",                pts: 64.3, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2020, grado: "onceno",    nombre: "Luis Antonio Lorenzo Carballo",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 63.5, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2020, grado: "onceno",    nombre: "Yan Carlos Gutierrez Justiniani",           prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 63.5, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2020, grado: "onceno",    nombre: "José David Valles Desten",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 57.3, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2020, grado: "onceno",    nombre: "Samira de los Ángeles González Castelló",   prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 55.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2020, grado: "onceno",    nombre: "José Alberto Almeida Cabrales",             prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 53.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2020, grado: "onceno",    nombre: "Samira Madai Alfonso Rosa",                 prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 53.0, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2020, grado: "onceno",    nombre: "Laura Beatríz Pérez Zayas",                 prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 51.0, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2020, grado: "onceno",    nombre: "Jesús González Concepción",                 prov: "PR", escuela: "IPVCE Federico Engels",              pts: 51.0, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2020, grado: "onceno",    nombre: "Antonio Sánchez Diaz",                      prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 48.0, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2020, grado: "onceno",    nombre: "Leivys Laura Serrano Jaime",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 46.8, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2020, grado: "onceno",    nombre: "Rosailis Matos Claro",                      prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 43.8, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2020, grado: "onceno",    nombre: "Alejandra Gabriela Arenal García",          prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 39.3, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2020, grado: "onceno",    nombre: "Annaelisa Peró Machirán",                   prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 39.0, medalla: "bronce", psn: false, rank: 18 },
+
+    // ──────────────────────────────────────────────────
+    // 2020 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2020, grado: "duodécimo", nombre: "Sheila María Peña González",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 84.3, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2020, grado: "duodécimo", nombre: "Fabio Darío Quevedo Sedeño",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 78.3, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2020, grado: "duodécimo", nombre: "Héctor David Couso Hérnandez",              prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 74.5, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/BnPaJ9I.png" },
+    { año: 2020, grado: "duodécimo", nombre: "Joan Ernesto Méndez Batista",               prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 57.5, medalla: "plata",  psn: true,  rank:  4 },
+    { año: 2020, grado: "duodécimo", nombre: "Mariana Gamboa Céspedes",                   prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 56.0, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2020, grado: "duodécimo", nombre: "Yanitza Yisay Céspedes Hechavarría",        prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 54.3, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2020, grado: "duodécimo", nombre: "Glenda Bauta Castañeda",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 50.0, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2020, grado: "duodécimo", nombre: "Laura Rodríguez Martinez",                  prov: "SC", escuela: "IPU Rafael M. Mendive",              pts: 38.5, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2020, grado: "duodécimo", nombre: "Isabella Maziel Martínez Núñez",            prov: "LT", escuela: "IPVCE Luis Urquiza",                 pts: 38.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2020, grado: "duodécimo", nombre: "Frank Aguilera Brito",                      prov: "VC", escuela: "IPU Chichi Padrón",                  pts: 34.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2020, grado: "duodécimo", nombre: "Ludwin A Soria Abrahantes",                 prov: "VC", escuela: "IPU Abel Santamaria",                pts: 31.8, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2020, grado: "duodécimo", nombre: "Sergio Roche Diaz",                         prov: "UH", escuela: "Universidad de La Habana",           pts: 31.5, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2020, grado: "duodécimo", nombre: "Ricardo Duarte Griñan",                     prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 30.5, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2020, grado: "duodécimo", nombre: "Maylis Herrera Pacheco",                    prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 25.0, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2020, grado: "duodécimo", nombre: "Milani Casanueva Rivero",                   prov: "UH", escuela: "Universidad de La Habana",           pts: 24.0, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2020, grado: "duodécimo", nombre: "Camila V Rosales Olivera",                  prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 23.5, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2020, grado: "duodécimo", nombre: "Magdiel Enrique Martinez Batista",          prov: "GR", escuela: "IPU Ignacio Pérez Zamora",           pts: 19.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2020, grado: "duodécimo", nombre: "René K García Sarduy",                      prov: "HO", escuela: "IPU Máximo Gómez",                   pts: 18.5, medalla: "bronce", psn: false, rank: 18 },
+
+    // ──────────────────────────────────────────────────
+    // 2019 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2019, grado: "décimo",    nombre: "Yonathan González García",                  prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 84.0, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2019, grado: "décimo",    nombre: "Anthony Cruz García",                       prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 81.5, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2019, grado: "décimo",    nombre: "Nicolás Antonio García Álvarez",            prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 78.5, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2019, grado: "décimo",    nombre: "Samira de los Á. González Castelló",        prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 75.0, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2019, grado: "décimo",    nombre: "Luis Antonio Lorenzo Carballo",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 73.0, medalla: "oro",    psn: true,  rank:  5 },
+    { año: 2019, grado: "décimo",    nombre: "Laura Medina Ramírez Medina",               prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 67.0, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2019, grado: "décimo",    nombre: "Samira Madai Alfonso Rosa",                 prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 62.5, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2019, grado: "décimo",    nombre: "José Alberto Almeida Cabrales",             prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 61.5, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2019, grado: "décimo",    nombre: "Francisco Foroni Valdivia",                 prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 56.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2019, grado: "décimo",    nombre: "Álvaro Laterrade Pizarrosa",                prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 51.0, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2019, grado: "décimo",    nombre: "Yan Carlos Gutiérrez",                      prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 49.5, medalla: "plata",  psn: false, rank: 11 },
+    { año: 2019, grado: "décimo",    nombre: "Andy A. Aribe-Andudi García",               prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 49.0, medalla: "plata",  psn: false, rank: 12 },
+    { año: 2019, grado: "décimo",    nombre: "Daniela de la Nuez Pérez",                  prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 48.5, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2019, grado: "décimo",    nombre: "Elisa Rodríguez Ultra",                     prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 48.5, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2019, grado: "décimo",    nombre: "Francisco M. Moreno Perdomo",               prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 47.5, medalla: "plata",  psn: false, rank: 15 },
+    { año: 2019, grado: "décimo",    nombre: "Alejandra Gabriela Arenal García",          prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 47.0, medalla: "plata",  psn: false, rank: 16 },
+    { año: 2019, grado: "décimo",    nombre: "Maikol Fiallo Sánchez",                     prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 44.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2019, grado: "décimo",    nombre: "César Alejandro Calderón Pino",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 44.0, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2019, grado: "décimo",    nombre: "Sheila Ortega Ruz",                         prov: "PR", escuela: "IPVCE Federico Engels",              pts: 43.5, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2019, grado: "décimo",    nombre: "José David Valles Desten",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 43.0, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2019, grado: "décimo",    nombre: "Roger Alejandro Leyva Poblador",            prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 43.0, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2019, grado: "décimo",    nombre: "Antonio Sánchez Días",                      prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 41.5, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2019, grado: "décimo",    nombre: "Rosailis Matos Claro",                      prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 41.5, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2019, grado: "décimo",    nombre: "Lauren Heather Anslon Rondón",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 41.5, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2019, grado: "décimo",    nombre: "Leyvis Laura Serrano Jaime",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 41.5, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2019, grado: "décimo",    nombre: "Ana Elisa Peró Machirán",                   prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 39.5, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2019, grado: "décimo",    nombre: "Eulis Gabriel Garzón Giraudi",              prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 38.5, medalla: "bronce", psn: false, rank: 27 },
+    { año: 2019, grado: "décimo",    nombre: "Víctor Manuel Ortiz Oliva",                 prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 38.5, medalla: "bronce", psn: false, rank: 27 },
+    { año: 2019, grado: "décimo",    nombre: "José Miguel Millán Peña",                   prov: "IJ", escuela: "IPU América Lavadí Arce",            pts: 37.0, medalla: "bronce", psn: false, rank: 29 },
+    { año: 2019, grado: "décimo",    nombre: "Alejandro Valiente López",                  prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 36.0, medalla: "bronce", psn: false, rank: 30 },
+    { año: 2019, grado: "décimo",    nombre: "Roxana Cárdenas Meneses",                   prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 36.0, medalla: "bronce", psn: false, rank: 30 },
+    { año: 2019, grado: "décimo",    nombre: "Alejandro Tomás Muñoz Ramírez",             prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 35.0, medalla: "bronce", psn: false, rank: 32 },
+    { año: 2019, grado: "décimo",    nombre: "Patricia Sharon Mackey Moreira",            prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 34.5, medalla: "bronce", psn: false, rank: 33 },
+
+    // ──────────────────────────────────────────────────
+    // 2019 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2019, grado: "onceno",    nombre: "Alessia Pérez Daniel",                      prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 87.0, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2019, grado: "onceno",    nombre: "Sheila María Peña González",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 86.0, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2019, grado: "onceno",    nombre: "Héctor David Couso Hernández",              prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 83.75, medalla: "oro",   psn: true,  rank:  3, foto: "https://i.imgur.com/BnPaJ9I.png" },
+    { año: 2019, grado: "onceno",    nombre: "Fabio Darío Quevedo Sedeño",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 82.0, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2019, grado: "onceno",    nombre: "Sahiary Martínez Paz",                      prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 69.75, medalla: "plata", psn: true,  rank:  5 },
+    { año: 2019, grado: "onceno",    nombre: "Glenda Bauta Castañeda",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 66.25, medalla: "plata", psn: true,  rank:  6 },
+    { año: 2019, grado: "onceno",    nombre: "Mariana Estrella Gamboa Céspedes",          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 65.0,  medalla: "plata", psn: true,  rank:  7 },
+    { año: 2019, grado: "onceno",    nombre: "Yanitza Céspedes Hechavarria",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 59.5,  medalla: "plata", psn: true,  rank:  8 },
+    { año: 2019, grado: "onceno",    nombre: "Joan Ernesto Méndez Batista",               prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 59.0,  medalla: "plata", psn: true,  rank:  9 },
+    { año: 2019, grado: "onceno",    nombre: "Frank Aguilera Brito",                      prov: "VC", escuela: "IPU Chichí Padrón",                  pts: 57.25, medalla: "plata", psn: true,  rank: 10 },
+    { año: 2019, grado: "onceno",    nombre: "Christian Saavedra Díaz",                   prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 56.5,  medalla: "plata", psn: false, rank: 11 },
+    { año: 2019, grado: "onceno",    nombre: "Jorge A. Aragón Infante",                   prov: "PR", escuela: "IPVCE Federico Engels",              pts: 53.5,  medalla: "plata", psn: false, rank: 12 },
+    { año: 2019, grado: "onceno",    nombre: "Laura Rodríguez Martínez",                  prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 51.75, medalla: "plata", psn: false, rank: 13 },
+    { año: 2019, grado: "onceno",    nombre: "Isebella Martínez Núñez",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 50.75, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2019, grado: "onceno",    nombre: "Ricardo Alejandro Duarte Grinán",           prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 50.0,  medalla: "bronce", psn: false, rank: 15 },
+    { año: 2019, grado: "onceno",    nombre: "Sergio David Roche Díaz",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 49.0,  medalla: "bronce", psn: false, rank: 16 },
+    { año: 2019, grado: "onceno",    nombre: "Melani Casanueva Rivero",                   prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 46.0,  medalla: "bronce", psn: false, rank: 17 },
+    { año: 2019, grado: "onceno",    nombre: "Camila Viviana Rosales Olivera",            prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 43.5,  medalla: "bronce", psn: false, rank: 18 },
+    { año: 2019, grado: "onceno",    nombre: "Huber Cesar Cabrera Betancourt",            prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 42.0,  medalla: "bronce", psn: false, rank: 19 },
+    { año: 2019, grado: "onceno",    nombre: "Magdiel Enrique Martínez Batista",          prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 41.5,  medalla: "bronce", psn: false, rank: 20 },
+    { año: 2019, grado: "onceno",    nombre: "Emy L. Hernández Montes de Oca",            prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 41.5,  medalla: "bronce", psn: false, rank: 20 },
+    { año: 2019, grado: "onceno",    nombre: "David Pérez León",                          prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 40.75, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2019, grado: "onceno",    nombre: "Greidis León Elizástigui",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 39.5,  medalla: "bronce", psn: false, rank: 23 },
+    { año: 2019, grado: "onceno",    nombre: "Lizt Adriana Pérez Díaz",                   prov: "PR", escuela: "IPVCE Federico Engels",              pts: 39.0,  medalla: "bronce", psn: false, rank: 24 },
+    { año: 2019, grado: "onceno",    nombre: "Frank Ernesto Rodríguez Carrera",           prov: "MY", escuela: "EMCC Mayabeque",                     pts: 38.0,  medalla: "bronce", psn: false, rank: 25 },
+
+    // ──────────────────────────────────────────────────
+    // 2019 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2019, grado: "duodécimo", nombre: "Samuel Baéz Lao",                           prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 94.0, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2019, grado: "duodécimo", nombre: "Rey Michel Rodríguez Navarro",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 93.5, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/eoIouFc.png" },
+    { año: 2019, grado: "duodécimo", nombre: "Osniel Alejandro García Orihuela",          prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 82.0, medalla: "plata",  psn: true,  rank:  3, foto: "https://i.imgur.com/kfXej0I.png" },
+    { año: 2019, grado: "duodécimo", nombre: "Eduardo Adiel Landrove Escalona",           prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 80.25, medalla: "plata", psn: true,  rank:  4, foto: "https://i.imgur.com/JZGx5ZC.png" },
+    { año: 2019, grado: "duodécimo", nombre: "Rafael Alejandro Perurena García",          prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 79.25, medalla: "plata", psn: true,  rank:  5, foto: "https://i.imgur.com/x2ZTh2T.png" },
+    { año: 2019, grado: "duodécimo", nombre: "Jocdan Lismar López Mantecón",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 78.0,  medalla: "plata", psn: true,  rank:  6, foto: "https://i.imgur.com/54bqv23.png" },
+    { año: 2019, grado: "duodécimo", nombre: "David Linares Ramírez",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 77.5,  medalla: "plata", psn: true,  rank:  7 },
+    { año: 2019, grado: "duodécimo", nombre: "José Manuel Cabrera Pereira",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 72.25, medalla: "plata", psn: true,  rank:  8 },
+    { año: 2019, grado: "duodécimo", nombre: "Marco Antonio Fernández Roquero",           prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 69.75, medalla: "bronce", psn: false, rank:  9 },
+    { año: 2019, grado: "duodécimo", nombre: "Eduardo Raúl González García",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 68.5,  medalla: "bronce", psn: false, rank: 10 },
+    { año: 2019, grado: "duodécimo", nombre: "Ernesto Alejandro Fajardo Díaz",            prov: "AR", escuela: "Colegio Universitario",              pts: 67.5,  medalla: "bronce", psn: false, rank: 11 },
+    { año: 2019, grado: "duodécimo", nombre: "Laura Maday De La Paz Cordero",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 65.5,  medalla: "bronce", psn: false, rank: 12 },
+    { año: 2019, grado: "duodécimo", nombre: "José Angel Delgado Morejón",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 63.75, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2019, grado: "duodécimo", nombre: "Camilo Más Jacobs",                         prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 63.5,  medalla: "bronce", psn: false, rank: 14 },
+    { año: 2019, grado: "duodécimo", nombre: "Laura Barreto González",                    prov: "AR", escuela: "IPVCE Mártires de Humbolt 7",        pts: 57.25, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2019, grado: "duodécimo", nombre: "Yasser Alejandro Hernández Ravelo",         prov: "AR", escuela: "Colegio Universitario",              pts: 51.5,  medalla: "bronce", psn: false, rank: 16 },
+    { año: 2019, grado: "duodécimo", nombre: "Beatriz Reyes Manals",                      prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 51.25, medalla: "bronce", psn: false, rank: 17 },
+
+    // ──────────────────────────────────────────────────
+    // 2018 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2018, grado: "décimo",    nombre: "Héctor David Couso Hernández",              prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 84.50, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/BnPaJ9I.png" },
+    { año: 2018, grado: "décimo",    nombre: "Favio Darío Quevedo Sedeño",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 84.50, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2018, grado: "décimo",    nombre: "Sheyla María Peña González",                prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 84.00, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2018, grado: "décimo",    nombre: "Alessia Pérez Daniel",                      prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 80.50, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2018, grado: "décimo",    nombre: "Sahiary Martínez Paz",                      prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 68.00, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2018, grado: "décimo",    nombre: "Lázaro Arturo Ichaso Pérez",                prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 63.10, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2018, grado: "décimo",    nombre: "Mariana Gamboa Céspedes",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 62.76, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2018, grado: "décimo",    nombre: "Hubert César Cabrera Betancourt",           prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 62.08, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2018, grado: "décimo",    nombre: "Yanitza Yisay Céspedes Echavarría",         prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 54.08, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2018, grado: "décimo",    nombre: "Isabella Maciel Martínez Núñez",            prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 54.08, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2018, grado: "décimo",    nombre: "Johan Ernesto Méndez Batista",              prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 51.03, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2018, grado: "décimo",    nombre: "Christian José Saavedra Díaz",              prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 50.53, medalla: "plata",  psn: true,  rank: 12 },
+    { año: 2018, grado: "décimo",    nombre: "Brayan González Falcón",                    prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 45.23, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2018, grado: "décimo",    nombre: "Ricardo Alejandro Duarte Griñán",           prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 43.19, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2018, grado: "décimo",    nombre: "Laura Rodríguez Martínez",                  prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 42.81, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2018, grado: "décimo",    nombre: "David Alejandro Pérez León",                prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 41.37, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2018, grado: "décimo",    nombre: "Camila Viviana Rosales Olivera",            prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 41.10, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2018, grado: "décimo",    nombre: "Maylis Herrera Pacheco",                    prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 40.96, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2018, grado: "décimo",    nombre: "Glenda Bauta Castañeda",                    prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 39.33, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2018, grado: "décimo",    nombre: "Liovanys Damas Sariol",                     prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 36.00, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2018, grado: "décimo",    nombre: "Carmen Gloria Dean Galán",                  prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 34.73, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2018, grado: "décimo",    nombre: "Jeniffer Bravo Martín",                     prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 34.62, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2018, grado: "décimo",    nombre: "Robert Jordán Martínez",                    prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 33.23, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2018, grado: "décimo",    nombre: "Magdiel Enrique Martínez Batista",          prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 32.62, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2018, grado: "décimo",    nombre: "Liana María Correoso Heredia",              prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 32.07, medalla: "bronce", psn: false, rank: 25 },
+    { año: 2018, grado: "décimo",    nombre: "Karen Rachel Corrales Cruz",                prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 31.84, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2018, grado: "décimo",    nombre: "Claudia Caridad Cuéllar Cabrera",           prov: "CF", escuela: "IPVCE Carlos Roloff Mialofsky",      pts: 31.50, medalla: "bronce", psn: false, rank: 27 },
+    { año: 2018, grado: "décimo",    nombre: "Sergio David Roche Díaz",                   prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 30.62, medalla: "bronce", psn: false, rank: 28 },
+    { año: 2018, grado: "décimo",    nombre: "Martha Laura López Rubio",                  prov: "CF", escuela: "IPVCE Carlos Roloff Mialofsky",      pts: 30.30, medalla: "bronce", psn: false, rank: 29 },
+    { año: 2018, grado: "décimo",    nombre: "William Benítez Rodríguez",                 prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 27.35, medalla: "bronce", psn: false, rank: 30 },
+    { año: 2018, grado: "décimo",    nombre: "Lidice Fabiana Pérez Palma",                prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 27.19, medalla: "bronce", psn: false, rank: 31 },
+
+    // ──────────────────────────────────────────────────
+    // 2018 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2018, grado: "onceno",    nombre: "Davier Sánchez Bello",                      prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 87.06, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2018, grado: "onceno",    nombre: "Rey Michel Rodríguez Navarro",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 84.94, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/eoIouFc.png" },
+    { año: 2018, grado: "onceno",    nombre: "Jocdan Lismar López Mantecón",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 82.92, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/54bqv23.png" },
+    { año: 2018, grado: "onceno",    nombre: "Laura Barreto González",                    prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 74.52, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2018, grado: "onceno",    nombre: "David Linares Ramírez",                     prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 72.41, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2018, grado: "onceno",    nombre: "Rafael Alejandro Perurena García",          prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 72.21, medalla: "plata",  psn: true,  rank:  6, foto: "https://i.imgur.com/x2ZTh2T.png" },
+    { año: 2018, grado: "onceno",    nombre: "Massiel B. Fuentes Vázquez",               prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 71.62, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2018, grado: "onceno",    nombre: "José Manuel Cabrera Pereira",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 71.55, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2018, grado: "onceno",    nombre: "Samuel Báez Lau",                           prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 70.33, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2018, grado: "onceno",    nombre: "Eduardo Addiel Landrove Escalona",          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 68.78, medalla: "plata",  psn: true,  rank: 10, foto: "https://i.imgur.com/JZGx5ZC.png" },
+    { año: 2018, grado: "onceno",    nombre: "Rachel Yina Báez González",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 67.78, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2018, grado: "onceno",    nombre: "Osniel García Orihuela",                    prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 67.17, medalla: "plata",  psn: true,  rank: 12, foto: "https://i.imgur.com/kfXej0I.png" },
+    { año: 2018, grado: "onceno",    nombre: "José Ángel Delgado Morejón",                prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 64.17, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2018, grado: "onceno",    nombre: "Camilo Mas Jacobs",                         prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 64.14, medalla: "plata",  psn: false, rank: 14 },
+    { año: 2018, grado: "onceno",    nombre: "Lisvany Martín Rodríguez",                  prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 62.19, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2018, grado: "onceno",    nombre: "Marcos Antonio Fernández Roquero",          prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 60.43, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2018, grado: "onceno",    nombre: "Maday Sánchez Oramas",                      prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 59.00, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2018, grado: "onceno",    nombre: "Ernesto Alejandro Fajardo Díaz",            prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 57.19, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2018, grado: "onceno",    nombre: "Laura Gil Espinosa",                        prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 55.43, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2018, grado: "onceno",    nombre: "Anier Alcides Peña Omar",                   prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 52.47, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2018, grado: "onceno",    nombre: "Ana Elia Miranda Castañeda",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 52.34, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2018, grado: "onceno",    nombre: "Beatriz Reyes Manals",                      prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 52.16, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2018, grado: "onceno",    nombre: "Laura Maday De la Paz Cordero",             prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 48.99, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2018, grado: "onceno",    nombre: "Amanda Ivet Rivero Arbolay",                prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 48.25, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2018, grado: "onceno",    nombre: "Claudia Ruiz Nogueira",                     prov: "PR", escuela: "IPVCE Federico Engels",              pts: 48.09, medalla: "bronce", psn: false, rank: 25 },
+
+    // ──────────────────────────────────────────────────
+    // 2018 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2018, grado: "duodécimo", nombre: "Sergio Modesto Reyes Díaz",                 prov: "LH", escuela: "IPVCE Vladimir Ilich Lenin",          pts: 90.15, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2018, grado: "duodécimo", nombre: "Isaac Enrique Peñuela Puente",              prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 85.00, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2018, grado: "duodécimo", nombre: "Adolfo Alejandro Cruz Cruz",                prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 83.35, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/RnoSRmw.png" },
+    { año: 2018, grado: "duodécimo", nombre: "Carlos Rafael Castillo Hernández",          prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 82.65, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2018, grado: "duodécimo", nombre: "Adiel Martínez Rodríguez",                  prov: "MT", escuela: "IPVCE Carlos Marx Pressburg",        pts: 79.35, medalla: "plata",  psn: true,  rank:  5, foto: "https://i.imgur.com/AnDC62r.png" },
+    { año: 2018, grado: "duodécimo", nombre: "Josué Ponce de León Cabrera",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 78.86, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2018, grado: "duodécimo", nombre: "Lilisbeth De La Caridad Bénitez Rojas",     prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 78.73, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2018, grado: "duodécimo", nombre: "Maricary Sifontes Niebla",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 74.35, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2018, grado: "duodécimo", nombre: "Ariel Ernesto Martínez Suffos",             prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 73.93, medalla: "plata",  psn: false, rank:  9 },
+    { año: 2018, grado: "duodécimo", nombre: "Ariel Alejandro Castro Sifonte",            prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 73.85, medalla: "plata",  psn: false, rank: 10 },
+    { año: 2018, grado: "duodécimo", nombre: "Denys Daniel Núñez Pupo",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 62.10, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2018, grado: "duodécimo", nombre: "Lilianne Gil Batista",                      prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 59.71, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2018, grado: "duodécimo", nombre: "Sara María Collejo Fernández",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 55.08, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2018, grado: "duodécimo", nombre: "Manuel Alejandro Santana Hernández",        prov: "VC", escuela: "IPVCE Ernesto Che Guevara",          pts: 46.46, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2018, grado: "duodécimo", nombre: "Rolando Pérez Heredia",                     prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 42.89, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2018, grado: "duodécimo", nombre: "Griela María Águila Álvarez",               prov: "PR", escuela: "IPVCE Federico Engels",              pts: 40.83, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2018, grado: "duodécimo", nombre: "Jorge Ernesto Claro Díaz",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 31.33, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2018, grado: "duodécimo", nombre: "Thalía Yera Martínez",                      prov: "CF", escuela: "IPVCE Carlos Roloff Mialofsky",      pts: 29.90, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2018, grado: "duodécimo", nombre: "Ismanuel Basulto Díaz",                     prov: "IJ", escuela: "IPU Rodolfo Carballosa",             pts: 29.76, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2018, grado: "duodécimo", nombre: "Noel Jesús Niebla Gómez",                   prov: "CF", escuela: "IPVCE Carlos Roloff Mialofsky",      pts: 28.83, medalla: "bronce", psn: false, rank: 20 },
+
+    // ──────────────────────────────────────────────────
+    // 2017 — Décimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2017, grado: "décimo",    nombre: "Rey Michel Rodríguez Navarro",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 96.0, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/eoIouFc.png" },
+    { año: 2017, grado: "décimo",    nombre: "Davier Sánchez Bello",                      prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 80.0, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2017, grado: "décimo",    nombre: "Eduardo Addiel Landrove Escalona",          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 73.0, medalla: "oro",    psn: true,  rank:  3, foto: "https://i.imgur.com/JZGx5ZC.png" },
+    { año: 2017, grado: "décimo",    nombre: "Massiel B Fuentes Vázquez",                prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 72.5, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2017, grado: "décimo",    nombre: "Osniel A García Orihuela",                  prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 71.1, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/kfXej0I.png" },
+    { año: 2017, grado: "décimo",    nombre: "Rachel Yina Báez González",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 71.0, medalla: "oro",    psn: true,  rank:  6 },
+    { año: 2017, grado: "décimo",    nombre: "Maday Sánchez Orama",                       prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 71.0, medalla: "oro",    psn: true,  rank:  6 },
+    { año: 2017, grado: "décimo",    nombre: "Jordan Lismar López Mantecón",              prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 69.0, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2017, grado: "décimo",    nombre: "Marco Antonio Fernández Roquero",           prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 65.0, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2017, grado: "décimo",    nombre: "José Manuel Cabrera Pereira",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 64.5, medalla: "plata",  psn: true,  rank: 10 },
+    { año: 2017, grado: "décimo",    nombre: "Ana Elia Miranda Castañeda",                prov: "PR", escuela: "IPVCE Federico Engels",              pts: 62.1, medalla: "plata",  psn: false, rank: 11 },
+    { año: 2017, grado: "décimo",    nombre: "Lucía María Figueroa Torres",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 57.1, medalla: "plata",  psn: false, rank: 12 },
+    { año: 2017, grado: "décimo",    nombre: "Liliana Llamos Pérez",                      prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 54.0, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2017, grado: "décimo",    nombre: "José Angel Delgado Morejón",                prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 53.0, medalla: "plata",  psn: false, rank: 14 },
+    { año: 2017, grado: "décimo",    nombre: "Lisvany Martín Rodríguez",                  prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 51.5, medalla: "plata",  psn: false, rank: 15 },
+    { año: 2017, grado: "décimo",    nombre: "Lester Padron Cuella",                      prov: "PR", escuela: "IPVCE Federico Engels",              pts: 51.1, medalla: "plata",  psn: false, rank: 16 },
+    { año: 2017, grado: "décimo",    nombre: "René Alejandro Vuelta Garcés",              prov: "SC", escuela: "IPU Rafael María de Mendive",        pts: 51.0, medalla: "plata",  psn: false, rank: 17 },
+    { año: 2017, grado: "décimo",    nombre: "Laura Barreto Gonzalez",                    prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 50.5, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2017, grado: "décimo",    nombre: "Yesenia de la C. Valladares Suárez",        prov: "PR", escuela: "IPVCE Federico Engels",              pts: 50.0, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2017, grado: "décimo",    nombre: "Beatriz Reyes Manals",                      prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 50.0, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2017, grado: "décimo",    nombre: "Anier Alcides Peña Omar",                   prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 49.1, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2017, grado: "décimo",    nombre: "Javier Alejandro Sánchez Sayas",            prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 48.5, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2017, grado: "décimo",    nombre: "Luis Fernando García Aguilar",              prov: "PR", escuela: "IPVCE Federico Engels",              pts: 47.1, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2017, grado: "décimo",    nombre: "Cecilia Ribeaux Villalón",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 47.0, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2017, grado: "décimo",    nombre: "Rosa María Mederos Martínez",               prov: "MT", escuela: "IPU Martin Klein",                  pts: 47.0, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2017, grado: "décimo",    nombre: "Roxana Pena Mendieta",                      prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 45.4, medalla: "bronce", psn: false, rank: 26 },
+    { año: 2017, grado: "décimo",    nombre: "Rafael Alejandro Perurena García",          prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 45.1, medalla: "bronce", psn: false, rank: 27, foto: "https://i.imgur.com/x2ZTh2T.png" },
+    { año: 2017, grado: "décimo",    nombre: "Camilo Mas Jacobs",                         prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 45.0, medalla: "bronce", psn: false, rank: 28 },
+    { año: 2017, grado: "décimo",    nombre: "Erik Richard Ventura Castro",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 43.1, medalla: "bronce", psn: false, rank: 29 },
+    { año: 2017, grado: "décimo",    nombre: "David Linares Ramírez",                     prov: "VC", escuela: "IPU Capitán Roberto Rodríguez",      pts: 42.5, medalla: "bronce", psn: false, rank: 30 },
+    { año: 2017, grado: "décimo",    nombre: "Zujay Bell Larduet",                        prov: "SC", escuela: "IPU Cuqui Bosh",                     pts: 41.1, medalla: "bronce", psn: false, rank: 31 },
+    { año: 2017, grado: "décimo",    nombre: "Dairon A. Pérez Sánchez",                   prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 41.1, medalla: "bronce", psn: false, rank: 31 },
+    { año: 2017, grado: "décimo",    nombre: "Amanda I Rivero Arbolay",                   prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 40.6, medalla: "bronce", psn: false, rank: 33 },
+    { año: 2017, grado: "décimo",    nombre: "Geidi Roxana Vargas Herryman",              prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 40.0, medalla: "bronce", psn: false, rank: 34 },
+    { año: 2017, grado: "décimo",    nombre: "Laura Gil Espenisa",                        prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 36.5, medalla: "bronce", psn: false, rank: 35 },
+
+    // ──────────────────────────────────────────────────
+    // 2017 — Onceno grado
+    // ──────────────────────────────────────────────────
+    { año: 2017, grado: "onceno",    nombre: "Isaac Enrique Peñuela Puente",              prov: "SC", escuela: "IPVCE Antonio Maceo Grajales",       pts: 85.5, medalla: "oro",    psn: true,  rank:  1 },
+    { año: 2017, grado: "onceno",    nombre: "Carlos Rafael Castillo Hernández",          prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 84.5, medalla: "oro",    psn: true,  rank:  2 },
+    { año: 2017, grado: "onceno",    nombre: "Lilisbeth de la C. Bénitez Rojas",          prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 81.0, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2017, grado: "onceno",    nombre: "Sergio Modesto Reyes Díaz",                 prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 80.0, medalla: "oro",    psn: true,  rank:  4 },
+    { año: 2017, grado: "onceno",    nombre: "Adolfo Alejandro Cruz Cruz",                prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 78.0, medalla: "oro",    psn: true,  rank:  5, foto: "https://i.imgur.com/RnoSRmw.png" },
+    { año: 2017, grado: "onceno",    nombre: "Sara María Collejo Fernández",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 73.5, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2017, grado: "onceno",    nombre: "Josué Ponce de León Cabrera",               prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 71.5, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2017, grado: "onceno",    nombre: "Adiel Alexis Martínez Rodríguez",           prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 71.0, medalla: "plata",  psn: true,  rank:  8, foto: "https://i.imgur.com/AnDC62r.png" },
+    { año: 2017, grado: "onceno",    nombre: "Ariel Ernesto Martínez Suffos",             prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 70.5, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2017, grado: "onceno",    nombre: "Maricary Sifontes Niebla",                  prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 70.5, medalla: "plata",  psn: true,  rank:  9 },
+    { año: 2017, grado: "onceno",    nombre: "Lilianne Gil Batista",                      prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 70.0, medalla: "plata",  psn: true,  rank: 11 },
+    { año: 2017, grado: "onceno",    nombre: "Denys Daniel Núñez Pupo",                   prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 68.0, medalla: "plata",  psn: false, rank: 12 },
+    { año: 2017, grado: "onceno",    nombre: "Ariel Alejandro Castro Sifonte",            prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 67.5, medalla: "plata",  psn: false, rank: 13 },
+    { año: 2017, grado: "onceno",    nombre: "Gricela María Águila Álvarez",              prov: "PR", escuela: "IPVCE Federico Engels",              pts: 61.0, medalla: "plata",  psn: false, rank: 14 },
+    { año: 2017, grado: "onceno",    nombre: "Pablo Enrique Remedios Rosa",               prov: "SS", escuela: "IPVCE Eusebio Olivera Rodríguez",   pts: 54.5, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2017, grado: "onceno",    nombre: "Yainel Miranda Hernández",                  prov: "PR", escuela: "IPVCE Federico Engels",              pts: 53.0, medalla: "bronce", psn: false, rank: 16 },
+    { año: 2017, grado: "onceno",    nombre: "Manuel A. Santana Hernández",               prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 52.5, medalla: "bronce", psn: false, rank: 17 },
+    { año: 2017, grado: "onceno",    nombre: "Liliana Matos Ávila",                       prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 50.5, medalla: "bronce", psn: false, rank: 18 },
+    { año: 2017, grado: "onceno",    nombre: "Jaime Reina Alares",                        prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 47.5, medalla: "bronce", psn: false, rank: 19 },
+    { año: 2017, grado: "onceno",    nombre: "Rolando Pérez Heredia",                     prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 44.5, medalla: "bronce", psn: false, rank: 20 },
+    { año: 2017, grado: "onceno",    nombre: "Noel G. Niebla Gómez",                      prov: "CF", escuela: "IPVCE Carlos Roloff",                pts: 38.5, medalla: "bronce", psn: false, rank: 21 },
+    { año: 2017, grado: "onceno",    nombre: "Jorge Ernesto Claro Díaz",                  prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 38.0, medalla: "bronce", psn: false, rank: 22 },
+    { año: 2017, grado: "onceno",    nombre: "Claudia Natalí Jeréz Zamora",               prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 34.5, medalla: "bronce", psn: false, rank: 23 },
+    { año: 2017, grado: "onceno",    nombre: "Marcos A González Correa",                  prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 33.0, medalla: "bronce", psn: false, rank: 24 },
+    { año: 2017, grado: "onceno",    nombre: "Elizabeth Teresita Cruz Portal",            prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 32.5, medalla: "bronce", psn: false, rank: 25 },
+    { año: 2017, grado: "onceno",    nombre: "Karen Valdés Delgado",                      prov: "AR", escuela: "IPVCE Mártires de Humboldt 7",       pts: 32.0, medalla: "bronce", psn: false, rank: 26 },
+
+    // ──────────────────────────────────────────────────
+    // 2017 — Duodécimo grado
+    // ──────────────────────────────────────────────────
+    { año: 2017, grado: "duodécimo", nombre: "Leonor Enedis Collejo Fernández",           prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 87.0, medalla: "oro",    psn: true,  rank:  1, foto: "https://i.imgur.com/eSzkTXN.png" },
+    { año: 2017, grado: "duodécimo", nombre: "José Rafael Rodríguez Rodríguez",           prov: "MT", escuela: "IPVCE Carlos Marx",                  pts: 86.6, medalla: "oro",    psn: true,  rank:  2, foto: "https://i.imgur.com/5VqdK3n.png" },
+    { año: 2017, grado: "duodécimo", nombre: "Norberto Javier Tamayo León",               prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 86.0, medalla: "oro",    psn: true,  rank:  3 },
+    { año: 2017, grado: "duodécimo", nombre: "Eduardo Eloy Blanco Rodríguez",             prov: "PR", escuela: "IPVCE Federico Engels",              pts: 80.9, medalla: "plata",  psn: true,  rank:  4 },
+    { año: 2017, grado: "duodécimo", nombre: "Patricia Cartaya Quintero",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 77.3, medalla: "plata",  psn: true,  rank:  5 },
+    { año: 2017, grado: "duodécimo", nombre: "Nataly Rodríguez González",                 prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 76.6, medalla: "plata",  psn: true,  rank:  6 },
+    { año: 2017, grado: "duodécimo", nombre: "Vanessa Mabel Martínez Núñez",              prov: "LT", escuela: "IPVCE Luis Urquiza Jorge",           pts: 76.5, medalla: "plata",  psn: true,  rank:  7 },
+    { año: 2017, grado: "duodécimo", nombre: "Cesar Eduardo Escalante Bermúdez",          prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 74.1, medalla: "plata",  psn: true,  rank:  8 },
+    { año: 2017, grado: "duodécimo", nombre: "Lídice Cabrera Victoria",                   prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 71.4, medalla: "plata",  psn: false, rank:  9 },
+    { año: 2017, grado: "duodécimo", nombre: "Adonis Castillo Ledesma",                   prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 70.1, medalla: "bronce", psn: false, rank: 10 },
+    { año: 2017, grado: "duodécimo", nombre: "Leonardo Rafael Rodríguez González",        prov: "CM", escuela: "IPVCE Máximo Gómez Báez",            pts: 68.7, medalla: "bronce", psn: false, rank: 11 },
+    { año: 2017, grado: "duodécimo", nombre: "Rolando Estévez Mendoza",                   prov: "GT", escuela: "IPVCE José Maceo Grajales",          pts: 67.7, medalla: "bronce", psn: false, rank: 12 },
+    { año: 2017, grado: "duodécimo", nombre: "Jorge Ernesto Mato Frontela",               prov: "LH", escuela: "IPVCE Vladimir I. Lenin",             pts: 63.6, medalla: "bronce", psn: false, rank: 13 },
+    { año: 2017, grado: "duodécimo", nombre: "Stany Almaguer Arias",                      prov: "GR", escuela: "IPVCE Silberto Álvarez Aroche",      pts: 58.8, medalla: "bronce", psn: false, rank: 14 },
+    { año: 2017, grado: "duodécimo", nombre: "Michel A. Machado León",                    prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 55.9, medalla: "bronce", psn: false, rank: 15 },
+    { año: 2017, grado: "duodécimo", nombre: "Melissa Gómez Saucedo",                     prov: "VC", escuela: "IPVCE Ernesto Guevara",              pts: 53.4, medalla: "bronce", psn: false, rank: 16 },
+
+];
+
+// ════════════════════════════════════════════════════
+// ÍNDICES Y MAPAS DERIVADOS
+// ════════════════════════════════════════════════════
+
+// Índice de fotos por nombre (para cruzar con otras tablas)
+const fotosCNQPorNombre = {};
+datosCNQ.forEach(r => {
+    if (r.foto && !fotosCNQPorNombre[r.nombre]) fotosCNQPorNombre[r.nombre] = r.foto;
+});
+
+// Listado de años disponibles
+const añosCNQ = [...new Set(datosCNQ.map(r => r.año))].sort((a, b) => b - a);
+
+// Provincias codificadas
+const nombreProvincia = {
+    SS: "Sancti Spíritus",
+    CM: "Camagüey",
+    LH: "La Habana",
+    LT: "Las Tunas",
+    VC: "Villa Clara",
+    MT: "Matanzas",
+    PR: "Pinar del Río",
+    SC: "Santiago de Cuba",
+    AR: "Artemisa",
+    GR: "Granma",
+    HO: "Holguín",
+    GT: "Guantánamo",
+    CF: "Cienfuegos",
+    MY: "Mayabeque",
+    CA: "Camagüey",  // nota: CA = Ciego de Ávila
+    IJ: "Isla de la Juventud",
+    UH: "Universidad de La Habana",
+};
+
+</script>
+</body>
+</html>
