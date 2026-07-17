@@ -4617,8 +4617,44 @@ async function inicializarNoticias() {
 //════════════════════════════
 //════ Contador de IChO ══════
 //════════════════════════════
+// Todas las fechas de este contador se interpretan SIEMPRE en horario de
+// Europa Central (CET/CEST, zona "Europe/Madrid"), sin importar la zona
+// horaria del navegador de quien visita la página. Así, "2026-07-10T00:00:00"
+// significa siempre medianoche en Madrid, la vea quien la vea desde donde sea.
+function _madridOffsetMinutes(utcInstant) {
+    // Offset (en minutos) de Europe/Madrid respecto a UTC en un instante dado
+    // (calculado con Intl, así que gestiona el cambio CET↔CEST automáticamente).
+    const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Madrid', hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const p = dtf.formatToParts(utcInstant).reduce((acc, x) => { acc[x.type] = x.value; return acc; }, {});
+    const hora = p.hour === '24' ? 0 : Number(p.hour); // Intl a veces devuelve "24" para medianoche
+    const comoUTC = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day), hora, Number(p.minute), Number(p.second));
+    return (comoUTC - utcInstant.getTime()) / 60000;
+}
+
+// Convierte "YYYY-MM-DDTHH:MM:SS" (hora de pared en Madrid) en el Date/instante
+// UTC real correspondiente, teniendo en cuenta si aplica CET (+1) o CEST (+2).
+function _parseHoraMadrid(str) {
+    if (!str) return null;
+    const [datePart, timePart = '00:00:00'] = String(str).trim().split('T');
+    const [Y, M, D] = datePart.split('-').map(Number);
+    const [h = 0, m = 0, s = 0] = timePart.split(':').map(Number);
+    if (!Y || !M || !D) return null;
+
+    // Primera estimación del offset usando la fecha "tal cual" como si fuese UTC
+    let offset = _madridOffsetMinutes(new Date(Date.UTC(Y, M - 1, D, h, m, s)));
+    let real   = new Date(Date.UTC(Y, M - 1, D, h, m, s) - offset * 60000);
+    // Segunda pasada por si el offset estimado cambia justo en un cambio de horario
+    const offset2 = _madridOffsetMinutes(real);
+    if (offset2 !== offset) real = new Date(Date.UTC(Y, M - 1, D, h, m, s) - offset2 * 60000);
+    return real;
+}
+
 // Valores por defecto (fallback si Data/olympiad_date.html no se puede cargar):
-let ICHO_FECHA         = new Date('2026-07-10T00:00:00');
+let ICHO_FECHA         = _parseHoraMadrid('2026-07-10T00:00:00');
 let ICHO_CIUDAD        = 'Tashkent';
 let ICHO_AÑO           = 2026;
 let ICHO_CLOSING_FECHA = null;   // fecha de la ceremonia de clausura (Date | null)
@@ -4635,12 +4671,12 @@ async function _cargarDatosIChO() {
         if (!el) throw new Error('No se encontró #olympiad-date-data en olympiad_date.html');
         const data = JSON.parse(el.textContent);
 
-        if (data.fecha) ICHO_FECHA  = new Date(data.fecha);
+        if (data.fecha) ICHO_FECHA  = _parseHoraMadrid(data.fecha) || ICHO_FECHA;
         if (data.lugar) ICHO_CIUDAD = data.lugar;
         if (data.anio)  ICHO_AÑO    = data.anio;
 
         ICHO_CLOSING_FECHA = (data.closingCeremonyFecha && String(data.closingCeremonyFecha).trim())
-            ? new Date(data.closingCeremonyFecha) : null;
+            ? _parseHoraMadrid(data.closingCeremonyFecha) : null;
         ICHO_CLOSING_LINK = (data.closingCeremonyLink && String(data.closingCeremonyLink).trim())
             ? String(data.closingCeremonyLink).trim() : null;
     } catch (err) {
