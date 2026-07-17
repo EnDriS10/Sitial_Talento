@@ -5,11 +5,17 @@
     Campos:
       - lugar   (obligatorio): ciudad / sede que se muestra junto al título.
       - fecha   (obligatorio): fecha y hora de inicio de la IChO, formato
-                                "YYYY-MM-DDTHH:MM:SS" (hora local del navegador).
+                                "YYYY-MM-DDTHH:MM:SS".
+                                ⚠️ Esta hora se interpreta SIEMPRE en horario de
+                                Europa Central (CET/CEST, zona "Europe/Madrid"),
+                                sin importar dónde esté ni qué navegador use la
+                                persona que visita la página. Así se evitan
+                                confusiones por zona horaria del visitante.
       - anio    (obligatorio): año que se muestra en el título "IChO {anio}".
 
       - closingCeremonyFecha (OPCIONAL): fecha/hora de la ceremonia de
-        clausura / anuncio de resultados, mismo formato que "fecha".
+        clausura / anuncio de resultados, mismo formato y misma zona horaria
+        (Europa Central, CET/CEST) que "fecha".
         Dejar como "" (cadena vacía) si aún no se sabe: en ese caso no se
         mostrará ningún contador de resultados.
 
