@@ -1,0 +1,34 @@
+<!--
+    olympiad_date.html
+    ════════════════════════════════════════════════════════════════
+
+    Campos:
+      - lugar   (obligatorio): ciudad / sede que se muestra junto al título.
+      - fecha   (obligatorio): fecha y hora de inicio de la IChO, formato
+                                "YYYY-MM-DDTHH:MM:SS" (hora local del navegador).
+      - anio    (obligatorio): año que se muestra en el título "IChO {anio}".
+
+      - closingCeremonyFecha (OPCIONAL): fecha/hora de la ceremonia de
+        clausura / anuncio de resultados, mismo formato que "fecha".
+        Dejar como "" (cadena vacía) si aún no se sabe: en ese caso no se
+        mostrará ningún contador de resultados.
+
+      - closingCeremonyLink (OPCIONAL): enlace de YouTube del directo de la
+        ceremonia de clausura. Dejar como "" si aún no hay enlace: en ese
+        caso no se mostrará ninguna previsualización.
+
+    Ambos campos opcionales pueden aparecer o no, independientemente uno
+    del otro: puedes tener fecha sin enlace, enlace sin fecha, ambos, o
+    ninguno.
+    ════════════════════════════════════════════════════════════════
+-->
+<script id="olympiad-date-data" type="application/json">
+{
+    "lugar": "Tashkent, Uzbekistán",
+    "fecha": "2026-07-10T00:00:00",
+    "anio": 2026,
+
+    "closingCeremonyFecha": "",
+    "closingCeremonyLink": ""
+}
+</script>
