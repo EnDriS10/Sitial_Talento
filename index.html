@@ -466,6 +466,7 @@
         .filtro-btn { padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all .2s; }
         .filtro-btn:hover { border-color: var(--navy-light); color: var(--navy); }
         .filtro-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
+        .filtro-btn:disabled { display: none; }
         .search-input { margin-left: auto; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; width: 200px; transition: border-color .2s; }
         .search-input:focus { border-color: var(--accent); }
 
@@ -1592,12 +1593,34 @@
             text-align: center; padding: 14px 0 10px;
             font-size: 15px; color: var(--text-muted);
         }
+        .icho-cd-closing {
+            text-align: center;
+            font-size: 13px; font-weight: 600;
+            color: var(--accent);
+            padding-bottom: 4px;
+        }
+        .icho-cd-closing-preview {
+            margin: 12px auto 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(4,18,43,.07);
+            width: 100%;
+            max-width: 420px;
+        }
+        .icho-cd-closing-preview iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            display: block;
+            border: 0;
+        }
         @media (max-width: 500px) {
             .icho-countdown-wrap  { width: 100%; border-radius: 16px; padding: 20px 16px 18px; box-sizing: border-box; }
             .icho-cd-cards        { gap: 8px; }
             .icho-cd-card         { flex: 1; min-width: 0; padding: 10px 8px 10px; }
             .icho-cd-num          { font-size: 30px; }
             .icho-cd-formula      { font-size: 9px; }
+            .icho-cd-closing-preview { max-width: 100%; }
         }
 
         /* ═══════════════════════════════════════════
@@ -2929,7 +2952,15 @@ function renderCNQRanking() {
 
 // ─── Concurso Nacional ──────────────────────────────
 // Años candidatos (se filtran con HEAD antes de mostrar botones)
-const _cnqYearsCandidatos = [2017,2018,2019,2020,2021,2022,2023,2024,2025];
+// Generado dinámicamente desde 2017 hasta el año actual + 1, para que nunca
+// haga falta tocar este array manualmente al añadir una edición nueva.
+const _cnqYearsCandidatos = (() => {
+    const inicio = 2017;
+    const fin = new Date().getFullYear() + 1;
+    const años = [];
+    for (let a = inicio; a <= fin; a++) años.push(a);
+    return años;
+})();
 let _cnqYearsReal    = [];
 let _cnqSelectedYear = null;
 let _cnqSelectedCat  = 'preparatorio';
@@ -3078,10 +3109,50 @@ async function _cargarFuenteEnlace(año) {
 }
 
 function cnqSeleccionarCat(cat, btn) {
+    if (btn && btn.disabled) return; // categoría sin contenido para el año actual
     _cnqSelectedCat = cat;
     document.querySelectorAll('.cnq-cat-btn').forEach(b => b.classList.remove('activo'));
     if (btn) btn.classList.add('activo');
     _renderCNQConcurso();
+}
+
+// Determina si una categoría tiene al menos un archivo disponible para el
+// objeto `files` ya resuelto de un año concreto.
+function _cnqCategoriaTieneContenido(files, cat) {
+    if (!files) return false;
+    if (cat === 'preparatorio') return !!(files.prep_prob || files.prep_sol);
+    if (cat === '10') return !!(files.day1_10 || files.day2_unified || files.day2_10);
+    if (cat === '11') return !!(files.day1_11 || files.day2_unified || files.day2_11);
+    if (cat === '12') return !!(files.day1_12 || files.day2_unified || files.day2_12);
+    if (cat === 'soluciones') return !!(files.solutions || files.results);
+    return false;
+}
+
+// Oculta/deshabilita los botones de categoría que no tengan ningún archivo
+// para el año seleccionado, de modo que no se puedan ni clickear.
+function _cnqActualizarBotonesCategoria(files) {
+    const cats = ['preparatorio', '10', '11', '12', 'soluciones'];
+    const disponibles = {};
+    cats.forEach(c => disponibles[c] = _cnqCategoriaTieneContenido(files, c));
+
+    document.querySelectorAll('.cnq-cat-btn').forEach(btn => {
+        const cat = btn.getAttribute('data-cat');
+        const ok = disponibles[cat];
+        btn.style.display = ok ? '' : 'none';
+        btn.disabled = !ok;
+    });
+
+    // Si la categoría seleccionada actualmente ya no tiene contenido en este
+    // año, saltar automáticamente a la primera categoría que sí lo tenga.
+    if (!disponibles[_cnqSelectedCat]) {
+        const primera = cats.find(c => disponibles[c]);
+        if (primera) {
+            _cnqSelectedCat = primera;
+            document.querySelectorAll('.cnq-cat-btn').forEach(b => {
+                b.classList.toggle('activo', b.getAttribute('data-cat') === primera);
+            });
+        }
+    }
 }
 
 async function _renderCNQConcurso() {
@@ -3092,6 +3163,7 @@ async function _renderCNQConcurso() {
     area.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-muted);font-size:14px;">⏳ ${lang==='es'?'Verificando archivos…':'Checking files…'}</div>`;
 
     const files = await _cnqFilesForYear(_cnqSelectedYear);
+    _cnqActualizarBotonesCategoria(files);
 
     // Título para el Day1 según si es examen común o específico del grado
     const day1TitleFor = (grade) => files.isCommonDay1
@@ -4545,31 +4617,125 @@ async function inicializarNoticias() {
 //════════════════════════════
 //════ Contador de IChO ══════
 //════════════════════════════
-// Modifica aquí la fecha, ciudad y año de la próxima IChO:
-const ICHO_FECHA  = new Date('2026-07-10T00:00:00');   // ← Fecha de inicio (año-mes-día)
-const ICHO_CIUDAD = 'Tashkent';                         // ← Ciudad sede
-const ICHO_AÑO    = 2026;                               // ← Año del evento
-//════════════════════════════
+// Valores por defecto (fallback si Data/olympiad_date.html no se puede cargar):
+let ICHO_FECHA         = new Date('2026-07-10T00:00:00');
+let ICHO_CIUDAD        = 'Tashkent';
+let ICHO_AÑO           = 2026;
+let ICHO_CLOSING_FECHA = null;   // fecha de la ceremonia de clausura (Date | null)
+let ICHO_CLOSING_LINK  = null;   // link de YouTube de la clausura (string | null)
+
+// Carga lugar / fecha / datos de clausura desde Data/olympiad_date.html
+async function _cargarDatosIChO() {
+    try {
+        const resp = await fetch('Data/olympiad_date.html');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const html = await resp.text();
+        const doc  = new DOMParser().parseFromString(html, 'text/html');
+        const el   = doc.getElementById('olympiad-date-data');
+        if (!el) throw new Error('No se encontró #olympiad-date-data en olympiad_date.html');
+        const data = JSON.parse(el.textContent);
+
+        if (data.fecha) ICHO_FECHA  = new Date(data.fecha);
+        if (data.lugar) ICHO_CIUDAD = data.lugar;
+        if (data.anio)  ICHO_AÑO    = data.anio;
+
+        ICHO_CLOSING_FECHA = (data.closingCeremonyFecha && String(data.closingCeremonyFecha).trim())
+            ? new Date(data.closingCeremonyFecha) : null;
+        ICHO_CLOSING_LINK = (data.closingCeremonyLink && String(data.closingCeremonyLink).trim())
+            ? String(data.closingCeremonyLink).trim() : null;
+    } catch (err) {
+        console.warn('No se pudo cargar Data/olympiad_date.html, usando valores por defecto.', err);
+    }
+}
+
+// Convierte un link de YouTube (watch?v=, youtu.be/, /live/, /embed/) en su URL de embed
+function _youtubeEmbedUrl(url) {
+    try {
+        const u = new URL(url);
+        let id = null;
+        if (/youtu\.be$/.test(u.hostname)) {
+            id = u.pathname.slice(1);
+        } else if (u.pathname.startsWith('/live/')) {
+            id = u.pathname.split('/live/')[1];
+        } else if (u.pathname.startsWith('/embed/')) {
+            id = u.pathname.split('/embed/')[1];
+        } else {
+            id = u.searchParams.get('v');
+        }
+        if (!id) return null;
+        id = id.split('?')[0].split('&')[0].split('/')[0];
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+    } catch (e) {
+        return null;
+    }
+}
 
 (function iniciarContador() {
-    function run() {
+    async function run() {
     const elTitle    = document.getElementById('icho-cd-title');
     const elLocation = document.getElementById('icho-cd-location');
     const elCards    = document.getElementById('icho-cd-cards');
     const elWrap     = document.getElementById('icho-countdown-wrap');
     if (!elWrap) return;
 
+    await _cargarDatosIChO();
+
     if (elTitle)    elTitle.textContent = `IChO ${ICHO_AÑO}`;
     if (elLocation) elLocation.innerHTML = `International Chemistry Olympiad · <strong>${ICHO_CIUDAD}</strong>`;
 
     function pad(n) { return String(n).padStart(2, '0'); }
+
+    let finishedRendered = false;
+
+    // Construye una única vez el bloque "It's IChO Time!" + (opcional) contador
+    // de resultados + (opcional) previsualización del directo de la clausura.
+    function renderFinishedBlock() {
+        let html = `<div class="icho-cd-finished">🏆 It's IChO Time!</div>`;
+
+        if (ICHO_CLOSING_FECHA) {
+            html += `<div class="icho-cd-closing" id="icho-cd-closing-timer"></div>`;
+        }
+        if (ICHO_CLOSING_LINK) {
+            const embed = _youtubeEmbedUrl(ICHO_CLOSING_LINK);
+            if (embed) {
+                html += `<div class="icho-cd-closing-preview">
+                    <iframe src="${embed}" title="Closing Ceremony" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>`;
+            }
+        }
+        if (elCards) elCards.innerHTML = html;
+        finishedRendered = true;
+    }
+
+    // Actualiza (cada segundo) solo el texto del contador de resultados,
+    // sin volver a montar el iframe de la previsualización.
+    function updateClosingTimer() {
+        if (!ICHO_CLOSING_FECHA) return;
+        const timerEl = document.getElementById('icho-cd-closing-timer');
+        if (!timerEl) return;
+        const lang  = window._lang || 'es';
+        const diff  = ICHO_CLOSING_FECHA - new Date();
+        if (diff <= 0) {
+            timerEl.textContent = lang === 'es' ? '🎉 ¡Resultados anunciados!' : '🎉 Results announced!';
+            return;
+        }
+        const dc = Math.floor(diff / 86400000);
+        const hc = Math.floor((diff % 86400000) / 3600000);
+        const mc = Math.floor((diff % 3600000)  / 60000);
+        const sc = Math.floor((diff % 60000)    / 1000);
+        const label = lang === 'es' ? 'Resultados en' : 'Results in';
+        timerEl.textContent = `⏳ ${label}: ${pad(dc)}d ${pad(hc)}h ${pad(mc)}m ${pad(sc)}s`;
+    }
 
     function tick() {
         const ahora   = new Date();
         const diff    = ICHO_FECHA - ahora;
         if (diff <= 0) {
             // Event has started / passed
-            if (elCards) elCards.innerHTML = `<div class="icho-cd-finished">🏆 It's IChO Time!</div>`;
+            if (!finishedRendered) renderFinishedBlock();
+            updateClosingTimer();
             return;
         }
         const dias    = Math.floor(diff / 86400000);
