@@ -1589,18 +1589,46 @@
         .icho-cd-num.c-green  { color: #22c065; }
         .icho-cd-num.c-orange { color: #f77b24; }
         .icho-cd-num.c-purple { color: #9b59d6; }
+        .icho-cd-finished-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 6px 0 2px;
+        }
         .icho-cd-finished {
-            text-align: center; padding: 14px 0 10px;
-            font-size: 15px; color: var(--text-muted);
+            font-family: 'Playfair Display', serif;
+            font-size: 21px; font-weight: 800;
+            color: var(--navy);
+            text-align: center;
+            margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .icho-cd-closing {
+            display: inline-flex; align-items: center; gap: 6px;
             text-align: center;
-            font-size: 13px; font-weight: 600;
-            color: var(--accent);
-            padding-bottom: 4px;
+            font-size: 12.5px; font-weight: 700;
+            color: #fff;
+            background: linear-gradient(90deg, #3b6ef0, #9b59d6);
+            padding: 7px 18px;
+            border-radius: 30px;
+            box-shadow: 0 2px 10px rgba(59,110,240,.25);
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+        .icho-cd-closing-preview-label {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: .4px; text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 16px 0 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .icho-cd-closing-preview-label::before,
+        .icho-cd-closing-preview-label::after {
+            content: ''; height: 1px; width: 24px; background: var(--border);
         }
         .icho-cd-closing-preview {
-            margin: 12px auto 0;
+            margin: 0 auto 0;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border);
@@ -1622,6 +1650,78 @@
             .icho-cd-formula      { font-size: 9px; }
             .icho-cd-closing-preview { max-width: 100%; }
         }
+
+        /* ═══════════════════════════════════════════
+           MEDIA — GALERÍA DE FOTOS
+        ═══════════════════════════════════════════ */
+        .media-gallery {
+            columns: 4 260px;
+            column-gap: 16px;
+            margin-top: 8px;
+        }
+        .media-gallery img {
+            width: 100%;
+            display: block;
+            margin: 0 0 16px;
+            border-radius: 14px;
+            cursor: zoom-in;
+            box-shadow: 0 2px 14px rgba(4,18,43,.08);
+            transition: transform .25s ease, box-shadow .25s ease, opacity .4s ease;
+            break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            opacity: 0;
+            animation: mediaFadeIn .5s ease forwards;
+        }
+        @keyframes mediaFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .media-gallery img:hover {
+            transform: translateY(-4px) scale(1.015);
+            box-shadow: 0 10px 26px rgba(4,18,43,.18);
+        }
+        @media (max-width: 900px) {
+            .media-gallery { columns: 3 200px; column-gap: 12px; }
+        }
+        @media (max-width: 600px) {
+            .media-gallery { columns: 2 140px; column-gap: 10px; }
+            .media-gallery img { margin-bottom: 10px; border-radius: 10px; }
+        }
+        @media (max-width: 400px) {
+            .media-gallery { columns: 1; }
+        }
+
+        /* Lightbox: tap para zoom-in, tap de nuevo para zoom-out */
+        .media-lightbox {
+            position: fixed; inset: 0;
+            background: rgba(4,10,22,.94);
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 10000;
+            cursor: zoom-out;
+            padding: 32px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+        .media-lightbox.visible   { display: flex; }
+        .media-lightbox.mostrando { opacity: 1; }
+        .media-lightbox img {
+            max-width: 100%; max-height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 24px 70px rgba(0,0,0,.55);
+            transform: scale(.85);
+            transition: transform .3s cubic-bezier(.2,.85,.3,1.2);
+        }
+        .media-lightbox.mostrando img { transform: scale(1); }
+        .media-lightbox-close {
+            position: absolute; top: 18px; right: 22px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,.12); color: #fff;
+            border: none; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s ease;
+        }
+        .media-lightbox-close:hover { background: rgba(255,255,255,.22); }
 
         /* ═══════════════════════════════════════════
            EN NÚMEROS
@@ -1862,6 +1962,7 @@
     <button class="menu-item" id="menu-btn-cnq" onclick="cambiarSeccion('cnq')">🧪 <span data-i18n="nav.cnq">Olimpiada Cubana de Química</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
+    <button class="menu-item" id="menu-btn-media" onclick="cambiarSeccion('media')">📸 <span data-i18n="nav.media">Media</span></button>
     <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span data-i18n="nav.contacto">Enlaces y Contacto</span></button>
     <div class="menu-pie" data-i18n="footer.copy">© 2026 · Sitial de Talentos Cubanos</div>
 </div>
@@ -2218,6 +2319,23 @@
     </div><!-- /#noticias -->
 
     <!-- ══════════════════════════════════════ -->
+    <!--              SECCIÓN: MEDIA            -->
+    <!-- ══════════════════════════════════════ -->
+    <div id="media" class="seccion">
+        <article class="seccion-contenido">
+            <h2 class="titulo-seccion" id="media-title-el">📸 Media</h2>
+            <p class="section-sub" id="media-sub-el">Fotos de eventos y equipos</p>
+
+            <div id="media-gallery" class="media-gallery"></div>
+
+            <div class="proximamente" id="media-empty" style="display:none; margin-top:40px; border-top: 1px solid var(--border); padding-top: 40px;">
+                <div class="empty-icon">📸</div>
+                <p id="media-empty-el">Aún no hay fotos publicadas en esta sección.</p>
+            </div>
+        </article>
+    </div><!-- /#media -->
+
+    <!-- ══════════════════════════════════════ -->
     <!--       SECCIÓN: ENLACES Y CONTACTO      -->
     <!-- ══════════════════════════════════════ -->
     <div id="contacto" class="seccion">
@@ -2347,6 +2465,14 @@
 
 </div><!-- /.contenedor -->
 
+<!-- ══════════════════════════════════════ -->
+<!--     LIGHTBOX: ZOOM DE FOTOS (MEDIA)    -->
+<!-- ══════════════════════════════════════ -->
+<div id="media-lightbox" class="media-lightbox" onclick="cerrarLightboxMedia()">
+    <button class="media-lightbox-close" onclick="event.stopPropagation(); cerrarLightboxMedia()" aria-label="Cerrar">✕</button>
+    <img id="media-lightbox-img" src="" alt="">
+</div>
+
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
         <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
@@ -2376,6 +2502,7 @@
 <footer>
     <div class="footer-links">
         <a href="#" class="footer-link-noticias" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
+        <a href="#" class="footer-link-media" onclick="cambiarSeccion('media');return false;">📸 Media</a>
         <a href="#" class="footer-link-contacto" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
     </div>
     <p id="footer-copy-el" style="font-size:12px;opacity:.5;margin-top:6px;">
@@ -4205,9 +4332,125 @@ const _tituloSeccion = {
     eventos:  'nav.eventos',
     honor:    'nav.honor',
     noticias: 'nav.noticias',
+    media:    'nav.media',
     contacto: 'nav.contacto'
 };
 let _transicionEnCurso = false;
+
+// ════════════════════════════════════════════════════════════════
+// MEDIA — Galería de fotos leída directamente de Assets/Media
+// ════════════════════════════════════════════════════════════════
+// No hay ninguna lista/manifiesto que mantener: usamos la API de
+// contenidos de GitHub para pedir el listado REAL de archivos que hay
+// en la carpeta Assets/Media del repositorio, igual de espíritu que la
+// detección automática que ya usa el resto del sitio. La diferencia con
+// el Concurso Nacional (CNQ) es que allí los nombres son predecibles
+// (solo cambia la extensión) y se puede "probar" con HEAD; aquí el
+// nombre de cada foto es libre (fecha + posible sufijo + extensión
+// variable), así que hace falta el listado real de la carpeta.
+let _mediaArchivosCache = null; // caché en memoria durante la sesión de la página
+
+// Deduce {owner, repo} a partir de la propia URL en la que corre la página
+// (patrón de GitHub Pages: https://{owner}.github.io/{repo}/...), con un
+// fallback razonable por si se abre en local durante pruebas.
+function _githubRepoInfo() {
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+    const owner = m ? m[1] : 'EnDriS10';
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    const repo = (m && pathParts[0]) ? pathParts[0] : 'Sitial_Talento';
+    return { owner, repo };
+}
+
+async function _mediaListarArchivos() {
+    if (_mediaArchivosCache) return _mediaArchivosCache;
+    const { owner, repo } = _githubRepoInfo();
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/Assets/Media`;
+    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!Array.isArray(data)) throw new Error('Respuesta inesperada de la API de GitHub');
+    const archivos = data
+        .filter(it => it.type === 'file' && /\.(jpe?g|png|webp|gif)$/i.test(it.name))
+        .map(it => ({ nombre: it.name, url: it.download_url }));
+    _mediaArchivosCache = archivos;
+    return archivos;
+}
+
+// Extrae la fecha DD_MM_AAAA del nombre de archivo (solo para ORDENAR, nunca
+// se muestra en pantalla). Si un archivo no sigue el patrón, se manda al
+// final de la galería en vez de romper la carga.
+function _mediaFechaDesdeNombre(nombre) {
+    const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
+    if (!m) return null;
+    const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    return isNaN(d.getTime()) ? null : d;
+}
+
+let _mediaCargada = false;
+
+async function cargarGaleriaMedia() {
+    if (_mediaCargada) return; // ya cargada en esta visita, no repetir
+    const cont  = document.getElementById('media-gallery');
+    const empty = document.getElementById('media-empty');
+    if (!cont) return;
+    const lang = window._lang || 'es';
+
+    cont.innerHTML = `<div style="padding:50px 20px;text-align:center;color:var(--text-muted);font-size:14px;">⏳ ${lang === 'es' ? 'Cargando fotos…' : 'Loading photos…'}</div>`;
+    if (empty) empty.style.display = 'none';
+
+    try {
+        const archivos = await _mediaListarArchivos();
+
+        const conFecha = archivos.map(a => ({ ...a, fecha: _mediaFechaDesdeNombre(a.nombre) }));
+        conFecha.sort((a, b) => {
+            const ta = a.fecha ? a.fecha.getTime() : -Infinity;
+            const tb = b.fecha ? b.fecha.getTime() : -Infinity;
+            if (tb !== ta) return tb - ta; // más reciente primero
+            return a.nombre.localeCompare(b.nombre);
+        });
+
+        cont.innerHTML = '';
+        if (conFecha.length === 0) {
+            if (empty) empty.style.display = '';
+            _mediaCargada = true;
+            return;
+        }
+
+        conFecha.forEach(({ nombre, url }, i) => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.loading = 'lazy';
+            img.alt = 'Sitial de Talentos';
+            img.style.animationDelay = (Math.min(i, 24) * 0.035) + 's';
+            img.onclick = () => abrirLightboxMedia(url);
+            img.onerror = () => img.remove(); // por si algún archivo falla al cargar
+            cont.appendChild(img);
+        });
+        _mediaCargada = true;
+    } catch (err) {
+        console.error('Error cargando Assets/Media vía la API de GitHub:', err);
+        cont.innerHTML = `<div style="padding:50px 20px;text-align:center;color:var(--text-muted);font-size:14px;">⚠️ ${lang === 'es' ? 'No se pudo cargar la galería en este momento.' : 'The gallery could not be loaded right now.'}</div>`;
+    }
+}
+
+// ── Lightbox: tap para zoom-in, tap de nuevo (o ✕) para zoom-out ──
+function abrirLightboxMedia(src) {
+    const lb  = document.getElementById('media-lightbox');
+    const img = document.getElementById('media-lightbox-img');
+    if (!lb || !img) return;
+    img.src = src;
+    lb.classList.add('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => lb.classList.add('mostrando')));
+    document.addEventListener('keydown', _mediaLightboxEsc);
+}
+function cerrarLightboxMedia() {
+    const lb = document.getElementById('media-lightbox');
+    if (!lb) return;
+    lb.classList.remove('mostrando');
+    setTimeout(() => lb.classList.remove('visible'), 260);
+    document.removeEventListener('keydown', _mediaLightboxEsc);
+}
+function _mediaLightboxEsc(e) { if (e.key === 'Escape') cerrarLightboxMedia(); }
 
 function actualizarStatsBar(seccion) {
     const bar             = document.querySelector('.stats-bar');
@@ -4292,6 +4535,10 @@ function cambiarSeccion(p) {
             if (gateway)  gateway.style.display = '';
             if (listView) listView.classList.remove('visible');
             _honorCategoriaActual = null;
+        }
+        // Al entrar a Media, cargar la galería de fotos (solo la primera vez)
+        if (p === 'media') {
+            cargarGaleriaMedia();
         }
         entrar();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4729,8 +4976,13 @@ function _youtubeEmbedUrl(url) {
 
     // Construye una única vez el bloque "It's IChO Time!" + (opcional) contador
     // de resultados + (opcional) previsualización del directo de la clausura.
+    // Todo va envuelto en su propio contenedor en columna (icho-cd-finished-wrap)
+    // para que NO herede el layout en fila/wrap pensado para las 4 tarjetas
+    // numéricas (días/horas/min/seg), que era lo que descuadraba el bloque.
     function renderFinishedBlock() {
-        let html = `<div class="icho-cd-finished">🏆 It's IChO Time!</div>`;
+        const lang = window._lang || 'es';
+        let html = `<div class="icho-cd-finished-wrap">`;
+        html += `<div class="icho-cd-finished">🏆 ${lang === 'es' ? 'It\'s IChO Time!' : 'It\'s IChO Time!'}</div>`;
 
         if (ICHO_CLOSING_FECHA) {
             html += `<div class="icho-cd-closing" id="icho-cd-closing-timer"></div>`;
@@ -4738,6 +4990,8 @@ function _youtubeEmbedUrl(url) {
         if (ICHO_CLOSING_LINK) {
             const embed = _youtubeEmbedUrl(ICHO_CLOSING_LINK);
             if (embed) {
+                const label = lang === 'es' ? '🎬 Ceremonia de Clausura' : '🎬 Closing Ceremony';
+                html += `<div class="icho-cd-closing-preview-label">${label}</div>`;
                 html += `<div class="icho-cd-closing-preview">
                     <iframe src="${embed}" title="Closing Ceremony" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -4745,6 +4999,7 @@ function _youtubeEmbedUrl(url) {
                 </div>`;
             }
         }
+        html += `</div>`;
         if (elCards) elCards.innerHTML = html;
         finishedRendered = true;
     }
@@ -4758,7 +5013,9 @@ function _youtubeEmbedUrl(url) {
         const lang  = window._lang || 'es';
         const diff  = ICHO_CLOSING_FECHA - new Date();
         if (diff <= 0) {
-            timerEl.textContent = lang === 'es' ? '🎉 ¡Resultados anunciados!' : '🎉 Results announced!';
+            // Ya pasó la fecha de clausura prevista: en vez de asumir que los
+            // resultados ya se anunciaron, avisamos de que están al caer.
+            timerEl.textContent = lang === 'es' ? '🔔 IChO Results — Próximamente' : '🔔 IChO Results — Coming Soon';
             return;
         }
         const dc = Math.floor(diff / 86400000);
@@ -4959,6 +5216,7 @@ const _i18n = {
         'nav.sitial':               'Historial por Medallas',
         'nav.honor':                'Honor a quien Honor Merece',
         'nav.noticias':             'Noticias y Entrevistas',
+        'nav.media':                'Media',
         'nav.contacto':             'Enlaces y Contacto',
         // CNQ
         'nav.cnq':                  'Olimpiada Cubana de Química',
@@ -5099,6 +5357,10 @@ const _i18n = {
         'noticias.more.videos':     'Ver más videos',
         'noticias.empty':           'Esta sección albergará noticias, crónicas y entrevistas con los concursantes.',
         'noticias.contribute':      '¿Tienes una historia que contar? Escríbenos a ',
+        // Media
+        'media.title':               '📸 Media',
+        'media.sub':                 'Fotos de eventos y equipos',
+        'media.empty':               'Aún no hay fotos publicadas en esta sección.',
         // Contacto
         'contacto.title':           '📌 Enlaces y Contacto',
         'contacto.sub':             'Recursos de interés y vías de comunicación',
@@ -5111,6 +5373,7 @@ const _i18n = {
         'filtro.year.label':        'Año:',
         // Footer
         'footer.news':              '📰 Noticias y Entrevistas',
+        'footer.media':             '📸 Media',
         'footer.contact':           '📌 Enlaces y Contacto',
         'footer.copy':              '© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química',
         // Breadcrumb
@@ -5134,6 +5397,7 @@ const _i18n = {
         'nav.sitial':               'Hall of Medals',
         'nav.honor':                'Hall of Fame',
         'nav.noticias':             'News & Interviews',
+        'nav.media':                'Media',
         'nav.contacto':             'Links & Contact',
         // CNQ
         'nav.cnq':                  'Cuban Chemistry Olympiad',
@@ -5265,6 +5529,9 @@ const _i18n = {
         'noticias.more.videos':     'Load more videos',
         'noticias.empty':           'This section will host news, chronicles and interviews with competitors.',
         'noticias.contribute':      'Have a story to share? Write to us at ',
+        'media.title':               '📸 Media',
+        'media.sub':                 'Photos from events and teams',
+        'media.empty':               'No photos have been published in this section yet.',
         'contacto.title':           '📌 Links & Contact',
         'contacto.sub':             'Useful resources and ways to get in touch',
         'contacto.contact':         'Contact',
@@ -5274,6 +5541,7 @@ const _i18n = {
         'filtro.year.placeholder':  'Year',
         'filtro.year.label':        'Year:',
         'footer.news':              '📰 News & Interviews',
+        'footer.media':             '📸 Media',
         'footer.contact':           '📌 Links & Contact',
         'footer.copy':              '© 2026 · Cuban Talent Olympiad Registry',
         'bc.home':                  'Home',
@@ -5374,6 +5642,11 @@ function _refreshDynamic() {
     _setInnerById('noticias-empty-el',  T('noticias.empty'));
     _setInnerById('noticias-contrib-el',T('noticias.contribute') + '<a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>');
 
+    // Media
+    _setTextById('media-title-el', T('media.title'));
+    _setTextById('media-sub-el',   T('media.sub'));
+    _setTextById('media-empty-el', T('media.empty'));
+
     // Contacto
     _setInnerById('contacto-title-el',  T('contacto.title'));
     _setTextById('contacto-sub-el',     T('contacto.sub'));
@@ -5385,6 +5658,8 @@ function _refreshDynamic() {
     // Footer links
     const footerLinks = document.querySelectorAll('.footer-link-noticias');
     footerLinks.forEach(el => el.textContent = T('footer.news'));
+    const footerLinksM = document.querySelectorAll('.footer-link-media');
+    footerLinksM.forEach(el => el.textContent = T('footer.media'));
     const footerLinksC = document.querySelectorAll('.footer-link-contacto');
     footerLinksC.forEach(el => el.textContent = T('footer.contact'));
     _setInnerById('footer-copy-el', T('footer.copy'));
@@ -5501,6 +5776,7 @@ const _bcKeys = {
     cnq:      'nav.cnq',
     honor:    'nav.honor',
     noticias: 'nav.noticias',
+    media:    'nav.media',
     contacto: 'nav.contacto',
 };
 
