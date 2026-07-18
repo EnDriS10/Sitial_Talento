@@ -128,7 +128,18 @@
         [data-theme="dark"] .honor-cat-badge.scientists-badge { background: rgba(90,160,255,.1); color: #5ba3e8; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
+        html { height: 100%; }
+        body {
+            font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text);
+            min-height: 100vh; transition: background .3s, color .3s;
+            /* Pie de página "sticky": siempre pegado abajo del viewport, sin
+               importar cuánto contenido tenga la sección activa (antes, en
+               secciones cortas como Media, el footer subía y quedaba
+               descolocado en vez de quedarse al fondo de la pantalla). */
+            display: flex; flex-direction: column;
+        }
+        #topbar-hamburger { flex-shrink: 0; }
+        footer { flex-shrink: 0; }
 
         /* ═══════════════════════════════════════════
            HEADER
@@ -393,7 +404,7 @@
         nav button.activo::after { left: 16px; right: 16px; }
 
         /* LAYOUT */
-        .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+        .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; flex: 1 0 auto; width: 100%; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
         .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -.2px; line-height: 1.2; }
         .section-sub { font-size: var(--font-base); color: var(--text-muted); margin-bottom: 32px; max-width: 68ch; line-height: 1.65; }
