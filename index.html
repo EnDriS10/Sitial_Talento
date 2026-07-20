@@ -1734,6 +1734,91 @@
         }
         .media-lightbox-close:hover { background: rgba(255,255,255,.22); }
 
+        /* ── Barra de acciones (compartir / descargar) en los visores de foto ── */
+        .foto-share-bar {
+            position: absolute;
+            top: 18px; left: 22px;
+            display: flex; gap: 10px;
+            z-index: 2;
+        }
+        .foto-share-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,.12); color: #fff;
+            border: none; font-size: 17px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .2s ease, transform .15s ease;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        }
+        .foto-share-btn:hover { background: rgba(255,255,255,.22); transform: scale(1.07); }
+        .foto-share-btn svg { width: 18px; height: 18px; display: block; }
+
+        /* Panel desplegable de compartir */
+        .foto-share-panel {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(14,20,32,.82);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border-top: 1px solid rgba(255,255,255,.08);
+            border-radius: 22px 22px 0 0;
+            padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+            box-sizing: border-box;
+            transform: translateY(100%);
+            transition: transform .3s cubic-bezier(.32,.9,.35,1.1);
+            z-index: 3;
+        }
+        .foto-share-panel.abierto { transform: translateY(0); }
+        .foto-share-panel-titulo {
+            color: rgba(255,255,255,.55); font-size: 12px; font-weight: 600;
+            letter-spacing: .6px; text-transform: uppercase;
+            margin: 0 0 16px; text-align: center;
+        }
+        .foto-share-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-width: 480px; margin: 0 auto;
+        }
+        .foto-share-opcion {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            background: none; border: none; cursor: pointer;
+            padding: 4px 2px; border-radius: 12px;
+            transition: background .15s ease, transform .15s ease;
+        }
+        .foto-share-opcion:hover { background: rgba(255,255,255,.06); transform: translateY(-2px); }
+        .foto-share-opcion:active { transform: scale(.94); }
+        .foto-share-icono {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 16px rgba(0,0,0,.3);
+        }
+        .foto-share-icono svg { width: 22px; height: 22px; }
+        .foto-share-icono.whatsapp { background: #25D366; }
+        .foto-share-icono.facebook { background: #1877F2; }
+        .foto-share-icono.x        { background: #000; }
+        .foto-share-icono.telegram { background: #26A5E4; }
+        .foto-share-icono.link     { background: rgba(255,255,255,.14); }
+        .foto-share-icono.descarga { background: var(--gold, #c9a227); }
+        .foto-share-label {
+            color: rgba(255,255,255,.75); font-size: 11px; font-weight: 500;
+            white-space: nowrap;
+        }
+        .foto-share-toast {
+            position: absolute; bottom: 28px; left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(255,255,255,.95); color: #1a1a1a;
+            padding: 9px 18px; border-radius: 20px;
+            font-size: 13px; font-weight: 600;
+            opacity: 0; pointer-events: none;
+            transition: opacity .22s ease, transform .22s ease;
+            z-index: 4; white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0,0,0,.25);
+        }
+        .foto-share-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 480px) {
+            .foto-share-grid { grid-template-columns: repeat(3, 1fr); row-gap: 16px; }
+            .foto-share-bar { top: 14px; left: 14px; }
+        }
+
         /* ═══════════════════════════════════════════
            EN NÚMEROS
         ═══════════════════════════════════════════ */
@@ -2485,8 +2570,42 @@
 <!--     LIGHTBOX: ZOOM DE FOTOS (MEDIA)    -->
 <!-- ══════════════════════════════════════ -->
 <div id="media-lightbox" class="media-lightbox" onclick="cerrarLightboxMedia()">
+    <div class="foto-share-bar" onclick="event.stopPropagation()">
+        <button class="foto-share-btn" onclick="abrirPanelCompartir('media-lightbox-img')" aria-label="Compartir" title="Compartir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg>
+        </button>
+        <button class="foto-share-btn" onclick="descargarFotoActual('media-lightbox-img')" aria-label="Descargar" title="Descargar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        </button>
+    </div>
     <button class="media-lightbox-close" onclick="event.stopPropagation(); cerrarLightboxMedia()" aria-label="Cerrar">✕</button>
     <img id="media-lightbox-img" src="" alt="">
+    <div id="foto-share-panel" class="foto-share-panel" onclick="event.stopPropagation()">
+        <p class="foto-share-panel-titulo" data-i18n="share.title">Compartir</p>
+        <div class="foto-share-grid">
+            <button class="foto-share-opcion" onclick="compartirRed('whatsapp')">
+                <span class="foto-share-icono whatsapp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C11 9.2 10.6 8 10.4 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/></svg></span>
+                <span class="foto-share-label">WhatsApp</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('facebook')">
+                <span class="foto-share-icono facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>
+                <span class="foto-share-label">Facebook</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('x')">
+                <span class="foto-share-icono x"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>
+                <span class="foto-share-label">X</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('telegram')">
+                <span class="foto-share-icono telegram"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>
+                <span class="foto-share-label">Telegram</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('link')">
+                <span class="foto-share-icono link"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"></path></svg></span>
+                <span class="foto-share-label" data-i18n="share.copyLink">Copiar enlace</span>
+            </button>
+        </div>
+        <div class="foto-share-toast" id="foto-share-toast"></div>
+    </div>
 </div>
 
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
@@ -2502,9 +2621,43 @@
 </div>
 
 <div id="foto-zoom-overlay" onclick="cerrarFotoZoom()">
+    <div class="foto-share-bar" onclick="event.stopPropagation()">
+        <button class="foto-share-btn" onclick="abrirPanelCompartir('foto-zoom-img', 'foto-zoom-panel')" aria-label="Compartir" title="Compartir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg>
+        </button>
+        <button class="foto-share-btn" onclick="descargarFotoActual('foto-zoom-img')" aria-label="Descargar" title="Descargar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        </button>
+    </div>
     <button id="foto-zoom-close" onclick="cerrarFotoZoom()" aria-label="Cerrar">✕</button>
     <img id="foto-zoom-img" src="" alt="">
     <div id="foto-zoom-nombre"></div>
+    <div id="foto-zoom-panel" class="foto-share-panel" onclick="event.stopPropagation()">
+        <p class="foto-share-panel-titulo" data-i18n="share.title">Compartir</p>
+        <div class="foto-share-grid">
+            <button class="foto-share-opcion" onclick="compartirRed('whatsapp', 'foto-zoom-panel')">
+                <span class="foto-share-icono whatsapp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C11 9.2 10.6 8 10.4 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/></svg></span>
+                <span class="foto-share-label">WhatsApp</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('facebook', 'foto-zoom-panel')">
+                <span class="foto-share-icono facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>
+                <span class="foto-share-label">Facebook</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('x', 'foto-zoom-panel')">
+                <span class="foto-share-icono x"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>
+                <span class="foto-share-label">X</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('telegram', 'foto-zoom-panel')">
+                <span class="foto-share-icono telegram"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>
+                <span class="foto-share-label">Telegram</span>
+            </button>
+            <button class="foto-share-opcion" onclick="compartirRed('link', 'foto-zoom-panel')">
+                <span class="foto-share-icono link"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"></path></svg></span>
+                <span class="foto-share-label" data-i18n="share.copyLink">Copiar enlace</span>
+            </button>
+        </div>
+        <div class="foto-share-toast" id="foto-zoom-toast"></div>
+    </div>
 </div>
 
 <div id="logo-zoom-overlay" onclick="cerrarLogoZoom()">
@@ -4462,6 +4615,7 @@ function abrirLightboxMedia(src) {
 function cerrarLightboxMedia() {
     const lb = document.getElementById('media-lightbox');
     if (!lb) return;
+    cerrarPanelCompartir('foto-share-panel');
     lb.classList.remove('mostrando');
     setTimeout(() => lb.classList.remove('visible'), 260);
     document.removeEventListener('keydown', _mediaLightboxEsc);
@@ -4667,6 +4821,113 @@ function abrirFotoDirecta(foto, nombre) {
 }
 function cerrarFotoZoom() {
     document.getElementById('foto-zoom-overlay').classList.remove('abierto');
+    cerrarPanelCompartir('foto-zoom-panel');
+}
+
+// ════ COMPARTIR / DESCARGAR FOTOS (galería Media y fotos de perfil) ════
+function abrirPanelCompartir(imgId, panelId) {
+    panelId = panelId || 'foto-share-panel';
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    _prepararOpcionNativaCompartir(panel);
+    panel.classList.toggle('abierto');
+}
+
+function cerrarPanelCompartir(panelId) {
+    const panel = document.getElementById(panelId || 'foto-share-panel');
+    if (panel) panel.classList.remove('abierto');
+}
+
+function _prepararOpcionNativaCompartir(panel) {
+    const grid = panel.querySelector('.foto-share-grid');
+    if (!grid || !navigator.share || grid.querySelector('.foto-share-opcion-nativo')) return;
+    const btn = document.createElement('button');
+    btn.className = 'foto-share-opcion foto-share-opcion-nativo';
+    btn.innerHTML = `<span class="foto-share-icono" style="background:rgba(255,255,255,.16)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span><span class="foto-share-label" data-i18n="share.more">${T('share.more')}</span>`;
+    btn.onclick = compartirNativo;
+    grid.insertBefore(btn, grid.firstChild);
+}
+
+function compartirNativo() {
+    const url = location.origin + location.pathname;
+    const esEn = window._lang === 'en';
+    navigator.share({
+        title: 'Sitial de Talentos',
+        text: esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos',
+        url
+    }).catch(() => {});
+}
+
+function compartirRed(red, panelId) {
+    if (red === 'link') { copiarEnlacePagina(panelId); return; }
+    const esEn   = window._lang === 'en';
+    const urlEnc = encodeURIComponent(location.origin + location.pathname);
+    const texto  = encodeURIComponent(esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos');
+    let enlace = '';
+    switch (red) {
+        case 'whatsapp': enlace = `https://wa.me/?text=${texto}%20${urlEnc}`; break;
+        case 'facebook': enlace = `https://www.facebook.com/sharer/sharer.php?u=${urlEnc}`; break;
+        case 'x':        enlace = `https://twitter.com/intent/tweet?text=${texto}&url=${urlEnc}`; break;
+        case 'telegram': enlace = `https://t.me/share/url?url=${urlEnc}&text=${texto}`; break;
+        default: return;
+    }
+    window.open(enlace, '_blank', 'noopener,noreferrer,width=560,height=620');
+}
+
+function copiarEnlacePagina(panelId) {
+    const url    = location.origin + location.pathname;
+    const esEn   = window._lang === 'en';
+    const toastId = panelId === 'foto-zoom-panel' ? 'foto-zoom-toast' : 'foto-share-toast';
+    const finalizar = (ok) => mostrarToastCompartir(
+        toastId,
+        ok ? (esEn ? 'Link copied!' : '¡Enlace copiado!') : (esEn ? 'Could not copy link' : 'No se pudo copiar el enlace')
+    );
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => finalizar(true)).catch(() => finalizar(false));
+    } else {
+        try {
+            const tmp = document.createElement('textarea');
+            tmp.value = url;
+            tmp.style.position = 'fixed';
+            tmp.style.opacity  = '0';
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+            finalizar(true);
+        } catch (e) { finalizar(false); }
+    }
+}
+
+function mostrarToastCompartir(toastId, mensaje) {
+    const toast = document.getElementById(toastId);
+    if (!toast) return;
+    toast.textContent = mensaje;
+    toast.classList.add('visible');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('visible'), 2200);
+}
+
+async function descargarFotoActual(imgId) {
+    const img = document.getElementById(imgId);
+    if (!img || !img.src) return;
+    try {
+        const resp = await fetch(img.src, { mode: 'cors' });
+        if (!resp.ok) throw new Error('fetch falló');
+        const blob    = await resp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const nombre  = (img.alt || 'foto').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase() || 'foto';
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `sitial-de-talentos-${nombre}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+    } catch (err) {
+        // Fallback si el fetch falla por CORS: abrir la imagen en pestaña nueva
+        window.open(img.src, '_blank', 'noopener,noreferrer');
+    }
 }
 
 // Abre logo sobre fondo blanco
@@ -4682,7 +4943,13 @@ function cerrarLogoZoom() {
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        if (document.getElementById('logo-zoom-overlay').classList.contains('abierto')) {
+        const panelMedia = document.getElementById('foto-share-panel');
+        const panelZoom  = document.getElementById('foto-zoom-panel');
+        if (panelMedia && panelMedia.classList.contains('abierto')) {
+            cerrarPanelCompartir('foto-share-panel');
+        } else if (panelZoom && panelZoom.classList.contains('abierto')) {
+            cerrarPanelCompartir('foto-zoom-panel');
+        } else if (document.getElementById('logo-zoom-overlay').classList.contains('abierto')) {
             cerrarLogoZoom();
         } else if (document.getElementById('foto-zoom-overlay').classList.contains('abierto')) {
             cerrarFotoZoom();
@@ -5234,6 +5501,10 @@ const _i18n = {
         'nav.noticias':             'Noticias y Entrevistas',
         'nav.media':                'Media',
         'nav.contacto':             'Enlaces y Contacto',
+        // Compartir foto
+        'share.title':              'Compartir',
+        'share.copyLink':           'Copiar enlace',
+        'share.more':               'Más',
         // CNQ
         'nav.cnq':                  'Olimpiada Cubana de Química',
         'cnq.title':                'Olimpiada Cubana de Química',
@@ -5416,6 +5687,10 @@ const _i18n = {
         'nav.noticias':             'News & Interviews',
         'nav.media':                'Media',
         'nav.contacto':             'Links & Contact',
+        // Share photo
+        'share.title':              'Share',
+        'share.copyLink':           'Copy link',
+        'share.more':               'More',
         // CNQ
         'nav.cnq':                  'Cuban Chemistry Olympiad',
         'cnq.title':                'Cuban Chemistry Olympiad',
