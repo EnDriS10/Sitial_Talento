@@ -1734,6 +1734,25 @@
         }
         .media-lightbox-close:hover { background: rgba(255,255,255,.22); }
 
+        /* Insignia minimalista: evento + año (p.ej. "IChO · 2023") */
+        .media-lightbox-evento {
+            display: none;
+            position: absolute;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.16);
+            color: rgba(255,255,255,.92);
+            font-size: 12px; font-weight: 600;
+            letter-spacing: .4px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            z-index: 2;
+            align-items: center;
+            pointer-events: none;
+        }
+
         /* ── Barra de acciones (compartir / descargar) en los visores de foto ── */
         .foto-share-bar {
             position: absolute;
@@ -2579,6 +2598,7 @@
         </button>
     </div>
     <button class="media-lightbox-close" onclick="event.stopPropagation(); cerrarLightboxMedia()" aria-label="Cerrar">✕</button>
+    <span id="media-lightbox-evento" class="media-lightbox-evento" onclick="event.stopPropagation()"></span>
     <img id="media-lightbox-img" src="" alt="">
     <div id="foto-share-panel" class="foto-share-panel" onclick="event.stopPropagation()">
         <p class="foto-share-panel-titulo" data-i18n="share.title">Compartir</p>
@@ -3685,11 +3705,18 @@ const _origInit = () => {
     calcularEnNumeros();
     inicializarNoticias();
 
+    // Deep-link a una foto concreta de Media: ?media=DD_MM_AAAA_evento.ext
+    const _mediaParam = (() => {
+        try { return new URLSearchParams(location.search).get('media'); } catch(e) { return null; }
+    })();
+
     // Restaurar sección activa si el usuario recargó la página
-    const seccionGuardada = (() => {
+    let seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias'];
+    if (_mediaParam) seccionGuardada = 'media'; // el enlace compartido manda sobre la sesión guardada
+
+    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias','media'];
     if (seccionGuardada && secciones.includes(seccionGuardada) && seccionGuardada !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
         const secEl = document.getElementById(seccionGuardada);
@@ -3703,6 +3730,11 @@ const _origInit = () => {
             if (menuBtn) menuBtn.classList.add('activo');
             actualizarStatsBar(seccionGuardada);
             if (seccionGuardada === 'eventos') { statsParaEvento(); cargarTabla(); }
+            if (seccionGuardada === 'media') {
+                cargarGaleriaMedia().then(() => {
+                    if (_mediaParam) _abrirFotoPorNombreDesdeGaleria(_mediaParam);
+                });
+            }
         }
     } else {
         actualizarStatsBar('inicio');
@@ -4546,8 +4578,10 @@ async function _mediaListarArchivos() {
 }
 
 // Extrae la fecha DD_MM_AAAA del nombre de archivo (solo para ORDENAR, nunca
-// se muestra en pantalla). Si un archivo no sigue el patrón, se manda al
-// final de la galería en vez de romper la carga.
+// se muestra en pantalla). El nombre real es DD_MM_AAAA_evento.ext — el sufijo
+// de evento no afecta a este parseo porque solo miramos el principio.
+// Si un archivo no sigue el patrón, se manda al final de la galería en vez
+// de romper la carga.
 function _mediaFechaDesdeNombre(nombre) {
     const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
     if (!m) return null;
@@ -4555,7 +4589,25 @@ function _mediaFechaDesdeNombre(nombre) {
     return isNaN(d.getTime()) ? null : d;
 }
 
+// Extrae el código de evento del nombre de archivo: DD_MM_AAAA_evento.ext
+// evento ∈ { icho, imcho, oiaq, ocacq, otras } (case-insensitive).
+function _mediaEventoDesdeNombre(nombre) {
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)\.\w+$/);
+    return m ? m[1].toLowerCase() : null;
+}
+
+// Etiqueta minimalista del evento para mostrar en el visor.
+function _mediaEventoLabel(codigo) {
+    if (!codigo) return null;
+    const mapa = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+    const key  = codigo.toLowerCase();
+    if (mapa[key]) return mapa[key];
+    if (key === 'otras' || key === 'otra' || key === 'otro') return (window._lang === 'en') ? 'Other' : 'Otras';
+    return null;
+}
+
 let _mediaCargada = false;
+let _mediaGaleriaActual = []; // caché de la última galería cargada (para deep-links y datos del visor)
 
 async function cargarGaleriaMedia() {
     if (_mediaCargada) return; // ya cargada en esta visita, no repetir
@@ -4570,13 +4622,18 @@ async function cargarGaleriaMedia() {
     try {
         const archivos = await _mediaListarArchivos();
 
-        const conFecha = archivos.map(a => ({ ...a, fecha: _mediaFechaDesdeNombre(a.nombre) }));
+        const conFecha = archivos.map(a => ({
+            ...a,
+            fecha:  _mediaFechaDesdeNombre(a.nombre),
+            evento: _mediaEventoDesdeNombre(a.nombre)
+        }));
         conFecha.sort((a, b) => {
             const ta = a.fecha ? a.fecha.getTime() : -Infinity;
             const tb = b.fecha ? b.fecha.getTime() : -Infinity;
             if (tb !== ta) return tb - ta; // más reciente primero
             return a.nombre.localeCompare(b.nombre);
         });
+        _mediaGaleriaActual = conFecha;
 
         cont.innerHTML = '';
         if (conFecha.length === 0) {
@@ -4585,13 +4642,14 @@ async function cargarGaleriaMedia() {
             return;
         }
 
-        conFecha.forEach(({ nombre, url }, i) => {
+        conFecha.forEach((datos, i) => {
+            const { nombre, url } = datos;
             const img = document.createElement('img');
             img.src = url;
             img.loading = 'lazy';
             img.alt = 'Sitial de Talentos';
             img.style.animationDelay = (Math.min(i, 24) * 0.035) + 's';
-            img.onclick = () => abrirLightboxMedia(url);
+            img.onclick = () => abrirLightboxMedia(datos);
             img.onerror = () => img.remove(); // por si algún archivo falla al cargar
             cont.appendChild(img);
         });
@@ -4603,11 +4661,29 @@ async function cargarGaleriaMedia() {
 }
 
 // ── Lightbox: tap para zoom-in, tap de nuevo (o ✕) para zoom-out ──
-function abrirLightboxMedia(src) {
+let _mediaLightboxActual = null; // { nombre, url, fecha, evento } de la foto abierta actualmente
+
+function abrirLightboxMedia(datos) {
+    // Compatibilidad: admite tanto el objeto completo como (legado) una URL suelta.
+    if (typeof datos === 'string') datos = { nombre: null, url: datos, fecha: null, evento: null };
     const lb  = document.getElementById('media-lightbox');
     const img = document.getElementById('media-lightbox-img');
     if (!lb || !img) return;
-    img.src = src;
+    _mediaLightboxActual = datos;
+    img.src = datos.url;
+
+    const badge = document.getElementById('media-lightbox-evento');
+    if (badge) {
+        const etiqueta = _mediaEventoLabel(datos.evento);
+        const año = datos.fecha ? datos.fecha.getFullYear() : null;
+        if (etiqueta) {
+            badge.textContent = año ? `${etiqueta} · ${año}` : etiqueta;
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
     lb.classList.add('visible');
     requestAnimationFrame(() => requestAnimationFrame(() => lb.classList.add('mostrando')));
     document.addEventListener('keydown', _mediaLightboxEsc);
@@ -4619,8 +4695,17 @@ function cerrarLightboxMedia() {
     lb.classList.remove('mostrando');
     setTimeout(() => lb.classList.remove('visible'), 260);
     document.removeEventListener('keydown', _mediaLightboxEsc);
+    _mediaLightboxActual = null;
 }
 function _mediaLightboxEsc(e) { if (e.key === 'Escape') cerrarLightboxMedia(); }
+
+// Abre en el visor la foto de la galería que coincide con este nombre de
+// archivo (usado al llegar desde un enlace compartido ?media=archivo.ext).
+function _abrirFotoPorNombreDesdeGaleria(nombre) {
+    if (!nombre || !_mediaGaleriaActual.length) return;
+    const datos = _mediaGaleriaActual.find(d => d.nombre === nombre);
+    if (datos) abrirLightboxMedia(datos);
+}
 
 function actualizarStatsBar(seccion) {
     const bar             = document.querySelector('.stats-bar');
@@ -4829,7 +4914,7 @@ function abrirPanelCompartir(imgId, panelId) {
     panelId = panelId || 'foto-share-panel';
     const panel = document.getElementById(panelId);
     if (!panel) return;
-    _prepararOpcionNativaCompartir(panel);
+    _prepararOpcionNativaCompartir(panel, panelId);
     panel.classList.toggle('abierto');
 }
 
@@ -4838,18 +4923,30 @@ function cerrarPanelCompartir(panelId) {
     if (panel) panel.classList.remove('abierto');
 }
 
-function _prepararOpcionNativaCompartir(panel) {
+// Construye el enlace a compartir. Si se comparte desde la galería de Media
+// (foto-share-panel) con una foto abierta, el enlace lleva directamente a la
+// sección Media y abre esa foto en zoom; en cualquier otro caso, enlaza a la
+// página principal del sitial.
+function _enlaceCompartirActual(panelId) {
+    const base = location.origin + location.pathname;
+    if (panelId === 'foto-share-panel' && _mediaLightboxActual && _mediaLightboxActual.nombre) {
+        return `${base}?media=${encodeURIComponent(_mediaLightboxActual.nombre)}`;
+    }
+    return base;
+}
+
+function _prepararOpcionNativaCompartir(panel, panelId) {
     const grid = panel.querySelector('.foto-share-grid');
     if (!grid || !navigator.share || grid.querySelector('.foto-share-opcion-nativo')) return;
     const btn = document.createElement('button');
     btn.className = 'foto-share-opcion foto-share-opcion-nativo';
     btn.innerHTML = `<span class="foto-share-icono" style="background:rgba(255,255,255,.16)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span><span class="foto-share-label" data-i18n="share.more">${T('share.more')}</span>`;
-    btn.onclick = compartirNativo;
+    btn.onclick = () => compartirNativo(panelId);
     grid.insertBefore(btn, grid.firstChild);
 }
 
-function compartirNativo() {
-    const url = location.origin + location.pathname;
+function compartirNativo(panelId) {
+    const url  = _enlaceCompartirActual(panelId);
     const esEn = window._lang === 'en';
     navigator.share({
         title: 'Sitial de Talentos',
@@ -4861,7 +4958,7 @@ function compartirNativo() {
 function compartirRed(red, panelId) {
     if (red === 'link') { copiarEnlacePagina(panelId); return; }
     const esEn   = window._lang === 'en';
-    const urlEnc = encodeURIComponent(location.origin + location.pathname);
+    const urlEnc = encodeURIComponent(_enlaceCompartirActual(panelId));
     const texto  = encodeURIComponent(esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos');
     let enlace = '';
     switch (red) {
@@ -4875,7 +4972,7 @@ function compartirRed(red, panelId) {
 }
 
 function copiarEnlacePagina(panelId) {
-    const url    = location.origin + location.pathname;
+    const url    = _enlaceCompartirActual(panelId);
     const esEn   = window._lang === 'en';
     const toastId = panelId === 'foto-zoom-panel' ? 'foto-zoom-toast' : 'foto-share-toast';
     const finalizar = (ok) => mostrarToastCompartir(
