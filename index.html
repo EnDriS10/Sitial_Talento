@@ -5576,7 +5576,11 @@ function _provHide() {
 // DARK MODE
 // ════════════════════════════════════════════════════════════════════
 (function() {
-    try { if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch(e) {}
+    try {
+        const guardado = localStorage.getItem('theme');
+        const oscuro = guardado ? (guardado === 'dark') : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (oscuro) document.documentElement.setAttribute('data-theme', 'dark');
+    } catch(e) {}
 })();
 
 function toggleTheme() {
@@ -5591,7 +5595,12 @@ function toggleTheme() {
 // INTERNACIONALIZACIÓN COMPLETA  (ES ↔ EN)
 // ════════════════════════════════════════════════════════════════════
 window._lang = (function() {
-    try { return localStorage.getItem('lang') || 'es'; } catch(e) { return 'es'; }
+    try {
+        const guardado = localStorage.getItem('lang');
+        if (guardado) return guardado;
+        const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+        return navLang.startsWith('en') ? 'en' : 'es';
+    } catch(e) { return 'es'; }
 })();
 
 // T() — función global de traducción usada en toda la app
@@ -6133,7 +6142,7 @@ function _setOptionText(selectId, value, text) {
 
 function _actualizarBotonesUtilidad() {
     const labelEl = document.getElementById('lang-label');
-    if (labelEl) labelEl.textContent = T('lang.btn');
+    if (labelEl) labelEl.textContent = (window._lang === 'es') ? 'ES' : 'EN';
 }
 
 function applyI18n(lang) {
