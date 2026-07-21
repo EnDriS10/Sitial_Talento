@@ -67,46 +67,31 @@
     }
     .mp-sub { color: var(--text-muted); font-size: 14px; margin: 0 0 22px; }
     .mp-gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        grid-auto-rows: 150px;
-        grid-auto-flow: dense;
-        gap: 16px;
+        columns: 4 260px;
+        column-gap: 16px;
     }
     .mp-tile {
-        position: relative; width: 100%; height: 100%;
-        grid-column: span 1; grid-row: span 1;
+        position: relative; width: 100%;
         border-radius: 14px; overflow: hidden; cursor: zoom-in;
         background: var(--card-bg); border: 1px solid var(--border);
         box-shadow: 0 2px 14px rgba(4,18,43,.08);
         transition: transform .25s ease, box-shadow .25s ease;
         opacity: 0; animation: mpFadeIn .5s ease forwards;
+        break-inside: avoid; -webkit-column-break-inside: avoid;
+        margin: 0 0 16px;
     }
-    /* Tamaños del mosaico: varían según la proporción real de cada foto
-       (paisaje → ancha, retrato → alta, casi cuadrada → normal), y siempre
-       encajan en la cuadrícula gracias a grid-auto-flow: dense. La variación
-       es sutil a propósito (máx. 2×1 / 1×2) para que no se vea dispar. */
-    .mp-tile.mp-size-wide { grid-column: span 2; grid-row: span 1; }
-    .mp-tile.mp-size-tall { grid-column: span 1; grid-row: span 2; }
     @keyframes mpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .mp-tile:hover { transform: translateY(-4px) scale(1.015); box-shadow: 0 10px 26px rgba(4,18,43,.18); }
-    .mp-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mp-tile img { width: 100%; height: auto; display: block; }
     .mp-tile-badge {
         position: absolute; bottom: 8px; left: 8px;
         background: rgba(4,10,22,.6); color: #fff; font-size: 10px; font-weight: 700;
         letter-spacing: .3px; padding: 4px 9px; border-radius: 999px;
         backdrop-filter: blur(3px);
     }
-    @media (max-width: 900px) {
-        .mp-gallery { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: 130px; gap: 12px; }
-    }
-    @media (max-width: 600px) {
-        .mp-gallery { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 90px; gap: 8px; }
-        .mp-tile { border-radius: 9px; }
-        /* En pantallas muy estrechas, las piezas grandes siguen ocupando 2×2
-           (mitad del ancho), pero limitamos las "wide" a no desbordar. */
-        .mp-tile.mp-size-wide { grid-column: span 2; grid-row: span 1; }
-    }
+    @media (max-width: 900px)  { .mp-gallery { columns: 3 200px; column-gap: 12px; } }
+    @media (max-width: 600px)  { .mp-gallery { columns: 2 140px; column-gap: 10px; } .mp-tile { border-radius: 10px; margin-bottom: 10px; } }
+    @media (max-width: 400px)  { .mp-gallery { columns: 1; } }
 
     .mp-estado {
         padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 14px;
@@ -400,10 +385,6 @@ function _etiquetaEvento(codigo) {
 
 let _galeria = [];   // lista ordenada de { nombre, url, fecha, evento, num }
 let _actual  = null; // foto abierta actualmente en el visor
-let _entradaPropia = false; // true si abrir esta foto generó una entrada nueva en el
-                             // historial (pushState); false si solo reemplazó la entrada
-                             // inicial (llegada directa por enlace compartido). Determina
-                             // si al cerrar es seguro usar history.back().
 
 async function cargarGaleria() {
     const cont = document.getElementById('mp-gallery');
@@ -429,23 +410,12 @@ async function cargarGaleria() {
             cont.innerHTML = `<div class="mp-estado">${_t('empty')}</div>`;
             return;
         }
-        // El tamaño de cada pieza del mosaico se calcula a partir de la
-        // proporción REAL de la foto (una vez cargada), no de un patrón
-        // fijo: paisaje → ancha, retrato → alta, casi cuadrada → normal.
-        // Los umbrales son moderados para que la variación sea sutil y no
-        // dispar entre fotos.
         _galeria.forEach((datos, i) => {
             const tile = document.createElement('div');
             tile.className = 'mp-tile';
             tile.style.animationDelay = (Math.min(i, 24) * 0.03) + 's';
             const img = document.createElement('img');
             img.src = datos.url; img.loading = 'lazy'; img.alt = 'Sitial de Talentos';
-            img.onload = () => {
-                const ratio = img.naturalWidth / img.naturalHeight;
-                if (ratio >= 1.35) tile.classList.add('mp-size-wide');
-                else if (ratio <= 0.74) tile.classList.add('mp-size-tall');
-                // si es casi cuadrada, se queda con el tamaño normal (sin clase)
-            };
             img.onerror = () => tile.remove();
             tile.appendChild(img);
             const etiqueta = _etiquetaEvento(datos.evento);
@@ -518,7 +488,9 @@ function _lbTeclado(e) {
 
 // Abre una foto por nombre de archivo. push=true crea una entrada nueva en el
 // historial (al abrir desde la cuadrícula); push=false solo se usa al cargar
-// la página ya con ?foto=archivo en la URL.
+// la página ya con ?foto=archivo en la URL (enlace compartido / recarga).
+let _historyPushed = false; // true solo si NOSOTROS apilamos una entrada nueva
+
 function abrirFoto(nombre, push) {
     const datos = _galeria.find(d => d.nombre === nombre);
     if (!datos) return;
@@ -526,8 +498,12 @@ function abrirFoto(nombre, push) {
     _renderLightbox(datos);
     _mostrarLightbox();
     const url = 'media.html?foto=' + encodeURIComponent(nombre);
-    if (push) { history.pushState({ foto: nombre }, '', url); _entradaPropia = true; }
-    else      { history.replaceState({ foto: nombre }, '', url); _entradaPropia = false; }
+    if (push) {
+        history.pushState({ foto: nombre }, '', url);
+        _historyPushed = true;
+    } else {
+        history.replaceState({ foto: nombre }, '', url);
+    }
 }
 
 // Flechas prev/next: cambia de foto sin apilar historial (replaceState).
@@ -541,22 +517,18 @@ function irFotoAdyacente(delta) {
     history.replaceState({ foto: destino.nombre }, '', 'media.html?foto=' + encodeURIComponent(destino.nombre));
 }
 
-// Cerrar: si esta apertura generó una entrada de historial, retrocede
-// (así el botón "atrás" del navegador funciona de forma natural); si se
-// llegó directo por enlace compartido, simplemente limpia la URL.
+// Cerrar (botón ✕ o tocar fuera de la foto): siempre debe hacer "zoom out" y
+// quedarse en Media, nunca abandonar la página. Solo usamos history.back()
+// cuando la apertura actual generó de verdad una entrada nueva en el
+// historial de ESTA sesión (abierta desde la cuadrícula); si se llegó
+// directo por un enlace compartido o al recargar la página, no hay ninguna
+// entrada nuestra a la que volver, así que simplemente limpiamos la URL sin
+// navegar fuera del sitio.
 function cerrarFoto() {
-    if (_entradaPropia && history.state && history.state.foto) {
-        // Esta foto se abrió desde la cuadrícula (pushState), así que hay una
-        // entrada previa segura a la que volver: el botón atrás del navegador
-        // se comporta de forma natural.
+    if (_historyPushed) {
         history.back();
     } else {
-        // Se llegó directo por un enlace compartido (?foto=...): no existe una
-        // entrada previa propia en el historial de esta pestaña, así que NO
-        // usamos history.back() (eso haría que la página entera desaparezca).
-        // Simplemente hacemos zoom-out y limpiamos la URL en el sitio.
         _ocultarLightbox();
-        _entradaPropia = false;
         history.replaceState({}, '', 'media.html');
     }
 }
@@ -567,6 +539,7 @@ window.addEventListener('popstate', (e) => {
         const datos = _galeria.find(d => d.nombre === foto);
         if (datos) { _actual = datos; _renderLightbox(datos); _mostrarLightbox(); return; }
     }
+    _historyPushed = false; // volvimos al estado base: la siguiente apertura debe re-marcarse
     _ocultarLightbox();
 });
 
@@ -592,27 +565,12 @@ function _prepararOpcionNativa(panel) {
     btn.onclick = compartirNativo;
     grid.insertBefore(btn, grid.firstChild);
 }
-function _slugFoto(nombre) {
-    // Debe coincidir con slug() de scripts/generar-paginas-compartir.js
-    return nombre.replace(/\.[^.]+$/, '');
-}
-function _urlCompartirActual() {
-    // Si hay una foto abierta, se comparte el link a su página estática de
-    // "compartir" (share/<slug>.html), que trae las etiquetas og:image
-    // correctas para que WhatsApp/Facebook/Telegram muestren la vista
-    // previa de esa foto. Sin eso, como la app carga todo por JS, el link
-    // directo a media.html?foto=... siempre mostraría la misma vista previa
-    // genérica (los "crawlers" de esas apps no ejecutan JavaScript).
-    if (!_actual) return location.href;
-    const base = location.href.replace(/media\.html.*$/, '');
-    return base + 'share/' + _slugFoto(_actual.nombre) + '.html';
-}
 function compartirNativo() {
-    navigator.share({ title: 'Sitial de Talentos', text: _t('shareText'), url: _urlCompartirActual() }).catch(() => {});
+    navigator.share({ title: 'Sitial de Talentos', text: _t('shareText'), url: location.href }).catch(() => {});
 }
 function compartirRed(red) {
     if (red === 'link') { copiarEnlace(); return; }
-    const urlEnc = encodeURIComponent(_urlCompartirActual());
+    const urlEnc = encodeURIComponent(location.href);
     const texto  = encodeURIComponent(_t('shareText'));
     let enlace = '';
     switch (red) {
@@ -625,7 +583,7 @@ function compartirRed(red) {
     window.open(enlace, '_blank', 'noopener,noreferrer,width=560,height=620');
 }
 function copiarEnlace() {
-    const url = _urlCompartirActual();
+    const url = location.href;
     const finalizar = (ok) => mostrarToast(ok ? _t('copied') : _t('copyFail'));
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(() => finalizar(true)).catch(() => finalizar(false));
