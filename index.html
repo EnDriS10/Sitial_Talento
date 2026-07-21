@@ -2756,54 +2756,135 @@ function calcularActividadProfesor(nombre, rawFechaInicio) {
     };
 }
 
+// Busca en los datos de ESTUDIANTES (todasLasOlimpiadas + datosOtras) todas las
+// apariciones de un nombre y devuelve { añoMin, añoMax, totalEventos, registros }
+// (con la medalla de cada evento incluida) o null si nunca participó como
+// estudiante. Se usa para detectar profesores que también fueron estudiantes.
+function calcularActividadEstudiante(nombre) {
+    const nombreNorm = nombre ? nombre.trim().toLowerCase() : '';
+    if (!nombreNorm) return null;
+    const registros = [];
+
+    // todasLasOlimpiadas: { icho:[...], imcho:[...], oiaq:[...], ocacq:[...] } —
+    // cada registro no trae el código de olimpiada, así que se toma de la clave.
+    if (typeof todasLasOlimpiadas === 'object' && todasLasOlimpiadas) {
+        Object.entries(todasLasOlimpiadas).forEach(([key, arr]) => {
+            (Array.isArray(arr) ? arr : []).forEach(r => {
+                if ((r.nombre || '').trim().toLowerCase() === nombreNorm) {
+                    const olimpNombre = (typeof nombreOlimpiada !== 'undefined' && nombreOlimpiada[key]) || key.toUpperCase();
+                    registros.push({ ...r, _olimpKey: olimpNombre });
+                }
+            });
+        });
+    }
+
+    // datosOtras: cada registro ya trae su propio Olimp/Olimpiada.
+    if (typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) {
+        datosOtras.forEach(r => {
+            if ((r.nombre || '').trim().toLowerCase() === nombreNorm) {
+                registros.push({ ...r, _olimpKey: r.Olimp || r.Olimpiada || 'Otras' });
+            }
+        });
+    }
+
+    const años = registros.map(r => Number(r.año)).filter(a => !isNaN(a) && a > 1900);
+    if (!años.length) return null;
+
+    const olimpOrder = { 'IChO': 1, 'IMChO': 2, 'OIAQ': 3, 'OCACQ': 4 };
+    const registrosOrdenados = [...registros].sort((a, b) => {
+        const añoDiff = Number(b.año) - Number(a.año);
+        if (añoDiff !== 0) return añoDiff;
+        const keyA = Object.keys(olimpOrder).find(k => k.toLowerCase() === (a.Olimp || a._olimpKey || '').toLowerCase()) || null;
+        const keyB = Object.keys(olimpOrder).find(k => k.toLowerCase() === (b.Olimp || b._olimpKey || '').toLowerCase()) || null;
+        return (keyA ? olimpOrder[keyA] : 99) - (keyB ? olimpOrder[keyB] : 99);
+    });
+
+    return {
+        añoMin: Math.min(...años),
+        añoMax: Math.max(...años),
+        totalEventos: registros.length,
+        registros: registrosOrdenados
+    };
+}
+
 function generarContenidoArticulo(d) {
     const parrafos = d.paragrafos.map((p, i) =>
         `<p style="margin-bottom:${i < d.paragrafos.length - 1 ? '16px' : '0'};">${p}</p>`
     ).join('');
 
+    // Colores de badge por olimpiada (compartido entre eventos de entrenador y de estudiante)
+    const olimpColors = {
+        'IChO':  { bg: 'rgba(26,111,181,.13)', color: '#1a4a9a' },
+        'IMChO': { bg: 'rgba(140,60,200,.1)',  color: '#6b2fa0' },
+        'OIAQ':  { bg: 'rgba(201,162,39,.13)', color: '#7a5500' },
+        'OCACQ': { bg: 'rgba(22,160,100,.1)',  color: '#0e6640' },
+    };
+    function _badgeOlimp(olimp) {
+        const key = Object.keys(olimpColors).find(k => k.toLowerCase() === (olimp || '').toLowerCase()) || null;
+        const col = key ? olimpColors[key] : { bg: 'rgba(4,18,43,.07)', color: 'var(--text-muted)' };
+        return { label: key || olimp, col };
+    }
+
     // Leer "fecha inicio" (con espacio) O "fechaInicio" (camelCase)
     const fechaInicioVal = d['fecha inicio'] || d.fechaInicio || null;
     const act = calcularActividadProfesor(d.nombreArticulo, fechaInicioVal);
+    // Un profesor puede haber sido estudiante antes: d.nombre suele ser el
+    // nombre "de estudiante" y d.nombreArticulo el nombre "de profesor" — se
+    // prueban ambos por si el artículo solo trae uno de los dos.
+    const actEstudiante = calcularActividadEstudiante(d.nombre) || calcularActividadEstudiante(d.nombreArticulo);
 
     let actividadHTML = '';
-    if (act) {
-        // Construir filas del desplegable de eventos
-        const filaEventos = act.registros.map(r => {
+    if (act || actEstudiante) {
+        // ── Fila de eventos como entrenador ──
+        const filaEventosEntrenador = act ? act.registros.map(r => {
             const olimp = r.Olimp || r.olimpiada || r._olimpKey || '';
             const año   = r.año   || '';
             const sede  = r.sede  || '';
             const pais  = r.pais  || '';
-            // Color del badge según olimpiada
-            const olimpColors = {
-                'IChO':  { bg: 'rgba(26,111,181,.13)', color: '#1a4a9a' },
-                'IMChO': { bg: 'rgba(140,60,200,.1)',  color: '#6b2fa0' },
-                'OIAQ':  { bg: 'rgba(201,162,39,.13)', color: '#7a5500' },
-                'OCACQ': { bg: 'rgba(22,160,100,.1)',  color: '#0e6640' },
-            };
-            const key = Object.keys(olimpColors).find(k => k.toLowerCase() === olimp.toLowerCase()) || null;
-            const col = key ? olimpColors[key] : { bg: 'rgba(4,18,43,.07)', color: 'var(--text-muted)' };
-            const badgeLabel = key || olimp;
+            const { label: badgeLabel, col } = _badgeOlimp(olimp);
             return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(4,18,43,.06);font-size:13px;">
                 <span style="font-weight:700;color:var(--navy);min-width:36px;">${año}</span>
                 ${badgeLabel ? `<span style="background:${col.bg};color:${col.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;">${badgeLabel}</span>` : ''}
                 ${sede ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais ? pais + ' · ' : ''}${sede}</span>` : (pais ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais}</span>` : '')}
             </div>`;
-        }).join('');
+        }).join('') : '';
 
-        const listaId = 'ev-lista-' + d.id;
-        const arrowId = 'ev-arrow-' + d.id;
-        const tieneEventos = act.registros.length > 0;
+        // ── Fila de eventos como estudiante (incluye medalla obtenida) ──
+        const filaEventosEstudiante = actEstudiante ? actEstudiante.registros.map(r => {
+            const olimp   = r.Olimp || r.Olimpiada || r._olimpKey || '';
+            const año     = r.año   || '';
+            const medalla = r.medalla || 'participante';
+            const { label: badgeLabel, col } = _badgeOlimp(olimp);
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(4,18,43,.06);font-size:13px;">
+                <span style="font-weight:700;color:var(--navy);min-width:36px;">${año}</span>
+                ${badgeLabel ? `<span style="background:${col.bg};color:${col.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;">${badgeLabel}</span>` : ''}
+                <span class="badge badge-${medalla}" style="margin-left:auto;"><span class="badge-dot dot-${medalla}"></span>${medallaLabel[medalla] || medalla}</span>
+            </div>`;
+        }).join('') : '';
+
+        const listaId       = 'ev-lista-' + d.id;
+        const arrowId       = 'ev-arrow-' + d.id;
+        const listaEstId    = 'ev-lista-est-' + d.id;
+        const arrowEstId    = 'ev-arrow-est-' + d.id;
+        const tieneEventos  = !!(act && act.registros.length);
+        const tieneEventosEst = !!(actEstudiante && actEstudiante.registros.length);
+
+        // Años en activo: si hay actividad de entrenador se usa esa; si no,
+        // se usan los años como estudiante (para no dejar el dato vacío).
+        const añosRef = act || actEstudiante;
 
         actividadHTML = `
         <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-            <div style="display:flex;gap:28px;flex-wrap:wrap;margin-bottom:${tieneEventos ? '14px' : '0'};">
+            <div style="display:flex;gap:28px;flex-wrap:wrap;margin-bottom:${(tieneEventos || tieneEventosEst) ? '14px' : '0'};">
+                ${añosRef ? `
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:20px;">📅</span>
                     <div>
                         <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.years.active')}</p>
-                        <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.añoMin === act.añoMax ? act.añoMin : act.añoMin + ' – ' + act.añoMax}</p>
+                        <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${añosRef.añoMin === añosRef.añoMax ? añosRef.añoMin : añosRef.añoMin + ' – ' + añosRef.añoMax}</p>
                     </div>
-                </div>
+                </div>` : ''}
+                ${act ? `
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:20px;">🏅</span>
                     <div>
@@ -2816,11 +2897,31 @@ function generarContenidoArticulo(d) {
                           : `<p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.totalEventos}</p>`
                         }
                     </div>
-                </div>
+                </div>` : ''}
+                ${actEstudiante ? `
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:20px;">🏅</span>
+                    <div>
+                        <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.events.as.student')}</p>
+                        ${tieneEventosEst
+                          ? `<button onclick="toggleEventosEstudiante('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">
+                                ${actEstudiante.totalEventos}
+                                <span id="${arrowEstId}" style="font-size:13px;transition:transform .25s;display:inline-block;">▼</span>
+                             </button>`
+                          : `<p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${actEstudiante.totalEventos}</p>`
+                        }
+                    </div>
+                </div>` : ''}
             </div>
             ${tieneEventos ? `
-            <div id="${listaId}" style="display:none;margin-top:4px;border:1px solid var(--border);border-radius:10px;padding:8px 14px;background:#fafbff;">
-                ${filaEventos}
+            <div id="${listaId}" style="display:none;margin-top:4px;margin-bottom:${tieneEventosEst ? '10px' : '0'};border:1px solid var(--border);border-radius:10px;padding:8px 14px;background:#fafbff;">
+                <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:700;margin:2px 0 4px;">${T('honor.events.as.coach')}</p>
+                ${filaEventosEntrenador}
+            </div>` : ''}
+            ${tieneEventosEst ? `
+            <div id="${listaEstId}" style="display:none;margin-top:4px;border:1px solid var(--border);border-radius:10px;padding:8px 14px;background:#fafbff;">
+                <p style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:700;margin:2px 0 4px;">${T('honor.events.as.student')}</p>
+                ${filaEventosEstudiante}
             </div>` : ''}
         </div>`;
     }
@@ -2844,6 +2945,15 @@ function generarContenidoArticulo(d) {
 function toggleEventosEntrenador(id) {
     const lista  = document.getElementById('ev-lista-' + id);
     const arrow  = document.getElementById('ev-arrow-' + id);
+    if (!lista) return;
+    const abierto = lista.style.display !== 'none';
+    lista.style.display = abierto ? 'none' : 'block';
+    if (arrow) arrow.style.transform = abierto ? '' : 'rotate(180deg)';
+}
+
+function toggleEventosEstudiante(id) {
+    const lista  = document.getElementById('ev-lista-est-' + id);
+    const arrow  = document.getElementById('ev-arrow-est-' + id);
     if (!lista) return;
     const abierto = lista.style.display !== 'none';
     lista.style.display = abierto ? 'none' : 'block';
@@ -5760,6 +5870,7 @@ const _i18n = {
         'honor.modal.title':        'Honor a quien Honor Merece',
         'honor.years.active':       'Años en activo',
         'honor.events.as.coach':    'Eventos como entrenador',
+        'honor.events.as.student':  'Eventos como estudiante',
         'honor.honorlabel':         'Honor a quien Honor Merece',
         // Noticias
         'noticias.title':           'Noticias y Entrevistas',
@@ -5938,6 +6049,7 @@ const _i18n = {
         'honor.modal.title':        'Hall of Fame',
         'honor.years.active':       'Years active',
         'honor.events.as.coach':    'Events as coach',
+        'honor.events.as.student':  'Events as student',
         'honor.honorlabel':         'Hall of Fame',
         'noticias.title':           'News & Interviews',
         'noticias.press':           'Press & Chronicles',
