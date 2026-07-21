@@ -1666,20 +1666,20 @@
            MEDIA — GALERÍA DE FOTOS
         ═══════════════════════════════════════════ */
         .media-gallery {
-            columns: 4 260px;
-            column-gap: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
             margin-top: 8px;
         }
         .media-gallery img {
             width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
             display: block;
-            margin: 0 0 16px;
             border-radius: 14px;
             cursor: zoom-in;
             box-shadow: 0 2px 14px rgba(4,18,43,.08);
             transition: transform .25s ease, box-shadow .25s ease, opacity .4s ease;
-            break-inside: avoid;
-            -webkit-column-break-inside: avoid;
             background: var(--card-bg);
             border: 1px solid var(--border);
             opacity: 0;
@@ -1691,14 +1691,11 @@
             box-shadow: 0 10px 26px rgba(4,18,43,.18);
         }
         @media (max-width: 900px) {
-            .media-gallery { columns: 3 200px; column-gap: 12px; }
+            .media-gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
         }
         @media (max-width: 600px) {
-            .media-gallery { columns: 2 140px; column-gap: 10px; }
-            .media-gallery img { margin-bottom: 10px; border-radius: 10px; }
-        }
-        @media (max-width: 400px) {
-            .media-gallery { columns: 1; }
+            .media-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .media-gallery img { border-radius: 10px; }
         }
 
         /* Lightbox: tap para zoom-in, tap de nuevo para zoom-out */
@@ -2077,7 +2074,7 @@
     <button class="menu-item" id="menu-btn-cnq" onclick="cambiarSeccion('cnq')">🧪 <span data-i18n="nav.cnq">Olimpiada Cubana de Química</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="cambiarSeccion('noticias')">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
-    <button class="menu-item" id="menu-btn-media" onclick="cambiarSeccion('media')">📸 <span data-i18n="nav.media">Media</span></button>
+    <button class="menu-item" id="menu-btn-media" onclick="location.href='media.html'">📸 <span data-i18n="nav.media">Media</span></button>
     <button class="menu-item" id="menu-btn-contacto" onclick="cambiarSeccion('contacto')">📌 <span data-i18n="nav.contacto">Enlaces y Contacto</span></button>
     <div class="menu-pie" data-i18n="footer.copy">© 2026 · Sitial de Talentos Cubanos</div>
 </div>
@@ -2114,7 +2111,7 @@
                 <h3 data-i18n="nav.noticias">Noticias y Entrevistas</h3>
                 <p data-i18n="home.card.noticias">Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas</p>
             </div>
-            <div class="inicio-card" onclick="cambiarSeccion('media')">
+            <div class="inicio-card" onclick="location.href='media.html'">
                 <span class="inicio-card-icon">📸</span>
                 <h3 data-i18n="nav.media">Media</h3>
                 <p data-i18n="home.card.media">Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas</p>
@@ -2691,7 +2688,7 @@
 <footer>
     <div class="footer-links">
         <a href="#" class="footer-link-noticias" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
-        <a href="#" class="footer-link-media" onclick="cambiarSeccion('media');return false;">📸 Media</a>
+        <a href="media.html" class="footer-link-media">📸 Media</a>
         <a href="#" class="footer-link-contacto" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
     </div>
     <p id="footer-copy-el" style="font-size:12px;opacity:.5;margin-top:6px;">
@@ -3705,18 +3702,11 @@ const _origInit = () => {
     calcularEnNumeros();
     inicializarNoticias();
 
-    // Deep-link a una foto concreta de Media: ?media=DD_MM_AAAA_evento.ext
-    const _mediaParam = (() => {
-        try { return new URLSearchParams(location.search).get('media'); } catch(e) { return null; }
-    })();
-
     // Restaurar sección activa si el usuario recargó la página
-    let seccionGuardada = (() => {
+    const seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    if (_mediaParam) seccionGuardada = 'media'; // el enlace compartido manda sobre la sesión guardada
-
-    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias','media'];
+    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias'];
     if (seccionGuardada && secciones.includes(seccionGuardada) && seccionGuardada !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
         const secEl = document.getElementById(seccionGuardada);
@@ -3730,11 +3720,6 @@ const _origInit = () => {
             if (menuBtn) menuBtn.classList.add('activo');
             actualizarStatsBar(seccionGuardada);
             if (seccionGuardada === 'eventos') { statsParaEvento(); cargarTabla(); }
-            if (seccionGuardada === 'media') {
-                cargarGaleriaMedia().then(() => {
-                    if (_mediaParam) _abrirFotoPorNombreDesdeGaleria(_mediaParam);
-                });
-            }
         }
     } else {
         actualizarStatsBar('inicio');
@@ -3743,6 +3728,17 @@ const _origInit = () => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Compatibilidad con enlaces antiguos (índice ?media=archivo): Media es
+    // ahora una subpágina propia (media.html?foto=archivo) con su URL real,
+    // así que redirigimos de inmediato en vez de cargar todo el sitial.
+    try {
+        const _mediaLegacy = new URLSearchParams(location.search).get('media');
+        if (_mediaLegacy) {
+            location.replace('media.html?foto=' + encodeURIComponent(_mediaLegacy));
+            return;
+        }
+    } catch (e) {}
+
     await cargarDatosOlimpiadas();
     await cargarProfesoresData();
     await cargarHonorData();
@@ -4578,10 +4574,10 @@ async function _mediaListarArchivos() {
 }
 
 // Extrae la fecha DD_MM_AAAA del nombre de archivo (solo para ORDENAR, nunca
-// se muestra en pantalla). El nombre real es DD_MM_AAAA_evento.ext — el sufijo
-// de evento no afecta a este parseo porque solo miramos el principio.
-// Si un archivo no sigue el patrón, se manda al final de la galería en vez
-// de romper la carga.
+// se muestra en pantalla). El nombre real es DD_MM_AAAA_evento[_num].ext — ni
+// el sufijo de evento ni el número opcional afectan a este parseo porque solo
+// miramos el principio. Si un archivo no sigue el patrón, se manda al final
+// de la galería en vez de romper la carga.
 function _mediaFechaDesdeNombre(nombre) {
     const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
     if (!m) return null;
@@ -4589,11 +4585,18 @@ function _mediaFechaDesdeNombre(nombre) {
     return isNaN(d.getTime()) ? null : d;
 }
 
-// Extrae el código de evento del nombre de archivo: DD_MM_AAAA_evento.ext
+// Extrae el código de evento del nombre de archivo: DD_MM_AAAA_evento[_num].ext
 // evento ∈ { icho, imcho, oiaq, ocacq, otras } (case-insensitive).
 function _mediaEventoDesdeNombre(nombre) {
-    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)\.\w+$/);
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?\.\w+$/);
     return m ? m[1].toLowerCase() : null;
+}
+
+// Extrae el número de orden opcional para fotos con la misma fecha y evento:
+// DD_MM_AAAA_evento_num.ext → num. Si no hay número, se asume 0.
+function _mediaNumDesdeNombre(nombre) {
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)\.\w+$/);
+    return m ? Number(m[1]) : 0;
 }
 
 // Etiqueta minimalista del evento para mostrar en el visor.
@@ -4625,12 +4628,14 @@ async function cargarGaleriaMedia() {
         const conFecha = archivos.map(a => ({
             ...a,
             fecha:  _mediaFechaDesdeNombre(a.nombre),
-            evento: _mediaEventoDesdeNombre(a.nombre)
+            evento: _mediaEventoDesdeNombre(a.nombre),
+            num:    _mediaNumDesdeNombre(a.nombre)
         }));
         conFecha.sort((a, b) => {
             const ta = a.fecha ? a.fecha.getTime() : -Infinity;
             const tb = b.fecha ? b.fecha.getTime() : -Infinity;
             if (tb !== ta) return tb - ta; // más reciente primero
+            if (a.num !== b.num) return a.num - b.num; // mismo día: por número de orden
             return a.nombre.localeCompare(b.nombre);
         });
         _mediaGaleriaActual = conFecha;
