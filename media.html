@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media — Sitial de Talentos</title>
+<meta name="description" content="Galería de fotos del Sitial de Talentos Cubanos — Olimpiadas de Química.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --gold: #c9a227; --gold-light: #f0c84a;
+        --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
+    }
+    [data-theme="dark"] {
+        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --gold: #d4a82a; --gold-light: #f5d060;
+        --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        transition: background .25s ease, color .25s ease;
+        min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Topbar ── */
+    .mp-topbar {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--navy);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px; padding: 14px 20px;
+    }
+    .mp-back {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
+        color: #fff; padding: 8px 16px; font-family: 'DM Sans', sans-serif;
+        font-size: 14px; font-weight: 500; cursor: pointer; transition: background .2s;
+    }
+    .mp-back:hover { background: rgba(255,255,255,.22); }
+    .mp-title {
+        font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700;
+        color: rgba(255,255,255,.9); display: flex; align-items: center; gap: 8px;
+        position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .mp-icon-btn {
+        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
+        color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s;
+    }
+    .mp-icon-btn:hover { background: rgba(255,255,255,.22); }
+    @media (max-width: 560px) {
+        .mp-title { display: none; }
+    }
+
+    /* ── Gallery ── */
+    .mp-main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+    .mp-heading {
+        font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px;
+        margin: 6px 0 4px;
+    }
+    .mp-sub { color: var(--text-muted); font-size: 14px; margin: 0 0 22px; }
+    .mp-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+    }
+    .mp-tile {
+        position: relative; width: 100%; aspect-ratio: 1 / 1;
+        border-radius: 14px; overflow: hidden; cursor: zoom-in;
+        background: var(--card-bg); border: 1px solid var(--border);
+        box-shadow: 0 2px 14px rgba(4,18,43,.08);
+        transition: transform .25s ease, box-shadow .25s ease;
+        opacity: 0; animation: mpFadeIn .5s ease forwards;
+    }
+    @keyframes mpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .mp-tile:hover { transform: translateY(-4px) scale(1.015); box-shadow: 0 10px 26px rgba(4,18,43,.18); }
+    .mp-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mp-tile-badge {
+        position: absolute; bottom: 8px; left: 8px;
+        background: rgba(4,10,22,.6); color: #fff; font-size: 10px; font-weight: 700;
+        letter-spacing: .3px; padding: 4px 9px; border-radius: 999px;
+        backdrop-filter: blur(3px);
+    }
+    @media (max-width: 900px)  { .mp-gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; } }
+    @media (max-width: 600px)  { .mp-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; } .mp-tile { border-radius: 10px; } }
+
+    .mp-estado {
+        padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 14px;
+    }
+
+    /* ── Lightbox ── */
+    .mp-lightbox {
+        position: fixed; inset: 0; z-index: 1000;
+        background: rgba(4,10,22,.95);
+        display: none; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity .25s ease;
+        padding: 32px; box-sizing: border-box;
+    }
+    .mp-lightbox.visible   { display: flex; }
+    .mp-lightbox.mostrando { opacity: 1; }
+    .mp-lightbox img {
+        max-width: 100%; max-height: 100%; border-radius: 10px;
+        box-shadow: 0 24px 70px rgba(0,0,0,.55);
+        transform: scale(.85); transition: transform .3s cubic-bezier(.2,.85,.3,1.2);
+        user-select: none;
+    }
+    .mp-lightbox.mostrando img { transform: scale(1); }
+
+    .mp-lb-close {
+        position: absolute; top: 18px; right: 22px;
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(255,255,255,.12); color: #fff; border: none;
+        font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s ease; z-index: 3;
+    }
+    .mp-lb-close:hover { background: rgba(255,255,255,.22); }
+
+    .mp-lb-badge {
+        position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+        background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16);
+        color: rgba(255,255,255,.92); font-size: 12px; font-weight: 600; letter-spacing: .4px;
+        padding: 6px 14px; border-radius: 999px;
+        backdrop-filter: blur(6px); display: none; align-items: center; z-index: 2;
+        pointer-events: none;
+    }
+
+    .mp-lb-nav {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        width: 46px; height: 46px; border-radius: 50%;
+        background: rgba(255,255,255,.1); border: none; color: #fff;
+        font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s ease, opacity .2s ease; z-index: 3;
+    }
+    .mp-lb-nav:hover { background: rgba(255,255,255,.22); }
+    .mp-lb-nav:disabled { opacity: 0; pointer-events: none; }
+    .mp-lb-prev { left: 18px; }
+    .mp-lb-next { right: 18px; }
+    @media (max-width: 560px) {
+        .mp-lb-nav { width: 38px; height: 38px; font-size: 16px; }
+        .mp-lb-prev { left: 8px; } .mp-lb-next { right: 8px; }
+    }
+
+    /* ── Barra de acciones (compartir / descargar) ── */
+    .mp-share-bar { position: absolute; top: 18px; left: 22px; display: flex; gap: 10px; z-index: 3; }
+    .mp-share-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(255,255,255,.12); color: #fff; border: none; font-size: 17px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s ease, transform .15s ease;
+        backdrop-filter: blur(4px);
+    }
+    .mp-share-btn:hover { background: rgba(255,255,255,.22); transform: scale(1.07); }
+    .mp-share-btn svg { width: 18px; height: 18px; display: block; }
+
+    .mp-share-panel {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: rgba(14,20,32,.85);
+        backdrop-filter: blur(14px);
+        border-top: 1px solid rgba(255,255,255,.08);
+        border-radius: 22px 22px 0 0;
+        padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+        box-sizing: border-box;
+        transform: translateY(100%);
+        transition: transform .3s cubic-bezier(.32,.9,.35,1.1);
+        z-index: 4;
+    }
+    .mp-share-panel.abierto { transform: translateY(0); }
+    .mp-share-panel-titulo {
+        color: rgba(255,255,255,.55); font-size: 12px; font-weight: 600;
+        letter-spacing: .6px; text-transform: uppercase; margin: 0 0 16px; text-align: center;
+    }
+    .mp-share-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-width: 480px; margin: 0 auto; }
+    .mp-share-opcion {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        background: none; border: none; cursor: pointer; padding: 4px 2px; border-radius: 12px;
+        transition: background .15s ease, transform .15s ease;
+    }
+    .mp-share-opcion:hover { background: rgba(255,255,255,.06); transform: translateY(-2px); }
+    .mp-share-opcion:active { transform: scale(.94); }
+    .mp-share-icono {
+        width: 48px; height: 48px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(0,0,0,.3);
+    }
+    .mp-share-icono svg { width: 22px; height: 22px; }
+    .mp-share-icono.whatsapp { background: #25D366; }
+    .mp-share-icono.facebook { background: #1877F2; }
+    .mp-share-icono.x        { background: #000; }
+    .mp-share-icono.telegram { background: #26A5E4; }
+    .mp-share-icono.link     { background: rgba(255,255,255,.14); }
+    .mp-share-label { color: rgba(255,255,255,.75); font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .mp-share-toast {
+        position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(10px);
+        background: rgba(255,255,255,.95); color: #1a1a1a; padding: 9px 18px; border-radius: 20px;
+        font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none;
+        transition: opacity .22s ease, transform .22s ease; z-index: 5; white-space: nowrap;
+        box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+    .mp-share-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 480px) { .mp-share-grid { grid-template-columns: repeat(3, 1fr); row-gap: 16px; } .mp-share-bar { top: 14px; left: 14px; } }
+</style>
+</head>
+<body>
+
+<div class="mp-topbar">
+    <button class="mp-back" onclick="location.href='index.html'">← <span id="mp-back-label">Volver al Sitial</span></button>
+    <div class="mp-title">📸 <span id="mp-title-label">Media</span></div>
+    <div class="mp-topbar-actions">
+        <button class="mp-icon-btn" id="mp-lang-btn" onclick="mpToggleLang()" title="Idioma / Language">ES</button>
+        <button class="mp-icon-btn" id="mp-theme-btn" onclick="mpToggleTheme()" title="Tema">🌙</button>
+    </div>
+</div>
+
+<div class="mp-main">
+    <h1 class="mp-heading" id="mp-heading">Galería de Media</h1>
+    <p class="mp-sub" id="mp-sub">Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas</p>
+    <div class="mp-gallery" id="mp-gallery"></div>
+</div>
+
+<div class="mp-lightbox" id="mp-lightbox" onclick="cerrarFoto()">
+    <div class="mp-share-bar" onclick="event.stopPropagation()">
+        <button class="mp-share-btn" onclick="abrirPanelCompartir()" aria-label="Compartir" title="Compartir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg>
+        </button>
+        <button class="mp-share-btn" onclick="descargarFotoActual()" aria-label="Descargar" title="Descargar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        </button>
+    </div>
+    <button class="mp-lb-close" onclick="event.stopPropagation(); cerrarFoto()" aria-label="Cerrar">✕</button>
+    <span class="mp-lb-badge" id="mp-lb-badge"></span>
+    <button class="mp-lb-nav mp-lb-prev" onclick="event.stopPropagation(); irFotoAdyacente(-1)" aria-label="Anterior">‹</button>
+    <img id="mp-lb-img" src="" alt="">
+    <button class="mp-lb-nav mp-lb-next" onclick="event.stopPropagation(); irFotoAdyacente(1)" aria-label="Siguiente">›</button>
+
+    <div class="mp-share-panel" id="mp-share-panel" onclick="event.stopPropagation()">
+        <p class="mp-share-panel-titulo" id="mp-share-titulo">Compartir</p>
+        <div class="mp-share-grid" id="mp-share-grid">
+            <button class="mp-share-opcion" onclick="compartirRed('whatsapp')">
+                <span class="mp-share-icono whatsapp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C11 9.2 10.6 8 10.4 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/></svg></span>
+                <span class="mp-share-label">WhatsApp</span>
+            </button>
+            <button class="mp-share-opcion" onclick="compartirRed('facebook')">
+                <span class="mp-share-icono facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>
+                <span class="mp-share-label">Facebook</span>
+            </button>
+            <button class="mp-share-opcion" onclick="compartirRed('x')">
+                <span class="mp-share-icono x"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>
+                <span class="mp-share-label">X</span>
+            </button>
+            <button class="mp-share-opcion" onclick="compartirRed('telegram')">
+                <span class="mp-share-icono telegram"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>
+                <span class="mp-share-label">Telegram</span>
+            </button>
+            <button class="mp-share-opcion" onclick="compartirRed('link')">
+                <span class="mp-share-icono link"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"></path></svg></span>
+                <span class="mp-share-label" id="mp-share-copylabel">Copiar enlace</span>
+            </button>
+        </div>
+        <div class="mp-share-toast" id="mp-share-toast"></div>
+    </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// IDIOMA Y TEMA (sincronizados con el sitio principal vía localStorage)
+// ════════════════════════════════════════════════════════════════════
+const _T = {
+    es: {
+        back: 'Volver al Sitial', title: 'Media', heading: 'Galería de Media',
+        sub: 'Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas',
+        loading: 'Cargando fotos…', empty: 'Aún no hay fotos en la galería.',
+        error: 'No se pudo cargar la galería en este momento.',
+        share: 'Compartir', copyLink: 'Copiar enlace', more: 'Más',
+        copied: '¡Enlace copiado!', copyFail: 'No se pudo copiar el enlace',
+        shareText: 'Mira esta foto en Sitial de Talentos'
+    },
+    en: {
+        back: 'Back to Sitial', title: 'Media', heading: 'Media Gallery',
+        sub: 'Photos from events, teams and moments of the Cuban chemistry olympiads',
+        loading: 'Loading photos…', empty: 'No photos in the gallery yet.',
+        error: 'The gallery could not be loaded right now.',
+        share: 'Share', copyLink: 'Copy link', more: 'More',
+        copied: 'Link copied!', copyFail: 'Could not copy link',
+        shareText: 'Check out this photo on Sitial de Talentos'
+    }
+};
+function _lang() { try { return localStorage.getItem('lang') || 'es'; } catch(e) { return 'es'; } }
+function _t(key) { return (_T[_lang()] || _T.es)[key]; }
+
+function mpAplicarIdioma() {
+    const l = _lang();
+    document.getElementById('mp-back-label').textContent   = _t('back');
+    document.getElementById('mp-title-label').textContent  = _t('title');
+    document.getElementById('mp-heading').textContent      = _t('heading');
+    document.getElementById('mp-sub').textContent           = _t('sub');
+    document.getElementById('mp-share-titulo').textContent = _t('share');
+    document.getElementById('mp-share-copylabel').textContent = _t('copyLink');
+    document.getElementById('mp-lang-btn').textContent     = l === 'es' ? 'ES' : 'EN';
+    document.title = (l === 'es' ? 'Media — Sitial de Talentos' : 'Media — Talent Registry');
+}
+function mpToggleLang() {
+    const next = _lang() === 'es' ? 'en' : 'es';
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    mpAplicarIdioma();
+    if (_actual) _renderBadge(_actual); // re-traduce "Otras" si aplica
+}
+
+function mpAplicarTema() {
+    let dark = false;
+    try { dark = localStorage.getItem('theme') === 'dark'; } catch(e) {}
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('mp-theme-btn').textContent = dark ? '☀️' : '🌙';
+}
+function mpToggleTheme() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next === 'dark' ? 'dark' : 'light');
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    document.getElementById('mp-theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+mpAplicarIdioma();
+mpAplicarTema();
+
+// ════════════════════════════════════════════════════════════════════
+// CARGA DE FOTOS DESDE Assets/Media (API de GitHub)
+// ════════════════════════════════════════════════════════════════════
+function _githubRepoInfo() {
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+    const owner = m ? m[1] : 'EnDriS10';
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    // El propio archivo (media.html) cuenta como "parte" del path; el repo es
+    // el primer segmento cuando se sirve desde {owner}.github.io/{repo}/...
+    const repo = (m && pathParts[0] && pathParts[0] !== 'media.html') ? pathParts[0] : 'Sitial_Talento';
+    return { owner, repo };
+}
+
+let _archivosCache = null;
+async function _listarArchivos() {
+    if (_archivosCache) return _archivosCache;
+    const { owner, repo } = _githubRepoInfo();
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/Assets/Media`;
+    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (!Array.isArray(data)) throw new Error('Respuesta inesperada de la API de GitHub');
+    const archivos = data
+        .filter(it => it.type === 'file' && /\.(jpe?g|png|webp|gif)$/i.test(it.name))
+        .map(it => ({ nombre: it.name, url: it.download_url }));
+    _archivosCache = archivos;
+    return archivos;
+}
+
+// Nombre de archivo: DD_MM_AAAA_evento[_num].ext
+function _fechaDesdeNombre(nombre) {
+    const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
+    if (!m) return null;
+    const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    return isNaN(d.getTime()) ? null : d;
+}
+function _eventoDesdeNombre(nombre) {
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?\.\w+$/);
+    return m ? m[1].toLowerCase() : null;
+}
+function _numDesdeNombre(nombre) {
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)\.\w+$/);
+    return m ? Number(m[1]) : 0;
+}
+function _etiquetaEvento(codigo) {
+    if (!codigo) return null;
+    const mapa = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+    const key = codigo.toLowerCase();
+    if (mapa[key]) return mapa[key];
+    if (key === 'otras' || key === 'otra' || key === 'otro') return (_lang() === 'en') ? 'Other' : 'Otras';
+    return null;
+}
+
+let _galeria = [];   // lista ordenada de { nombre, url, fecha, evento, num }
+let _actual  = null; // foto abierta actualmente en el visor
+
+async function cargarGaleria() {
+    const cont = document.getElementById('mp-gallery');
+    cont.innerHTML = `<div class="mp-estado">⏳ ${_t('loading')}</div>`;
+    try {
+        const archivos = await _listarArchivos();
+        _galeria = archivos.map(a => ({
+            ...a,
+            fecha:  _fechaDesdeNombre(a.nombre),
+            evento: _eventoDesdeNombre(a.nombre),
+            num:    _numDesdeNombre(a.nombre)
+        }));
+        _galeria.sort((a, b) => {
+            const ta = a.fecha ? a.fecha.getTime() : -Infinity;
+            const tb = b.fecha ? b.fecha.getTime() : -Infinity;
+            if (tb !== ta) return tb - ta;               // más reciente primero
+            if (a.num !== b.num) return a.num - b.num;    // mismo día: por número de orden
+            return a.nombre.localeCompare(b.nombre);
+        });
+
+        cont.innerHTML = '';
+        if (_galeria.length === 0) {
+            cont.innerHTML = `<div class="mp-estado">${_t('empty')}</div>`;
+            return;
+        }
+        _galeria.forEach((datos, i) => {
+            const tile = document.createElement('div');
+            tile.className = 'mp-tile';
+            tile.style.animationDelay = (Math.min(i, 24) * 0.03) + 's';
+            const img = document.createElement('img');
+            img.src = datos.url; img.loading = 'lazy'; img.alt = 'Sitial de Talentos';
+            img.onerror = () => tile.remove();
+            tile.appendChild(img);
+            const etiqueta = _etiquetaEvento(datos.evento);
+            if (etiqueta) {
+                const badge = document.createElement('span');
+                badge.className = 'mp-tile-badge';
+                badge.textContent = datos.fecha ? `${etiqueta} · ${datos.fecha.getFullYear()}` : etiqueta;
+                tile.appendChild(badge);
+            }
+            tile.onclick = () => abrirFoto(datos.nombre, true);
+            cont.appendChild(tile);
+        });
+
+        // Si llegamos con ?foto=archivo en la URL, abrir esa foto directamente.
+        const fotoParam = _fotoParamActual();
+        if (fotoParam) abrirFoto(fotoParam, false);
+    } catch (err) {
+        console.error('Error cargando Assets/Media vía la API de GitHub:', err);
+        cont.innerHTML = `<div class="mp-estado">⚠️ ${_t('error')}</div>`;
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// VISOR (LIGHTBOX) CON URL REAL POR FOTO Y NAVEGACIÓN PREV/NEXT
+// ════════════════════════════════════════════════════════════════════
+function _fotoParamActual() {
+    try { return new URLSearchParams(location.search).get('foto'); } catch(e) { return null; }
+}
+
+function _renderBadge(datos) {
+    const badge = document.getElementById('mp-lb-badge');
+    const etiqueta = _etiquetaEvento(datos.evento);
+    const año = datos.fecha ? datos.fecha.getFullYear() : null;
+    if (etiqueta) {
+        badge.textContent = año ? `${etiqueta} · ${año}` : etiqueta;
+        badge.style.display = 'inline-flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function _renderLightbox(datos) {
+    document.getElementById('mp-lb-img').src = datos.url;
+    document.getElementById('mp-lb-img').alt = datos.nombre;
+    _renderBadge(datos);
+    const idx = _galeria.findIndex(d => d.nombre === datos.nombre);
+    document.querySelector('.mp-lb-prev').disabled = idx <= 0;
+    document.querySelector('.mp-lb-next').disabled = (idx === -1) || (idx >= _galeria.length - 1);
+}
+
+function _mostrarLightbox() {
+    const lb = document.getElementById('mp-lightbox');
+    lb.classList.add('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => lb.classList.add('mostrando')));
+    document.addEventListener('keydown', _lbTeclado);
+}
+function _ocultarLightbox() {
+    const lb = document.getElementById('mp-lightbox');
+    cerrarPanelCompartir();
+    lb.classList.remove('mostrando');
+    setTimeout(() => lb.classList.remove('visible'), 260);
+    document.removeEventListener('keydown', _lbTeclado);
+    _actual = null;
+}
+function _lbTeclado(e) {
+    if (e.key === 'Escape') cerrarFoto();
+    else if (e.key === 'ArrowLeft')  irFotoAdyacente(-1);
+    else if (e.key === 'ArrowRight') irFotoAdyacente(1);
+}
+
+// Abre una foto por nombre de archivo. push=true crea una entrada nueva en el
+// historial (al abrir desde la cuadrícula); push=false solo se usa al cargar
+// la página ya con ?foto=archivo en la URL.
+function abrirFoto(nombre, push) {
+    const datos = _galeria.find(d => d.nombre === nombre);
+    if (!datos) return;
+    _actual = datos;
+    _renderLightbox(datos);
+    _mostrarLightbox();
+    const url = 'media.html?foto=' + encodeURIComponent(nombre);
+    if (push) history.pushState({ foto: nombre }, '', url);
+    else      history.replaceState({ foto: nombre }, '', url);
+}
+
+// Flechas prev/next: cambia de foto sin apilar historial (replaceState).
+function irFotoAdyacente(delta) {
+    if (!_actual) return;
+    const idx = _galeria.findIndex(d => d.nombre === _actual.nombre);
+    const destino = _galeria[idx + delta];
+    if (!destino) return;
+    _actual = destino;
+    _renderLightbox(destino);
+    history.replaceState({ foto: destino.nombre }, '', 'media.html?foto=' + encodeURIComponent(destino.nombre));
+}
+
+// Cerrar: si esta apertura generó una entrada de historial, retrocede
+// (así el botón "atrás" del navegador funciona de forma natural); si se
+// llegó directo por enlace compartido, simplemente limpia la URL.
+function cerrarFoto() {
+    if (history.state && history.state.foto) {
+        history.back();
+    } else {
+        _ocultarLightbox();
+        history.replaceState({}, '', 'media.html');
+    }
+}
+
+window.addEventListener('popstate', (e) => {
+    const foto = (e.state && e.state.foto) || _fotoParamActual();
+    if (foto) {
+        const datos = _galeria.find(d => d.nombre === foto);
+        if (datos) { _actual = datos; _renderLightbox(datos); _mostrarLightbox(); return; }
+    }
+    _ocultarLightbox();
+});
+
+// ════════════════════════════════════════════════════════════════════
+// COMPARTIR / DESCARGAR — el enlace de cada foto es la URL real de esta
+// página (media.html?foto=archivo), así que compartir = copiar la barra
+// de direcciones actual.
+// ════════════════════════════════════════════════════════════════════
+function abrirPanelCompartir() {
+    const panel = document.getElementById('mp-share-panel');
+    _prepararOpcionNativa(panel);
+    panel.classList.toggle('abierto');
+}
+function cerrarPanelCompartir() {
+    document.getElementById('mp-share-panel').classList.remove('abierto');
+}
+function _prepararOpcionNativa(panel) {
+    const grid = panel.querySelector('.mp-share-grid');
+    if (!grid || !navigator.share || grid.querySelector('.mp-share-opcion-nativo')) return;
+    const btn = document.createElement('button');
+    btn.className = 'mp-share-opcion mp-share-opcion-nativo';
+    btn.innerHTML = `<span class="mp-share-icono" style="background:rgba(255,255,255,.16)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span><span class="mp-share-label">${_t('more')}</span>`;
+    btn.onclick = compartirNativo;
+    grid.insertBefore(btn, grid.firstChild);
+}
+function compartirNativo() {
+    navigator.share({ title: 'Sitial de Talentos', text: _t('shareText'), url: location.href }).catch(() => {});
+}
+function compartirRed(red) {
+    if (red === 'link') { copiarEnlace(); return; }
+    const urlEnc = encodeURIComponent(location.href);
+    const texto  = encodeURIComponent(_t('shareText'));
+    let enlace = '';
+    switch (red) {
+        case 'whatsapp': enlace = `https://wa.me/?text=${texto}%20${urlEnc}`; break;
+        case 'facebook': enlace = `https://www.facebook.com/sharer/sharer.php?u=${urlEnc}`; break;
+        case 'x':        enlace = `https://twitter.com/intent/tweet?text=${texto}&url=${urlEnc}`; break;
+        case 'telegram': enlace = `https://t.me/share/url?url=${urlEnc}&text=${texto}`; break;
+        default: return;
+    }
+    window.open(enlace, '_blank', 'noopener,noreferrer,width=560,height=620');
+}
+function copiarEnlace() {
+    const url = location.href;
+    const finalizar = (ok) => mostrarToast(ok ? _t('copied') : _t('copyFail'));
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => finalizar(true)).catch(() => finalizar(false));
+    } else {
+        try {
+            const tmp = document.createElement('textarea');
+            tmp.value = url; tmp.style.position = 'fixed'; tmp.style.opacity = '0';
+            document.body.appendChild(tmp); tmp.select();
+            document.execCommand('copy'); document.body.removeChild(tmp);
+            finalizar(true);
+        } catch (e) { finalizar(false); }
+    }
+}
+function mostrarToast(mensaje) {
+    const toast = document.getElementById('mp-share-toast');
+    toast.textContent = mensaje;
+    toast.classList.add('visible');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('visible'), 2200);
+}
+async function descargarFotoActual() {
+    if (!_actual) return;
+    const img = document.getElementById('mp-lb-img');
+    try {
+        const resp = await fetch(img.src, { mode: 'cors' });
+        if (!resp.ok) throw new Error('fetch falló');
+        const blob = await resp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `sitial-de-talentos-${_actual.nombre}`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+    } catch (err) {
+        window.open(img.src, '_blank', 'noopener,noreferrer');
+    }
+}
+
+cargarGaleria();
+</script>
+</body>
+</html>
