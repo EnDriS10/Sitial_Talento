@@ -214,8 +214,8 @@
     <button class="mp-back" onclick="location.href='index.html'">← <span id="mp-back-label">Volver al Sitial</span></button>
     <div class="mp-title">📸 <span id="mp-title-label">Media</span></div>
     <div class="mp-topbar-actions">
-        <button class="mp-icon-btn" id="mp-lang-btn" onclick="mpToggleLang()" title="Idioma / Language">ES</button>
         <button class="mp-icon-btn" id="mp-theme-btn" onclick="mpToggleTheme()" title="Tema">🌙</button>
+        <button class="mp-icon-btn" id="mp-lang-btn" onclick="mpToggleLang()" title="Idioma / Language">ES</button>
     </div>
 </div>
 
@@ -310,7 +310,7 @@ function mpToggleLang() {
     const next = _lang() === 'es' ? 'en' : 'es';
     try { localStorage.setItem('lang', next); } catch(e) {}
     mpAplicarIdioma();
-    if (_actual) _renderBadge(_actual); // re-traduce "Otras" si aplica
+    if (_actual) _renderBadge(_actual); // por si el idioma afecta algo del badge en el futuro
 }
 
 function mpAplicarTema() {
@@ -377,10 +377,21 @@ function _numDesdeNombre(nombre) {
 function _etiquetaEvento(codigo) {
     if (!codigo) return null;
     const mapa = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
-    const key = codigo.toLowerCase();
-    if (mapa[key]) return mapa[key];
-    if (key === 'otras' || key === 'otra' || key === 'otro') return (_lang() === 'en') ? 'Other' : 'Otras';
-    return null;
+    return mapa[codigo.toLowerCase()] || null;
+}
+function _esEventoOtras(codigo) {
+    const key = (codigo || '').toLowerCase();
+    return key === 'otras' || key === 'otra' || key === 'otro';
+}
+// Texto de la insignia para una foto: evento conocido → "IChO · 2023";
+// "otras" → solo el año (sin nombre de evento); sin evento reconocible → null
+// (no se muestra insignia, para no inventar datos).
+function _textoBadge(datos) {
+    const año = datos.fecha ? datos.fecha.getFullYear() : null;
+    if (_esEventoOtras(datos.evento)) return año ? String(año) : null;
+    const etiqueta = _etiquetaEvento(datos.evento);
+    if (!etiqueta) return null;
+    return año ? `${etiqueta} · ${año}` : etiqueta;
 }
 
 let _galeria = [];   // lista ordenada de { nombre, url, fecha, evento, num }
@@ -418,11 +429,11 @@ async function cargarGaleria() {
             img.src = datos.url; img.loading = 'lazy'; img.alt = 'Sitial de Talentos';
             img.onerror = () => tile.remove();
             tile.appendChild(img);
-            const etiqueta = _etiquetaEvento(datos.evento);
-            if (etiqueta) {
+            const textoBadge = _textoBadge(datos);
+            if (textoBadge) {
                 const badge = document.createElement('span');
                 badge.className = 'mp-tile-badge';
-                badge.textContent = datos.fecha ? `${etiqueta} · ${datos.fecha.getFullYear()}` : etiqueta;
+                badge.textContent = textoBadge;
                 tile.appendChild(badge);
             }
             tile.onclick = () => abrirFoto(datos.nombre, true);
@@ -447,10 +458,9 @@ function _fotoParamActual() {
 
 function _renderBadge(datos) {
     const badge = document.getElementById('mp-lb-badge');
-    const etiqueta = _etiquetaEvento(datos.evento);
-    const año = datos.fecha ? datos.fecha.getFullYear() : null;
-    if (etiqueta) {
-        badge.textContent = año ? `${etiqueta} · ${año}` : etiqueta;
+    const texto = _textoBadge(datos);
+    if (texto) {
+        badge.textContent = texto;
         badge.style.display = 'inline-flex';
     } else {
         badge.style.display = 'none';
