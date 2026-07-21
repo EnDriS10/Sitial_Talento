@@ -292,7 +292,14 @@ const _T = {
         shareText: 'Check out this photo on Sitial de Talentos'
     }
 };
-function _lang() { try { return localStorage.getItem('lang') || 'es'; } catch(e) { return 'es'; } }
+function _lang() {
+    try {
+        const guardado = localStorage.getItem('lang');
+        if (guardado) return guardado;
+        const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+        return navLang.startsWith('en') ? 'en' : 'es';
+    } catch(e) { return 'es'; }
+}
 function _t(key) { return (_T[_lang()] || _T.es)[key]; }
 
 function mpAplicarIdioma() {
@@ -313,18 +320,24 @@ function mpToggleLang() {
     if (_actual) _renderBadge(_actual); // por si el idioma afecta algo del badge en el futuro
 }
 
+function _temaOscuroPorDefecto() {
+    try {
+        const guardado = localStorage.getItem('theme');
+        if (guardado) return guardado === 'dark';
+        return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch(e) { return false; }
+}
 function mpAplicarTema() {
-    let dark = false;
-    try { dark = localStorage.getItem('theme') === 'dark'; } catch(e) {}
+    const dark = _temaOscuroPorDefecto();
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.getElementById('mp-theme-btn').textContent = dark ? '☀️' : '🌙';
+    document.getElementById('mp-theme-btn').textContent = dark ? '🌙' : '☀️';
 }
 function mpToggleTheme() {
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     const next = dark ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next === 'dark' ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('theme', next); } catch(e) {}
-    document.getElementById('mp-theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+    document.getElementById('mp-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
 }
 
 mpAplicarIdioma();
