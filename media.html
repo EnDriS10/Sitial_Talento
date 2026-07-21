@@ -82,9 +82,10 @@
         transition: transform .25s ease, box-shadow .25s ease;
         opacity: 0; animation: mpFadeIn .5s ease forwards;
     }
-    /* Tamaños del mosaico: varían pero siempre encajan en la cuadrícula
-       gracias a grid-auto-flow: dense, que rellena los huecos. */
-    .mp-tile.mp-size-lg   { grid-column: span 2; grid-row: span 2; }
+    /* Tamaños del mosaico: varían según la proporción real de cada foto
+       (paisaje → ancha, retrato → alta, casi cuadrada → normal), y siempre
+       encajan en la cuadrícula gracias a grid-auto-flow: dense. La variación
+       es sutil a propósito (máx. 2×1 / 1×2) para que no se vea dispar. */
     .mp-tile.mp-size-wide { grid-column: span 2; grid-row: span 1; }
     .mp-tile.mp-size-tall { grid-column: span 1; grid-row: span 2; }
     @keyframes mpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -428,17 +429,23 @@ async function cargarGaleria() {
             cont.innerHTML = `<div class="mp-estado">${_t('empty')}</div>`;
             return;
         }
-        // Patrón de tamaños que se repite a lo largo de la galería: crea un
-        // mosaico con variedad (como antes) pero siempre encaja en la
-        // cuadrícula porque grid-auto-flow: dense rellena los huecos.
-        const _patronTamanos = ['lg','','','tall','','wide','','','tall','','','wide','lg','','','','tall',''];
+        // El tamaño de cada pieza del mosaico se calcula a partir de la
+        // proporción REAL de la foto (una vez cargada), no de un patrón
+        // fijo: paisaje → ancha, retrato → alta, casi cuadrada → normal.
+        // Los umbrales son moderados para que la variación sea sutil y no
+        // dispar entre fotos.
         _galeria.forEach((datos, i) => {
             const tile = document.createElement('div');
-            const tam = _patronTamanos[i % _patronTamanos.length];
-            tile.className = 'mp-tile' + (tam ? ' mp-size-' + tam : '');
+            tile.className = 'mp-tile';
             tile.style.animationDelay = (Math.min(i, 24) * 0.03) + 's';
             const img = document.createElement('img');
             img.src = datos.url; img.loading = 'lazy'; img.alt = 'Sitial de Talentos';
+            img.onload = () => {
+                const ratio = img.naturalWidth / img.naturalHeight;
+                if (ratio >= 1.35) tile.classList.add('mp-size-wide');
+                else if (ratio <= 0.74) tile.classList.add('mp-size-tall');
+                // si es casi cuadrada, se queda con el tamaño normal (sin clase)
+            };
             img.onerror = () => tile.remove();
             tile.appendChild(img);
             const etiqueta = _etiquetaEvento(datos.evento);
@@ -585,12 +592,27 @@ function _prepararOpcionNativa(panel) {
     btn.onclick = compartirNativo;
     grid.insertBefore(btn, grid.firstChild);
 }
+function _slugFoto(nombre) {
+    // Debe coincidir con slug() de scripts/generar-paginas-compartir.js
+    return nombre.replace(/\.[^.]+$/, '');
+}
+function _urlCompartirActual() {
+    // Si hay una foto abierta, se comparte el link a su página estática de
+    // "compartir" (share/<slug>.html), que trae las etiquetas og:image
+    // correctas para que WhatsApp/Facebook/Telegram muestren la vista
+    // previa de esa foto. Sin eso, como la app carga todo por JS, el link
+    // directo a media.html?foto=... siempre mostraría la misma vista previa
+    // genérica (los "crawlers" de esas apps no ejecutan JavaScript).
+    if (!_actual) return location.href;
+    const base = location.href.replace(/media\.html.*$/, '');
+    return base + 'share/' + _slugFoto(_actual.nombre) + '.html';
+}
 function compartirNativo() {
-    navigator.share({ title: 'Sitial de Talentos', text: _t('shareText'), url: location.href }).catch(() => {});
+    navigator.share({ title: 'Sitial de Talentos', text: _t('shareText'), url: _urlCompartirActual() }).catch(() => {});
 }
 function compartirRed(red) {
     if (red === 'link') { copiarEnlace(); return; }
-    const urlEnc = encodeURIComponent(location.href);
+    const urlEnc = encodeURIComponent(_urlCompartirActual());
     const texto  = encodeURIComponent(_t('shareText'));
     let enlace = '';
     switch (red) {
@@ -603,7 +625,7 @@ function compartirRed(red) {
     window.open(enlace, '_blank', 'noopener,noreferrer,width=560,height=620');
 }
 function copiarEnlace() {
-    const url = location.href;
+    const url = _urlCompartirActual();
     const finalizar = (ok) => mostrarToast(ok ? _t('copied') : _t('copyFail'));
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(() => finalizar(true)).catch(() => finalizar(false));
