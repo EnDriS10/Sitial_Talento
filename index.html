@@ -2058,11 +2058,11 @@
     <span id="topbar-titulo-seccion"></span>
     <!-- Right: theme, lang, hamburger -->
     <div id="topbar-right" onclick="event.stopPropagation()">
-        <button class="topbar-util-btn" id="lang-toggle" onclick="toggleLang()" title="Idioma / Language">
-            <span id="lang-label">EN</span>
-        </button>
         <button class="topbar-util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
             <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+        </button>
+        <button class="topbar-util-btn" id="lang-toggle" onclick="toggleLang()" title="Idioma / Language">
+            <span id="lang-label">EN</span>
         </button>
         <button id="hamburger-btn" onclick="event.stopPropagation(); toggleMenu()" aria-label="Abrir/cerrar menú">
             <span></span><span></span><span></span>
@@ -4607,10 +4607,20 @@ function _mediaNumDesdeNombre(nombre) {
 function _mediaEventoLabel(codigo) {
     if (!codigo) return null;
     const mapa = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
-    const key  = codigo.toLowerCase();
-    if (mapa[key]) return mapa[key];
-    if (key === 'otras' || key === 'otra' || key === 'otro') return (window._lang === 'en') ? 'Other' : 'Otras';
-    return null;
+    return mapa[codigo.toLowerCase()] || null;
+}
+function _mediaEsEventoOtras(codigo) {
+    const key = (codigo || '').toLowerCase();
+    return key === 'otras' || key === 'otra' || key === 'otro';
+}
+// Texto de la insignia: evento conocido → "IChO · 2023"; "otras" → solo el
+// año (sin nombre de evento); sin evento reconocible → null (sin insignia).
+function _mediaTextoBadge(datos) {
+    const año = datos.fecha ? datos.fecha.getFullYear() : null;
+    if (_mediaEsEventoOtras(datos.evento)) return año ? String(año) : null;
+    const etiqueta = _mediaEventoLabel(datos.evento);
+    if (!etiqueta) return null;
+    return año ? `${etiqueta} · ${año}` : etiqueta;
 }
 
 let _mediaCargada = false;
@@ -4683,10 +4693,9 @@ function abrirLightboxMedia(datos) {
 
     const badge = document.getElementById('media-lightbox-evento');
     if (badge) {
-        const etiqueta = _mediaEventoLabel(datos.evento);
-        const año = datos.fecha ? datos.fecha.getFullYear() : null;
-        if (etiqueta) {
-            badge.textContent = año ? `${etiqueta} · ${año}` : etiqueta;
+        const texto = _mediaTextoBadge(datos);
+        if (texto) {
+            badge.textContent = texto;
             badge.style.display = 'inline-flex';
         } else {
             badge.style.display = 'none';
