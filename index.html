@@ -612,7 +612,8 @@
             #topbar-home-btn { font-size: 12px; padding: 5px 6px 5px 2px; }
             #topbar-sep { font-size: 11px; }
             #topbar-titulo-seccion { font-size: 11px; }
-            .topbar-icon-btn { width: 30px; height: 30px; font-size: 12px; }
+            .topbar-util-btn { width: 30px; height: 30px; font-size: 12px; }
+            #theme-toggle { font-size: 13px; }
             #hamburger-btn { padding: 7px 6px; }
             /* Noticia stack */
             .noticia-full { flex-direction: column; }
@@ -1346,26 +1347,31 @@
             flex-shrink: 0;
             margin-left: auto;
         }
-        /* Util buttons inside topbar — estilo minimalista, igual al de Media */
-        .topbar-icon-btn {
-            display: flex;
+        /* Util buttons inside topbar — estilo minimalista (igual que en Media) */
+        .topbar-util-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
-            border: none;
+            width: 34px;
+            height: 34px;
+            padding: 0;
             border-radius: 8px;
+            border: none;
             background: rgba(255,255,255,.12);
             font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
-            transition: background .2s;
-            flex-shrink: 0;
+            transition: background .18s;
         }
-        .topbar-icon-btn:hover { background: rgba(255,255,255,.22); }
-        .topbar-icon-btn:active { background: rgba(255,255,255,.28); }
+        .topbar-util-btn:hover  { background: rgba(255,255,255,.22); }
+        .topbar-util-btn:active { background: rgba(255,255,255,.3); }
+        #theme-toggle { font-size: 15px; }
+        #theme-toggle .icon-sun  { display: inline; }
+        #theme-toggle .icon-moon { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-sun  { display: none; }
+        [data-theme="dark"] #theme-toggle .icon-moon { display: inline; }
         #hamburger-btn {
             background: none;
             border: none;
@@ -1663,20 +1669,20 @@
            MEDIA — GALERÍA DE FOTOS
         ═══════════════════════════════════════════ */
         .media-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
+            columns: 4 260px;
+            column-gap: 16px;
             margin-top: 8px;
         }
         .media-gallery img {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
             display: block;
+            margin: 0 0 16px;
             border-radius: 14px;
             cursor: zoom-in;
             box-shadow: 0 2px 14px rgba(4,18,43,.08);
             transition: transform .25s ease, box-shadow .25s ease, opacity .4s ease;
+            break-inside: avoid;
+            -webkit-column-break-inside: avoid;
             background: var(--card-bg);
             border: 1px solid var(--border);
             opacity: 0;
@@ -1688,11 +1694,14 @@
             box-shadow: 0 10px 26px rgba(4,18,43,.18);
         }
         @media (max-width: 900px) {
-            .media-gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+            .media-gallery { columns: 3 200px; column-gap: 12px; }
         }
         @media (max-width: 600px) {
-            .media-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .media-gallery img { border-radius: 10px; }
+            .media-gallery { columns: 2 140px; column-gap: 10px; }
+            .media-gallery img { margin-bottom: 10px; border-radius: 10px; }
+        }
+        @media (max-width: 400px) {
+            .media-gallery { columns: 1; }
         }
 
         /* Lightbox: tap para zoom-in, tap de nuevo para zoom-out */
@@ -2049,8 +2058,12 @@
     <span id="topbar-titulo-seccion"></span>
     <!-- Right: theme, lang, hamburger -->
     <div id="topbar-right" onclick="event.stopPropagation()">
-        <button class="topbar-icon-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">🌙</button>
-        <button class="topbar-icon-btn" id="lang-toggle" onclick="toggleLang()" title="Idioma / Language">EN</button>
+        <button class="topbar-util-btn" id="lang-toggle" onclick="toggleLang()" title="Idioma / Language">
+            <span id="lang-label">EN</span>
+        </button>
+        <button class="topbar-util-btn" id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema / Toggle theme">
+            <span class="icon-sun">☀️</span><span class="icon-moon">🌙</span>
+        </button>
         <button id="hamburger-btn" onclick="event.stopPropagation(); toggleMenu()" aria-label="Abrir/cerrar menú">
             <span></span><span></span><span></span>
         </button>
@@ -6110,14 +6123,8 @@ function _setOptionText(selectId, value, text) {
 }
 
 function _actualizarBotonesUtilidad() {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const themeBtn = document.getElementById('theme-toggle');
-    if (themeBtn) {
-        themeBtn.textContent = isDark ? '☀️' : '🌙';
-        themeBtn.title = isDark ? T('theme.light') : T('theme.dark');
-    }
-    const langBtn = document.getElementById('lang-toggle');
-    if (langBtn) langBtn.textContent = T('lang.btn');
+    const labelEl = document.getElementById('lang-label');
+    if (labelEl) labelEl.textContent = T('lang.btn');
 }
 
 function applyI18n(lang) {
