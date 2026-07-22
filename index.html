@@ -2399,15 +2399,19 @@
                 <!-- Cargado dinámicamente desde honor_merece.html -->
             </div>
         </div>
+    </div>
 
-        <div id="modal-overlay">
-            <div id="modal-topbar">
-                <button id="modal-back-btn" onclick="cerrarArticulo()">← Volver</button>
-                <span id="modal-topbar-title">Honor a quien Honor Merece</span>
-            </div>
-            <div id="modal-scroll">
-                <div id="modal-body"></div>
-            </div>
+    <!-- Overlay global del artículo "Honor a quien Honor Merece": vive FUERA de
+         cualquier .seccion para poder abrirse desde cualquier pestaña (p.ej.
+         Historial por Eventos) sin quedar oculto por el display:none de la
+         sección que no esté activa en ese momento. -->
+    <div id="modal-overlay">
+        <div id="modal-topbar">
+            <button id="modal-back-btn" onclick="cerrarArticulo()">← Volver</button>
+            <span id="modal-topbar-title">Honor a quien Honor Merece</span>
+        </div>
+        <div id="modal-scroll">
+            <div id="modal-body"></div>
         </div>
     </div>
 
