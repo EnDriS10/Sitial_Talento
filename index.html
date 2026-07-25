@@ -4656,8 +4656,11 @@ let _transicionEnCurso = false;
 // MEDIA — Galería de fotos leída desde Data/media_data.html
 // ════════════════════════════════════════════════════════════════
 // Ya no se lee Assets/Media vía la API de GitHub: la lista de fotos vive
-// en Data/media_data.html como una tabla con columnas "name" y "link".
-// Ejemplo de fila: name = 29_10_2022_oiaq_1, link = https://i.imgur.com/09R24rp.jpeg
+// en Data/media_data.html como un array JS (const datosMedia = [...]),
+// igual de espíritu que el resto de archivos de Data/ (CNQ_data.html...).
+// Ejemplo: { name: "29_10_2022_oiaq_1", link: "https://i.imgur.com/09R24rp.jpeg" }
+// (_removeJSLineComments y _jsLiteralToJSON ya están definidos más arriba,
+// junto a la carga de CNQ_data.html, y se reutilizan aquí.)
 let _mediaArchivosCache = null; // caché en memoria durante la sesión de la página
 
 async function _mediaListarArchivos() {
@@ -4665,15 +4668,20 @@ async function _mediaListarArchivos() {
     const resp = await fetch('Data/media_data.html');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const text = await resp.text();
-    const doc = new DOMParser().parseFromString(text, 'text/html');
-    const filas = Array.from(doc.querySelectorAll('table tr')).slice(1); // saltar cabecera
-    const archivos = filas.map(f => {
-        const c = f.querySelectorAll('td');
-        return {
-            nombre: (c[0]?.textContent || '').trim(),
-            url:    (c[1]?.textContent || '').trim()
-        };
-    }).filter(a => a.nombre && a.url);
+
+    const marker = text.indexOf('const datosMedia = [');
+    if (marker === -1) throw new Error('No se encontró datosMedia');
+    let dep = 0, i = text.indexOf('[', marker);
+    const start = i;
+    for (; i < text.length; i++) {
+        if (text[i] === '[') dep++;
+        else if (text[i] === ']') { dep--; if (dep === 0) break; }
+    }
+    const datos = JSON.parse(_jsLiteralToJSON(text.slice(start, i + 1)));
+
+    const archivos = datos
+        .map(d => ({ nombre: (d.name || '').trim(), url: (d.link || '').trim() }))
+        .filter(a => a.nombre && a.url);
     _mediaArchivosCache = archivos;
     return archivos;
 }
