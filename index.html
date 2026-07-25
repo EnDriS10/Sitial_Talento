@@ -4653,49 +4653,36 @@ const _tituloSeccion = {
 let _transicionEnCurso = false;
 
 // ════════════════════════════════════════════════════════════════
-// MEDIA — Galería de fotos leída directamente de Assets/Media
+// MEDIA — Galería de fotos leída desde Data/media_data.html
 // ════════════════════════════════════════════════════════════════
-// No hay ninguna lista/manifiesto que mantener: usamos la API de
-// contenidos de GitHub para pedir el listado REAL de archivos que hay
-// en la carpeta Assets/Media del repositorio, igual de espíritu que la
-// detección automática que ya usa el resto del sitio. La diferencia con
-// el Concurso Nacional (CNQ) es que allí los nombres son predecibles
-// (solo cambia la extensión) y se puede "probar" con HEAD; aquí el
-// nombre de cada foto es libre (fecha + posible sufijo + extensión
-// variable), así que hace falta el listado real de la carpeta.
+// Ya no se lee Assets/Media vía la API de GitHub: la lista de fotos vive
+// en Data/media_data.html como una tabla con columnas "name" y "link".
+// Ejemplo de fila: name = 29_10_2022_oiaq_1, link = https://i.imgur.com/09R24rp.jpeg
 let _mediaArchivosCache = null; // caché en memoria durante la sesión de la página
-
-// Deduce {owner, repo} a partir de la propia URL en la que corre la página
-// (patrón de GitHub Pages: https://{owner}.github.io/{repo}/...), con un
-// fallback razonable por si se abre en local durante pruebas.
-function _githubRepoInfo() {
-    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
-    const owner = m ? m[1] : 'EnDriS10';
-    const pathParts = location.pathname.split('/').filter(Boolean);
-    const repo = (m && pathParts[0]) ? pathParts[0] : 'Sitial_Talento';
-    return { owner, repo };
-}
 
 async function _mediaListarArchivos() {
     if (_mediaArchivosCache) return _mediaArchivosCache;
-    const { owner, repo } = _githubRepoInfo();
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/Assets/Media`;
-    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    const resp = await fetch('Data/media_data.html');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (!Array.isArray(data)) throw new Error('Respuesta inesperada de la API de GitHub');
-    const archivos = data
-        .filter(it => it.type === 'file' && /\.(jpe?g|png|webp|gif)$/i.test(it.name))
-        .map(it => ({ nombre: it.name, url: it.download_url }));
+    const text = await resp.text();
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const filas = Array.from(doc.querySelectorAll('table tr')).slice(1); // saltar cabecera
+    const archivos = filas.map(f => {
+        const c = f.querySelectorAll('td');
+        return {
+            nombre: (c[0]?.textContent || '').trim(),
+            url:    (c[1]?.textContent || '').trim()
+        };
+    }).filter(a => a.nombre && a.url);
     _mediaArchivosCache = archivos;
     return archivos;
 }
 
-// Extrae la fecha DD_MM_AAAA del nombre de archivo (solo para ORDENAR, nunca
-// se muestra en pantalla). El nombre real es DD_MM_AAAA_evento[_num].ext — ni
-// el sufijo de evento ni el número opcional afectan a este parseo porque solo
-// miramos el principio. Si un archivo no sigue el patrón, se manda al final
-// de la galería en vez de romper la carga.
+// Extrae la fecha DD_MM_AAAA del "name" (solo para ORDENAR, nunca se muestra
+// en pantalla). El formato es DD_MM_AAAA_evento[_num] — ni el sufijo de
+// evento ni el número opcional afectan a este parseo porque solo miramos el
+// principio. Si una fila no sigue el patrón, se manda al final de la
+// galería en vez de romper la carga.
 function _mediaFechaDesdeNombre(nombre) {
     const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
     if (!m) return null;
@@ -4703,17 +4690,17 @@ function _mediaFechaDesdeNombre(nombre) {
     return isNaN(d.getTime()) ? null : d;
 }
 
-// Extrae el código de evento del nombre de archivo: DD_MM_AAAA_evento[_num].ext
+// Extrae el código de evento del "name": DD_MM_AAAA_evento[_num]
 // evento ∈ { icho, imcho, oiaq, ocacq, otras } (case-insensitive).
 function _mediaEventoDesdeNombre(nombre) {
-    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?\.\w+$/);
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?(?:\.\w+)?$/);
     return m ? m[1].toLowerCase() : null;
 }
 
 // Extrae el número de orden opcional para fotos con la misma fecha y evento:
-// DD_MM_AAAA_evento_num.ext → num. Si no hay número, se asume 0.
+// DD_MM_AAAA_evento_num → num. Si no hay número, se asume 0.
 function _mediaNumDesdeNombre(nombre) {
-    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)\.\w+$/);
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)(?:\.\w+)?$/);
     return m ? Number(m[1]) : 0;
 }
 
@@ -4788,7 +4775,7 @@ async function cargarGaleriaMedia() {
         });
         _mediaCargada = true;
     } catch (err) {
-        console.error('Error cargando Assets/Media vía la API de GitHub:', err);
+        console.error('Error cargando Data/media_data.html:', err);
         cont.innerHTML = `<div style="padding:50px 20px;text-align:center;color:var(--text-muted);font-size:14px;">⚠️ ${lang === 'es' ? 'No se pudo cargar la galería en este momento.' : 'The gallery could not be loaded right now.'}</div>`;
     }
 }
