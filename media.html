@@ -344,35 +344,31 @@ mpAplicarIdioma();
 mpAplicarTema();
 
 // ════════════════════════════════════════════════════════════════════
-// CARGA DE FOTOS DESDE Assets/Media (API de GitHub)
+// CARGA DE FOTOS DESDE Data/media_data.html (name + link)
 // ════════════════════════════════════════════════════════════════════
-function _githubRepoInfo() {
-    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
-    const owner = m ? m[1] : 'EnDriS10';
-    const pathParts = location.pathname.split('/').filter(Boolean);
-    // El propio archivo (media.html) cuenta como "parte" del path; el repo es
-    // el primer segmento cuando se sirve desde {owner}.github.io/{repo}/...
-    const repo = (m && pathParts[0] && pathParts[0] !== 'media.html') ? pathParts[0] : 'Sitial_Talento';
-    return { owner, repo };
-}
-
+// Ya no se lee Assets/Media vía la API de GitHub: la lista de fotos vive
+// en Data/media_data.html como una tabla con columnas "name" y "link".
+// Ejemplo de fila: name = 29_10_2022_oiaq_1, link = https://i.imgur.com/09R24rp.jpeg
 let _archivosCache = null;
 async function _listarArchivos() {
     if (_archivosCache) return _archivosCache;
-    const { owner, repo } = _githubRepoInfo();
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/Assets/Media`;
-    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    const resp = await fetch('Data/media_data.html');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (!Array.isArray(data)) throw new Error('Respuesta inesperada de la API de GitHub');
-    const archivos = data
-        .filter(it => it.type === 'file' && /\.(jpe?g|png|webp|gif)$/i.test(it.name))
-        .map(it => ({ nombre: it.name, url: it.download_url }));
+    const text = await resp.text();
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const filas = Array.from(doc.querySelectorAll('table tr')).slice(1); // saltar cabecera
+    const archivos = filas.map(f => {
+        const c = f.querySelectorAll('td');
+        return {
+            nombre: (c[0]?.textContent || '').trim(),
+            url:    (c[1]?.textContent || '').trim()
+        };
+    }).filter(a => a.nombre && a.url);
     _archivosCache = archivos;
     return archivos;
 }
 
-// Nombre de archivo: DD_MM_AAAA_evento[_num].ext
+// Formato de "name" en Data/media_data.html: DD_MM_AAAA_evento[_num]
 function _fechaDesdeNombre(nombre) {
     const m = nombre.match(/^(\d{2})_(\d{2})_(\d{4})/);
     if (!m) return null;
@@ -380,11 +376,11 @@ function _fechaDesdeNombre(nombre) {
     return isNaN(d.getTime()) ? null : d;
 }
 function _eventoDesdeNombre(nombre) {
-    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?\.\w+$/);
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?(?:\.\w+)?$/);
     return m ? m[1].toLowerCase() : null;
 }
 function _numDesdeNombre(nombre) {
-    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)\.\w+$/);
+    const m = nombre.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)(?:\.\w+)?$/);
     return m ? Number(m[1]) : 0;
 }
 function _etiquetaEvento(codigo) {
@@ -457,7 +453,7 @@ async function cargarGaleria() {
         const fotoParam = _fotoParamActual();
         if (fotoParam) abrirFoto(fotoParam, false);
     } catch (err) {
-        console.error('Error cargando Assets/Media vía la API de GitHub:', err);
+        console.error('Error cargando Data/media_data.html:', err);
         cont.innerHTML = `<div class="mp-estado">⚠️ ${_t('error')}</div>`;
     }
 }
