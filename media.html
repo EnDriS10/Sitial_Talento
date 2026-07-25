@@ -344,26 +344,61 @@ mpAplicarIdioma();
 mpAplicarTema();
 
 // ════════════════════════════════════════════════════════════════════
-// CARGA DE FOTOS DESDE Data/media_data.html (name + link)
+// CARGA DE FOTOS DESDE Data/media_data.html (const datosMedia = [...])
 // ════════════════════════════════════════════════════════════════════
 // Ya no se lee Assets/Media vía la API de GitHub: la lista de fotos vive
-// en Data/media_data.html como una tabla con columnas "name" y "link".
-// Ejemplo de fila: name = 29_10_2022_oiaq_1, link = https://i.imgur.com/09R24rp.jpeg
+// en Data/media_data.html como un array JS, igual de espíritu que el
+// resto de archivos de Data/ (CNQ_data.html, olympiad_data.html...).
+// Ejemplo: { name: "29_10_2022_oiaq_1", link: "https://i.imgur.com/09R24rp.jpeg" }
+
+// Elimina comentarios // solo fuera de strings (para que https:// no sea afectado)
+function _removeJSLineComments(src) {
+    let out = '', inStr = false, strChar = '', escape = false, i = 0;
+    while (i < src.length) {
+        const c = src[i];
+        if (escape)                          { out += c; escape = false; i++; continue; }
+        if (c === '\\' && inStr)             { out += c; escape = true;  i++; continue; }
+        if (!inStr && (c === '"' || c === "'")) { inStr = true; strChar = c; out += c; i++; continue; }
+        if (inStr && c === strChar)          { inStr = false; out += c;  i++; continue; }
+        if (!inStr && c === '/' && src[i + 1] === '/') {
+            while (i < src.length && src[i] !== '\n') i++;
+            continue;
+        }
+        out += c; i++;
+    }
+    return out;
+}
+
+// Convierte un bloque JS (array u objeto literal) a JSON válido
+function _jsLiteralToJSON(src) {
+    return _removeJSLineComments(src)
+        .replace(/,(\s*[\]\}])/g, '$1')   // trailing commas
+        .replace(/(^|[{,])\s*([^\s"'0-9{},\[\]:][^\s:,\]{}]*)\s*:/gm, (m, pre, key) => {
+            if (key.startsWith('"') || key.startsWith("'")) return m;
+            return `${pre} "${key.trim()}":`;
+        });
+}
+
 let _archivosCache = null;
 async function _listarArchivos() {
     if (_archivosCache) return _archivosCache;
     const resp = await fetch('Data/media_data.html');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const text = await resp.text();
-    const doc = new DOMParser().parseFromString(text, 'text/html');
-    const filas = Array.from(doc.querySelectorAll('table tr')).slice(1); // saltar cabecera
-    const archivos = filas.map(f => {
-        const c = f.querySelectorAll('td');
-        return {
-            nombre: (c[0]?.textContent || '').trim(),
-            url:    (c[1]?.textContent || '').trim()
-        };
-    }).filter(a => a.nombre && a.url);
+
+    const marker = text.indexOf('const datosMedia = [');
+    if (marker === -1) throw new Error('No se encontró datosMedia');
+    let dep = 0, i = text.indexOf('[', marker);
+    const start = i;
+    for (; i < text.length; i++) {
+        if (text[i] === '[') dep++;
+        else if (text[i] === ']') { dep--; if (dep === 0) break; }
+    }
+    const datos = JSON.parse(_jsLiteralToJSON(text.slice(start, i + 1)));
+
+    const archivos = datos
+        .map(d => ({ nombre: (d.name || '').trim(), url: (d.link || '').trim() }))
+        .filter(a => a.nombre && a.url);
     _archivosCache = archivos;
     return archivos;
 }
