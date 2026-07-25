@@ -14,12 +14,12 @@
     1. Sube la imagen a un servicio externo (por ejemplo https://imgur.com)
        y copia el enlace DIRECTO a la imagen (la URL de la imagen en sí,
        terminada normalmente en .jpg / .jpeg / .png / .webp).
-    2. Añade una nueva fila <tr> a la tabla de abajo con:
-         - name (columna 1): DD_MM_AAAA_evento[_num]
+    2. Añade un nuevo objeto al array datosMedia de abajo con:
+         - name: "DD_MM_AAAA_evento[_num]"   (¡entre comillas!)
              evento ∈ { icho, imcho, oiaq, ocacq, otras }
              el sufijo _num es opcional, para distinguir varias fotos
              del mismo día y evento (_1, _2, _3...)
-         - link (columna 2): la URL directa de la imagen
+         - link: la URL directa de la imagen (entre comillas)
     3. Guarda el archivo. No hace falta tocar media.html ni index.html:
        la nueva foto aparecerá sola, ordenada por fecha (más reciente
        primero) la próxima vez que se cargue la galería.
@@ -28,15 +28,10 @@
       → 29/10/2022, evento OIAQ, foto número 1 de ese día/evento
       → se mostrará en la galería con la insignia "OIAQ · 2022"
 -->
-<table>
-    <tr>
-        <th>name</th>
-        <th>link</th>
-    </tr>
-    <tr>
-        <td>29_10_2022_oiaq_1</td>
-        <td>https://i.imgur.com/09R24rp.jpeg</td>
-    </tr>
-</table>
+<script>
+const datosMedia = [
+    { name: "29_10_2022_oiaq_1", link: "https://i.imgur.com/09R24rp.jpeg" },
+];
+</script>
 </body>
 </html>
