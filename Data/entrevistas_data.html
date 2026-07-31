@@ -1,0 +1,40 @@
+<!--
+    Data/entrevistas_data.html
+    ═══════════════════════════════════════════════════════════════
+    Fuente de datos para la sección "Entrevistas Exclusivas" de
+    noticias.html. Mismo espíritu que Data/media_data.html y
+    Data/CNQ_data.html: un array JS literal que se parsea en el
+    cliente con _jsLiteralToJSON (sin necesidad de build ni backend).
+
+    CÓMO AÑADIR UNA ENTREVISTA
+    ───────────────────────────
+    Agrega un objeto al array `datosEntrevistas` con estos campos:
+
+      nombre   → Nombre del entrevistado (obligatorio)
+      rol      → Cargo o logro breve, p.ej. "Medalla de Oro IChO 2025"
+      foto     → URL de la foto (opcional; si falta se usan iniciales)
+      resumen  → Frase o extracto destacado de la entrevista (obligatorio)
+      fecha    → Fecha de publicación, p.ej. "2026-05-12" (opcional)
+      link     → URL del artículo/entrevista completa (opcional; si
+                 falta, la tarjeta no será clicable)
+
+    El PRIMER elemento del array se muestra como la entrevista
+    destacada (tarjeta grande); el resto se muestra en cuadrícula.
+    Ordena el array con las entrevistas más recientes primero.
+
+    Mientras el array esté vacío, la sección muestra un estado
+    "próximamente" en vez de una cuadrícula vacía.
+    ═══════════════════════════════════════════════════════════════
+-->
+<script>
+const datosEntrevistas = [
+    // {
+    //     nombre:  "Nombre Apellido",
+    //     rol:     "Medalla de Oro, IChO 2025",
+    //     foto:    "https://i.imgur.com/ejemplo.jpeg",
+    //     resumen: "Una frase o extracto breve y potente de la entrevista.",
+    //     fecha:   "2026-05-12",
+    //     link:    "https://..."
+    // },
+];
+</script>
