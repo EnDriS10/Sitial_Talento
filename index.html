@@ -2531,7 +2531,6 @@
 
             <div class="proximamente" style="margin-top:60px;">
                 <div class="proximamente-icon">📰</div>
-                <p id="noticias-empty-el">Esta sección albergará noticias, crónicas y entrevistas con los concursantes.</p>
                 <p id="noticias-contrib-el" class="proximamente-contrib">¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
             </div>
         </article>
@@ -2625,7 +2624,7 @@
                                 <img src="Assets/logos/IG_logo.jpg" alt="Instagram" style="width:22px;height:22px;border-radius:6px;object-fit:cover;display:block;vertical-align:middle;">
                             </span>
                             <div>
-                                <div class="contacto-enlace-name">Instagram del Concurso</div>
+                                <div class="contacto-enlace-name">La AgUSTiNeTa Ig</div>
                                 <div class="contacto-enlace-url">instagram.com/la_agustineta</div>
                             </div>
                             <span class="contacto-enlace-arrow">→</span>
@@ -2799,9 +2798,9 @@
 
 <footer>
     <div class="footer-links">
-        <a href="#" class="footer-link-noticias" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
+        <a href="#noticias" class="footer-link-noticias" onclick="cambiarSeccion('noticias');return false;">📰 Noticias y Entrevistas</a>
         <a href="media.html" class="footer-link-media">📸 Media</a>
-        <a href="#" class="footer-link-contacto" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
+        <a href="#contacto" class="footer-link-contacto" onclick="cambiarSeccion('contacto');return false;">📌 Enlaces y Contacto</a>
     </div>
     <div class="footer-social">
         <a class="footer-social-icon" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener" aria-label="Telegram">
@@ -2813,7 +2812,21 @@
             </svg>
         </a>
         <a class="footer-social-icon" href="https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4" target="_blank" rel="noopener" aria-label="Instagram">
-            <img src="Assets/logos/IG_logo.jpg" alt="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="footerIgGrad" cx="30%" cy="107%" r="150%">
+                        <stop offset="0%" stop-color="#fdf497"/>
+                        <stop offset="5%" stop-color="#fdf497"/>
+                        <stop offset="45%" stop-color="#fd5949"/>
+                        <stop offset="60%" stop-color="#d6249f"/>
+                        <stop offset="90%" stop-color="#285AEB"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="12" cy="12" r="12" fill="url(#footerIgGrad)"/>
+                <rect x="6.6" y="6.6" width="10.8" height="10.8" rx="3.1" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="12" cy="12" r="2.9" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="15.35" cy="8.65" r="0.85" fill="#fff"/>
+            </svg>
         </a>
     </div>
     <p id="footer-copy-el" style="font-size:12px;opacity:.5;margin-top:6px;">
@@ -3937,27 +3950,48 @@ const _origInit = () => {
     calcularEnNumeros();
     inicializarNoticias();
 
-    // Restaurar sección activa si el usuario recargó la página
+    // Sección inicial a mostrar. Prioridad:
+    //   1) El hash de la URL (#noticias, #contacto, …) — así los enlaces del
+    //      footer de otras páginas (p.ej. media.html) o de fuera del sitio
+    //      pueden llevar directo a una sección concreta por su id.
+    //   2) La sección guardada en sessionStorage — para sobrevivir recargas
+    //      dentro de la misma pestaña.
+    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias','media','contacto'];
+    const seccionHash = (() => {
+        const h = (location.hash || '').replace('#', '').trim();
+        return secciones.includes(h) ? h : null;
+    })();
     const seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    const secciones = ['inicio','sitial','eventos','cnq','honor','noticias'];
-    if (seccionGuardada && secciones.includes(seccionGuardada) && seccionGuardada !== 'inicio') {
+    const seccionInicial = seccionHash || (secciones.includes(seccionGuardada) ? seccionGuardada : null);
+
+    if (seccionInicial && seccionInicial !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
-        const secEl = document.getElementById(seccionGuardada);
+        const secEl = document.getElementById(seccionInicial);
         const inicioEl = document.getElementById('inicio');
         if (secEl && inicioEl) {
             inicioEl.classList.remove('activa');
             secEl.classList.add('activa');
-            actualizarBreadcrumb(seccionGuardada);
+            actualizarBreadcrumb(seccionInicial);
             document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('activo'));
-            const menuBtn = document.getElementById('menu-btn-' + seccionGuardada);
+            const menuBtn = document.getElementById('menu-btn-' + seccionInicial);
             if (menuBtn) menuBtn.classList.add('activo');
-            actualizarStatsBar(seccionGuardada);
-            if (seccionGuardada === 'eventos') { statsParaEvento(); cargarTabla(); }
+            actualizarStatsBar(seccionInicial);
+            if (seccionInicial === 'eventos') { statsParaEvento(); cargarTabla(); }
+            if (seccionInicial === 'media')   { cargarGaleriaMedia(); }
+            try { sessionStorage.setItem('seccionActiva', seccionInicial); } catch(e) {}
         }
     } else {
         actualizarStatsBar('inicio');
+        if (seccionHash === 'inicio') {
+            try { sessionStorage.setItem('seccionActiva', 'inicio'); } catch(e) {}
+        }
+    }
+    // Limpiar el hash de la URL una vez aplicado, para que no interfiera
+    // luego con la navegación normal dentro del SPA.
+    if (seccionHash) {
+        try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
     }
     window._appReady = true;
 };
@@ -6287,7 +6321,6 @@ function _refreshDynamic() {
     if (morNews) morNews.textContent = T('noticias.more.news');
     const morVid = document.getElementById('btn-mas-videos');
     if (morVid) morVid.textContent = T('noticias.more.videos');
-    _setInnerById('noticias-empty-el',  T('noticias.empty'));
     _setInnerById('noticias-contrib-el',T('noticias.contribute') + '<a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>');
 
     // Media
