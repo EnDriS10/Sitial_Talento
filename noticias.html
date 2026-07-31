@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noticias y Entrevistas — Sitial de Talentos</title>
+<meta name="description" content="Noticias, crónicas y entrevistas exclusivas del Sitial de Talentos Cubanos — Olimpiadas de Química.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --gold: #c9a227; --gold-light: #f0c84a;
+        --accent: #1a6fb5;
+        --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
+        --radius: 14px;
+    }
+    [data-theme="dark"] {
+        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --gold: #d4a82a; --gold-light: #f5d060;
+        --accent: #5ba3e8;
+        --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
+    }
+    * { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        transition: background .25s ease, color .25s ease;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    .np-topbar { flex-shrink: 0; }
+    footer { flex-shrink: 0; }
+
+    /* ── Topbar (idéntico a media.html) ── */
+    .np-topbar {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--navy);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px; padding: 14px 20px;
+    }
+    .np-breadcrumb { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .np-crumb-home {
+        display: flex; align-items: center; gap: 6px;
+        background: none; border: none; cursor: pointer;
+        color: var(--gold-light); font-family: 'DM Sans', sans-serif;
+        font-size: 14px; font-weight: 700; padding: 6px 8px 6px 4px;
+        border-radius: 8px; transition: background .18s, color .18s;
+        white-space: nowrap; flex-shrink: 0;
+    }
+    .np-crumb-home:hover { background: rgba(255,255,255,.1); }
+    .np-crumb-sep { color: rgba(255,255,255,.35); font-size: 14px; flex-shrink: 0; }
+    .np-crumb-current {
+        font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+        color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .np-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .np-icon-btn {
+        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
+        color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s;
+    }
+    .np-icon-btn:hover { background: rgba(255,255,255,.22); }
+    @media (max-width: 560px) {
+        .np-crumb-current { display: none; }
+        .np-crumb-sep { display: none; }
+    }
+
+    /* ── Main / Heading ── */
+    .np-main { max-width: 980px; margin: 0 auto; padding: 28px 20px 64px; flex: 1 0 auto; width: 100%; }
+    .np-header {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 20px; flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+    .np-header-titulo { display: flex; align-items: flex-start; gap: 16px; }
+    .np-header-icono {
+        flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--navy) 100%);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; box-shadow: 0 8px 18px rgba(26,111,181,.28);
+    }
+    .np-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(22px,3.4vw,30px); margin: 4px 0 4px; color: var(--navy); }
+    .np-sub { color: var(--text-muted); font-size: 14px; margin: 0; max-width: 60ch; line-height: 1.55; }
+
+    .np-section { margin-top: 52px; }
+    .np-section-head {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        flex-wrap: wrap; margin-bottom: 22px;
+    }
+    .np-section-title { display: flex; align-items: center; gap: 10px; }
+    .np-section-title-icon {
+        width: 30px; height: 30px; border-radius: 9px;
+        background: rgba(26,111,181,.1);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; flex-shrink: 0;
+    }
+    [data-theme="dark"] .np-section-title-icon { background: rgba(91,163,232,.16); }
+    .np-section-title h2 {
+        font-family: 'Playfair Display', serif; font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+        color: var(--navy); font-weight: 700; margin: 0;
+    }
+
+    /* ── Filtro de años ── */
+    #filtro-años-wrapper {
+        display: none; align-items: center; gap: 10px;
+        padding: 8px 14px; background: var(--card-bg);
+        border-radius: var(--radius); border: 1px solid var(--border);
+        width: fit-content;
+    }
+    .filtro-años-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; }
+    .filtro-año-btn {
+        padding: 6px 15px; border-radius: 20px; border: 1.5px solid var(--border);
+        background: var(--card-bg); cursor: pointer;
+        font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+        color: var(--text-muted); transition: all .2s;
+    }
+    .filtro-año-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+    .filtro-año-btn.activo { background: var(--navy); color: var(--bg); border-color: var(--navy); }
+    .year-navigator {
+        display: inline-flex; align-items: center;
+        border: 1.5px solid var(--border); border-radius: 20px;
+        overflow: hidden; background: var(--card-bg);
+    }
+    .year-nav-btn {
+        background: none; border: none; cursor: pointer;
+        width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+        font-size: 10px; color: var(--text-muted);
+        transition: background .18s, color .18s;
+    }
+    .year-nav-btn:hover { background: var(--bg); color: var(--navy); }
+    #año-input {
+        width: 52px; border: none; outline: none; text-align: center;
+        font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+        color: var(--navy); padding: 4px 0; background: transparent;
+    }
+    #año-input::placeholder { color: var(--text-muted); font-weight: 400; }
+
+    /* ── Prensa y Crónicas ── */
+    .contenedor-dinamico { display: flex; flex-direction: column; gap: 22px; }
+    .noticia-full {
+        position: relative; display: flex; flex-direction: row; align-items: stretch;
+        background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+        border-radius: var(--radius); overflow: hidden; text-decoration: none;
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        color: var(--text); min-height: 150px;
+    }
+    .noticia-full:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(4,18,43,.14); border-left-color: var(--gold); }
+    .foto-noticia-wrap { width: 200px; min-width: 200px; min-height: 150px; background: var(--navy-mid); flex-shrink: 0; overflow: hidden; }
+    .foto-noticia-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+    .noticia-full:hover .foto-noticia-wrap img { transform: scale(1.06); }
+    .info-noticia { padding: 20px 26px; display: flex; flex-direction: column; justify-content: center; }
+    .info-noticia h4 {
+        margin: 0 0 8px; font-family: 'Playfair Display', serif; color: var(--navy);
+        font-size: clamp(1.05rem, 2.4vw, 1.35rem); line-height: 1.35;
+        overflow-wrap: break-word; transition: color .25s ease;
+    }
+    .noticia-full:hover .info-noticia h4 { color: var(--accent); }
+    @media (max-width: 600px) {
+        .noticia-full { flex-direction: column; border-left: none; border-top: 4px solid var(--accent); }
+        .noticia-full:hover { border-top-color: var(--gold); }
+        .foto-noticia-wrap { width: 100%; min-width: 0; height: 170px; min-height: 0; }
+    }
+
+    .grid-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+    .video-item {
+        position: relative; background: var(--card-bg); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 15px; text-decoration: none; color: var(--text);
+        transition: all .3s ease; display: block;
+    }
+    .video-item:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 14px 26px rgba(4,18,43,.14); }
+    .video-item::after {
+        content: '▶'; position: absolute; top: 30px; left: 30px;
+        width: 44px; height: 44px; border-radius: 50%; background: rgba(4,18,43,.55); color: #fff;
+        display: flex; align-items: center; justify-content: center; font-size: 15px;
+        opacity: 0; transform: scale(.8); transition: opacity .25s ease, transform .25s ease;
+        backdrop-filter: blur(2px); pointer-events: none;
+    }
+    .video-item:hover::after { opacity: 1; transform: scale(1); }
+    .video-thumb {
+        width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+        border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        margin-bottom: 12px; color: #fff; font-size: 1.8rem;
+    }
+    .fecha-etiqueta {
+        font-size: .7rem; color: #fff; background: var(--accent); font-weight: 700;
+        text-transform: uppercase; letter-spacing: .4px; margin-bottom: 10px;
+        padding: 3px 10px; border-radius: 20px; display: inline-block;
+    }
+    .btn-ver-mas {
+        display: block; width: fit-content; margin: 28px auto 0; padding: 11px 28px;
+        background: transparent; border: 2px solid var(--accent); color: var(--accent);
+        border-radius: 30px; font-weight: 600; cursor: pointer; transition: all .3s;
+        font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    }
+    .btn-ver-mas:hover { background: var(--accent); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(26,111,181,.28); }
+    .np-estado { padding: 44px 20px; text-align: center; color: var(--text-muted); font-size: 14px; }
+
+    /* ═══════════════════════════════════════════
+       ENTREVISTAS EXCLUSIVAS — sección insignia
+    ═══════════════════════════════════════════ */
+    .ent-section-head { margin-bottom: 24px; }
+    .ent-eyebrow {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-size: 11px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+        color: var(--gold); margin-bottom: 8px;
+    }
+    .ent-eyebrow::before { content: '●'; font-size: 8px; }
+    .ent-section-head h2 {
+        font-family: 'Playfair Display', serif; font-weight: 900;
+        font-size: clamp(1.3rem, 3vw, 1.7rem); color: var(--navy); margin: 0 0 8px;
+    }
+    .ent-section-head p { color: var(--text-muted); font-size: 14px; max-width: 62ch; margin: 0; line-height: 1.6; }
+
+    .ent-featured {
+        display: grid; grid-template-columns: 260px 1fr; gap: 0;
+        background: var(--navy); border-radius: 20px; overflow: hidden;
+        box-shadow: 0 18px 44px rgba(4,18,43,.22);
+        text-decoration: none; color: #fff;
+        transition: transform .3s ease, box-shadow .3s ease;
+        margin-bottom: 22px;
+    }
+    .ent-featured:hover { transform: translateY(-4px); box-shadow: 0 26px 56px rgba(4,18,43,.3); }
+    .ent-featured-photo { position: relative; min-height: 260px; background: var(--navy-mid); overflow: hidden; }
+    .ent-featured-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ent-featured-body { padding: 34px 36px; display: flex; flex-direction: column; justify-content: center; }
+    .ent-badge {
+        display: inline-flex; align-items: center; gap: 6px; width: fit-content;
+        background: rgba(201,162,39,.16); border: 1px solid rgba(201,162,39,.4);
+        color: var(--gold-light); font-size: 11px; font-weight: 700; letter-spacing: .8px;
+        text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .ent-featured-body h3 {
+        font-family: 'Playfair Display', serif; font-weight: 800; font-size: clamp(1.2rem, 2.6vw, 1.55rem);
+        margin: 0 0 6px; line-height: 1.25;
+    }
+    .ent-role { font-size: 12.5px; color: rgba(255,255,255,.55); font-weight: 600; margin: 0 0 16px; letter-spacing: .2px; }
+    .ent-quote {
+        font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700;
+        font-size: clamp(1rem, 2vw, 1.15rem); line-height: 1.5; color: rgba(255,255,255,.92);
+        margin: 0 0 18px; position: relative; padding-left: 18px; border-left: 2px solid var(--gold);
+    }
+    .ent-featured-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ent-cta { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: var(--gold-light); transition: gap .2s ease; }
+    .ent-featured:hover .ent-cta { gap: 11px; }
+    .ent-fecha { font-size: 11.5px; color: rgba(255,255,255,.4); font-weight: 600; letter-spacing: .3px; }
+
+    @media (max-width: 700px) {
+        .ent-featured { grid-template-columns: 1fr; }
+        .ent-featured-photo { min-height: 200px; }
+        .ent-featured-body { padding: 26px 24px; }
+    }
+
+    .ent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+    .ent-card {
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 22px 20px; text-decoration: none; color: var(--text);
+        display: flex; flex-direction: column; gap: 12px;
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .ent-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(4,18,43,.12); border-color: var(--gold); }
+    .ent-card-top { display: flex; align-items: center; gap: 12px; }
+    .ent-avatar {
+        width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+        background: var(--navy); border: 2px solid var(--gold); overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .ent-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .ent-avatar-initials { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--gold-light); font-size: 15px; }
+    .ent-card-name h4 { margin: 0 0 2px; font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+    .ent-card-name span { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .ent-card p.ent-snippet { font-size: 13px; line-height: 1.55; color: var(--text-muted); margin: 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .ent-card-foot { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); }
+    .ent-card-foot .ent-cta { color: var(--accent); font-size: 12.5px; }
+
+    /* ── Estado vacío ── */
+    .np-empty {
+        text-align: center; padding: 46px 20px;
+        border: 1px dashed var(--border); border-radius: var(--radius);
+        color: var(--text-muted);
+    }
+    .np-empty-icon {
+        width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(26,111,181,.12) 0%, rgba(201,162,39,.12) 100%);
+        display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .np-empty p { max-width: 440px; margin: 0 auto; font-size: 14px; line-height: 1.6; }
+
+    /* ── Contribuir ── */
+    .np-contribute {
+        margin-top: 56px; text-align: center; border-top: 1px dashed var(--border); padding-top: 34px;
+        color: var(--text-muted); font-size: 14.5px; line-height: 1.6;
+    }
+    .np-contribute a { color: var(--accent); font-weight: 600; }
+
+    /* ── Footer (idéntico al de media.html) ── */
+    footer { background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px 22px; font-size: 13px; }
+    footer a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+    footer a:hover { opacity: .75; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; font-weight: 500; }
+    .footer-social { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .footer-social-icon {
+        width: 38px; height: 38px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,.08); overflow: hidden;
+        transition: transform .2s ease, background .2s ease;
+    }
+    .footer-social-icon:hover { transform: translateY(-3px); background: rgba(255,255,255,.16); }
+    .footer-social-icon svg { width: 20px; height: 20px; display: block; }
+    .footer-social-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+</style>
+</head>
+<body>
+
+<div class="np-topbar">
+    <div class="np-breadcrumb">
+        <button class="np-crumb-home" onclick="location.href='index.html#inicio'" aria-label="Inicio">
+            🏠 <span id="np-back-label">Home</span>
+        </button>
+        <span class="np-crumb-sep">›</span>
+        <span class="np-crumb-current">📰 <span id="np-title-label">Noticias</span></span>
+    </div>
+    <div class="np-topbar-actions">
+        <button class="np-icon-btn" id="np-theme-btn" onclick="npToggleTheme()" title="Tema">🌙</button>
+        <button class="np-icon-btn" id="np-lang-btn" onclick="npToggleLang()" title="Idioma / Language">ES</button>
+    </div>
+</div>
+
+<div class="np-main">
+    <div class="np-header">
+        <div class="np-header-titulo">
+            <span class="np-header-icono">📰</span>
+            <div>
+                <h1 class="np-heading" id="np-heading">Noticias y Entrevistas</h1>
+                <p class="np-sub" id="np-sub">Lo último del mundo de la química olímpica cubana: crónicas, entrevistas y momentos que hacen historia.</p>
+            </div>
+        </div>
+        <div id="filtro-años-wrapper"></div>
+    </div>
+
+    <!-- ══ ENTREVISTAS EXCLUSIVAS ══ -->
+    <div class="np-section">
+        <div class="ent-section-head">
+            <span class="ent-eyebrow" id="ent-eyebrow">Contenido original del sitio</span>
+            <h2 id="ent-title">Entrevistas Exclusivas</h2>
+            <p id="ent-sub">Conversaciones a fondo con medallistas, entrenadores y protagonistas de las olimpiadas cubanas de química, producidas por el Sitial de Talentos.</p>
+        </div>
+        <div id="ent-contenido">
+            <div class="np-estado" id="ent-estado">⏳ <span id="ent-loading-label">Cargando entrevistas…</span></div>
+        </div>
+    </div>
+
+    <!-- ══ PRENSA Y CRÓNICAS ══ -->
+    <div class="np-section">
+        <div class="np-section-head">
+            <div class="np-section-title">
+                <span class="np-section-title-icon">📝</span>
+                <h2 id="noticias-press-el">Prensa y Crónicas</h2>
+            </div>
+        </div>
+        <div id="lista-noticias" class="contenedor-dinamico">
+            <div class="np-estado">⏳ <span id="np-loading-label-1">Cargando noticias…</span></div>
+        </div>
+        <button class="btn-ver-mas" id="btn-mas-noticias" style="display:none;">Ver más noticias</button>
+    </div>
+
+    <!-- ══ VIDEOS ══ -->
+    <div class="np-section">
+        <div class="np-section-head">
+            <div class="np-section-title">
+                <span class="np-section-title-icon">🎬</span>
+                <h2 id="noticias-videos-el">Videos</h2>
+            </div>
+        </div>
+        <div id="lista-videos" class="grid-videos"></div>
+        <button class="btn-ver-mas" id="btn-mas-videos" style="display:none;">Ver más videos</button>
+    </div>
+
+    <div class="np-contribute">
+        <p id="np-contrib-el">¿Tienes una historia que contar? Escríbenos a <a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a></p>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-links">
+        <a href="media.html">📸 Media</a>
+        <a href="index.html#inicio">🏠 Home</a>
+        <a href="index.html#contacto">📌 Enlaces y Contacto</a>
+    </div>
+    <div class="footer-social">
+        <a class="footer-social-icon" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener" aria-label="Telegram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#29A8E4"/>
+                <path d="M5.5 11.8l2.7 1 1.05 3.4c.07.2.32.27.49.13l1.5-1.22a.36.36 0 01.44-.02l2.7 1.96c.19.14.46.03.5-.2l1.85-8.9c.05-.25-.18-.46-.42-.37L5.37 11.15c-.27.1-.26.5.13.65z" fill="#fff"/>
+                <path d="M8.2 12.8l.27 2.9c.03.24.34.3.46.1l1.18-1.5" fill="#D2E5F1"/>
+                <path d="M8.2 12.8l5.3-3.3" stroke="#fff" stroke-width=".5" stroke-linecap="round"/>
+            </svg>
+        </a>
+        <a class="footer-social-icon" href="https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="footerIgGradNoticias" cx="30%" cy="107%" r="150%">
+                        <stop offset="0%" stop-color="#fdf497"/>
+                        <stop offset="5%" stop-color="#fdf497"/>
+                        <stop offset="45%" stop-color="#fd5949"/>
+                        <stop offset="60%" stop-color="#d6249f"/>
+                        <stop offset="90%" stop-color="#285AEB"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="12" cy="12" r="12" fill="url(#footerIgGradNoticias)"/>
+                <rect x="6.6" y="6.6" width="10.8" height="10.8" rx="3.1" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="12" cy="12" r="2.9" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="15.35" cy="8.65" r="0.85" fill="#fff"/>
+            </svg>
+        </a>
+    </div>
+    <p style="font-size:12px;opacity:.5;margin-top:6px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// IDIOMA Y TEMA (sincronizados con el sitio principal vía localStorage)
+// ════════════════════════════════════════════════════════════════════
+const _T = {
+    es: {
+        back: 'Home', title: 'Noticias', heading: 'Noticias y Entrevistas',
+        sub: 'Lo último del mundo de la química olímpica cubana: crónicas, entrevistas y momentos que hacen historia.',
+        press: 'Prensa y Crónicas', videos: 'Videos',
+        moreNews: 'Ver más noticias', moreVideos: 'Ver más videos',
+        loadingNews: 'Cargando noticias…', loadingEnt: 'Cargando entrevistas…',
+        errorNews: 'No se pudieron cargar las noticias en este momento.',
+        noResultsYear: 'No hay contenido para el año',
+        contribute: '¿Tienes una historia que contar? Escríbenos a ',
+        entEyebrow: 'Contenido original del sitio',
+        entTitle: 'Entrevistas Exclusivas',
+        entSub: 'Conversaciones a fondo con medallistas, entrenadores y protagonistas de las olimpiadas cubanas de química, producidas por el Sitial de Talentos.',
+        entEmpty: 'Muy pronto publicaremos aquí entrevistas exclusivas con medallistas, entrenadores y protagonistas del movimiento olímpico cubano.',
+        entCta: 'Leer entrevista completa', entRead: 'Leer entrevista'
+    },
+    en: {
+        back: 'Home', title: 'News', heading: 'News & Interviews',
+        sub: 'The latest from the Cuban chemistry olympiad world: chronicles, interviews and history-making moments.',
+        press: 'Press & Chronicles', videos: 'Videos',
+        moreNews: 'Load more news', moreVideos: 'Load more videos',
+        loadingNews: 'Loading news…', loadingEnt: 'Loading interviews…',
+        errorNews: 'The news could not be loaded right now.',
+        noResultsYear: 'No content for the year',
+        contribute: 'Have a story to share? Write to us at ',
+        entEyebrow: 'Original site content',
+        entTitle: 'Exclusive Interviews',
+        entSub: 'In-depth conversations with medalists, coaches and protagonists of the Cuban chemistry olympiads, produced by Sitial de Talentos.',
+        entEmpty: 'We will soon publish exclusive interviews here with medalists, coaches and protagonists of the Cuban olympiad movement.',
+        entCta: 'Read full interview', entRead: 'Read interview'
+    }
+};
+function _lang() {
+    try {
+        const guardado = localStorage.getItem('lang');
+        if (guardado) return guardado;
+        const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+        return navLang.startsWith('en') ? 'en' : 'es';
+    } catch(e) { return 'es'; }
+}
+function _t(key) { return (_T[_lang()] || _T.es)[key]; }
+
+function npAplicarIdioma() {
+    const l = _lang();
+    document.getElementById('np-back-label').textContent  = _t('back');
+    document.getElementById('np-title-label').textContent = _t('title');
+    document.getElementById('np-heading').textContent     = _t('heading');
+    document.getElementById('np-sub').textContent          = _t('sub');
+    document.getElementById('noticias-press-el').textContent  = _t('press');
+    document.getElementById('noticias-videos-el').textContent = _t('videos');
+    document.getElementById('btn-mas-noticias').textContent = _t('moreNews');
+    document.getElementById('btn-mas-videos').textContent   = _t('moreVideos');
+    document.getElementById('np-contrib-el').innerHTML = _t('contribute') + '<a href="mailto:tchoquimica@yahoo.com">tchoquimica@yahoo.com</a>';
+    document.getElementById('ent-eyebrow').textContent = _t('entEyebrow');
+    document.getElementById('ent-title').textContent   = _t('entTitle');
+    document.getElementById('ent-sub').textContent     = _t('entSub');
+    document.getElementById('np-lang-btn').textContent = l === 'es' ? 'ES' : 'EN';
+    document.title = (l === 'es' ? 'Noticias y Entrevistas — Sitial de Talentos' : 'News & Interviews — Sitial de Talentos');
+    renderNoticias(); renderVideos(); renderEntrevistas();
+}
+function npToggleLang() {
+    const next = _lang() === 'es' ? 'en' : 'es';
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    npAplicarIdioma();
+}
+
+function _temaOscuroPorDefecto() {
+    try {
+        const guardado = localStorage.getItem('theme');
+        if (guardado) return guardado === 'dark';
+        return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch(e) { return false; }
+}
+function npAplicarTema() {
+    const dark = _temaOscuroPorDefecto();
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('np-theme-btn').textContent = dark ? '🌙' : '☀️';
+}
+function npToggleTheme() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    document.getElementById('np-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
+npAplicarTema();
+
+// ════════════════════════════════════════════════════════════════════
+// Helpers compartidos para parsear los archivos de Data/ (mismo criterio
+// que media.html / CNQ_data.html: arrays JS literales convertidos a JSON)
+// ════════════════════════════════════════════════════════════════════
+function _removeJSLineComments(src) {
+    let out = '', inStr = false, strChar = '', escape = false, i = 0;
+    while (i < src.length) {
+        const c = src[i];
+        if (escape)                          { out += c; escape = false; i++; continue; }
+        if (c === '\\' && inStr)             { out += c; escape = true;  i++; continue; }
+        if (!inStr && (c === '"' || c === "'")) { inStr = true; strChar = c; out += c; i++; continue; }
+        if (inStr && c === strChar)          { inStr = false; out += c;  i++; continue; }
+        if (!inStr && c === '/' && src[i + 1] === '/') {
+            while (i < src.length && src[i] !== '\n') i++;
+            continue;
+        }
+        out += c; i++;
+    }
+    return out;
+}
+function _jsLiteralToJSON(src) {
+    return _removeJSLineComments(src)
+        .replace(/,(\s*[\]\}])/g, '$1')
+        .replace(/(^|[{,])\s*([^\s"'0-9{},\[\]:][^\s:,\]{}]*)\s*:/gm, (m, pre, key) => {
+            if (key.startsWith('"') || key.startsWith("'")) return m;
+            return `${pre} "${key.trim()}":`;
+        });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PRENSA Y CRÓNICAS / VIDEOS — leído de Data/newspapers.html (tabla)
+// ════════════════════════════════════════════════════════════════════
+const NOTICIAS_POR_PAGINA = 3;
+const VIDEOS_POR_PAGINA = 6;
+let _todasNoticias = [];
+let _todosVideos = [];
+let _noticiasPagina = 1;
+let _videosPagina = 1;
+let _filtroAño = null;
+
+function extraerAñoFecha(fechaStr) {
+    const m = (fechaStr || '').match(/\d{4}/);
+    return m ? m[0] : null;
+}
+
+function renderNoticias() {
+    const container = document.getElementById('lista-noticias');
+    const btn = document.getElementById('btn-mas-noticias');
+    if (!container) return;
+    const filtradas = _filtroAño
+        ? _todasNoticias.filter(d => extraerAñoFecha(d.fecha) === _filtroAño)
+        : _todasNoticias;
+    const visibles = filtradas.slice(0, _noticiasPagina * NOTICIAS_POR_PAGINA);
+    if (!visibles.length) {
+        container.innerHTML = `<div class="np-estado">📰 ${_t('noResultsYear')} ${_filtroAño || ''}.</div>`;
+        btn.style.display = 'none';
+        return;
+    }
+    container.innerHTML = visibles.map(item => {
+        const fotoHTML = item.imagen
+            ? `<div class="foto-noticia-wrap"><img src="${item.imagen}" loading="lazy" onerror="var w=this.closest('.foto-noticia-wrap');if(w)w.style.display='none';"></div>`
+            : '';
+        return `<a href="${item.link}" target="_blank" rel="noopener" class="noticia-full">${fotoHTML}<div class="info-noticia"><span class="fecha-etiqueta">${item.fecha}</span><h4>${item.titulo}</h4></div></a>`;
+    }).join('');
+    btn.style.display = filtradas.length > visibles.length ? 'block' : 'none';
+}
+
+function getYoutubeThumbnail(url) {
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
+
+function renderVideos() {
+    const container = document.getElementById('lista-videos');
+    const btn = document.getElementById('btn-mas-videos');
+    if (!container) return;
+    const filtrados = _filtroAño
+        ? _todosVideos.filter(d => extraerAñoFecha(d.fecha) === _filtroAño)
+        : _todosVideos;
+    const visibles = filtrados.slice(0, _videosPagina * VIDEOS_POR_PAGINA);
+    container.innerHTML = visibles.map(item => {
+        const thumb = getYoutubeThumbnail(item.link);
+        const thumbHTML = thumb
+            ? `<img src="${thumb}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;display:block;margin-bottom:12px;" loading="lazy">`
+            : `<div class="video-thumb">▶</div>`;
+        return `
+        <a href="${item.link}" target="_blank" rel="noopener" class="video-item">
+            ${thumbHTML}
+            <span class="fecha-etiqueta">${item.fecha}</span>
+            <h4 style="font-size:1.05rem;font-family:'Playfair Display',serif;color:var(--navy);overflow-wrap:break-word;margin:0;">${item.titulo}</h4>
+        </a>`;
+    }).join('');
+    btn.style.display = filtrados.length > visibles.length ? 'block' : 'none';
+}
+
+document.getElementById('btn-mas-noticias').addEventListener('click', () => { _noticiasPagina++; renderNoticias(); });
+document.getElementById('btn-mas-videos').addEventListener('click', () => { _videosPagina++; renderVideos(); });
+
+function setFiltroTodos() {
+    _filtroAño = null; _noticiasPagina = 1; _videosPagina = 1;
+    const btnTodos = document.getElementById('btn-todos-años');
+    if (btnTodos) btnTodos.classList.add('activo');
+    const inp = document.getElementById('año-input');
+    if (inp) inp.value = '';
+    renderNoticias(); renderVideos();
+}
+function aplicarAñoInput() {
+    const inp = document.getElementById('año-input');
+    const val = (inp ? inp.value : '').trim();
+    if (!val || !/^\d{4}$/.test(val)) return;
+    _filtroAño = val; _noticiasPagina = 1; _videosPagina = 1;
+    const btnTodos = document.getElementById('btn-todos-años');
+    if (btnTodos) btnTodos.classList.remove('activo');
+    renderNoticias(); renderVideos();
+}
+function navegarAño(delta) {
+    const todos = [..._todasNoticias, ..._todosVideos];
+    const añosSet = [...new Set(todos.map(d => extraerAñoFecha(d.fecha)).filter(Boolean))].sort((a, b) => a - b);
+    if (!añosSet.length) return;
+    const inp = document.getElementById('año-input');
+    let current = _filtroAño ? _filtroAño : null;
+    let idx;
+    if (current === null) {
+        idx = añosSet.length - 1;
+    } else {
+        idx = añosSet.indexOf(String(current));
+        if (idx === -1) idx = delta > 0 ? añosSet.length - 1 : 0;
+        else idx = Math.max(0, Math.min(añosSet.length - 1, idx + delta));
+    }
+    const newYear = añosSet[idx];
+    _filtroAño = newYear; _noticiasPagina = 1; _videosPagina = 1;
+    if (inp) inp.value = newYear;
+    const btnTodos = document.getElementById('btn-todos-años');
+    if (btnTodos) btnTodos.classList.remove('activo');
+    renderNoticias(); renderVideos();
+}
+function renderFiltroAnios() {
+    const todos = [..._todasNoticias, ..._todosVideos];
+    const añosSet = new Set(todos.map(d => extraerAñoFecha(d.fecha)).filter(Boolean));
+    const wrapper = document.getElementById('filtro-años-wrapper');
+    if (!añosSet.size) { wrapper.style.display = 'none'; return; }
+    wrapper.style.display = 'flex';
+    wrapper.innerHTML = `
+        <span class="filtro-años-label">${_lang() === 'es' ? 'Año' : 'Year'}:</span>
+        <button class="filtro-año-btn activo" id="btn-todos-años" onclick="setFiltroTodos()">${_lang() === 'es' ? 'Todos' : 'All'}</button>
+        <div class="year-navigator">
+            <button class="year-nav-btn" onclick="navegarAño(1)" title="${_lang() === 'es' ? 'Año siguiente' : 'Next year'}">▲</button>
+            <input type="text" id="año-input" inputmode="numeric" maxlength="4" placeholder="${_lang() === 'es' ? 'Año' : 'Year'}"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                onkeydown="if(event.key==='Enter'){aplicarAñoInput();event.preventDefault();}"
+                onblur="if(this.value.length===4)aplicarAñoInput()">
+            <button class="year-nav-btn" onclick="navegarAño(-1)" title="${_lang() === 'es' ? 'Año anterior' : 'Previous year'}">▼</button>
+        </div>`;
+}
+
+async function inicializarNoticias() {
+    const container = document.getElementById('lista-noticias');
+    try {
+        const response = await fetch('Data/newspapers.html');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const text = await response.text();
+        const doc = new DOMParser().parseFromString(text, 'text/html');
+        const filas = Array.from(doc.querySelectorAll('table tr')).slice(1);
+        const datos = filas.map(f => {
+            const c = f.querySelectorAll('td');
+            return {
+                link:   (c[0]?.textContent || '').trim(),
+                titulo: (c[1]?.textContent || '').trim(),
+                fecha:  (c[2]?.textContent || '').trim(),
+                imagen: (c[3]?.textContent || '').trim() || ''
+            };
+        }).filter(d => d.link && d.titulo);
+        const _seenLinks = new Set();
+        const datosFiltrados = datos.filter(d => {
+            if (_seenLinks.has(d.link)) return false;
+            _seenLinks.add(d.link);
+            return true;
+        });
+        datosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        _todasNoticias = datosFiltrados.filter(d => !/youtube\.com|youtu\.be|facebook\.com/.test(d.link));
+        _todosVideos   = datosFiltrados.filter(d =>  /youtube\.com|youtu\.be|facebook\.com/.test(d.link));
+        renderNoticias();
+        renderVideos();
+        renderFiltroAnios();
+    } catch (err) {
+        console.warn('Data/newspapers.html no encontrado o error al leer.', err);
+        if (container) container.innerHTML = `<div class="np-estado">⚠️ ${_t('errorNews')}</div>`;
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// ENTREVISTAS EXCLUSIVAS — leído de Data/entrevistas_data.html
+// Formato esperado (mismo espíritu que Data/media_data.html):
+//   const datosEntrevistas = [
+//     { nombre: "...", rol: "...", foto: "https://...", resumen: "...",
+//       fecha: "2026-05-12", link: "entrevistas/nombre.html" },
+//     ...
+//   ];
+// El primer elemento del array se muestra como entrevista destacada.
+// ════════════════════════════════════════════════════════════════════
+let _entrevistas = [];
+
+function _inicialesDe(nombre) {
+    return (nombre || '').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+}
+
+async function _cargarEntrevistas() {
+    const resp = await fetch('Data/entrevistas_data.html');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    const marker = text.indexOf('const datosEntrevistas = [');
+    if (marker === -1) throw new Error('No se encontró datosEntrevistas');
+    let dep = 0, i = text.indexOf('[', marker);
+    const start = i;
+    for (; i < text.length; i++) {
+        if (text[i] === '[') dep++;
+        else if (text[i] === ']') { dep--; if (dep === 0) break; }
+    }
+    const datos = JSON.parse(_jsLiteralToJSON(text.slice(start, i + 1)));
+    return datos
+        .map(d => ({
+            nombre:  (d.nombre || '').trim(),
+            rol:     (d.rol || '').trim(),
+            foto:    (d.foto || '').trim(),
+            resumen: (d.resumen || '').trim(),
+            fecha:   (d.fecha || '').trim(),
+            link:    (d.link || '').trim()
+        }))
+        .filter(d => d.nombre && d.resumen);
+}
+
+function renderEntrevistas() {
+    const cont = document.getElementById('ent-contenido');
+    if (!cont) return;
+    if (!_entrevistas.length) {
+        cont.innerHTML = `
+            <div class="np-empty">
+                <div class="np-empty-icon">🎙️</div>
+                <p>${_t('entEmpty')}</p>
+            </div>`;
+        return;
+    }
+    const [destacada, ...resto] = _entrevistas;
+    const featuredHTML = `
+        <a href="${destacada.link || '#'}" ${destacada.link ? 'target="_blank" rel="noopener"' : 'onclick="return false;" style="cursor:default;"'} class="ent-featured">
+            <div class="ent-featured-photo">
+                ${destacada.foto ? `<img src="${destacada.foto}" alt="${destacada.nombre}" loading="lazy">` : ''}
+            </div>
+            <div class="ent-featured-body">
+                <span class="ent-badge">🎙️ ${_t('entTitle')}</span>
+                <h3>${destacada.nombre}</h3>
+                ${destacada.rol ? `<p class="ent-role">${destacada.rol}</p>` : ''}
+                <p class="ent-quote">“${destacada.resumen}”</p>
+                <div class="ent-featured-foot">
+                    <span class="ent-cta">${_t('entCta')} →</span>
+                    ${destacada.fecha ? `<span class="ent-fecha">${destacada.fecha}</span>` : '<span></span>'}
+                </div>
+            </div>
+        </a>`;
+    const gridHTML = resto.length ? `<div class="ent-grid">${resto.map(d => `
+        <a href="${d.link || '#'}" ${d.link ? 'target="_blank" rel="noopener"' : 'onclick="return false;" style="cursor:default;"'} class="ent-card">
+            <div class="ent-card-top">
+                <div class="ent-avatar">
+                    ${d.foto
+                        ? `<img src="${d.foto}" alt="${d.nombre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                        : ''}
+                    <span class="ent-avatar-initials" style="${d.foto ? 'display:none' : 'display:flex'}">${_inicialesDe(d.nombre)}</span>
+                </div>
+                <div class="ent-card-name">
+                    <h4>${d.nombre}</h4>
+                    ${d.rol ? `<span>${d.rol}</span>` : ''}
+                </div>
+            </div>
+            <p class="ent-snippet">${d.resumen}</p>
+            <div class="ent-card-foot">
+                <span>${d.fecha || ''}</span>
+                <span class="ent-cta">${_t('entRead')} →</span>
+            </div>
+        </a>`).join('')}</div>` : '';
+    cont.innerHTML = featuredHTML + gridHTML;
+}
+
+async function inicializarEntrevistas() {
+    try {
+        _entrevistas = await _cargarEntrevistas();
+    } catch (err) {
+        console.warn('Data/entrevistas_data.html no encontrado o error al leer.', err);
+        _entrevistas = [];
+    }
+    renderEntrevistas();
+}
+
+npAplicarIdioma();
+inicializarNoticias();
+inicializarEntrevistas();
+</script>
+</body>
+</html>
