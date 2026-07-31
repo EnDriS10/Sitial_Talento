@@ -20,13 +20,17 @@
         --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
     }
     * { box-sizing: border-box; }
+    html { height: 100%; }
     body {
         margin: 0; background: var(--bg); color: var(--text);
         font-family: 'DM Sans', sans-serif;
         transition: background .25s ease, color .25s ease;
         min-height: 100vh;
+        display: flex; flex-direction: column;
     }
     a { color: inherit; text-decoration: none; }
+    .mp-topbar { flex-shrink: 0; }
+    footer { flex-shrink: 0; }
 
     /* ── Topbar ── */
     .mp-topbar {
@@ -60,7 +64,24 @@
     }
 
     /* ── Gallery ── */
-    .mp-main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+    .mp-main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; flex: 1 0 auto; width: 100%; }
+
+    /* ── Footer (idéntico al de index.html) ── */
+    footer { background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px 22px; font-size: 13px; }
+    footer a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+    footer a:hover { opacity: .75; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; font-weight: 500; }
+    .footer-social { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .footer-social-icon {
+        width: 38px; height: 38px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,.08); overflow: hidden;
+        transition: transform .2s ease, background .2s ease;
+    }
+    .footer-social-icon:hover { transform: translateY(-3px); background: rgba(255,255,255,.16); }
+    .footer-social-icon svg { width: 20px; height: 20px; display: block; }
+    .footer-social-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .mp-heading {
         font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px;
         margin: 6px 0 4px;
@@ -224,6 +245,28 @@
     <p class="mp-sub" id="mp-sub">Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas</p>
     <div class="mp-gallery" id="mp-gallery"></div>
 </div>
+
+<footer>
+    <div class="footer-links">
+        <a href="index.html">📰 Noticias y Entrevistas</a>
+        <a href="media.html">📸 Media</a>
+        <a href="index.html">📌 Enlaces y Contacto</a>
+    </div>
+    <div class="footer-social">
+        <a class="footer-social-icon" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener" aria-label="Telegram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#29A8E4"/>
+                <path d="M5.5 11.8l2.7 1 1.05 3.4c.07.2.32.27.49.13l1.5-1.22a.36.36 0 01.44-.02l2.7 1.96c.19.14.46.03.5-.2l1.85-8.9c.05-.25-.18-.46-.42-.37L5.37 11.15c-.27.1-.26.5.13.65z" fill="#fff"/>
+                <path d="M8.2 12.8l.27 2.9c.03.24.34.3.46.1l1.18-1.5" fill="#D2E5F1"/>
+                <path d="M8.2 12.8l5.3-3.3" stroke="#fff" stroke-width=".5" stroke-linecap="round"/>
+            </svg>
+        </a>
+        <a class="footer-social-icon" href="https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4" target="_blank" rel="noopener" aria-label="Instagram">
+            <img src="Assets/logos/IG_logo.jpg" alt="Instagram">
+        </a>
+    </div>
+    <p style="font-size:12px;opacity:.5;margin-top:6px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
+</footer>
 
 <div class="mp-lightbox" id="mp-lightbox" onclick="cerrarFoto()">
     <div class="mp-share-bar" onclick="event.stopPropagation()">
