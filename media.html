@@ -39,19 +39,25 @@
         display: flex; align-items: center; justify-content: space-between;
         gap: 12px; padding: 14px 20px;
     }
-    .mp-back {
-        display: flex; align-items: center; gap: 8px;
-        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
-        color: #fff; padding: 8px 16px; font-family: 'DM Sans', sans-serif;
-        font-size: 14px; font-weight: 500; cursor: pointer; transition: background .2s;
+    .mp-breadcrumb {
+        display: flex; align-items: center; gap: 6px; min-width: 0;
     }
-    .mp-back:hover { background: rgba(255,255,255,.22); }
-    .mp-title {
-        font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700;
-        color: rgba(255,255,255,.9); display: flex; align-items: center; gap: 8px;
-        position: absolute; left: 50%; transform: translateX(-50%);
+    .mp-crumb-home {
+        display: flex; align-items: center; gap: 6px;
+        background: none; border: none; cursor: pointer;
+        color: var(--gold-light); font-family: 'DM Sans', sans-serif;
+        font-size: 14px; font-weight: 700; padding: 6px 8px 6px 4px;
+        border-radius: 8px; transition: background .18s, color .18s;
+        white-space: nowrap; flex-shrink: 0;
     }
-    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .mp-crumb-home:hover { background: rgba(255,255,255,.1); }
+    .mp-crumb-sep { color: rgba(255,255,255,.35); font-size: 14px; flex-shrink: 0; }
+    .mp-crumb-current {
+        font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+        color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
     .mp-icon-btn {
         background: rgba(255,255,255,.12); border: none; border-radius: 8px;
         color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600;
@@ -60,7 +66,8 @@
     }
     .mp-icon-btn:hover { background: rgba(255,255,255,.22); }
     @media (max-width: 560px) {
-        .mp-title { display: none; }
+        .mp-crumb-current { display: none; }
+        .mp-crumb-sep { display: none; }
     }
 
     /* ── Gallery ── */
@@ -232,8 +239,13 @@
 <body>
 
 <div class="mp-topbar">
-    <button class="mp-back" onclick="location.href='index.html'">← <span id="mp-back-label">Volver al Sitial</span></button>
-    <div class="mp-title">📸 <span id="mp-title-label">Media</span></div>
+    <div class="mp-breadcrumb">
+        <button class="mp-crumb-home" onclick="location.href='index.html#inicio'" aria-label="Inicio">
+            🏠 <span id="mp-back-label">Home</span>
+        </button>
+        <span class="mp-crumb-sep">›</span>
+        <span class="mp-crumb-current">📸 <span id="mp-title-label">Media</span></span>
+    </div>
     <div class="mp-topbar-actions">
         <button class="mp-icon-btn" id="mp-theme-btn" onclick="mpToggleTheme()" title="Tema">🌙</button>
         <button class="mp-icon-btn" id="mp-lang-btn" onclick="mpToggleLang()" title="Idioma / Language">ES</button>
@@ -248,9 +260,9 @@
 
 <footer>
     <div class="footer-links">
-        <a href="index.html">📰 Noticias y Entrevistas</a>
-        <a href="media.html">📸 Media</a>
-        <a href="index.html">📌 Enlaces y Contacto</a>
+        <a href="index.html#noticias">📰 Noticias y Entrevistas</a>
+        <a href="index.html#inicio">🏠 Home</a>
+        <a href="index.html#contacto">📌 Enlaces y Contacto</a>
     </div>
     <div class="footer-social">
         <a class="footer-social-icon" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener" aria-label="Telegram">
@@ -262,7 +274,21 @@
             </svg>
         </a>
         <a class="footer-social-icon" href="https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4" target="_blank" rel="noopener" aria-label="Instagram">
-            <img src="Assets/logos/IG_logo.jpg" alt="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="footerIgGradMedia" cx="30%" cy="107%" r="150%">
+                        <stop offset="0%" stop-color="#fdf497"/>
+                        <stop offset="5%" stop-color="#fdf497"/>
+                        <stop offset="45%" stop-color="#fd5949"/>
+                        <stop offset="60%" stop-color="#d6249f"/>
+                        <stop offset="90%" stop-color="#285AEB"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="12" cy="12" r="12" fill="url(#footerIgGradMedia)"/>
+                <rect x="6.6" y="6.6" width="10.8" height="10.8" rx="3.1" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="12" cy="12" r="2.9" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="15.35" cy="8.65" r="0.85" fill="#fff"/>
+            </svg>
         </a>
     </div>
     <p style="font-size:12px;opacity:.5;margin-top:6px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
@@ -317,7 +343,7 @@
 // ════════════════════════════════════════════════════════════════════
 const _T = {
     es: {
-        back: 'Volver al Sitial', title: 'Media', heading: 'Galería de Media',
+        back: 'Home', title: 'Media', heading: 'Galería de Media',
         sub: 'Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas',
         loading: 'Cargando fotos…', empty: 'Aún no hay fotos en la galería.',
         error: 'No se pudo cargar la galería en este momento.',
@@ -326,7 +352,7 @@ const _T = {
         shareText: 'Mira esta foto en Sitial de Talentos'
     },
     en: {
-        back: 'Back to Sitial', title: 'Media', heading: 'Media Gallery',
+        back: 'Home', title: 'Media', heading: 'Media Gallery',
         sub: 'Photos from events, teams and moments of the Cuban chemistry olympiads',
         loading: 'Loading photos…', empty: 'No photos in the gallery yet.',
         error: 'The gallery could not be loaded right now.',
