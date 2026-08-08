@@ -3870,14 +3870,14 @@ async function cargarProfesoresData() {
         const doc  = new DOMParser().parseFromString(html, 'text/html');
         const el   = doc.getElementById('professor-data');
         if (!el) throw new Error('No se encontró #professor-data en professor_data.html');
-        window.todasLosProfesores = JSON.parse(el.textContent);
-        // Construir mapa de fotos de profesores (foto leída desde professor_data, distinta de las de estudiantes)
-        window.fotosPorNombreProfesor = {};
-        Object.values(window.todasLosProfesores).flat().forEach(p => {
-            if (p.nombre && p.foto) {
-                window.fotosPorNombreProfesor[p.nombre] = p.foto;
-            }
-        });
+        // Igual que con olympiad_data.html: professor_data.html ahora define
+        // datosProfesoresXxx/todasLosProfesores/fotosPorNombreProfesor como
+        // JS (no JSON), así que ejecutamos el script en el contexto de la
+        // página principal. El propio script se encarga de exponer
+        // window.todasLosProfesores y window.fotosPorNombreProfesor.
+        const s = document.createElement('script');
+        s.textContent = el.textContent;
+        document.head.appendChild(s);
     } catch (err) {
         // El archivo es opcional; si no existe, simplemente no hay datos de profesores
         console.warn('professor_data.html no encontrado o sin datos:', err.message);
