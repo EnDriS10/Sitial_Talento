@@ -114,9 +114,11 @@
         [data-theme="dark"] .menu-item:hover { background: rgba(255,255,255,.06); }
         [data-theme="dark"] #menu-overlay { background: rgba(0,0,0,.6); }
         [data-theme="dark"] #tarjeta-modal-card,
-        [data-theme="dark"] #tarjeta-modal-close { background: var(--card-bg); color: var(--text); }
+        [data-theme="dark"] #tarjeta-modal-close,
+        [data-theme="dark"] #tarjeta-modal-share { background: var(--card-bg); color: var(--text); }
         [data-theme="dark"] #tarjeta-modal-nombre { color: var(--text); }
-        [data-theme="dark"] #tarjeta-modal-close { background: #1c2430; }
+        [data-theme="dark"] #tarjeta-modal-close,
+        [data-theme="dark"] #tarjeta-modal-share { background: #1c2430; }
         [data-theme="dark"] .tabla-footer { background: #0d1117; }
         [data-theme="dark"] .noticia-full { background: var(--card-bg); }
         [data-theme="dark"] .video-item { background: var(--card-bg); }
@@ -431,10 +433,12 @@
         /* TARJETA MODAL */
         #tarjeta-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(4,18,43,.65); z-index: 500; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
         #tarjeta-modal-overlay.abierto { display: flex; animation: fadeIn .25s ease; }
-        #tarjeta-modal-card { background: var(--card-bg); border-radius: 22px; max-width: 420px; width: 100%; padding: 40px 28px 32px; text-align: center; position: relative; box-shadow: 0 28px 70px rgba(4,18,43,.35); animation: cardPop .28s cubic-bezier(.34,1.56,.64,1); }
+        #tarjeta-modal-card { background: var(--card-bg); border-radius: 22px; max-width: 420px; width: 100%; padding: 40px 28px 32px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 28px 70px rgba(4,18,43,.35); animation: cardPop .28s cubic-bezier(.34,1.56,.64,1); }
         @keyframes cardPop { from { opacity: 0; transform: scale(.88) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        #tarjeta-modal-close { position: absolute; top: 14px; right: 14px; background: var(--bg); border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background .2s, transform .15s; line-height: 1; }
-        #tarjeta-modal-close:hover { background: var(--border); transform: scale(1.1); }
+        #tarjeta-modal-actions { position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 8px; z-index: 2; }
+        #tarjeta-modal-share, #tarjeta-modal-close { background: var(--bg); border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background .2s, transform .15s; line-height: 1; }
+        #tarjeta-modal-share:hover, #tarjeta-modal-close:hover { background: var(--border); transform: scale(1.1); }
+        #tarjeta-modal-share svg { width: 16px; height: 16px; }
         #tarjeta-modal-avatar-wrap { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 20px; overflow: hidden; border: 4px solid var(--gold); background: #e8ecf5; display: flex; align-items: center; justify-content: center; position: relative; transition: transform .22s, box-shadow .22s; }
         #tarjeta-modal-avatar-wrap.tiene-foto { cursor: zoom-in; }
         #tarjeta-modal-avatar-wrap.tiene-foto:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(201,162,39,.45); }
@@ -604,6 +608,7 @@
             #modal-body img { float: none !important; display: block !important; margin: 0 auto 18px auto !important; width: 110px !important; height: 110px !important; }
             #modal-body h2 { font-size: 22px !important; }
             #tarjeta-modal-card { padding: 32px 20px 26px; }
+            #tarjeta-modal-share, #tarjeta-modal-close { width: 30px; height: 30px; }
             #tarjeta-modal-avatar-wrap { width: 110px; height: 110px; }
             .modal-avatar-initials-big { font-size: 34px; }
             #tarjeta-modal-nombre { font-size: 18px; }
@@ -2675,54 +2680,56 @@
 
 <div id="tarjeta-modal-overlay" onclick="cerrarTarjetaModal(event)">
     <div id="tarjeta-modal-card" onclick="event.stopPropagation()">
-        <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
+        <div id="tarjeta-modal-actions">
+            <button id="tarjeta-modal-share" onclick="abrirPanelCompartir(null, 'tarjeta-share-panel')" aria-label="Compartir" title="Compartir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg>
+            </button>
+            <button id="tarjeta-modal-close" onclick="cerrarTarjetaModal(null, true)" aria-label="Cerrar">✕</button>
+        </div>
         <span id="tarjeta-modal-prov" style="display:none;position:absolute;top:14px;left:14px;padding:4px 11px;border-radius:10px;font-size:14px;font-weight:700;background:rgba(201,162,39,.15);color:#7a5800;letter-spacing:.3px;cursor:pointer;user-select:none;"></span>
         <div id="tarjeta-modal-avatar-wrap" onclick="abrirFotoZoom()"></div>
         <h2 id="tarjeta-modal-nombre"></h2>
         <p id="tarjeta-modal-subtitulo"></p>
         <div class="tarjeta-modal-divider"></div>
         <div id="tarjeta-modal-chips"></div>
+
+        <div id="tarjeta-share-panel" class="foto-share-panel" onclick="event.stopPropagation()">
+            <p class="foto-share-panel-titulo" data-i18n="share.title">Compartir</p>
+            <div class="foto-share-grid">
+                <button class="foto-share-opcion" onclick="compartirRed('whatsapp', 'tarjeta-share-panel')">
+                    <span class="foto-share-icono whatsapp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C11 9.2 10.6 8 10.4 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/></svg></span>
+                    <span class="foto-share-label">WhatsApp</span>
+                </button>
+                <button class="foto-share-opcion" onclick="compartirRed('facebook', 'tarjeta-share-panel')">
+                    <span class="foto-share-icono facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>
+                    <span class="foto-share-label">Facebook</span>
+                </button>
+                <button class="foto-share-opcion" onclick="compartirRed('x', 'tarjeta-share-panel')">
+                    <span class="foto-share-icono x"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>
+                    <span class="foto-share-label">X</span>
+                </button>
+                <button class="foto-share-opcion" onclick="compartirRed('telegram', 'tarjeta-share-panel')">
+                    <span class="foto-share-icono telegram"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>
+                    <span class="foto-share-label">Telegram</span>
+                </button>
+                <button class="foto-share-opcion" onclick="compartirRed('link', 'tarjeta-share-panel')">
+                    <span class="foto-share-icono link"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"></path></svg></span>
+                    <span class="foto-share-label" data-i18n="share.copyLink">Copiar enlace</span>
+                </button>
+            </div>
+            <div class="foto-share-toast" id="tarjeta-share-toast"></div>
+        </div>
     </div>
 </div>
 
 <div id="foto-zoom-overlay" onclick="cerrarFotoZoom()">
-    <div class="foto-share-bar" onclick="event.stopPropagation()">
-        <button class="foto-share-btn" onclick="abrirPanelCompartir('foto-zoom-img', 'foto-zoom-panel')" aria-label="Compartir" title="Compartir">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"></line><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line></svg>
-        </button>
-        <button class="foto-share-btn" onclick="descargarFotoActual('foto-zoom-img')" aria-label="Descargar" title="Descargar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
-        </button>
-    </div>
+    <!-- Zoom de foto de PERFIL (avatar de tarjeta / tabla): es solo una vista
+         ampliada, sin compartir ni descargar — esas acciones quedan
+         reservadas a la galería de Media (media.html) y a la propia tarjeta
+         del sitial (botón de compartir en tarjeta-modal-card). -->
     <button id="foto-zoom-close" onclick="cerrarFotoZoom()" aria-label="Cerrar">✕</button>
     <img id="foto-zoom-img" src="" alt="">
     <div id="foto-zoom-nombre"></div>
-    <div id="foto-zoom-panel" class="foto-share-panel" onclick="event.stopPropagation()">
-        <p class="foto-share-panel-titulo" data-i18n="share.title">Compartir</p>
-        <div class="foto-share-grid">
-            <button class="foto-share-opcion" onclick="compartirRed('whatsapp', 'foto-zoom-panel')">
-                <span class="foto-share-icono whatsapp"><svg viewBox="0 0 24 24" fill="#fff"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5C11 9.2 10.6 8 10.4 7.6c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/></svg></span>
-                <span class="foto-share-label">WhatsApp</span>
-            </button>
-            <button class="foto-share-opcion" onclick="compartirRed('facebook', 'foto-zoom-panel')">
-                <span class="foto-share-icono facebook"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>
-                <span class="foto-share-label">Facebook</span>
-            </button>
-            <button class="foto-share-opcion" onclick="compartirRed('x', 'foto-zoom-panel')">
-                <span class="foto-share-icono x"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>
-                <span class="foto-share-label">X</span>
-            </button>
-            <button class="foto-share-opcion" onclick="compartirRed('telegram', 'foto-zoom-panel')">
-                <span class="foto-share-icono telegram"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>
-                <span class="foto-share-label">Telegram</span>
-            </button>
-            <button class="foto-share-opcion" onclick="compartirRed('link', 'foto-zoom-panel')">
-                <span class="foto-share-icono link"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"></path></svg></span>
-                <span class="foto-share-label" data-i18n="share.copyLink">Copiar enlace</span>
-            </button>
-        </div>
-        <div class="foto-share-toast" id="foto-zoom-toast"></div>
-    </div>
 </div>
 
 <div id="logo-zoom-overlay" onclick="cerrarLogoZoom()">
@@ -3930,6 +3937,15 @@ const _origInit = () => {
     if (seccionHash) {
         try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
     }
+
+    // Enlace compartido de una tarjeta del sitial (?tarjeta=slug, ver
+    // _slugTarjeta): abrir esa tarjeta directamente al cargar la página.
+    const tarjetaParam = _queryParam('tarjeta');
+    if (tarjetaParam) {
+        const est = _estudiantePorSlug(tarjetaParam);
+        if (est) abrirTarjetaModal(est.nombre);
+    }
+
     window._appReady = true;
 };
 
@@ -5096,8 +5112,19 @@ document.addEventListener('click', () => {
 function cerrarTarjetaModal(e, forzar) {
     if (!forzar && e && e.target !== document.getElementById('tarjeta-modal-overlay')) return;
     document.getElementById('tarjeta-modal-overlay').classList.remove('abierto');
+    cerrarPanelCompartir('tarjeta-share-panel');
     document.body.style.overflow = '';
     _tarjetaModalActual = null;
+    // Si llegamos aquí desde un enlace ?tarjeta=slug, limpiar el parámetro
+    // de la URL al cerrar para no reabrir la tarjeta en una futura recarga.
+    if (_queryParam('tarjeta')) {
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch(err) {}
+    }
+}
+
+// Lee un parámetro de la query string actual (?tarjeta=slug, etc.)
+function _queryParam(param) {
+    try { return new URLSearchParams(location.search).get(param); } catch(e) { return null; }
 }
 
 // ════ FOTO ZOOM ════
@@ -5121,7 +5148,6 @@ function abrirFotoDirecta(foto, nombre) {
 }
 function cerrarFotoZoom() {
     document.getElementById('foto-zoom-overlay').classList.remove('abierto');
-    cerrarPanelCompartir('foto-zoom-panel');
 }
 
 // ════ COMPARTIR / DESCARGAR FOTOS (galería Media y fotos de perfil) ════
@@ -5147,7 +5173,27 @@ function _enlaceCompartirActual(panelId) {
     if (panelId === 'foto-share-panel' && _mediaLightboxActual && _mediaLightboxActual.nombre) {
         return `${base}?media=${encodeURIComponent(_mediaLightboxActual.nombre)}`;
     }
+    if (panelId === 'tarjeta-share-panel' && _tarjetaModalActual && _tarjetaModalActual.nombre) {
+        return `${base}?tarjeta=${encodeURIComponent(_slugTarjeta(_tarjetaModalActual.nombre))}#sitial`;
+    }
     return base;
+}
+
+// ID estable para cada tarjeta del sitial, usado en el enlace de compartir
+// (?tarjeta=id) igual de espíritu que media.html?foto=archivo. Se deriva del
+// nombre del estudiante (sin tildes, en minúsculas, separado por guiones).
+function _slugTarjeta(nombre) {
+    return (nombre || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+// Busca un estudiante por el slug de su nombre (para abrir tarjeta desde un
+// enlace compartido ?tarjeta=slug).
+function _estudiantePorSlug(slug) {
+    if (!slug) return null;
+    return (window._estudiantesTodos || []).find(e => _slugTarjeta(e.nombre) === slug) || null;
 }
 
 function _prepararOpcionNativaCompartir(panel, panelId) {
@@ -5160,21 +5206,31 @@ function _prepararOpcionNativaCompartir(panel, panelId) {
     grid.insertBefore(btn, grid.firstChild);
 }
 
+// Texto de compartir: varía según si se comparte una foto (media/perfil) o
+// una tarjeta del sitial de honor.
+function _textoCompartir(panelId) {
+    const esEn = window._lang === 'en';
+    if (panelId === 'tarjeta-share-panel' && _tarjetaModalActual) {
+        return esEn
+            ? `Check out ${_tarjetaModalActual.nombre}'s profile on Sitial de Talentos`
+            : `Mira la tarjeta de ${_tarjetaModalActual.nombre} en Sitial de Talentos`;
+    }
+    return esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos';
+}
+
 function compartirNativo(panelId) {
     const url  = _enlaceCompartirActual(panelId);
-    const esEn = window._lang === 'en';
     navigator.share({
         title: 'Sitial de Talentos',
-        text: esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos',
+        text: _textoCompartir(panelId),
         url
     }).catch(() => {});
 }
 
 function compartirRed(red, panelId) {
     if (red === 'link') { copiarEnlacePagina(panelId); return; }
-    const esEn   = window._lang === 'en';
     const urlEnc = encodeURIComponent(_enlaceCompartirActual(panelId));
-    const texto  = encodeURIComponent(esEn ? 'Check out this photo on Sitial de Talentos' : 'Mira esta foto en Sitial de Talentos');
+    const texto  = encodeURIComponent(_textoCompartir(panelId));
     let enlace = '';
     switch (red) {
         case 'whatsapp': enlace = `https://wa.me/?text=${texto}%20${urlEnc}`; break;
@@ -5189,7 +5245,7 @@ function compartirRed(red, panelId) {
 function copiarEnlacePagina(panelId) {
     const url    = _enlaceCompartirActual(panelId);
     const esEn   = window._lang === 'en';
-    const toastId = panelId === 'foto-zoom-panel' ? 'foto-zoom-toast' : 'foto-share-toast';
+    const toastId = panelId === 'tarjeta-share-panel' ? 'tarjeta-share-toast' : 'foto-share-toast';
     const finalizar = (ok) => mostrarToastCompartir(
         toastId,
         ok ? (esEn ? 'Link copied!' : '¡Enlace copiado!') : (esEn ? 'Could not copy link' : 'No se pudo copiar el enlace')
@@ -5255,12 +5311,12 @@ function cerrarLogoZoom() {
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        const panelMedia = document.getElementById('foto-share-panel');
-        const panelZoom  = document.getElementById('foto-zoom-panel');
+        const panelMedia   = document.getElementById('foto-share-panel');
+        const panelTarjeta = document.getElementById('tarjeta-share-panel');
         if (panelMedia && panelMedia.classList.contains('abierto')) {
             cerrarPanelCompartir('foto-share-panel');
-        } else if (panelZoom && panelZoom.classList.contains('abierto')) {
-            cerrarPanelCompartir('foto-zoom-panel');
+        } else if (panelTarjeta && panelTarjeta.classList.contains('abierto')) {
+            cerrarPanelCompartir('tarjeta-share-panel');
         } else if (document.getElementById('logo-zoom-overlay').classList.contains('abierto')) {
             cerrarLogoZoom();
         } else if (document.getElementById('foto-zoom-overlay').classList.contains('abierto')) {
