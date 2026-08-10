@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco de Problemas — Sitial de Talentos</title>
+<meta name="description" content="Banco de problemas de química para entrenar por tu cuenta, organizados por dificultad y tema, con sus respuestas — Sitial de Talentos Cubanos en Olimpiadas de Química.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --gold: #c9a227; --gold-light: #f0c84a;
+        --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
+    }
+    [data-theme="dark"] {
+        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --gold: #d4a82a; --gold-light: #f5d060;
+        --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
+    }
+    * { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        transition: background .25s ease, color .25s ease;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    .mp-topbar { flex-shrink: 0; }
+    footer { flex-shrink: 0; }
+
+    /* ── Topbar (idéntico al de media.html) ── */
+    .mp-topbar {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--navy);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px; padding: 14px 20px;
+    }
+    .mp-breadcrumb { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .mp-crumb-home {
+        display: flex; align-items: center; gap: 6px;
+        background: none; border: none; cursor: pointer;
+        color: var(--gold-light); font-family: 'DM Sans', sans-serif;
+        font-size: 14px; font-weight: 700; padding: 6px 8px 6px 4px;
+        border-radius: 8px; transition: background .18s, color .18s;
+        white-space: nowrap; flex-shrink: 0;
+    }
+    .mp-crumb-home:hover { background: rgba(255,255,255,.1); }
+    .mp-crumb-sep { color: rgba(255,255,255,.35); font-size: 14px; flex-shrink: 0; }
+    .mp-crumb-current {
+        font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+        color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .mp-icon-btn {
+        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
+        color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s;
+    }
+    .mp-icon-btn:hover { background: rgba(255,255,255,.22); }
+    @media (max-width: 560px) {
+        .mp-crumb-current { display: none; }
+        .mp-crumb-sep { display: none; }
+    }
+
+    /* ── Footer (idéntico al de media.html) ── */
+    footer { background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px 22px; font-size: 13px; }
+    footer a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+    footer a:hover { opacity: .75; }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 18px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; font-weight: 500; }
+    .footer-social { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .footer-social-icon {
+        width: 38px; height: 38px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,.08); overflow: hidden;
+        transition: transform .2s ease, background .2s ease;
+    }
+    .footer-social-icon:hover { transform: translateY(-3px); background: rgba(255,255,255,.16); }
+    .footer-social-icon svg { width: 20px; height: 20px; display: block; }
+    .footer-social-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ══════════════════════════ CONTENIDO ══════════════════════════ */
+    .bp-main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; flex: 1 0 auto; width: 100%; }
+
+    /* ── Hero / cabecera explicativa ── */
+    .bp-hero { padding: 8px 0 28px; }
+    .bp-eyebrow {
+        font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+        color: var(--gold); margin: 0 0 8px;
+    }
+    .bp-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 30px; margin: 0 0 12px; line-height: 1.2; }
+    .bp-lead { color: var(--text-muted); font-size: 15px; line-height: 1.68; max-width: 760px; margin: 0 0 14px; }
+    .bp-lead:last-of-type { margin-bottom: 0; }
+    .bp-dif-legend {
+        display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;
+    }
+    .bp-dif-legend-item {
+        display: flex; align-items: flex-start; gap: 8px;
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+        padding: 10px 14px; flex: 1 1 220px; min-width: 200px;
+    }
+    .bp-dif-legend-num {
+        flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 800; color: #fff;
+    }
+    .bp-dif-legend-text { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+    .bp-dif-legend-text strong { color: var(--text); }
+
+    /* ── Transición ── */
+    .bp-transicion {
+        display: flex; align-items: center; gap: 14px; margin: 32px 0 24px;
+        color: var(--text-muted); font-size: 13px; font-weight: 600; letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+    .bp-transicion::before, .bp-transicion::after {
+        content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Buscador / filtros ── */
+    .bp-toolbar {
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+        padding: 20px 20px 18px; margin-bottom: 22px;
+    }
+    .bp-search-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .bp-search-input {
+        flex: 1; padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+        background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+        outline: none; transition: border-color .18s;
+    }
+    .bp-search-input:focus { border-color: var(--gold); }
+    .bp-reset-btn {
+        flex-shrink: 0; background: none; border: 1.5px solid var(--border); border-radius: 10px;
+        padding: 0 16px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 13px;
+        font-weight: 600; cursor: pointer; transition: border-color .18s, color .18s;
+    }
+    .bp-reset-btn:hover { border-color: var(--gold); color: var(--text); }
+
+    .bp-filter-group { margin-bottom: 14px; }
+    .bp-filter-group:last-child { margin-bottom: 0; }
+    .bp-filter-label {
+        font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+        color: var(--text-muted); margin: 0 0 8px;
+    }
+    .bp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .bp-chip {
+        display: flex; align-items: center; gap: 6px;
+        background: var(--bg); border: 1.5px solid var(--border); border-radius: 999px;
+        padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+        color: var(--text-muted); cursor: pointer; transition: all .18s ease; user-select: none;
+    }
+    .bp-chip:hover { border-color: var(--gold); color: var(--text); }
+    .bp-chip.activo {
+        background: var(--navy); border-color: var(--navy); color: #fff;
+    }
+    [data-theme="dark"] .bp-chip.activo { background: var(--gold); border-color: var(--gold); color: #1a1206; }
+    .bp-chip-dot {
+        width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    /* ── Contador de resultados ── */
+    .bp-resultados-meta {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 13px; color: var(--text-muted); margin: 4px 2px 14px;
+    }
+
+    /* ── Grid de problemas ── */
+    .bp-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+    }
+    .bp-card {
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+        padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 10px;
+        box-shadow: 0 2px 14px rgba(4,18,43,.06);
+        transition: transform .22s ease, box-shadow .22s ease;
+        opacity: 0; animation: bpFadeIn .45s ease forwards;
+    }
+    @keyframes bpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .bp-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(4,18,43,.14); }
+    .bp-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .bp-dif-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 11px; font-weight: 800; letter-spacing: .3px;
+        padding: 4px 10px; border-radius: 999px; color: #fff; white-space: nowrap;
+    }
+    .bp-card-temas { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
+    .bp-tema-tag {
+        font-size: 10.5px; font-weight: 700; letter-spacing: .2px;
+        padding: 3px 9px; border-radius: 999px;
+        background: rgba(4,18,43,.06); color: var(--text-muted);
+    }
+    [data-theme="dark"] .bp-tema-tag { background: rgba(255,255,255,.08); }
+    .bp-card-title {
+        font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px;
+        line-height: 1.32; margin: 0;
+    }
+    .bp-card-fuente { font-size: 12px; color: var(--gold); font-weight: 600; margin: -4px 0 0; }
+    .bp-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0; flex: 1; }
+    .bp-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .bp-btn {
+        flex: 1; text-align: center; padding: 9px 10px; border-radius: 10px;
+        font-size: 12.5px; font-weight: 700; cursor: pointer; transition: opacity .18s, transform .15s;
+        border: none; font-family: 'DM Sans', sans-serif;
+    }
+    .bp-btn:active { transform: scale(.97); }
+    .bp-btn-enunciado { background: var(--navy); color: #fff; }
+    [data-theme="dark"] .bp-btn-enunciado { background: var(--navy-light); color: #fff; }
+    .bp-btn-respuesta { background: var(--gold); color: #241c02; }
+    .bp-btn:hover { opacity: .88; }
+    .bp-btn[aria-disabled="true"] { opacity: .4; pointer-events: none; }
+
+    /* ── Estados (cargando / vacío / error) ── */
+    .bp-estado { padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 14px; grid-column: 1 / -1; }
+
+    @media (max-width: 640px) {
+        .bp-heading { font-size: 24px; }
+        .bp-search-row { flex-direction: column; }
+        .bp-reset-btn { padding: 9px 16px; }
+        .bp-grid { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<div class="mp-topbar">
+    <div class="mp-breadcrumb">
+        <button class="mp-crumb-home" onclick="location.href='index.html#inicio'" aria-label="Inicio">
+            🏠 <span id="bp-back-label">Home</span>
+        </button>
+        <span class="mp-crumb-sep">›</span>
+        <span class="mp-crumb-current">📝 <span id="bp-title-label">Banco de Problemas</span></span>
+    </div>
+    <div class="mp-topbar-actions">
+        <button class="mp-icon-btn" id="bp-theme-btn" onclick="bpToggleThemeMode()" title="Tema">🌙</button>
+        <button class="mp-icon-btn" id="bp-lang-btn" onclick="bpToggleIdioma()" title="Idioma / Language">ES</button>
+    </div>
+</div>
+
+<div class="bp-main">
+
+    <!-- ══ CABECERA EXPLICATIVA ══ -->
+    <div class="bp-hero">
+        <p class="bp-eyebrow" id="bp-eyebrow">Entrena por tu cuenta</p>
+        <h1 class="bp-heading" id="bp-heading">Banco de Problemas</h1>
+        <p class="bp-lead" id="bp-lead-1">Una colección de problemas de química, cada uno con su respuesta, pensada para entrenar como lo harías de cara a un concurso u olimpiada. Puedes intentarlos por tu cuenta y comprobar tu solución cuando quieras.</p>
+        <p class="bp-lead" id="bp-lead-2">Los problemas están organizados por nivel de dificultad y por tema, para que puedas elegir el reto adecuado a tu etapa de preparación.</p>
+
+        <div class="bp-dif-legend">
+            <div class="bp-dif-legend-item">
+                <span class="bp-dif-legend-num" style="background:#1b7a43;">1</span>
+                <span class="bp-dif-legend-text" id="bp-leg-1"><strong>Dificultad 1</strong> — Nivel Nacional / Centroamericana (CNQ, OCACQ)</span>
+            </div>
+            <div class="bp-dif-legend-item">
+                <span class="bp-dif-legend-num" style="background:#b8860b;">2</span>
+                <span class="bp-dif-legend-text" id="bp-leg-2"><strong>Dificultad 2</strong> — Nivel Iberoamericano y otras olimpiadas (OIAQ y afines)</span>
+            </div>
+            <div class="bp-dif-legend-item">
+                <span class="bp-dif-legend-num" style="background:#9a2020;">3</span>
+                <span class="bp-dif-legend-text" id="bp-leg-3"><strong>Dificultad 3</strong> — Nivel IChO, Mendeléiev y olimpiadas chinas</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bp-transicion" id="bp-transicion">Busca tu próximo problema</div>
+
+    <!-- ══ BUSCADOR / FILTROS ══ -->
+    <div class="bp-toolbar">
+        <div class="bp-search-row">
+            <input class="bp-search-input" id="bp-search" type="text" placeholder="🔎 Buscar por título, tema o fuente…" oninput="bpRenderizar()">
+            <button class="bp-reset-btn" id="bp-reset-btn" onclick="bpLimpiarFiltros()">Limpiar filtros</button>
+        </div>
+
+        <div class="bp-filter-group">
+            <p class="bp-filter-label" id="bp-lbl-dificultad">Dificultad</p>
+            <div class="bp-chips" id="bp-chips-dificultad">
+                <button class="bp-chip" data-dif="1" onclick="bpToggleDificultad(1, this)"><span class="bp-chip-dot" style="background:#1b7a43;"></span>Dificultad 1</button>
+                <button class="bp-chip" data-dif="2" onclick="bpToggleDificultad(2, this)"><span class="bp-chip-dot" style="background:#b8860b;"></span>Dificultad 2</button>
+                <button class="bp-chip" data-dif="3" onclick="bpToggleDificultad(3, this)"><span class="bp-chip-dot" style="background:#9a2020;"></span>Dificultad 3</button>
+            </div>
+        </div>
+
+        <div class="bp-filter-group">
+            <p class="bp-filter-label" id="bp-lbl-tema">Tema</p>
+            <div class="bp-chips" id="bp-chips-tema">
+                <button class="bp-chip" data-tema="inorganica" onclick="bpToggleTema('inorganica', this)">🧪 <span data-i18n-tema="inorganica">Inorgánica</span></button>
+                <button class="bp-chip" data-tema="fisica" onclick="bpToggleTema('fisica', this)">⚛️ <span data-i18n-tema="fisica">Física</span></button>
+                <button class="bp-chip" data-tema="analitica" onclick="bpToggleTema('analitica', this)">🔬 <span data-i18n-tema="analitica">Analítica</span></button>
+                <button class="bp-chip" data-tema="organica" onclick="bpToggleTema('organica', this)">🧬 <span data-i18n-tema="organica">Orgánica</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bp-resultados-meta">
+        <span id="bp-contador">— problemas</span>
+    </div>
+
+    <div class="bp-grid" id="bp-grid">
+        <div class="bp-estado" id="bp-estado-inicial">⏳ <span id="bp-cargando-txt">Cargando problemas…</span></div>
+    </div>
+
+</div>
+
+<footer>
+    <div class="footer-links">
+        <a href="index.html#noticias">📰 Noticias y Entrevistas</a>
+        <a href="index.html#inicio">🏠 Home</a>
+        <a href="index.html#contacto">📌 Enlaces y Contacto</a>
+    </div>
+    <div class="footer-social">
+        <a class="footer-social-icon" href="https://t.me/Concursantes_Quimica" target="_blank" rel="noopener" aria-label="Telegram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#29A8E4"/>
+                <path d="M5.5 11.8l2.7 1 1.05 3.4c.07.2.32.27.49.13l1.5-1.22a.36.36 0 01.44-.02l2.7 1.96c.19.14.46.03.5-.2l1.85-8.9c.05-.25-.18-.46-.42-.37L5.37 11.15c-.27.1-.26.5.13.65z" fill="#fff"/>
+                <path d="M8.2 12.8l.27 2.9c.03.24.34.3.46.1l1.18-1.5" fill="#D2E5F1"/>
+                <path d="M8.2 12.8l5.3-3.3" stroke="#fff" stroke-width=".5" stroke-linecap="round"/>
+            </svg>
+        </a>
+        <a class="footer-social-icon" href="https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="footerIgGradBanco" cx="30%" cy="107%" r="150%">
+                        <stop offset="0%" stop-color="#fdf497"/>
+                        <stop offset="5%" stop-color="#fdf497"/>
+                        <stop offset="45%" stop-color="#fd5949"/>
+                        <stop offset="60%" stop-color="#d6249f"/>
+                        <stop offset="90%" stop-color="#285AEB"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="12" cy="12" r="12" fill="url(#footerIgGradBanco)"/>
+                <rect x="6.6" y="6.6" width="10.8" height="10.8" rx="3.1" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="12" cy="12" r="2.9" fill="none" stroke="#fff" stroke-width="1.3"/>
+                <circle cx="15.35" cy="8.65" r="0.85" fill="#fff"/>
+            </svg>
+        </a>
+    </div>
+    <p style="font-size:12px;opacity:.5;margin-top:6px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// IDIOMA Y TEMA (sincronizados con el sitio principal vía localStorage)
+// — mismo mecanismo que media.html —
+// ════════════════════════════════════════════════════════════════════
+const _BPT = {
+    es: {
+        back: 'Home', title: 'Banco de Problemas',
+        eyebrow: 'Entrena por tu cuenta', heading: 'Banco de Problemas',
+        lead1: 'Una colección de problemas de química, cada uno con su respuesta, pensada para entrenar como lo harías de cara a un concurso u olimpiada. Puedes intentarlos por tu cuenta y comprobar tu solución cuando quieras.',
+        lead2: 'Los problemas están organizados por nivel de dificultad y por tema, para que puedas elegir el reto adecuado a tu etapa de preparación.',
+        leg1: 'Nivel Nacional / Centroamericana (CNQ, OCACQ)',
+        leg2: 'Nivel Iberoamericano y otras olimpiadas (OIAQ y afines)',
+        leg3: 'Nivel IChO, Mendeléiev y olimpiadas chinas',
+        transicion: 'Busca tu próximo problema',
+        searchPlaceholder: '🔎 Buscar por título, tema o fuente…',
+        reset: 'Limpiar filtros',
+        lblDificultad: 'Dificultad', lblTema: 'Tema',
+        dif1: 'Dificultad 1', dif2: 'Dificultad 2', dif3: 'Dificultad 3',
+        temaInorganica: 'Inorgánica', temaFisica: 'Física', temaAnalitica: 'Analítica', temaOrganica: 'Orgánica',
+        cargando: 'Cargando problemas…',
+        vacio: 'No hay problemas que coincidan con estos filtros.',
+        error: 'No se pudo cargar el banco de problemas en este momento.',
+        contador1: 'problema encontrado', contadorN: 'problemas encontrados',
+        verEnunciado: '📄 Ver enunciado', verRespuesta: '🔑 Ver respuesta', proximamente: 'Próximamente'
+    },
+    en: {
+        back: 'Home', title: 'Problem Bank',
+        eyebrow: 'Train on your own', heading: 'Problem Bank',
+        lead1: 'A collection of chemistry problems, each with its own answer, designed to train the way you would for a contest or olympiad. You can attempt them on your own and check your solution whenever you like.',
+        lead2: 'Problems are organized by difficulty level and topic, so you can pick the right challenge for your stage of preparation.',
+        leg1: 'National / Central American level (CNQ, OCACQ)',
+        leg2: 'Ibero-American level and other olympiads (OIAQ and similar)',
+        leg3: 'IChO, Mendeleev and Chinese olympiad level',
+        transicion: 'Find your next problem',
+        searchPlaceholder: '🔎 Search by title, topic or source…',
+        reset: 'Clear filters',
+        lblDificultad: 'Difficulty', lblTema: 'Topic',
+        dif1: 'Difficulty 1', dif2: 'Difficulty 2', dif3: 'Difficulty 3',
+        temaInorganica: 'Inorganic', temaFisica: 'Physical', temaAnalitica: 'Analytical', temaOrganica: 'Organic',
+        cargando: 'Loading problems…',
+        vacio: 'No problems match these filters.',
+        error: 'The problem bank could not be loaded right now.',
+        contador1: 'problem found', contadorN: 'problems found',
+        verEnunciado: '📄 View problem', verRespuesta: '🔑 View answer', proximamente: 'Coming soon'
+    }
+};
+function _bpLang() {
+    try {
+        const guardado = localStorage.getItem('lang');
+        if (guardado) return guardado;
+        const navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || 'es').toLowerCase();
+        return navLang.startsWith('en') ? 'en' : 'es';
+    } catch(e) { return 'es'; }
+}
+function _bpT(key) { return (_BPT[_bpLang()] || _BPT.es)[key]; }
+
+function bpAplicarIdioma() {
+    const l = _bpLang();
+    document.getElementById('bp-back-label').textContent = _bpT('back');
+    document.getElementById('bp-title-label').textContent = _bpT('title');
+    document.getElementById('bp-eyebrow').textContent = _bpT('eyebrow');
+    document.getElementById('bp-heading').textContent = _bpT('heading');
+    document.getElementById('bp-lead-1').textContent = _bpT('lead1');
+    document.getElementById('bp-lead-2').textContent = _bpT('lead2');
+    document.getElementById('bp-leg-1').innerHTML = `<strong>${_bpT('dif1')}</strong> — ${_bpT('leg1')}`;
+    document.getElementById('bp-leg-2').innerHTML = `<strong>${_bpT('dif2')}</strong> — ${_bpT('leg2')}`;
+    document.getElementById('bp-leg-3').innerHTML = `<strong>${_bpT('dif3')}</strong> — ${_bpT('leg3')}`;
+    document.getElementById('bp-transicion').textContent = _bpT('transicion');
+    document.getElementById('bp-search').placeholder = _bpT('searchPlaceholder');
+    document.getElementById('bp-reset-btn').textContent = _bpT('reset');
+    document.getElementById('bp-lbl-dificultad').textContent = _bpT('lblDificultad');
+    document.getElementById('bp-lbl-tema').textContent = _bpT('lblTema');
+    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[0].lastChild.textContent = _bpT('dif1');
+    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[1].lastChild.textContent = _bpT('dif2');
+    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[2].lastChild.textContent = _bpT('dif3');
+    document.querySelectorAll('[data-i18n-tema]').forEach(el => {
+        const k = el.getAttribute('data-i18n-tema');
+        const map = { inorganica: 'temaInorganica', fisica: 'temaFisica', analitica: 'temaAnalitica', organica: 'temaOrganica' };
+        el.textContent = _bpT(map[k]);
+    });
+    document.getElementById('bp-lang-btn').textContent = l === 'es' ? 'ES' : 'EN';
+    document.title = (l === 'es' ? 'Banco de Problemas — Sitial de Talentos' : 'Problem Bank — Sitial de Talentos');
+    bpRenderizar();
+}
+function bpToggleIdioma() {
+    const next = _bpLang() === 'es' ? 'en' : 'es';
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    bpAplicarIdioma();
+}
+
+function _bpTemaOscuroPorDefecto() {
+    try {
+        const guardado = localStorage.getItem('theme');
+        if (guardado) return guardado === 'dark';
+        return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch(e) { return false; }
+}
+function bpAplicarTema() {
+    const dark = _bpTemaOscuroPorDefecto();
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('bp-theme-btn').textContent = dark ? '🌙' : '☀️';
+}
+function bpToggleThemeMode() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    document.getElementById('bp-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+
+bpAplicarIdioma();
+bpAplicarTema();
+
+// ════════════════════════════════════════════════════════════════════
+// CARGA DE PROBLEMAS DESDE Data/problemas_data.html
+// (mismo patrón que Data/media_data.html — const datosProblemas = [...])
+// Formato provisional de cada problema (se ajustará cuando definas el
+// formato definitivo de entrada):
+//   {
+//     titulo: "Cinética de descomposición de alimentos",
+//     dificultad: 1,                      // 1, 2 ó 3
+//     temas: ["fisica"],                  // inorganica | fisica | analitica | organica
+//     fuente: "TChO · Cuba 2026",
+//     descripcion: "Arrhenius, Michaelis-Menten y conservación de alimentos.",
+//     enunciado: "Problemas/cinetica-alimentos-enunciado.pdf",
+//     respuesta: "Problemas/cinetica-alimentos-respuesta.pdf"
+//   }
+// ════════════════════════════════════════════════════════════════════
+function _bpRemoveJSLineComments(src) {
+    let out = '', inStr = false, strChar = '', escape = false, i = 0;
+    while (i < src.length) {
+        const c = src[i];
+        if (escape)                          { out += c; escape = false; i++; continue; }
+        if (c === '\\' && inStr)             { out += c; escape = true;  i++; continue; }
+        if (!inStr && (c === '"' || c === "'")) { inStr = true; strChar = c; out += c; i++; continue; }
+        if (inStr && c === strChar)          { inStr = false; out += c;  i++; continue; }
+        if (!inStr && c === '/' && src[i + 1] === '/') {
+            while (i < src.length && src[i] !== '\n') i++;
+            continue;
+        }
+        out += c; i++;
+    }
+    return out;
+}
+function _bpJsLiteralToJSON(src) {
+    return _bpRemoveJSLineComments(src)
+        .replace(/,(\s*[\]\}])/g, '$1')
+        .replace(/(^|[{,])\s*([^\s"'0-9{},\[\]:][^\s:,\]{}]*)\s*:/gm, (m, pre, key) => {
+            if (key.startsWith('"') || key.startsWith("'")) return m;
+            return `${pre} "${key.trim()}":`;
+        });
+}
+
+let _bpProblemasCache = null;
+async function _bpCargarProblemas() {
+    if (_bpProblemasCache) return _bpProblemasCache;
+    const resp = await fetch('Data/problemas_data.html');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+
+    const marker = text.indexOf('const datosProblemas = [');
+    if (marker === -1) throw new Error('No se encontró datosProblemas');
+    let dep = 0, i = text.indexOf('[', marker);
+    const start = i;
+    for (; i < text.length; i++) {
+        if (text[i] === '[') dep++;
+        else if (text[i] === ']') { dep--; if (dep === 0) break; }
+    }
+    const datos = JSON.parse(_bpJsLiteralToJSON(text.slice(start, i + 1)));
+
+    _bpProblemasCache = datos.map((p, idx) => ({
+        id: p.id || ('p' + idx),
+        titulo: (p.titulo || '').trim(),
+        dificultad: Number(p.dificultad) || 1,
+        temas: Array.isArray(p.temas) ? p.temas.map(t => (t || '').toLowerCase()) : [],
+        fuente: (p.fuente || '').trim(),
+        descripcion: (p.descripcion || '').trim(),
+        enunciado: (p.enunciado || '').trim(),
+        respuesta: (p.respuesta || '').trim()
+    }));
+    return _bpProblemasCache;
+}
+
+// ── Estado de filtros ──
+let _bpTodos = [];
+const _bpFiltroDificultad = new Set();
+const _bpFiltroTema = new Set();
+
+function bpToggleDificultad(n, btn) {
+    if (_bpFiltroDificultad.has(n)) { _bpFiltroDificultad.delete(n); btn.classList.remove('activo'); }
+    else { _bpFiltroDificultad.add(n); btn.classList.add('activo'); }
+    bpRenderizar();
+}
+function bpToggleTema(tema, btn) {
+    if (_bpFiltroTema.has(tema)) { _bpFiltroTema.delete(tema); btn.classList.remove('activo'); }
+    else { _bpFiltroTema.add(tema); btn.classList.add('activo'); }
+    bpRenderizar();
+}
+function bpLimpiarFiltros() {
+    _bpFiltroDificultad.clear();
+    _bpFiltroTema.clear();
+    document.querySelectorAll('.bp-chip.activo').forEach(c => c.classList.remove('activo'));
+    document.getElementById('bp-search').value = '';
+    bpRenderizar();
+}
+
+const _BP_TEMA_META = {
+    inorganica: { icon: '🧪' }, fisica: { icon: '⚛️' },
+    analitica: { icon: '🔬' }, organica: { icon: '🧬' }
+};
+const _BP_DIF_META = {
+    1: { color: '#1b7a43' }, 2: { color: '#b8860b' }, 3: { color: '#9a2020' }
+};
+
+function bpRenderizar() {
+    const grid = document.getElementById('bp-grid');
+    const contador = document.getElementById('bp-contador');
+    const texto = (document.getElementById('bp-search').value || '').trim().toLowerCase();
+
+    let lista = _bpTodos.filter(p => {
+        if (_bpFiltroDificultad.size && !_bpFiltroDificultad.has(p.dificultad)) return false;
+        if (_bpFiltroTema.size && !p.temas.some(t => _bpFiltroTema.has(t))) return false;
+        if (texto) {
+            const bolsa = (p.titulo + ' ' + p.descripcion + ' ' + p.fuente + ' ' + p.temas.join(' ')).toLowerCase();
+            if (!bolsa.includes(texto)) return false;
+        }
+        return true;
+    });
+
+    const n = lista.length;
+    contador.textContent = n === 0 ? '' : `${n} ${n === 1 ? _bpT('contador1') : _bpT('contadorN')}`;
+
+    if (n === 0) {
+        grid.innerHTML = `<div class="bp-estado">${_bpTodos.length === 0 ? '' : '🔎 ' + _bpT('vacio')}</div>`;
+        return;
+    }
+
+    grid.innerHTML = '';
+    lista.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'bp-card';
+        card.style.animationDelay = (Math.min(i, 20) * 0.03) + 's';
+
+        const difColor = (_BP_DIF_META[p.dificultad] || _BP_DIF_META[1]).color;
+        const temasHtml = p.temas.map(t => {
+            const meta = _BP_TEMA_META[t];
+            const label = _bpT('tema' + t.charAt(0).toUpperCase() + t.slice(1)) || t;
+            return `<span class="bp-tema-tag">${meta ? meta.icon + ' ' : ''}${label}</span>`;
+        }).join('');
+
+        const tieneEnunciado = !!p.enunciado;
+        const tieneRespuesta = !!p.respuesta;
+
+        card.innerHTML = `
+            <div class="bp-card-top">
+                <span class="bp-dif-badge" style="background:${difColor}">Dificultad ${p.dificultad}</span>
+                <div class="bp-card-temas">${temasHtml}</div>
+            </div>
+            <h3 class="bp-card-title">${p.titulo || '—'}</h3>
+            ${p.fuente ? `<p class="bp-card-fuente">${p.fuente}</p>` : ''}
+            <p class="bp-card-desc">${p.descripcion || ''}</p>
+            <div class="bp-card-actions">
+                <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="${tieneEnunciado ? `window.open('${p.enunciado}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-respuesta" ${tieneRespuesta ? '' : 'aria-disabled="true"'} onclick="${tieneRespuesta ? `window.open('${p.respuesta}','_blank','noopener')` : ''}">${tieneRespuesta ? _bpT('verRespuesta') : _bpT('proximamente')}</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+async function bpInicializar() {
+    const grid = document.getElementById('bp-grid');
+    try {
+        _bpTodos = await _bpCargarProblemas();
+        bpRenderizar();
+    } catch (err) {
+        console.error('Error cargando Data/problemas_data.html:', err);
+        grid.innerHTML = `<div class="bp-estado">⚠️ ${_bpT('error')}</div>`;
+    }
+}
+bpInicializar();
+</script>
+</body>
+</html>
