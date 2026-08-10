@@ -2106,6 +2106,7 @@
     <button class="menu-item" id="menu-btn-eventos" onclick="cambiarSeccion('eventos')">🔍 <span data-i18n="nav.eventos">Historial por Eventos</span></button>
     <button class="menu-item" id="menu-btn-sitial" onclick="cambiarSeccion('sitial')">🏅 <span data-i18n="nav.sitial">Historial por Medallas</span></button>
     <button class="menu-item" id="menu-btn-cnq" onclick="cambiarSeccion('cnq')">🧪 <span data-i18n="nav.cnq">Olimpiada Cubana de Química</span></button>
+    <button class="menu-item" id="menu-btn-banco" onclick="location.href='Banco_Problemas.html'">📝 <span data-i18n="nav.banco">Banco de Problemas</span></button>
     <button class="menu-item" id="menu-btn-honor" onclick="cambiarSeccion('honor')">🎓 <span data-i18n="nav.honor">Honor a quien Honor Merece</span></button>
     <button class="menu-item" id="menu-btn-noticias" onclick="location.href='noticias.html'">📰 <span data-i18n="nav.noticias">Noticias y Entrevistas</span></button>
     <button class="menu-item" id="menu-btn-media" onclick="location.href='media.html'">📸 <span data-i18n="nav.media">Media</span></button>
@@ -2134,6 +2135,11 @@
                 <span class="inicio-card-icon">🧪</span>
                 <h3 data-i18n="nav.cnq">Olimpiada Cubana de Química</h3>
                 <p data-i18n="home.card.cnq">Rankings y exámenes del Concurso Nacional de Química — décimo, onceno y duodécimo grado</p>
+            </div>
+            <div class="inicio-card" onclick="location.href='Banco_Problemas.html'">
+                <span class="inicio-card-icon">📝</span>
+                <h3 data-i18n="nav.banco">Banco de Problemas</h3>
+                <p data-i18n="home.card.banco">Problemas de química para entrenar por tu cuenta, organizados por dificultad y tema, con sus respuestas</p>
             </div>
             <div class="inicio-card" onclick="cambiarSeccion('honor')">
                 <span class="inicio-card-icon">🎓</span>
@@ -5875,6 +5881,7 @@ const _i18n = {
         'nav.eventos':              'Historial por Eventos',
         'nav.sitial':               'Historial por Medallas',
         'nav.honor':                'Honor a quien Honor Merece',
+        'nav.banco':                'Banco de Problemas',
         'nav.noticias':             'Noticias y Entrevistas',
         'nav.media':                'Media',
         'nav.contacto':             'Enlaces y Contacto',
@@ -5941,6 +5948,7 @@ const _i18n = {
         'home.card.eventos':        'Resultados detallados por olimpiada: IChO, IMChO, OIAQ y OCACQ',
         'home.card.sitial':         'Todos los estudiantes cubanos medallistas y mencionados en olimpiadas internacionales de química',
         'home.card.honor':          'Los entrenadores y profesores que forjaron la excelencia química cubana durante décadas',
+        'home.card.banco':          'Problemas de química para entrenar por tu cuenta, organizados por dificultad y tema, con sus respuestas',
         'home.card.noticias':       'Crónicas, entrevistas y videos sobre las olimpiadas de química cubanas',
         'home.card.media':          'Fotos de eventos, equipos y momentos de las olimpiadas de química cubanas',
         'home.innumbers':           'En <em>Números</em>',
@@ -6063,6 +6071,7 @@ const _i18n = {
         'nav.eventos':              'Results by Event',
         'nav.sitial':               'Hall of Medals',
         'nav.honor':                'Hall of Fame',
+        'nav.banco':                'Problem Bank',
         'nav.noticias':             'News & Interviews',
         'nav.media':                'Media',
         'nav.contacto':             'Links & Contact',
@@ -6127,6 +6136,7 @@ const _i18n = {
         'home.card.eventos':        'Detailed results by olympiad: IChO, IMChO, OIAQ and OCACQ',
         'home.card.sitial':         'All Cuban medal-winning and commended students at international chemistry olympiads',
         'home.card.honor':          'The coaches and teachers who forged Cuban chemistry excellence across decades',
+        'home.card.banco':          'Chemistry problems to train on your own, organized by difficulty and topic, with their answers',
         'home.card.noticias':       'Chronicles, interviews and videos about Cuban chemistry olympiads',
         'home.card.media':          'Photos of events, teams and moments from Cuban chemistry olympiads',
         'home.innumbers':           'By the <em>Numbers</em>',
