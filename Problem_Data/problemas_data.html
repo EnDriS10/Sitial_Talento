@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="problemas-data">
+
+// ════════════════════════════════════════════════════════════════════
+// BANCO DE PROBLEMAS — datos
+// Todo lo relacionado con problemas vive en la carpeta Problem_Data/.
+// ════════════════════════════════════════════════════════════════════
+// Campos de cada problema:
+//   id          : identificador único (usado por Problem_Data/visor.html)
+//   numero      : nº de pregunta dentro de la fuente original, p.ej. "Q1" (opcional)
+//   titulo      : título del problema
+//   dificultad  : 1 | 2 | 3
+//   temas       : array de "inorganica" | "fisica" | "analitica" | "organica"
+//   temaEspecifico : subtema puntual, p.ej. "Miscelánea", "Cinética" (opcional)
+//   fuente      : de dónde procede el problema
+//   descripcion : resumen breve mostrado en la tarjeta
+//   contenido   : texto íntegro del enunciado (NO se muestra, solo se usa
+//                 para que el buscador encuentre el problema por palabras
+//                 que aparecen dentro de él)
+//   enunciado   : URL a abrir con "Ver enunciado"
+//   respuesta   : URL a abrir con "Ver respuesta"
+//
+// El enunciado y la respuesta en sí (texto, ecuaciones, tablas, estructuras)
+// se definen como HTML en Problem_Data/problemas_contenido.html, y los
+// muestra Problem_Data/visor.html. No se usan imágenes ni PDFs: todo es
+// texto/HTML real, en español.
+// ════════════════════════════════════════════════════════════════════
+
+const datosProblemas = [
+
+    {
+        id: "q1-piscina",
+        numero: "Q1",
+        titulo: "Química en la piscina",
+        dificultad: 1,
+        temas: ["inorganica"],
+        temaEspecifico: "Miscelánea",
+        fuente: "58ª IChO · UK Round One 2026",
+        descripcion: "Especiación del cloro en el agua de una piscina, estados de oxidación, desproporción del ion clorato(I), hidrólisis de la urea, un diagrama de puntos y cruces y la ley de Henry aplicada a la tricloramina.",
+        contenido: "Química en la piscina pipí orina Michael Phelps cloro Cl2 H2O HOCl HCl ácido hipocloroso estados de oxidación número de oxidación carbonato de sodio Na2CO3 reacción ácido-base ion clorato I OCl- desproporción disproportionation ClO3- ion clorato V forma trigonal piramidal urea NH2 2CO hidrólisis amoniaco NH3 dióxido de carbono CO2 monocloramina NH2Cl dicloramina NHCl2 tricloramina NCl3 diagrama de puntos y cruces dot and cross ley de Henry Henry's law constante de Henry presión parcial equilibrio piscinas desinfección cloración",
+        enunciado: "Problem_Data/visor.html?id=q1-piscina&tab=enunciado",
+        respuesta: "Problem_Data/visor.html?id=q1-piscina&tab=respuesta"
+    },
+    {
+        id: "q2-isocianidas",
+        numero: "Q2",
+        titulo: "El maloliente mundo de los isocianuros",
+        dificultad: 1,
+        temas: ["organica"],
+        temaEspecifico: "Isocianuros",
+        fuente: "58ª IChO · UK Round One 2026",
+        descripcion: "Estructuras resonantes de isocianuros, sustitución nucleofílica con AgCN y NaCN, límite de detección olfativo, el test de Zaytsev, la reacción de Passerini y su aplicación en la síntesis del telaprevir.",
+        contenido: "isocianuros isocyanides olor maloliente resonancia pares solitarios AgCN NaCN bromuro de alilo allyl bromide sustitución nucleofílica precipitado color crema AgBr bromuro de plata umbral de detección concentración mol dm3 moléculas deshidratación hidrólisis amina formamida ácido fórmico metanoico test de Zaytsev Zaytsev's test triclorometano CHCl3 hidróxido de sodio NaOH aminas amidas reacción de Passerini Passerini reaction ácido carboxílico aldehído cetona telaprevir antiviral estereocentro enantiómeros quiralidad productos posibles combinatoria Isobel Cynthia Galvin fenilisocianuro acetona ciclopentanona benzofenona ácido acético ácido benzoico ácido 2-metilpropanoico propanal butan-2-ona benzaldehído",
+        enunciado: "Problem_Data/visor.html?id=q2-isocianidas&tab=enunciado",
+        respuesta: "Problem_Data/visor.html?id=q2-isocianidas&tab=respuesta"
+    }
+
+];
+
+window.datosProblemas = datosProblemas;
+
+</script>
+</body>
+</html>

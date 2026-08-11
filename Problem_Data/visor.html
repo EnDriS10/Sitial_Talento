@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problema — Sitial de Talentos</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --gold: #c9a227; --gold-light: #f0c84a;
+        --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
+        --green: #1f7a4d; --red-soft: #b3455a;
+    }
+    [data-theme="dark"] {
+        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --gold: #d4a82a; --gold-light: #f5d060;
+        --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
+        --green: #3fbf80; --red-soft: #e37b8c;
+    }
+    * { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+        margin: 0; background: var(--bg); color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        transition: background .25s ease, color .25s ease;
+        min-height: 100vh;
+        display: flex; flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Topbar (idéntico al resto del sitio) ── */
+    .mp-topbar {
+        position: sticky; top: 0; z-index: 50;
+        background: var(--navy);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px; padding: 14px 20px;
+    }
+    .mp-breadcrumb { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .mp-crumb-home {
+        display: flex; align-items: center; gap: 6px;
+        background: none; border: none; cursor: pointer;
+        color: var(--gold-light); font-family: 'DM Sans', sans-serif;
+        font-size: 14px; font-weight: 700; padding: 6px 8px 6px 4px;
+        border-radius: 8px; transition: background .18s, color .18s;
+        white-space: nowrap; flex-shrink: 0;
+    }
+    .mp-crumb-home:hover { background: rgba(255,255,255,.1); }
+    .mp-crumb-sep { color: rgba(255,255,255,.35); font-size: 14px; flex-shrink: 0; }
+    .mp-crumb-current {
+        font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+        color: rgba(255,255,255,.7); display: flex; align-items: center; gap: 6px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .mp-icon-btn {
+        background: rgba(255,255,255,.12); border: none; border-radius: 8px;
+        color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .2s;
+    }
+    .mp-icon-btn:hover { background: rgba(255,255,255,.22); }
+    @media (max-width: 560px) {
+        .mp-crumb-current { display: none; }
+        .mp-crumb-sep { display: none; }
+    }
+
+    /* ── Footer ── */
+    footer { flex-shrink: 0; background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px 22px; font-size: 13px; }
+    footer a { color: var(--gold-light); text-decoration: none; transition: opacity .2s; }
+    footer a:hover { opacity: .75; }
+
+    /* ══════════════════════════ CABECERA DEL PROBLEMA ══════════════════════════ */
+    .pv-main { max-width: 820px; margin: 0 auto; padding: 26px 20px 60px; flex: 1 0 auto; width: 100%; }
+
+    .pv-q-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--navy); color: var(--gold-light);
+        font-size: 12px; font-weight: 800; letter-spacing: .3px;
+        padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+    }
+    [data-theme="dark"] .pv-q-badge { background: var(--gold); color: #1a1206; }
+    .pv-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px; margin: 0 0 6px; line-height: 1.25; }
+    .pv-fuente { color: var(--text-muted); font-size: 13.5px; margin: 0 0 22px; }
+
+    .pv-tabs { display: flex; gap: 8px; margin-bottom: 22px; border-bottom: 1px solid var(--border); }
+    .pv-tab {
+        background: none; border: none; cursor: pointer; padding: 10px 4px;
+        margin-right: 18px; font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 700;
+        color: var(--text-muted); border-bottom: 2.5px solid transparent; transition: color .18s, border-color .18s;
+    }
+    .pv-tab:hover { color: var(--text); }
+    .pv-tab.activo { color: var(--text); border-bottom-color: var(--gold); }
+
+    .pv-articulo {
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+        padding: 30px 32px; box-shadow: 0 2px 14px rgba(4,18,43,.06);
+    }
+    @media (max-width: 560px) { .pv-articulo { padding: 20px 18px; } }
+
+    .pv-creditos {
+        margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--border);
+        font-size: 12px; color: var(--text-muted); line-height: 1.6;
+    }
+    .pv-estado { padding: 60px 20px; text-align: center; color: var(--text-muted); font-size: 14px; }
+
+    @media (max-width: 560px) { .pv-heading { font-size: 21px; } }
+
+    /* ══════════════════════════ CONTENIDO DEL PROBLEMA (pc-*) ══════════════════════════ */
+    .pv-articulo p { line-height: 1.68; margin: 0 0 14px; }
+    .pv-articulo em { color: var(--text); }
+
+    .pc-q-title {
+        font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px;
+        margin: 0 0 18px !important; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .pc-total-chip {
+        font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+        color: var(--navy); background: rgba(201,162,39,.18);
+        padding: 4px 12px; border-radius: 999px; white-space: nowrap;
+    }
+    [data-theme="dark"] .pc-total-chip { color: var(--gold-light); background: rgba(212,168,42,.16); }
+
+    .pc-intro p:first-child { margin-top: 0; }
+
+    .pc-eq {
+        font-family: 'JetBrains Mono', monospace; font-size: 15px; text-align: center;
+        background: rgba(4,18,43,.035); border-radius: 8px; padding: 12px 14px;
+        margin: 4px 0 16px !important; line-height: 1.8; overflow-x: auto;
+    }
+    [data-theme="dark"] .pc-eq { background: rgba(255,255,255,.04); }
+    .pc-eq-small { font-size: 13px; }
+    .pc-eq-label { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-muted); }
+    .pc-formula-inline { font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+
+    .pc-part { display: flex; gap: 10px; margin: 4px 0 16px; }
+    .pc-part-label {
+        flex-shrink: 0; font-weight: 800; color: var(--navy); background: rgba(4,18,43,.06);
+        border-radius: 7px; padding: 2px 9px; height: fit-content; font-size: 14px;
+    }
+    [data-theme="dark"] .pc-part-label { color: var(--gold-light); background: rgba(255,255,255,.08); }
+    .pc-part-body { flex: 1; min-width: 0; }
+    .pc-part-body p:last-child { margin-bottom: 0; }
+    .pc-sub { display: flex; gap: 8px; margin: 6px 0; padding-left: 4px; }
+    .pc-sub-label { flex-shrink: 0; font-weight: 700; color: var(--text-muted); font-size: 13.5px; }
+    .pc-sub p { margin: 0 !important; }
+
+    .pc-compounds { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 18px; }
+    .pc-compound {
+        display: flex; flex-direction: column; gap: 3px;
+        background: rgba(4,18,43,.035); border: 1px solid var(--border);
+        border-radius: 10px; padding: 8px 12px; min-width: 140px;
+    }
+    [data-theme="dark"] .pc-compound { background: rgba(255,255,255,.03); }
+    .pc-compound-name { font-size: 12.5px; font-weight: 700; color: var(--text); }
+    .pc-compound-formula { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-muted); }
+    .pc-compound-yes { border-color: var(--green); background: rgba(31,122,77,.08); }
+    .pc-compound-yes .pc-compound-formula { color: var(--green); font-weight: 600; }
+    .pc-compound-no { opacity: .65; }
+
+    .pc-answer {
+        border-left: 3px solid var(--gold); padding: 4px 0 4px 16px; margin: 4px 0 20px;
+    }
+    .pc-answer-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .pc-marks {
+        font-size: 11px; font-weight: 700; color: var(--gold); background: rgba(201,162,39,.14);
+        padding: 2px 9px; border-radius: 999px;
+    }
+    [data-theme="dark"] .pc-marks { background: rgba(212,168,42,.14); }
+    .pc-note {
+        font-size: 13px; font-style: italic; color: var(--text-muted);
+        background: rgba(4,18,43,.03); border-radius: 8px; padding: 9px 12px; margin: 8px 0 0 !important;
+    }
+    [data-theme="dark"] .pc-note { background: rgba(255,255,255,.03); }
+
+    .pc-table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 14px; }
+    .pc-table th, .pc-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: center; }
+    .pc-table th { background: rgba(4,18,43,.04); font-weight: 700; }
+    [data-theme="dark"] .pc-table th { background: rgba(255,255,255,.05); }
+
+    .pc-dotcross { display: flex; justify-content: center; margin: 10px 0; }
+    .pc-dotcross svg { width: 260px; height: auto; }
+    .pc-dc-atom-circle { fill: var(--card-bg); stroke: var(--text); stroke-width: 1.4; }
+    .pc-dc-atom-label { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+    .pc-dc-dot { fill: var(--navy); }
+    [data-theme="dark"] .pc-dc-dot { fill: var(--gold-light); }
+    .pc-dc-cross { font-size: 15px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
+</style>
+</head>
+<body>
+
+<div class="mp-topbar">
+    <div class="mp-breadcrumb">
+        <button class="mp-crumb-home" onclick="location.href='../Banco_Problemas.html'" aria-label="Volver">
+            ← <span id="pv-back-label">Banco de Problemas</span>
+        </button>
+        <span class="mp-crumb-sep">›</span>
+        <span class="mp-crumb-current" id="pv-crumb-actual">📝</span>
+    </div>
+    <div class="mp-topbar-actions">
+        <button class="mp-icon-btn" id="pv-theme-btn" onclick="pvToggleThemeMode()" title="Tema">🌙</button>
+        <button class="mp-icon-btn" id="pv-lang-btn" onclick="pvToggleIdioma()" title="Idioma / Language">ES</button>
+    </div>
+</div>
+
+<div class="pv-main" id="pv-main">
+    <div class="pv-estado" id="pv-estado">⏳ Cargando…</div>
+</div>
+
+<footer>
+    <p id="pv-foot-back"><a href="../Banco_Problemas.html">← Volver al Banco de Problemas</a></p>
+    <p style="font-size:12px;opacity:.5;margin-top:10px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
+</footer>
+
+<script>
+const _PVT = {
+    es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta',
+          error: 'No se pudo cargar este problema.', volver: '← Volver al Banco de Problemas' },
+    en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer',
+          error: 'This problem could not be loaded.', volver: '← Back to Problem Bank' }
+};
+function _pvLang() {
+    try {
+        const g = localStorage.getItem('lang');
+        if (g) return g;
+        const navLang = (navigator.language || 'es').toLowerCase();
+        return navLang.startsWith('en') ? 'en' : 'es';
+    } catch(e) { return 'es'; }
+}
+function _pvT(key) { return (_PVT[_pvLang()] || _PVT.es)[key]; }
+
+function pvAplicarTema() {
+    let dark;
+    try {
+        const g = localStorage.getItem('theme');
+        dark = g ? g === 'dark' : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch(e) { dark = false; }
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('pv-theme-btn').textContent = dark ? '🌙' : '☀️';
+}
+function pvToggleThemeMode() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    document.getElementById('pv-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+function pvToggleIdioma() {
+    const next = _pvLang() === 'es' ? 'en' : 'es';
+    try { localStorage.setItem('lang', next); } catch(e) {}
+    pvRender();
+}
+pvAplicarTema();
+
+// ── Parámetros de la URL ──
+const _pvParams = new URLSearchParams(location.search);
+const _pvId = _pvParams.get('id') || '';
+let _pvTab = _pvParams.get('tab') === 'respuesta' ? 'respuesta' : 'enunciado';
+
+// ── Carga de contenido: mismo patrón que CNQ_data.html / professor_data.html
+//    (fetch + DOMParser + inyectar el <script> real, no un parser JSON casero).
+//    Esto permite que el contenido sea HTML real en español, con comillas,
+//    subíndices, tablas, etc. sin restricciones. ──
+let _pvDatos = null;
+async function _pvCargar() {
+    const resp = await fetch('problemas_contenido.html');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const html = await resp.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const el = doc.getElementById('problemas-contenido');
+    if (!el) throw new Error('No se encontró #problemas-contenido en problemas_contenido.html');
+
+    const s = document.createElement('script');
+    s.textContent = el.textContent;
+    document.head.appendChild(s);
+
+    return window.contenidoProblemas || {};
+}
+
+function pvSetTab(tab) {
+    _pvTab = tab;
+    const url = new URL(location.href);
+    url.searchParams.set('tab', tab);
+    history.replaceState(null, '', url);
+    pvRender();
+}
+
+function pvRender() {
+    if (!_pvDatos || !_pvDatos[_pvId]) return;
+    const p = _pvDatos[_pvId];
+    const l = _pvLang();
+    const titulo = p.titulo;
+
+    document.getElementById('pv-back-label').textContent = _pvT('back');
+    document.getElementById('pv-crumb-actual').textContent = '📝 ' + titulo;
+    document.getElementById('pv-lang-btn').textContent = l === 'es' ? 'ES' : 'EN';
+    document.getElementById('pv-foot-back').innerHTML = `<a href="../Banco_Problemas.html">${_pvT('volver')}</a>`;
+    document.title = titulo + ' — Sitial de Talentos';
+
+    const cuerpo = p[_pvTab] || '<p>Contenido no disponible.</p>';
+
+    document.getElementById('pv-main').innerHTML = `
+        <span class="pv-q-badge">${p.numero || ''}</span>
+        <h1 class="pv-heading">${titulo}</h1>
+        <p class="pv-fuente">${p.fuente || ''}</p>
+        <div class="pv-tabs">
+            <button class="pv-tab ${_pvTab === 'enunciado' ? 'activo' : ''}" onclick="pvSetTab('enunciado')">${_pvT('tabEnunciado')}</button>
+            <button class="pv-tab ${_pvTab === 'respuesta' ? 'activo' : ''}" onclick="pvSetTab('respuesta')">${_pvT('tabRespuesta')}</button>
+        </div>
+        <article class="pv-articulo">${cuerpo}</article>
+        ${p.creditos ? `<p class="pv-creditos">${p.creditos}</p>` : ''}
+    `;
+}
+
+async function pvInicializar() {
+    try {
+        _pvDatos = await _pvCargar();
+        if (!_pvDatos[_pvId]) throw new Error('Problema no encontrado: ' + _pvId);
+        pvRender();
+    } catch (err) {
+        console.error(err);
+        document.getElementById('pv-main').innerHTML = `<div class="pv-estado">⚠️ ${_pvT('error')}</div>`;
+    }
+}
+pvInicializar();
+</script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="problemas-contenido">
+
+// ════════════════════════════════════════════════════════════════════
+// Contenido de cada problema (enunciado y respuesta), usado por
+// Problem_Data/visor.html.
+//
+// Todo el contenido es texto/HTML real, en español — no hay imágenes
+// ni PDFs. Las ecuaciones se escriben con <sub>/<sup>, las tablas de
+// corrección reproducen el mark scheme original, y las pocas
+// estructuras que de verdad necesitan un dibujo (p. ej. el diagrama de
+// puntos y cruces) se resuelven con un SVG pequeño e inline.
+// ════════════════════════════════════════════════════════════════════
+
+const contenidoProblemas = {
+
+    // ────────────────────────────────────────────────────────────────
+    // Q1 — Química en la piscina
+    // ────────────────────────────────────────────────────────────────
+    "q1-piscina": {
+        titulo: "Química en la piscina",
+        numero: "Q1",
+        fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA.",
+
+        enunciado: `
+            <p class="pc-q-title">Q1 — Esta pregunta trata sobre el pis en la piscina</p>
+
+            <div class="pc-intro">
+                <p>El nadador Michael Phelps, plusmarquista de medallas de oro olímpicas, dijo en una ocasión: <em>"Todo el mundo se hace pis en la piscina&hellip; el cloro lo mata, así que no pasa nada."</em></p>
+                <p>Las piscinas se desinfectan habitualmente con cloro. El cloro reacciona con el agua para formar varias especies desinfectantes, y el proceso debe controlarse cuidadosamente para evitar la liberación de gas Cl<sub>2</sub>.</p>
+                <p>El cloro reacciona con el agua de la siguiente manera:</p>
+            </div>
+            <p class="pc-eq">Cl<sub>2</sub> &nbsp;+&nbsp; H<sub>2</sub>O &nbsp;&rarr;&nbsp; HOCl &nbsp;+&nbsp; HCl</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body">
+                    <p>Indica los estados de oxidación del cloro en cada una de estas especies: Cl<sub>2</sub>, HOCl y HCl.</p>
+                </div>
+            </div>
+
+            <p>Por sí sola, esta reacción dejaría la piscina demasiado ácida, por lo que se añaden otros compuestos como el Na<sub>2</sub>CO<sub>3</sub>. Esto elimina iones H<sup>+</sup> y evita la reacción inversa que regeneraría Cl<sub>2</sub>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body">
+                    <p>Escribe la ecuación de la reacción entre el carbonato de sodio y el ácido hipocloroso (ácido clórico(I), HOCl).</p>
+                </div>
+            </div>
+
+            <p>Una mala gestión de la piscina puede provocar una acumulación de iones clorato(V) (ClO<sub>3</sub><sup>&minus;</sup>). Esto se debe a la lenta desproporción de los iones clorato(I) (OCl<sup>&minus;</sup>) en ClO<sub>3</sub><sup>&minus;</sup> y Cl<sup>&minus;</sup>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Escribe la ecuación iónica de la desproporción de los iones clorato(I).</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Indica la forma geométrica del ion ClO<sub>3</sub><sup>&minus;</sup>.</p></div>
+                </div>
+            </div>
+
+            <p>La urea, (NH<sub>2</sub>)<sub>2</sub>CO, presente en la orina, se hidroliza para formar amoniaco y dióxido de carbono.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(d)</span>
+                <div class="pc-part-body"><p>Escribe la ecuación de esta reacción.</p></div>
+            </div>
+
+            <p>El ácido clórico(I), HOCl, puede reaccionar con este amoniaco para formar monocloramina (NH<sub>2</sub>Cl), dicloramina (NHCl<sub>2</sub>) y tricloramina (NCl<sub>3</sub>).</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(e)</span>
+                <div class="pc-part-body"><p>Dibuja un diagrama de puntos y cruces para la estructura de la NH<sub>2</sub>Cl.</p></div>
+            </div>
+
+            <p>La tricloramina, NCl<sub>3</sub>, es volátil y provoca el característico "olor a cloro" de las piscinas.</p>
+            <p>La ley de Henry establece que la concentración disuelta de un gas es proporcional a su presión parcial sobre el líquido. La constante de proporcionalidad se llama constante de la ley de Henry. Para la tricloramina en agua de piscina, esta constante vale 435 mol dm<sup>&minus;3</sup> atm<sup>&minus;1</sup>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(f)</span>
+                <div class="pc-part-body">
+                    <p>Para una concentración de NCl<sub>3</sub> de 5.0&times;10<sup>&minus;4</sup> mol dm<sup>&minus;3</sup> en el agua, calcula la presión parcial de equilibrio del NCl<sub>3</sub> sobre la piscina (en atm).</p>
+                </div>
+            </div>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q1 — Esta pregunta trata sobre el pis en la piscina <span class="pc-total-chip">Total: 8 puntos</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">2 puntos</span></div>
+                <table class="pc-table">
+                    <thead><tr><th>Cl<sub>2</sub></th><th>HOCl</th><th>HCl</th></tr></thead>
+                    <tbody><tr><td>0</td><td>+1 (o I)</td><td>&minus;1 (o &minus;I)</td></tr></tbody>
+                </table>
+                <p class="pc-note">Los tres correctos: 2 puntos. Dos correctos y uno incorrecto: 1 punto. Solo uno correcto: 0 puntos. Se acepta si falta el signo "+" en HOCl y solo han escrito "1".</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">Na<sub>2</sub>CO<sub>3</sub> + 2HOCl &rarr; 2NaOCl + H<sub>2</sub>O + CO<sub>2</sub></p>
+                <p class="pc-note">No se requieren estados de agregación. Se aceptan múltiplos de esta ecuación, y también Na<sub>2</sub>CO<sub>3</sub> + 2HOCl &rarr; 2NaOCl + H<sub>2</sub>CO<sub>3</sub>. No se acepta ninguna reacción en la que el NaCl aparezca como producto.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)(i)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">3OCl<sup>&minus;</sup> &rarr; ClO<sub>3</sub><sup>&minus;</sup> + 2Cl<sup>&minus;</sup></p>
+                <p class="pc-note">Se aceptan múltiplos de esta ecuación. No se acepta la versión no iónica (p. ej. 3NaOCl &rarr; NaClO<sub>3</sub> + 2NaCl), ya que se pedía explícitamente la ecuación iónica.</p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <p>Piramidal trigonal.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">(NH<sub>2</sub>)<sub>2</sub>CO + H<sub>2</sub>O &rarr; 2NH<sub>3</sub> + CO<sub>2</sub></p>
+                <p class="pc-note">Se aceptan múltiplos de esta ecuación.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div>
+                <div class="pc-dotcross">
+                    <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de puntos y cruces de NH2Cl">
+                        <circle cx="150" cy="80" r="34" class="pc-dc-atom-circle"/>
+                        <text x="150" y="88" class="pc-dc-atom-label">N</text>
+                        <circle cx="65" cy="80" r="30" class="pc-dc-atom-circle"/>
+                        <text x="65" y="88" class="pc-dc-atom-label">Cl</text>
+                        <circle cx="205" cy="35" r="24" class="pc-dc-atom-circle"/>
+                        <text x="205" y="43" class="pc-dc-atom-label">H</text>
+                        <circle cx="205" cy="125" r="24" class="pc-dc-atom-circle"/>
+                        <text x="205" y="133" class="pc-dc-atom-label">H</text>
+
+                        <!-- par enlazante N-Cl: dos puntos del N, dos cruces del Cl -->
+                        <circle cx="112" cy="74" r="2.4" class="pc-dc-dot"/>
+                        <circle cx="112" cy="86" r="2.4" class="pc-dc-dot"/>
+                        <text x="103" y="78" class="pc-dc-cross">&times;</text>
+                        <text x="103" y="90" class="pc-dc-cross">&times;</text>
+
+                        <!-- par enlazante N-H (arriba): puntos del N -->
+                        <circle cx="175" cy="58" r="2.4" class="pc-dc-dot"/>
+                        <circle cx="182" cy="64" r="2.4" class="pc-dc-dot"/>
+                        <text x="185" y="52" class="pc-dc-cross">&times;</text>
+
+                        <!-- par enlazante N-H (abajo) -->
+                        <circle cx="175" cy="102" r="2.4" class="pc-dc-dot"/>
+                        <circle cx="182" cy="96" r="2.4" class="pc-dc-dot"/>
+                        <text x="185" y="112" class="pc-dc-cross">&times;</text>
+
+                        <!-- par solitario en N -->
+                        <circle cx="150" cy="46" r="2.4" class="pc-dc-dot"/>
+                        <circle cx="158" cy="46" r="2.4" class="pc-dc-dot"/>
+
+                        <!-- 3 pares solitarios en Cl -->
+                        <circle cx="35" cy="65" r="2.2" class="pc-dc-dot"/><circle cx="35" cy="72" r="2.2" class="pc-dc-dot"/>
+                        <circle cx="30" cy="80" r="2.2" class="pc-dc-dot"/><circle cx="30" cy="87" r="2.2" class="pc-dc-dot"/>
+                        <circle cx="35" cy="95" r="2.2" class="pc-dc-dot"/><circle cx="35" cy="102" r="2.2" class="pc-dc-dot"/>
+                    </svg>
+                </div>
+                <p class="pc-note">Los puntos y las cruces pueden intercambiarse (Cl con puntos y N con cruces también es válido).</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">c = k &times; p(NCl<sub>3</sub>)</p>
+                <p class="pc-eq">p(NCl<sub>3</sub>) = ( 5.0&times;10<sup>&minus;4</sup> mol dm<sup>&minus;3</sup> ) / ( 435 mol dm<sup>&minus;3</sup> atm<sup>&minus;1</sup> )</p>
+                <p class="pc-eq"><strong>p(NCl<sub>3</sub>) = 1.15&times;10<sup>&minus;6</sup> atm</strong></p>
+            </div>
+        `
+    },
+
+    // ────────────────────────────────────────────────────────────────
+    // Q2 — El maloliente mundo de los isocianuros
+    // ────────────────────────────────────────────────────────────────
+    "q2-isocianidas": {
+        titulo: "El maloliente mundo de los isocianuros",
+        numero: "Q2",
+        fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA.",
+
+        enunciado: `
+            <p class="pc-q-title">Q2 — Esta pregunta trata sobre los isocianuros</p>
+
+            <div class="pc-intro">
+                <p>Los isocianuros son moléculas orgánicas con olores extremadamente desagradables. Los químicos los han descrito como "horribles", "extremadamente angustiantes" e incluso como "el Godzilla de los olores". Pese a ello, los isocianuros son intermedios importantes en muchas reacciones orgánicas.</p>
+            </div>
+            <p class="pc-eq">R&ndash;N<sup>+</sup>&equiv;C<sup>&minus;</sup>: &nbsp;&nbsp;&nbsp;<span class="pc-eq-label">(un isocianuro)</span></p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body"><p>Dibuja la estructura resonante del isocianuro indicado arriba. Indica todos los pares solitarios.</p></div>
+            </div>
+
+            <p>Los isocianuros pueden prepararse por sustitución nucleofílica. Cuando se añade AgCN al bromuro de alilo (CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;Br), los productos son el compuesto <strong>A</strong> y un precipitado de color crema. Repitiendo la reacción con NaCN en lugar de AgCN se obtiene el producto <strong>B</strong>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Dibuja la estructura del compuesto <strong>B</strong>.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Identifica el precipitado de color crema.</p></div>
+                </div>
+            </div>
+
+            <p>La concentración umbral a la que un isocianuro puede detectarse por el olfato es 8.0&times;10<sup>&minus;8</sup> mol dm<sup>&minus;3</sup>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body"><p>Calcula el número de moléculas presentes en ese límite de detección, en una habitación de 50 m<sup>3</sup> de volumen.</p></div>
+            </div>
+
+            <p>Los isocianuros también pueden obtenerse por deshidratación del compuesto <strong>C</strong>. El compuesto <strong>C</strong> puede hidrolizarse para dar la amina R&ndash;NH<sub>2</sub> y el compuesto <strong>D</strong>. El análisis elemental muestra que <strong>D</strong> tiene un 26.1&nbsp;% de carbono en masa, independientemente de la identidad de R.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(d)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Dibuja la estructura del compuesto <strong>C</strong>.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Dibuja la estructura del compuesto <strong>D</strong>.</p></div>
+                </div>
+            </div>
+
+            <p>Las aminas pueden reaccionar con triclorometano e hidróxido de sodio para formar isocianuros; esto se conoce como el <strong>test de Zaytsev</strong>. Un resultado positivo se indica por el olor a isocianuro. Solo algunas aminas dan positivo; las amidas no.</p>
+            <p>Una amina de fórmula C<sub>3</sub>H<sub>5</sub>NH<sub>2</sub> da positivo y forma el isocianuro <strong>A</strong> mostrado arriba, sin producir ningún otro producto orgánico.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(e)</span>
+                <div class="pc-part-body"><p>Escribe la ecuación de esta reacción para formar el isocianuro <strong>A</strong>. Escribe todas las especies como fórmulas moleculares.</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(f)</span>
+                <div class="pc-part-body">
+                    <p>Indica cuáles de los siguientes compuestos darían un resultado positivo en el test de Zaytsev:</p>
+                    <div class="pc-compounds">
+                        <div class="pc-compound"><span class="pc-compound-name">N-metilalilamina</span><span class="pc-compound-formula">CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;NH&ndash;CH<sub>3</sub></span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">piridina</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>5</sub>N</span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">butan-2-amina</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CH(NH<sub>2</sub>)&ndash;CH<sub>2</sub>&ndash;CH<sub>3</sub></span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">3-metoxianilina</span><span class="pc-compound-formula">CH<sub>3</sub>O&ndash;C<sub>6</sub>H<sub>4</sub>&ndash;NH<sub>2</sub></span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">N-metilformamida</span><span class="pc-compound-formula">HCO&ndash;NH&ndash;CH<sub>3</sub></span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">acetamida</span><span class="pc-compound-formula">CH<sub>3</sub>CONH<sub>2</sub></span></div>
+                        <div class="pc-compound"><span class="pc-compound-name">pirrolidina</span><span class="pc-compound-formula">C<sub>4</sub>H<sub>8</sub>NH (amina cíclica)</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <p>Los isocianuros pueden reaccionar con un ácido carboxílico y un aldehído o cetona en un solo paso para formar un único producto. Esto se llama la <strong>reacción de Passerini</strong>. R<sup>1</sup>&ndash;R<sup>4</sup> representan grupos sustituyentes variables.</p>
+            <p class="pc-eq">R<sup>1</sup>COOH &nbsp;+&nbsp; R<sup>2</sup>NC &nbsp;+&nbsp; R<sup>3</sup>R<sup>4</sup>C=O &nbsp;&rarr;&nbsp; R<sup>1</sup>COO&ndash;C(R<sup>3</sup>)(R<sup>4</sup>)&ndash;C(=O)NH&ndash;R<sup>2</sup></p>
+
+            <p>Un intermedio clave en la síntesis del fármaco antiviral <strong>telaprevir</strong>, el compuesto <strong>E</strong>, se forma mediante una reacción de Passerini, donde "R" representa el resto de la molécula de telaprevir:</p>
+            <p class="pc-eq pc-eq-small">E &nbsp;=&nbsp; ciclopropil&ndash;C(=O)NH&ndash;CH(CH<sub>2</sub>CH<sub>3</sub>)&ndash;C(=O)&ndash;[anillo bicíclico&ndash;R]&ndash;CH(O&ndash;C(=O)CH<sub>3</sub>)&ndash;&hellip;</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(g)</span>
+                <div class="pc-part-body"><p>Dibuja las tres moléculas que reaccionan para dar el compuesto <strong>E</strong> en la reacción de Passerini. No es necesario considerar la estereoquímica.</p></div>
+            </div>
+
+            <p>Combinando distintos isocianuros, ácidos carboxílicos y aldehídos/cetonas se pueden preparar muchos productos distintos.</p>
+            <p>La química <strong>Isobel</strong> tiene los siguientes compuestos en su armario:</p>
+            <div class="pc-compounds">
+                <div class="pc-compound"><span class="pc-compound-name">fenilisocianuro</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;NC</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">1-isocianopropano</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>&ndash;NC</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">acetona</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CO&ndash;CH<sub>3</sub></span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">benzofenona</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;CO&ndash;C<sub>6</sub>H<sub>5</sub></span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido acético</span><span class="pc-compound-formula">CH<sub>3</sub>COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido 2-metilpropanoico</span><span class="pc-compound-formula">(CH<sub>3</sub>)<sub>2</sub>CH&ndash;COOH</span></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(h)</span>
+                <div class="pc-part-body"><p>Calcula el número de posibles productos de Passerini que podría preparar Isobel.</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(i)</span>
+                <div class="pc-part-body"><p>Sobre la estructura general del producto de Passerini, indica con un asterisco qué átomo de carbono tiene el potencial de ser un estereocentro.</p></div>
+            </div>
+
+            <p>La química <strong>Cynthia</strong> tiene los siguientes compuestos en su armario:</p>
+            <div class="pc-compounds">
+                <div class="pc-compound"><span class="pc-compound-name">fenilisocianuro</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;NC</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">1-isocianopropano</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>&ndash;NC</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido acético</span><span class="pc-compound-formula">CH<sub>3</sub>COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido 2-metilpropanoico</span><span class="pc-compound-formula">(CH<sub>3</sub>)<sub>2</sub>CH&ndash;COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">propanal</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CHO</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">benzaldehído</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>CHO</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">butan-2-ona</span><span class="pc-compound-formula">CH<sub>3</sub>CO&ndash;CH<sub>2</sub>CH<sub>3</sub></span></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(j)</span>
+                <div class="pc-part-body"><p>Calcula el número de posibles productos de Passerini que podría preparar Cynthia. Cuenta cada enantiómero como un producto único.</p></div>
+            </div>
+
+            <p>El químico <strong>Galvin</strong> tiene los siguientes compuestos en su armario:</p>
+            <div class="pc-compounds">
+                <div class="pc-compound"><span class="pc-compound-name">4-metil-1,2-diisocianobenceno</span><span class="pc-compound-formula">anillo de benceno con dos &ndash;NC en posiciones distintas + CH<sub>3</sub></span></div>
+                <div class="pc-compound"><span class="pc-compound-name">1,3-diisocianopropano</span><span class="pc-compound-formula">NC&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;NC</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">trisisocianometano</span><span class="pc-compound-formula">CH(NC)<sub>3</sub></span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">acetona</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CO&ndash;CH<sub>3</sub></span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido 2-hidroxi-4,5-dicarboxibenzoico</span><span class="pc-compound-formula">anillo de benceno con &ndash;OH y dos &ndash;COOH adicionales</span></div>
+                <div class="pc-compound"><span class="pc-compound-name">ácido 4-hidroxibenzoico</span><span class="pc-compound-formula">HO&ndash;C<sub>6</sub>H<sub>4</sub>&ndash;COOH</span></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(k)</span>
+                <div class="pc-part-body"><p>Calcula el número de posibles productos de reacción que podría preparar Galvin. Supón que cada producto resulta de la combinación de solo tres de las moléculas anteriores (un isocianuro, un ácido carboxílico y una cetona).</p></div>
+            </div>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q2 — Esta pregunta trata sobre los isocianuros <span class="pc-total-chip">Total: 18 puntos</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">R&ndash;N=C: &nbsp;&nbsp;<span class="pc-eq-label">(forma neutra: sin cargas formales, con dos pares solitarios sobre el carbono)</span></p>
+                <p class="pc-note">Deben aparecer ambos pares solitarios sobre el carbono para obtener el punto. La geometría/los ángulos de enlace alrededor del nitrógeno no se evalúan, solo el número de enlaces.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)(i)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>B</strong> = isocianuro de alilo &nbsp;<span class="pc-formula-inline">CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;NC</span></p>
+                <p class="pc-note">Se acepta si el grupo isocianuro se escribe de forma desarrollada o abreviada (NC).</p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <p>AgBr (bromuro de plata).</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">n = 8&times;10<sup>&minus;8</sup> mol dm<sup>&minus;3</sup> &times; 50&times;10<sup>3</sup> dm<sup>3</sup> = 4&times;10<sup>&minus;3</sup> mol</p>
+                <p class="pc-eq">moléculas = 4&times;10<sup>&minus;3</sup> mol &times; 6.022&times;10<sup>23</sup> mol<sup>&minus;1</sup> = <strong>2.4&times;10<sup>21</sup> moléculas</strong></p>
+                <p class="pc-note">Hay que recordar el factor de conversión 1000 entre m<sup>3</sup> y dm<sup>3</sup>. No hace falta escribir explícitamente "moléculas" como unidad.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)(i)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>C</strong> = una formamida N-sustituida, &nbsp;<span class="pc-formula-inline">R&ndash;NH&ndash;CHO</span></p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>D</strong> = ácido fórmico (metanoico), &nbsp;<span class="pc-formula-inline">HCOOH</span></p>
+                <p class="pc-note">Se acepta si el estudiante escribe "ácido fórmico", HCO<sub>2</sub>H o HCOOH, ya que demuestran conocer el grupo funcional. Si solo escriben la fórmula molecular CH<sub>2</sub>O<sub>2</sub> sin más, no se concede el punto (no demuestra el grupo funcional).</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">C<sub>3</sub>H<sub>5</sub>NH<sub>2</sub> + 3NaOH + CHCl<sub>3</sub> &rarr; C<sub>3</sub>H<sub>5</sub>NC + 3NaCl + 3H<sub>2</sub>O</p>
+                <p class="pc-note">No se requieren estados de agregación. Se aceptan múltiplos de esta ecuación.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">2 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">N-metilalilamina</span><span class="pc-compound-formula">amina secundaria &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">piridina</span><span class="pc-compound-formula">amina aromática sin H en N &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-compound-name">butan-2-amina</span><span class="pc-compound-formula">amina primaria &mdash; POSITIVO</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-compound-name">3-metoxianilina</span><span class="pc-compound-formula">amina primaria aromática &mdash; POSITIVO</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">N-metilformamida</span><span class="pc-compound-formula">amida &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">acetamida</span><span class="pc-compound-formula">amida &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">pirrolidina</span><span class="pc-compound-formula">amina secundaria &mdash; negativo</span></div>
+                </div>
+                <p class="pc-note">El test de Zaytsev solo da positivo con <strong>aminas primarias</strong> (alifáticas o aromáticas). 2 puntos si se marcan exactamente las 2 correctas y ninguna incorrecta. 1 punto si se marcan las 2 correctas más una incorrecta, o solo una correcta (con o sin una incorrecta). 0 puntos si se marcan dos o más incorrectas.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">3 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound"><span class="pc-compound-name">ácido ciclopropanocarboxílico</span><span class="pc-compound-formula">ciclopropil&ndash;COOH</span></div>
+                    <div class="pc-compound"><span class="pc-compound-name">isocianuro bicíclico</span><span class="pc-compound-formula">R<sup>2</sup>&ndash;NC (el anillo bicíclico saturado con el grupo R del telaprevir)</span></div>
+                    <div class="pc-compound"><span class="pc-compound-name">acetaldehído</span><span class="pc-compound-formula">CH<sub>3</sub>CHO</span></div>
+                </div>
+                <p class="pc-note">1 punto por cada estructura correcta. No se evalúa la estereoquímica.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">n = 2 isocianuros &times; 3 cetonas &times; 3 ácidos</p>
+                <p class="pc-eq"><strong>n = 18</strong></p>
+                <p class="pc-note">1 punto por el número correcto. No hace falta mostrar el desarrollo. No se concede el punto por el razonamiento si el número final es incorrecto.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">1 punto</span></div>
+                <p>El estereocentro es el carbono central que porta simultáneamente los grupos R<sup>3</sup>, R<sup>4</sup>, el grupo &ndash;O&ndash;C(=O)R<sup>1</sup> y el grupo &ndash;C(=O)NHR<sup>2</sup> (el carbono marcado con un asterisco en la fórmula general del producto de Passerini).</p>
+                <p class="pc-note">No se concede el punto si se marca cualquier otro átomo.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(j)</span><span class="pc-marks">2 puntos</span></div>
+                <p>Los sustituyentes R<sup>3</sup> y R<sup>4</sup> son distintos entre sí en los dos aldehídos (propanal y benzaldehído) y en una de las dos cetonas (butan-2-ona), lo que genera un estereocentro (y por tanto un par de enantiómeros) en cada uno de esos tres casos. La ciclopentanona es simétrica &mdash; R<sup>3</sup> y R<sup>4</sup> forman parte del mismo anillo &mdash; y no genera estereocentro. Esto da 7 posibilidades para el compañero carbonílico (2+2+2+1 = 7).</p>
+                <p class="pc-eq">n = 2 isocianuros &times; 7 (aldehídos/cetonas, contando enantiómeros) &times; 3 ácidos</p>
+                <p class="pc-eq"><strong>n = 42</strong></p>
+                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial. No hace falta mostrar el desarrollo.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(k)</span><span class="pc-marks">2 puntos</span></div>
+                <p>Hay cinco grupos isocianuro químicamente distinguibles, dos grupos cetona químicamente distinguibles y cinco grupos ácido químicamente distinguibles (contando cada posición reactiva distinta dentro de las moléculas polifuncionales de Galvin como un grupo aparte).</p>
+                <p class="pc-eq">n = 5 isocianuros &times; 2 cetonas &times; 5 ácidos</p>
+                <p class="pc-eq"><strong>n = 50</strong></p>
+                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial. No hace falta mostrar el desarrollo.</p>
+            </div>
+        `
+    }
+
+};
+
+window.contenidoProblemas = contenidoProblemas;
+
+</script>
+</body>
+</html>
