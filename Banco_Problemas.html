@@ -196,6 +196,18 @@
         background: rgba(4,18,43,.06); color: var(--text-muted);
     }
     [data-theme="dark"] .bp-tema-tag { background: rgba(255,255,255,.08); }
+    .bp-q-badge {
+        display: inline-flex; align-items: center;
+        font-size: 11px; font-weight: 800; letter-spacing: .3px;
+        padding: 4px 9px; border-radius: 999px; color: #fff;
+        background: var(--navy); white-space: nowrap;
+    }
+    [data-theme="dark"] .bp-q-badge { background: var(--navy-light); }
+    .bp-card-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .bp-tema-especifico {
+        font-size: 11.5px; font-weight: 600; color: var(--gold);
+        margin: -6px 0 0;
+    }
     .bp-card-title {
         font-family: 'Playfair Display', serif; font-weight: 700; font-size: 17px;
         line-height: 1.32; margin: 0;
@@ -248,8 +260,7 @@
     <div class="bp-hero">
         <p class="bp-eyebrow" id="bp-eyebrow">Entrena por tu cuenta</p>
         <h1 class="bp-heading" id="bp-heading">Banco de Problemas</h1>
-        <p class="bp-lead" id="bp-lead-1">Una colección de problemas de química, cada uno con su respuesta, pensada para entrenar como lo harías de cara a un concurso u olimpiada. Puedes intentarlos por tu cuenta y comprobar tu solución cuando quieras.</p>
-        <p class="bp-lead" id="bp-lead-2">Los problemas están organizados por nivel de dificultad y por tema, para que puedas elegir el reto adecuado a tu etapa de preparación.</p>
+        <p class="bp-lead" id="bp-lead-1">Problemas de química con respuesta, organizados por dificultad y tema, para entrenar como lo harías de cara a una olimpiada.</p>
 
         <div class="bp-dif-legend">
             <div class="bp-dif-legend-item">
@@ -351,14 +362,15 @@ const _BPT = {
     es: {
         back: 'Home', title: 'Banco de Problemas',
         eyebrow: 'Entrena por tu cuenta', heading: 'Banco de Problemas',
+        lead1: 'Problemas de química con respuesta, organizados por dificultad y tema, para entrenar como lo harías de cara a una olimpiada.',
         leg1: 'Nivel Nacional / Centroamericana (CNQ, OCACQ)',
         leg2: 'Nivel Iberoamericano y otras olimpiadas (OIAQ y afines)',
         leg3: 'Nivel IChO, Mendeléiev y olimpiadas chinas',
         transicion: 'Busca tu próximo problema',
-        searchPlaceholder: '🔎 Buscar por título, tema o fuente…',
+        searchPlaceholder: '🔎 Buscar por título, tema, fuente o contenido…',
         reset: 'Limpiar filtros',
         lblDificultad: 'Dificultad', lblTema: 'Tema',
-        dif1: 'Dificultad 1', dif2: 'Dificultad 2', dif3: 'Dificultad 3',
+        dif1: 'Dificultad 1', dif2: 'Dificultad 2', dif3: 'Dificultad 3', difLabel: 'Dificultad',
         temaInorganica: 'Inorgánica', temaFisica: 'Física', temaAnalitica: 'Analítica', temaOrganica: 'Orgánica',
         cargando: 'Cargando problemas…',
         vacio: 'No hay problemas que coincidan con estos filtros.',
@@ -369,16 +381,15 @@ const _BPT = {
     en: {
         back: 'Home', title: 'Problem Bank',
         eyebrow: 'Train on your own', heading: 'Problem Bank',
-        lead1: 'A collection of chemistry problems, each with its own answer, designed to train the way you would for a contest or olympiad. You can attempt them on your own and check your solution whenever you like.',
-        lead2: 'Problems are organized by difficulty level and topic, so you can pick the right challenge for your stage of preparation.',
+        lead1: 'Chemistry problems with answers, organized by difficulty and topic, to train the way you would for an olympiad.',
         leg1: 'National / Central American level (CNQ, OCACQ)',
         leg2: 'Ibero-American level and other olympiads (OIAQ and similar)',
         leg3: 'IChO, Mendeleev and Chinese olympiad level',
         transicion: 'Find your next problem',
-        searchPlaceholder: '🔎 Search by title, topic or source…',
+        searchPlaceholder: '🔎 Search by title, topic, source or content…',
         reset: 'Clear filters',
         lblDificultad: 'Difficulty', lblTema: 'Topic',
-        dif1: 'Difficulty 1', dif2: 'Difficulty 2', dif3: 'Difficulty 3',
+        dif1: 'Difficulty 1', dif2: 'Difficulty 2', dif3: 'Difficulty 3', difLabel: 'Difficulty',
         temaInorganica: 'Inorganic', temaFisica: 'Physical', temaAnalitica: 'Analytical', temaOrganica: 'Organic',
         cargando: 'Loading problems…',
         vacio: 'No problems match these filters.',
@@ -404,7 +415,6 @@ function bpAplicarIdioma() {
     document.getElementById('bp-eyebrow').textContent = _bpT('eyebrow');
     document.getElementById('bp-heading').textContent = _bpT('heading');
     document.getElementById('bp-lead-1').textContent = _bpT('lead1');
-    document.getElementById('bp-lead-2').textContent = _bpT('lead2');
     document.getElementById('bp-leg-1').innerHTML = `<strong>${_bpT('dif1')}</strong> — ${_bpT('leg1')}`;
     document.getElementById('bp-leg-2').innerHTML = `<strong>${_bpT('dif2')}</strong> — ${_bpT('leg2')}`;
     document.getElementById('bp-leg-3').innerHTML = `<strong>${_bpT('dif3')}</strong> — ${_bpT('leg3')}`;
@@ -451,73 +461,61 @@ function bpToggleThemeMode() {
     document.getElementById('bp-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
 }
 
-bpAplicarIdioma();
 bpAplicarTema();
 
 // ════════════════════════════════════════════════════════════════════
-// CARGA DE PROBLEMAS DESDE Data/problemas_data.html
-// (mismo patrón que Data/media_data.html — const datosProblemas = [...])
-// Formato provisional de cada problema (se ajustará cuando definas el
-// formato definitivo de entrada):
+// CARGA DE PROBLEMAS DESDE Problem_Data/problemas_data.html
+// (mismo patrón que Data/CNQ_data.html / Data/professor_data.html:
+//  fetch + DOMParser + inyectar el <script> real de la página)
+//
+// Formato de cada problema (ver Problem_Data/problemas_data.html):
 //   {
+//     id: "cinetica-alimentos",
+//     numero: "Q1",                       // nº de pregunta en la fuente original (opcional)
 //     titulo: "Cinética de descomposición de alimentos",
 //     dificultad: 1,                      // 1, 2 ó 3
 //     temas: ["fisica"],                  // inorganica | fisica | analitica | organica
+//     temaEspecifico: "Cinética",         // subtema puntual (opcional)
 //     fuente: "TChO · Cuba 2026",
 //     descripcion: "Arrhenius, Michaelis-Menten y conservación de alimentos.",
-//     enunciado: "Problemas/cinetica-alimentos-enunciado.pdf",
-//     respuesta: "Problemas/cinetica-alimentos-respuesta.pdf"
+//     contenido: "texto íntegro del enunciado, solo para el buscador",
+//     enunciado: "Problem_Data/visor.html?id=cinetica-alimentos&tab=enunciado",
+//     respuesta: "Problem_Data/visor.html?id=cinetica-alimentos&tab=respuesta"
 //   }
+//
+// El enunciado y la respuesta en sí se escriben como HTML real en español
+// dentro de Problem_Data/problemas_contenido.html (sin imágenes ni PDFs),
+// y los muestra Problem_Data/visor.html con pestañas Enunciado/Respuesta.
 // ════════════════════════════════════════════════════════════════════
-function _bpRemoveJSLineComments(src) {
-    let out = '', inStr = false, strChar = '', escape = false, i = 0;
-    while (i < src.length) {
-        const c = src[i];
-        if (escape)                          { out += c; escape = false; i++; continue; }
-        if (c === '\\' && inStr)             { out += c; escape = true;  i++; continue; }
-        if (!inStr && (c === '"' || c === "'")) { inStr = true; strChar = c; out += c; i++; continue; }
-        if (inStr && c === strChar)          { inStr = false; out += c;  i++; continue; }
-        if (!inStr && c === '/' && src[i + 1] === '/') {
-            while (i < src.length && src[i] !== '\n') i++;
-            continue;
-        }
-        out += c; i++;
-    }
-    return out;
-}
-function _bpJsLiteralToJSON(src) {
-    return _bpRemoveJSLineComments(src)
-        .replace(/,(\s*[\]\}])/g, '$1')
-        .replace(/(^|[{,])\s*([^\s"'0-9{},\[\]:][^\s:,\]{}]*)\s*:/gm, (m, pre, key) => {
-            if (key.startsWith('"') || key.startsWith("'")) return m;
-            return `${pre} "${key.trim()}":`;
-        });
-}
-
 let _bpProblemasCache = null;
 async function _bpCargarProblemas() {
     if (_bpProblemasCache) return _bpProblemasCache;
-    const resp = await fetch('Data/problemas_data.html');
+
+    const resp = await fetch('Problem_Data/problemas_data.html');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const text = await resp.text();
+    const html = await resp.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const el = doc.getElementById('problemas-data');
+    if (!el) throw new Error('No se encontró #problemas-data en problemas_data.html');
 
-    const marker = text.indexOf('const datosProblemas = [');
-    if (marker === -1) throw new Error('No se encontró datosProblemas');
-    let dep = 0, i = text.indexOf('[', marker);
-    const start = i;
-    for (; i < text.length; i++) {
-        if (text[i] === '[') dep++;
-        else if (text[i] === ']') { dep--; if (dep === 0) break; }
-    }
-    const datos = JSON.parse(_bpJsLiteralToJSON(text.slice(start, i + 1)));
+    // Igual que con CNQ_data.html / professor_data.html: el archivo define
+    // datosProblemas como JS real (no JSON), así que ejecutamos el script
+    // en el contexto de la página para que quede disponible en window.
+    const s = document.createElement('script');
+    s.textContent = el.textContent;
+    document.head.appendChild(s);
 
+    const datos = window.datosProblemas || [];
     _bpProblemasCache = datos.map((p, idx) => ({
         id: p.id || ('p' + idx),
+        numero: (p.numero || '').trim(),
         titulo: (p.titulo || '').trim(),
         dificultad: Number(p.dificultad) || 1,
         temas: Array.isArray(p.temas) ? p.temas.map(t => (t || '').toLowerCase()) : [],
+        temaEspecifico: (p.temaEspecifico || '').trim(),
         fuente: (p.fuente || '').trim(),
         descripcion: (p.descripcion || '').trim(),
+        contenido: (p.contenido || '').trim(),
         enunciado: (p.enunciado || '').trim(),
         respuesta: (p.respuesta || '').trim()
     }));
@@ -564,7 +562,10 @@ function bpRenderizar() {
         if (_bpFiltroDificultad.size && !_bpFiltroDificultad.has(p.dificultad)) return false;
         if (_bpFiltroTema.size && !p.temas.some(t => _bpFiltroTema.has(t))) return false;
         if (texto) {
-            const bolsa = (p.titulo + ' ' + p.descripcion + ' ' + p.fuente + ' ' + p.temas.join(' ')).toLowerCase();
+            const bolsa = (
+                p.titulo + ' ' + p.descripcion + ' ' + p.fuente + ' ' + p.temas.join(' ') + ' ' +
+                p.temaEspecifico + ' ' + p.numero + ' ' + p.contenido
+            ).toLowerCase();
             if (!bolsa.includes(texto)) return false;
         }
         return true;
@@ -596,11 +597,15 @@ function bpRenderizar() {
 
         card.innerHTML = `
             <div class="bp-card-top">
-                <span class="bp-dif-badge" style="background:${difColor}">Dificultad ${p.dificultad}</span>
+                <div class="bp-card-badges">
+                    <span class="bp-dif-badge" style="background:${difColor}">${_bpT('difLabel')} ${p.dificultad}</span>
+                    ${p.numero ? `<span class="bp-q-badge">${p.numero}</span>` : ''}
+                </div>
                 <div class="bp-card-temas">${temasHtml}</div>
             </div>
             <h3 class="bp-card-title">${p.titulo || '—'}</h3>
             ${p.fuente ? `<p class="bp-card-fuente">${p.fuente}</p>` : ''}
+            ${p.temaEspecifico ? `<p class="bp-tema-especifico">${p.temaEspecifico}</p>` : ''}
             <p class="bp-card-desc">${p.descripcion || ''}</p>
             <div class="bp-card-actions">
                 <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="${tieneEnunciado ? `window.open('${p.enunciado}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
@@ -611,13 +616,15 @@ function bpRenderizar() {
     });
 }
 
+bpAplicarIdioma();
+
 async function bpInicializar() {
     const grid = document.getElementById('bp-grid');
     try {
         _bpTodos = await _bpCargarProblemas();
         bpRenderizar();
     } catch (err) {
-        console.error('Error cargando Data/problemas_data.html:', err);
+        console.error('Error cargando Problem_Data/problemas_data.html:', err);
         grid.innerHTML = `<div class="bp-estado">⚠️ ${_bpT('error')}</div>`;
     }
 }
