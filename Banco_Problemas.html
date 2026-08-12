@@ -106,9 +106,9 @@
         padding: 10px 14px; flex: 1 1 220px; min-width: 200px;
     }
     .bp-dif-legend-num {
-        flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+        flex-shrink: 0; min-width: 26px; height: 26px; border-radius: 13px; padding: 0 7px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 800; color: #fff;
+        font-size: 12px; font-weight: 800; color: #fff; letter-spacing: -1px;
     }
     .bp-dif-legend-text { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
     .bp-dif-legend-text strong { color: var(--text); }
@@ -183,6 +183,8 @@
     }
     @keyframes bpFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .bp-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(4,18,43,.14); }
+    .bp-card-clicable { cursor: pointer; }
+    .bp-card-clicable:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     .bp-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .bp-dif-badge {
         display: inline-flex; align-items: center; gap: 5px;
@@ -224,6 +226,8 @@
     .bp-btn-enunciado { background: var(--navy); color: #fff; }
     [data-theme="dark"] .bp-btn-enunciado { background: var(--navy-light); color: #fff; }
     .bp-btn-respuesta { background: var(--gold); color: #241c02; }
+    .bp-btn-share { flex: 0 0 auto; background: rgba(4,18,43,.08); color: var(--text); padding: 9px 12px; }
+    [data-theme="dark"] .bp-btn-share { background: rgba(255,255,255,.1); }
     .bp-btn:hover { opacity: .88; }
     .bp-btn[aria-disabled="true"] { opacity: .4; pointer-events: none; }
 
@@ -264,16 +268,16 @@
 
         <div class="bp-dif-legend">
             <div class="bp-dif-legend-item">
-                <span class="bp-dif-legend-num" style="background:#1b7a43;">1</span>
-                <span class="bp-dif-legend-text" id="bp-leg-1"><strong>Dificultad 1</strong> — Nivel Nacional / Centroamericana (CNQ, OCACQ)</span>
+                <span class="bp-dif-legend-num" style="background:#1b7a43;">★</span>
+                <span class="bp-dif-legend-text" id="bp-leg-1"><strong>★ Dificultad 1</strong> — Nivel Nacional / Centroamericana (CNQ, OCACQ)</span>
             </div>
             <div class="bp-dif-legend-item">
-                <span class="bp-dif-legend-num" style="background:#b8860b;">2</span>
-                <span class="bp-dif-legend-text" id="bp-leg-2"><strong>Dificultad 2</strong> — Nivel Iberoamericano y otras olimpiadas (OIAQ y afines)</span>
+                <span class="bp-dif-legend-num" style="background:#b8860b;">★★</span>
+                <span class="bp-dif-legend-text" id="bp-leg-2"><strong>★★ Dificultad 2</strong> — Nivel Iberoamericano y otras olimpiadas (OIAQ y afines)</span>
             </div>
             <div class="bp-dif-legend-item">
-                <span class="bp-dif-legend-num" style="background:#9a2020;">3</span>
-                <span class="bp-dif-legend-text" id="bp-leg-3"><strong>Dificultad 3</strong> — Nivel IChO, Mendeléiev y olimpiadas chinas</span>
+                <span class="bp-dif-legend-num" style="background:#9a2020;">★★★</span>
+                <span class="bp-dif-legend-text" id="bp-leg-3"><strong>★★★ Dificultad 3</strong> — Nivel IChO, Mendeléiev y olimpiadas chinas</span>
             </div>
         </div>
     </div>
@@ -290,19 +294,19 @@
         <div class="bp-filter-group">
             <p class="bp-filter-label" id="bp-lbl-dificultad">Dificultad</p>
             <div class="bp-chips" id="bp-chips-dificultad">
-                <button class="bp-chip" data-dif="1" onclick="bpToggleDificultad(1, this)"><span class="bp-chip-dot" style="background:#1b7a43;"></span>Dificultad 1</button>
-                <button class="bp-chip" data-dif="2" onclick="bpToggleDificultad(2, this)"><span class="bp-chip-dot" style="background:#b8860b;"></span>Dificultad 2</button>
-                <button class="bp-chip" data-dif="3" onclick="bpToggleDificultad(3, this)"><span class="bp-chip-dot" style="background:#9a2020;"></span>Dificultad 3</button>
+                <button class="bp-chip" data-dif="1" onclick="bpToggleDificultad(1, this)"><span class="bp-chip-dot" style="background:#1b7a43;"></span><span class="bp-dif-stars">★</span> <span data-dif-text>Dificultad 1</span></button>
+                <button class="bp-chip" data-dif="2" onclick="bpToggleDificultad(2, this)"><span class="bp-chip-dot" style="background:#b8860b;"></span><span class="bp-dif-stars">★★</span> <span data-dif-text>Dificultad 2</span></button>
+                <button class="bp-chip" data-dif="3" onclick="bpToggleDificultad(3, this)"><span class="bp-chip-dot" style="background:#9a2020;"></span><span class="bp-dif-stars">★★★</span> <span data-dif-text>Dificultad 3</span></button>
             </div>
         </div>
 
         <div class="bp-filter-group">
             <p class="bp-filter-label" id="bp-lbl-tema">Tema</p>
             <div class="bp-chips" id="bp-chips-tema">
-                <button class="bp-chip" data-tema="inorganica" onclick="bpToggleTema('inorganica', this)">🧪 <span data-i18n-tema="inorganica">Inorgánica</span></button>
-                <button class="bp-chip" data-tema="fisica" onclick="bpToggleTema('fisica', this)">⚛️ <span data-i18n-tema="fisica">Física</span></button>
-                <button class="bp-chip" data-tema="analitica" onclick="bpToggleTema('analitica', this)">🔬 <span data-i18n-tema="analitica">Analítica</span></button>
-                <button class="bp-chip" data-tema="organica" onclick="bpToggleTema('organica', this)">🧬 <span data-i18n-tema="organica">Orgánica</span></button>
+                <button class="bp-chip" data-tema="inorganica" onclick="bpToggleTema('inorganica', this)">🧪 Q <span data-i18n-tema="inorganica">Inorgánica</span></button>
+                <button class="bp-chip" data-tema="fisica" onclick="bpToggleTema('fisica', this)">⚛️ Q <span data-i18n-tema="fisica">Física</span></button>
+                <button class="bp-chip" data-tema="analitica" onclick="bpToggleTema('analitica', this)">🔬 Q <span data-i18n-tema="analitica">Analítica</span></button>
+                <button class="bp-chip" data-tema="organica" onclick="bpToggleTema('organica', this)">🧬 Q <span data-i18n-tema="organica">Orgánica</span></button>
             </div>
         </div>
     </div>
@@ -376,7 +380,8 @@ const _BPT = {
         vacio: 'No hay problemas que coincidan con estos filtros.',
         error: 'No se pudo cargar el banco de problemas en este momento.',
         contador1: 'problema encontrado', contadorN: 'problemas encontrados',
-        verEnunciado: '📄 Ver enunciado', verRespuesta: '🔑 Ver respuesta', proximamente: 'Próximamente'
+        verEnunciado: '📄 Ver enunciado', verRespuesta: '🔑 Ver respuesta', proximamente: 'Próximamente',
+        compartir: 'Compartir problema'
     },
     en: {
         back: 'Home', title: 'Problem Bank',
@@ -395,9 +400,28 @@ const _BPT = {
         vacio: 'No problems match these filters.',
         error: 'The problem bank could not be loaded right now.',
         contador1: 'problem found', contadorN: 'problems found',
-        verEnunciado: '📄 View problem', verRespuesta: '🔑 View answer', proximamente: 'Coming soon'
+        verEnunciado: '📄 View problem', verRespuesta: '🔑 View answer', proximamente: 'Coming soon',
+        compartir: 'Share problem'
     }
 };
+
+async function bpCompartir(id, titulo, btn) {
+    const url = new URL('Problem_Data/visor.html', location.href);
+    url.searchParams.set('id', id);
+    url.searchParams.set('tab', 'enunciado');
+    const href = url.toString();
+    try {
+        if (navigator.share) { await navigator.share({ title: titulo, url: href }); return; }
+    } catch (e) { /* cancelado: probamos portapapeles */ }
+    try {
+        await navigator.clipboard.writeText(href);
+        const original = btn.textContent;
+        btn.textContent = '✅';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+    } catch (e) {
+        prompt(_bpLang() === 'es' ? 'Copia este enlace:' : 'Copy this link:', href);
+    }
+}
 function _bpLang() {
     try {
         const guardado = localStorage.getItem('lang');
@@ -415,9 +439,9 @@ function bpAplicarIdioma() {
     document.getElementById('bp-eyebrow').textContent = _bpT('eyebrow');
     document.getElementById('bp-heading').textContent = _bpT('heading');
     document.getElementById('bp-lead-1').textContent = _bpT('lead1');
-    document.getElementById('bp-leg-1').innerHTML = `<strong>${_bpT('dif1')}</strong> — ${_bpT('leg1')}`;
-    document.getElementById('bp-leg-2').innerHTML = `<strong>${_bpT('dif2')}</strong> — ${_bpT('leg2')}`;
-    document.getElementById('bp-leg-3').innerHTML = `<strong>${_bpT('dif3')}</strong> — ${_bpT('leg3')}`;
+    document.getElementById('bp-leg-1').innerHTML = `<strong>★ ${_bpT('dif1')}</strong> — ${_bpT('leg1')}`;
+    document.getElementById('bp-leg-2').innerHTML = `<strong>★★ ${_bpT('dif2')}</strong> — ${_bpT('leg2')}`;
+    document.getElementById('bp-leg-3').innerHTML = `<strong>★★★ ${_bpT('dif3')}</strong> — ${_bpT('leg3')}`;
     document.getElementById('bp-transicion').textContent = _bpT('transicion');
     document.getElementById('bp-search').placeholder = _bpT('searchPlaceholder');
     document.getElementById('bp-reset-btn').textContent = _bpT('reset');
@@ -586,19 +610,29 @@ function bpRenderizar() {
         card.style.animationDelay = (Math.min(i, 20) * 0.03) + 's';
 
         const difColor = (_BP_DIF_META[p.dificultad] || _BP_DIF_META[1]).color;
+        const difStars = '★'.repeat(Math.max(1, Math.min(3, p.dificultad)));
         const temasHtml = p.temas.map(t => {
             const meta = _BP_TEMA_META[t];
             const label = _bpT('tema' + t.charAt(0).toUpperCase() + t.slice(1)) || t;
-            return `<span class="bp-tema-tag">${meta ? meta.icon + ' ' : ''}${label}</span>`;
+            return `<span class="bp-tema-tag">${meta ? meta.icon + ' ' : ''}Q ${label}</span>`;
         }).join('');
 
         const tieneEnunciado = !!p.enunciado;
         const tieneRespuesta = !!p.respuesta;
 
+        if (tieneEnunciado) {
+            card.classList.add('bp-card-clicable');
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            const abrir = () => window.open(p.enunciado, '_blank', 'noopener');
+            card.addEventListener('click', abrir);
+            card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); } });
+        }
+
         card.innerHTML = `
             <div class="bp-card-top">
                 <div class="bp-card-badges">
-                    <span class="bp-dif-badge" style="background:${difColor}">${_bpT('difLabel')} ${p.dificultad}</span>
+                    <span class="bp-dif-badge" style="background:${difColor}">${difStars}</span>
                     ${p.numero ? `<span class="bp-q-badge">${p.numero}</span>` : ''}
                 </div>
                 <div class="bp-card-temas">${temasHtml}</div>
@@ -608,8 +642,9 @@ function bpRenderizar() {
             ${p.temaEspecifico ? `<p class="bp-tema-especifico">${p.temaEspecifico}</p>` : ''}
             <p class="bp-card-desc">${p.descripcion || ''}</p>
             <div class="bp-card-actions">
-                <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="${tieneEnunciado ? `window.open('${p.enunciado}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
-                <button class="bp-btn bp-btn-respuesta" ${tieneRespuesta ? '' : 'aria-disabled="true"'} onclick="${tieneRespuesta ? `window.open('${p.respuesta}','_blank','noopener')` : ''}">${tieneRespuesta ? _bpT('verRespuesta') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneEnunciado ? `window.open('${p.enunciado}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-respuesta" ${tieneRespuesta ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneRespuesta ? `window.open('${p.respuesta}','_blank','noopener')` : ''}">${tieneRespuesta ? _bpT('verRespuesta') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-share" title="${_bpT('compartir')}" onclick="event.stopPropagation();bpCompartir('${p.id}','${(p.titulo||'').replace(/'/g,"\\'")}',this)">🔗</button>
             </div>
         `;
         grid.appendChild(card);
