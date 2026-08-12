@@ -92,6 +92,20 @@
 
             if (order === 1) {
                 svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
+            } else if (order === 2 && b[3] && b[3].ring) {
+                // Doble enlace de anillo: una línea completa + una línea corta
+                // interior, desplazada SIEMPRE hacia el centro del anillo.
+                const cx = px(b[3].ring.x), cy = py(b[3].ring.y);
+                svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
+                const mx = (P1.x + P2.x) / 2, my = (P1.y + P2.y) / 2;
+                let dx0 = cx - mx, dy0 = cy - my;
+                const dlen = Math.hypot(dx0, dy0) || 1;
+                dx0 = dx0 / dlen * 4.4; dy0 = dy0 / dlen * 4.4;
+                const bx = P2.x - P1.x, by = P2.y - P1.y, blen = Math.hypot(bx, by) || 1;
+                const ux = bx / blen, uy = by / blen, inset = blen * 0.18;
+                const ix1 = P1.x + ux * inset + dx0, iy1 = P1.y + uy * inset + dy0;
+                const ix2 = P2.x - ux * inset + dx0, iy2 = P2.y - uy * inset + dy0;
+                svg += `<line x1="${ix1}" y1="${iy1}" x2="${ix2}" y2="${iy2}" class="pc-skel-bond"/>`;
             } else if (order === 2) {
                 const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 3.6);
                 const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -3.6);
@@ -178,7 +192,11 @@
     // ---- fragmentos comunes ----
     function benzeneAt(cx, cy, startDeg) {
         const p = ring(cx, cy, 6, startDeg || 90);
-        return { atoms: atoms(p), bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]] };
+        const c = { x: cx, y: cy };
+        // Los dobles enlaces aromáticos llevan el centro del anillo en b[3].ring,
+        // para que renderSkeletal dibuje la línea corta SIEMPRE hacia el interior
+        // del anillo (como en una fórmula esquelética real), no hacia afuera.
+        return { atoms: atoms(p), bonds: [[0,1,2,{ring:c}],[1,2,1],[2,3,2,{ring:c}],[3,4,1],[4,5,2,{ring:c}],[5,0,1]] };
     }
     function mergeMol(parts) {
         // parts: array of {atoms, bonds, offset?} -> concatena reindexando bonds
@@ -186,7 +204,7 @@
         let base = 0;
         parts.forEach(p => {
             allAtoms = allAtoms.concat(p.atoms);
-            (p.bonds || []).forEach(b => allBonds.push([b[0] + base, b[1] + base, b[2] || 1]));
+            (p.bonds || []).forEach(b => allBonds.push([b[0] + base, b[1] + base, b[2] || 1, b[3]]));
             base += p.atoms.length;
         });
         return { atoms: allAtoms, bonds: allBonds };
@@ -508,55 +526,62 @@
 
     // ═══ Q3 — lawsone y tautomería ═══
 
+    // Esqueleto de naftaleno REALMENTE fusionado (comparte la arista C4a-C8a
+    // entre los dos anillos, en vez de dos hexágonos sueltos sin enlazar).
+    // Numeración: 0=C1 1=C2 2=C3 3=C4 4=C4a 5=C8a 6=C5 7=C6 8=C7 9=C8
+    function lawsoneSkeleton() {
+        const P = {
+            C1: { x: 0.87, y: 1 }, C2: { x: 1.73, y: 0.5 }, C3: { x: 1.73, y: -0.5 }, C4: { x: 0.87, y: -1 },
+            C4a: { x: 0, y: -0.5 }, C8a: { x: 0, y: 0.5 },
+            C5: { x: -0.87, y: -1 }, C6: { x: -1.73, y: -0.5 }, C7: { x: -1.73, y: 0.5 }, C8: { x: -0.87, y: 1 }
+        };
+        const pts = [P.C1, P.C2, P.C3, P.C4, P.C4a, P.C8a, P.C5, P.C6, P.C7, P.C8];
+        const ringB = { x: 0.867, y: 0 };   // centro del anillo de la quinona (C1-C2-C3-C4-C4a-C8a)
+        const ringA = { x: -0.867, y: 0 };  // centro del anillo aromático (C4a-C5-C6-C7-C8-C8a)
+        return { pts, ringA, ringB };
+    }
+    // Enlaces del anillo aromático (siempre iguales: benceno fusionado, Kekulé)
+    function lawsoneAromaticBonds(ringA) {
+        return [[4,6,1],[6,7,2,{ring:ringA}],[7,8,1],[8,9,2,{ring:ringA}],[9,5,1],[5,4,2,{ring:ringA}]];
+    }
+
     def('lawsone-ceto', () => {
-        const b1 = ring(-0.87, 0, 6, 90);
-        const b2 = ring(0.87, 0, 6, 90);
-        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
-                             { atoms: atoms(b2), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1]] }]);
-        // b2 vértices 6-11; añadimos dos C=O y un OH sobre el anillo de la quinona
-        const v = i => m.atoms[i];
-        const o4 = pt(v(7), 30, 1);   // C=O en posición 1 (comparte con b1)
-        const o1 = pt(v(10), -30, 1); // C=O en posición 4
-        const oh = pt(v(9), 90, 1);   // OH en posición 2
-        m.atoms.push({ x: o4.x, y: o4.y, label: 'O' });
-        m.atoms.push({ x: o1.x, y: o1.y, label: 'O' });
-        m.atoms.push({ x: oh.x, y: oh.y, label: 'OH' });
-        m.bonds.push([7, 12, 2], [10, 13, 2], [9, 14, 1]);
-        return m;
+        // Forma "tricetona": C1=O, C2=O, C4=O y C3 es un CH2 (sp3) — la
+        // forma que da nombre a "lawsone tiene tres grupos cetona".
+        const { pts, ringA } = lawsoneSkeleton();
+        const o1 = pt(pts[0], 90, 1), o2 = pt(pts[1], 30, 1), o4 = pt(pts[3], -90, 1);
+        const a = atoms(pts.concat([o1, o2, o4]), { 10: 'O', 11: 'O', 12: 'O' });
+        return { atoms: a, bonds: [
+            [5,0,1], [0,10,2], [0,1,1], [1,11,2], [1,2,1], [2,3,1], [3,12,2], [3,4,1],
+            ...lawsoneAromaticBonds(ringA)
+        ] };
     });
 
     def('lawsone-enol-a', () => {
-        // tautómero enólico sin puente de H intramolecular (OH en posición 4, C=O en 1, OH en 2)
-        const b1 = ring(-0.87, 0, 6, 90);
-        const b2 = ring(0.87, 0, 6, 90);
-        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
-                             { atoms: atoms(b2), bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,1],[5,0,1]] }]);
-        const v = i => m.atoms[i];
-        const o4 = pt(v(7), 30, 1);
-        const oh1 = pt(v(10), -30, 1);
-        const oh2 = pt(v(9), 90, 1);
-        m.atoms.push({ x: o4.x, y: o4.y, label: 'O' });
-        m.atoms.push({ x: oh1.x, y: oh1.y, label: 'OH' });
-        m.atoms.push({ x: oh2.x, y: oh2.y, label: 'OH' });
-        m.bonds.push([7, 12, 2], [10, 13, 1], [9, 14, 1]);
-        return m;
+        // Tautómero enólico SIN puente de H (H migra de C3 a O4: C3=C4, C4-OH;
+        // C1=O y C2=O se mantienen — el OH en posición 4 no tiene ningún
+        // carbonilo vecino con el que formar puente de hidrógeno).
+        const { pts, ringA } = lawsoneSkeleton();
+        const o1 = pt(pts[0], 90, 1), o2 = pt(pts[1], 30, 1), oh4 = pt(pts[3], -90, 1);
+        const a = atoms(pts.concat([o1, o2, oh4]), { 10: 'O', 11: 'O', 12: 'OH' });
+        return { atoms: a, bonds: [
+            [5,0,1], [0,10,2], [0,1,1], [1,11,2], [1,2,1], [2,3,2], [3,12,1], [3,4,1],
+            ...lawsoneAromaticBonds(ringA)
+        ] };
     });
 
     def('lawsone-enol-b', () => {
-        // segundo tautómero enólico, estabilizado por puente de H intramolecular (OH junto a C=O adyacente)
-        const b1 = ring(-0.87, 0, 6, 90);
-        const b2 = ring(0.87, 0, 6, 90);
-        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
-                             { atoms: atoms(b2), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,1]] }]);
-        const v = i => m.atoms[i];
-        const oh4 = pt(v(7), 30, 1);
-        const o1 = pt(v(10), -30, 1);
-        const oh2 = pt(v(9), 90, 1);
-        m.atoms.push({ x: oh4.x, y: oh4.y, label: 'OH' });
-        m.atoms.push({ x: o1.x, y: o1.y, label: 'O' });
-        m.atoms.push({ x: oh2.x, y: oh2.y, label: 'OH' });
-        m.bonds.push([7, 12, 1], [10, 13, 2], [9, 14, 1]);
-        return m;
+        // Tautómero enólico CON puente de H intramolecular (H migra de C3 a O2:
+        // C2=C3, C2-OH; C1=O y C4=O se mantienen — el OH de la posición 2 es
+        // orto al C1=O, permitiendo el puente de hidrógeno). Esta es la forma
+        // habitualmente dibujada como "lawsona" (2-hidroxi-1,4-naftoquinona).
+        const { pts, ringA } = lawsoneSkeleton();
+        const o1 = pt(pts[0], 90, 1), oh2 = pt(pts[1], 30, 1), o4 = pt(pts[3], -90, 1);
+        const a = atoms(pts.concat([o1, oh2, o4]), { 10: 'O', 11: 'OH', 12: 'O' });
+        return { atoms: a, bonds: [
+            [5,0,1], [0,10,2], [0,1,1], [1,11,1], [1,2,2], [2,3,1], [3,12,2], [3,4,1],
+            ...lawsoneAromaticBonds(ringA)
+        ] };
     });
 
     def('ciclohexanona', () => {
@@ -633,6 +658,15 @@
     });
 
     // ═══ Q4 — síntesis de la tartrazina ═══
+
+    def('nitrobenceno', () => {
+        const b = benzeneAt(0, 0);
+        const n = pt(b.atoms[0], 90, 1);
+        const o1 = pt(n, 150, 1), o2 = pt(n, 30, 1);
+        b.atoms.push({ x: n.x, y: n.y, label: 'N', charge: '+' }, { x: o1.x, y: o1.y, label: 'O', charge: '\u2212' }, { x: o2.x, y: o2.y, label: 'O' });
+        b.bonds.push([0, 6, 1], [6, 7, 1], [6, 8, 2]);
+        return b;
+    });
 
     def('anilina', () => {
         const b = benzeneAt(0, 0);
@@ -718,6 +752,122 @@
         return m;
     });
 
+    // ═══ Q4 — polienos conjugados y carotenos ═══
+
+    def('butadieno', () => {
+        // CH2=CH-CH=CH2 (1,3-butadieno)
+        const c = zz(0, 0, 4);
+        return { atoms: atoms(c), bonds: [[0,1,2],[1,2,1],[2,3,2]] };
+    });
+
+    def('hexatrieno', () => {
+        // CH2=CH-CH=CH-CH=CH2 (1,3,5-hexatrieno)
+        const c = zz(0, 0, 6);
+        return { atoms: atoms(c), bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2]] };
+    });
+
+    // Anillo terminal tipo beta-ionona (trimetilciclohexeno) con una cadena
+    // de polieno saliendo de él — usado para representar de forma
+    // simplificada (no 100% IUPAC) el esqueleto de los carotenos.
+    function ioninoRing(cx, cy, dobleEnAnillo) {
+        const p = ring(cx, cy, 6, 90);
+        const me1 = pt(p[4], -150, 0.85), me2 = pt(p[4], -90, 0.85);
+        const me3 = pt(p[2], 30, 0.85);
+        const bonds = dobleEnAnillo
+            ? [[0,1,1],[1,2,1],[2,3,2],[3,4,1],[4,5,1],[5,0,1]]
+            : [[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,5,1],[5,0,1]];
+        const a = atoms(p.concat([me1, me2, me3]));
+        return { atoms: a, bonds: bonds.concat([[4,6,1],[4,7,1],[2,8,1]]), attachIdx: 0 };
+    }
+    function caroteneChain(startX) {
+        // Cadena central conjugada de 11 dobles enlaces con metilos alternos
+        // (representación esquemática, no numeración IUPAC exacta).
+        const pts = zz(startX, 0, 15, false);
+        const meIdxs = [1, 4, 7, 10, 13];
+        const meAtoms = [];
+        const bonds = [];
+        for (let i = 0; i < pts.length - 1; i++) bonds.push([i, i + 1, (i % 3 === 1) ? 1 : 2]);
+        meIdxs.forEach((idx, k) => {
+            const dir = (idx % 4 < 2) ? 90 : -90;
+            const m = pt(pts[idx], dir, 0.85);
+            meAtoms.push(m);
+            bonds.push([idx, pts.length + k, 1]);
+        });
+        return { atoms: atoms(pts.concat(meAtoms)), bonds, len: pts.length };
+    }
+    def('beta-caroteno-simplificado', () => {
+        const ringL = ioninoRing(-8.2, 0, false);
+        const chain = caroteneChain(-6.8);
+        const ringR = ioninoRing(-6.8 + (chain.len - 1) * Math.cos(30 * DEG) + 1.3, 0, false);
+        const m = mergeMol([ringL, chain]);
+        const chainLastIdx = ringL.atoms.length + chain.len - 1;
+        const ringRBase = m.atoms.length;
+        const m2 = mergeMol([m, ringR]);
+        m2.bonds.push([1, ringL.atoms.length, 1]); // anillo izq. -> inicio cadena
+        m2.bonds.push([chainLastIdx, ringRBase + 1, 1]); // fin cadena -> anillo der.
+        return m2;
+    });
+    def('alfa-caroteno-simplificado', () => {
+        // Igual que el beta-caroteno pero con un doble enlace desplazado en
+        // uno de los anillos terminales (representación esquemática).
+        const ringL = ioninoRing(-8.2, 0, true);
+        const chain = caroteneChain(-6.8);
+        const ringR = ioninoRing(-6.8 + (chain.len - 1) * Math.cos(30 * DEG) + 1.3, 0, false);
+        const m = mergeMol([ringL, chain]);
+        const chainLastIdx = ringL.atoms.length + chain.len - 1;
+        const ringRBase = m.atoms.length;
+        const m2 = mergeMol([m, ringR]);
+        m2.bonds.push([1, ringL.atoms.length, 1]);
+        m2.bonds.push([chainLastIdx, ringRBase + 1, 1]);
+        return m2;
+    });
+
+    def('anilina-simple', () => {
+        const b = benzeneAt(0, 0);
+        const nh2 = pt(b.atoms[0], 90, 1);
+        b.atoms.push({ x: nh2.x, y: nh2.y, label: 'NH2' });
+        b.bonds.push([0, 6, 1]);
+        return b;
+    });
+
+    def('telaprevir-E', () => {
+        // Representación esquemática (simplificada) del intermedio E:
+        // ciclopropano-C(=O)-NH-CH(Et)-C(=O)-N(anillo pirrolidínico con -OAc y -R)
+        const cp = ring(-9.2, 0.2, 3, 90);
+        const c1 = pt(cp[0], -10, 1);
+        const o1 = pt(c1, 90, 1);
+        const nh = pt(c1, -55, 1);
+        const ch = pt(nh, -10, 1);
+        const et1 = pt(ch, 90, 1), et2 = pt(et1, 40, 1);
+        const c2 = pt(ch, -55, 1);
+        const o2 = pt(c2, -90, 1);
+        const ringN = pt(c2, -15, 1);
+        const pRing = ring(ringN.x + 1.05, ringN.y - 0.05, 5, 162);
+        const oac_o = pt(pRing[2], -70, 1);
+        const oac_c = pt(oac_o, -20, 1);
+        const oac_o2 = pt(oac_c, 90, 1);
+        const oac_me = pt(oac_c, -40, 1);
+        const rGroup = pt(pRing[3], -100, 1);
+        const atomsArr = atoms(cp.concat([c1, o1, nh, ch, et1, et2, c2, o2]), { 4: 'O', 5: 'NH', 10: 'O' })
+            .concat(atoms(pRing, { 0: 'N' }))
+            .concat(atoms([oac_o, oac_c, oac_o2, oac_me, rGroup], { 0: 'O', 2: 'O', 4: 'R' }));
+        const bonds = [
+            [0,1,1],[1,2,1],[2,0,1],           // ciclopropano
+            [0,3,1],                             // ciclopropano - C1
+            [3,4,2],                             // C1=O
+            [3,5,1],                             // C1-NH
+            [5,6,1],                             // NH-CH
+            [6,7,1],[7,8,1],                     // CH-CH2-CH3 (etilo)
+            [6,9,1],                             // CH-C2
+            [9,10,2],                            // C2=O
+            [9,11,1],                            // C2-N(anillo)
+            [11,12,1],[12,13,1],[13,14,1],[14,15,1],[15,11,1], // anillo pirrolidínico
+            [13,16,1],[16,17,1],[17,18,2],[17,19,1],           // O-C(=O)-CH3 (éster)
+            [14,20,1]                            // -R
+        ];
+        return { atoms: atomsArr, bonds };
+    });
+
     // ═══ Q3 — pares de tautómeros con P y N (no carbonados) ═══
 
     def('fosforo-tautomero-a', () => {
@@ -781,17 +931,22 @@
     // ════════════════════════════════════════════════════════════════
     // API pública
     // ════════════════════════════════════════════════════════════════
-    function renderMolById(id) {
+    // Tamaños predefinidos para moléculas: "sm" (rejillas con muchos
+    // compuestos), "md" (por defecto) y "lg" (una sola molécula protagonista).
+    const SIZE_PRESETS = { sm: { unit: 26, pad: 14 }, md: { unit: 36, pad: 20 }, lg: { unit: 46, pad: 24 } };
+
+    function renderMolById(id, size) {
         const mol = get(id);
         if (!mol) return '<span class="pc-mol-missing">[' + id + ']</span>';
-        return renderSkeletal(mol);
+        return renderSkeletal(mol, SIZE_PRESETS[size] || SIZE_PRESETS.md);
     }
 
     function renderAll(root) {
         root = root || document;
         root.querySelectorAll('[data-mol]').forEach(el => {
-            el.innerHTML = renderMolById(el.getAttribute('data-mol'));
-            el.classList.add('pc-mol-rendered');
+            const size = el.getAttribute('data-size') || 'md';
+            el.innerHTML = renderMolById(el.getAttribute('data-mol'), size);
+            el.classList.add('pc-mol-rendered', 'pc-mol-' + size);
         });
         root.querySelectorAll('[data-orbitals]').forEach(el => {
             const N = parseInt(el.getAttribute('data-n') || '6', 10);
@@ -799,9 +954,135 @@
             el.innerHTML = renderOrbitalRow(N, idx);
             el.classList.add('pc-orb-rendered');
         });
+        root.querySelectorAll('[data-diagram]').forEach(el => {
+            const fn = DIAGRAMS[el.getAttribute('data-diagram')];
+            el.innerHTML = fn ? fn() : '<span class="pc-mol-missing">[' + el.getAttribute('data-diagram') + ']</span>';
+            el.classList.add('pc-diagram-rendered');
+        });
+        root.querySelectorAll('[data-scheme]').forEach(el => {
+            const fn = SCHEMES[el.getAttribute('data-scheme')];
+            el.innerHTML = fn ? fn() : '<span class="pc-mol-missing">[' + el.getAttribute('data-scheme') + ']</span>';
+            el.classList.add('pc-scheme-rendered');
+        });
     }
 
-    window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, pSigns, MOLS: BUILDERS };
+    // ════════════════════════════════════════════════════════════════
+    // ESQUEMAS DE SÍNTESIS / REACCIÓN
+    // Renderiza una fila de: [molécula] --reactivos/condiciones--> [molécula] --> ...
+    // steps: array de nodos, donde cada nodo es
+    //   { mol: 'id-molecula' }  ó  { text: 'HO' }  (para fórmulas sueltas)
+    // y entre nodos, flechas: { arrow: true, above: 'reactivo', below: 'condiciones' }
+    // ════════════════════════════════════════════════════════════════
+    function renderSchemeItem(node, size) {
+        if (node.arrow) {
+            return `<div class="pc-scheme-arrow">
+                <span class="pc-scheme-arrow-above">${node.above || ''}</span>
+                <svg viewBox="0 0 60 14" class="pc-scheme-arrow-svg"><line x1="2" y1="7" x2="52" y2="7" class="pc-skel-bond"/><polygon points="52,2 60,7 52,12" class="pc-scheme-arrowhead"/></svg>
+                <span class="pc-scheme-arrow-below">${node.below || ''}</span>
+            </div>`;
+        }
+        if (node.plus) return `<div class="pc-scheme-plus">+</div>`;
+        if (node.text === '') return `<div class="pc-scheme-node"></div>`;
+        if (node.text) {
+            return `<div class="pc-scheme-node"><div class="pc-scheme-text">${node.text}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
+        }
+        const svg = renderMolById(node.mol, size || 'sm');
+        return `<div class="pc-scheme-node"><div class="pc-scheme-mol">${svg}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
+    }
+    function renderScheme(steps, opts) {
+        opts = opts || {};
+        const rows = opts.rows || [steps];
+        const inner = rows.map(row => `<div class="pc-scheme-row">${row.map(n => renderSchemeItem(n, opts.size)).join('')}</div>`).join('');
+        return `<div class="pc-scheme-box">${inner}</div>`;
+    }
+
+    const SCHEMES = {};
+
+    SCHEMES['q2-agcn-nacn'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [ { mol: 'bromuro-alilo', label: 'bromuro de alilo' }, { arrow: true, above: 'AgCN' }, { mol: 'alil-isocianuro', label: 'A + precipitado color crema' } ],
+            [ { text: '' }, { arrow: true, above: 'NaCN' }, { mol: 'alil-isocianuro', label: 'B' } ]
+        ]
+    });
+    SCHEMES['q2-c-d'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [ { mol: 'formamida-generica', label: 'C' }, { arrow: true, above: '&minus;H\u2082O' }, { mol: 'alil-isocianuro', label: 'isocianuro R&ndash;N\u2261C' } ],
+            [ { mol: 'formamida-generica', label: 'C' }, { arrow: true, above: '+H\u2082O' }, { mol: 'n-metilalilamina', label: 'R&ndash;NH\u2082' }, { plus: true }, { mol: 'acido-formico', label: 'D' } ]
+        ]
+    });
+
+    SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'nitrobenceno', label: 'nitrobenceno' },
+                { arrow: true, above: 'Sn / HCl' },
+                { mol: 'anilina', label: 'A &middot; C\u2086H\u2087N' },
+                { arrow: true, above: 'H\u2082SO\u2084 conc.', below: '200 &deg;C' },
+                { mol: 'acido-sulfanilico', label: 'B &middot; C\u2086H\u2087NO\u2083S' }
+            ],
+            [
+                { text: '' },
+                { arrow: true, above: 'NaNO\u2082 / HCl' },
+                { mol: 'sal-diazonio', label: 'C &middot; [C\u2086H\u2085N\u2082O\u2083S]\u207aCl\u207b' },
+                { arrow: true, above: 'i. Na\u2082SO\u2083/Na\u2082CO\u2083', below: 'ii. H\u207a/H\u2082O' },
+                { mol: 'hidrazina-sulfonica', label: 'D &middot; C\u2086H\u2088N\u2082O\u2083S' }
+            ],
+            [
+                { text: '' },
+                { arrow: true, above: 'dietil oxalacetato', below: '&minus;H\u2082O, &minus;EtOH' },
+                { mol: 'pirazolona-ester', label: 'E' },
+                { arrow: true, above: 'compuesto C' },
+                { mol: 'tartrazina-simplificada', label: 'F' },
+                { arrow: true, above: 'exceso NaOH' },
+                { mol: 'tartrazina-simplificada', label: 'tartrazina' }
+            ]
+        ]
+    });
+
+    SCHEMES['q3-keratina'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [[
+            { mol: 'lawsone-enol-b', label: 'lawsona' },
+            { plus: true },
+            { text: 'queratina&ndash;S<sup>&minus;</sup>' },
+            { arrow: true, above: 'adición', below: 'al anillo' },
+            { text: 'aducto <span style="color:#c9862c">naranja</span><br>(lawsona&ndash;S&ndash;queratina)' },
+            { arrow: true, above: 'oxidación', below: '(tiempo)' },
+            { text: 'aducto <span style="color:#7a4a1e">marrón</span>' }
+        ]]
+    });
+
+    SCHEMES['q3-tautomeria-general'] = () => `<div class="pc-scheme-box"><div class="pc-scheme-row">
+        <div class="pc-scheme-node"><div class="pc-scheme-text">X<sub>‖</sub><br>Y<sub>&#8211;</sub>Z&#8211;H</div></div>
+        <div class="pc-scheme-arrow"><span class="pc-scheme-arrow-above">&#8652;</span><svg viewBox="0 0 60 14" class="pc-scheme-arrow-svg"><line x1="2" y1="7" x2="52" y2="7" class="pc-skel-bond"/><polygon points="52,2 60,7 52,12" class="pc-scheme-arrowhead"/></svg></div>
+        <div class="pc-scheme-node"><div class="pc-scheme-text">X&#8211;H<br>Y<sub>‖</sub>Z</div></div>
+        </div></div>`;
+
+    const DIAGRAMS = {};
+    DIAGRAMS['p-orbital-fases'] = () => `
+        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <line x1="80" y1="10" x2="80" y2="110" class="pc-orb-axis"/>
+            <ellipse cx="80" cy="36" rx="22" ry="26" class="pc-orb-lobe pc-orb-pos"/>
+            <ellipse cx="80" cy="84" rx="22" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <text x="120" y="32" class="pc-skel-label" style="font-size:11px;text-anchor:start;">+ positivo</text>
+            <text x="120" y="90" class="pc-skel-label" style="font-size:11px;text-anchor:start;">&#8211; negativo</text>
+        </svg>`;
+    DIAGRAMS['interferencia-mo'] = () => `
+        <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <text x="60" y="14" class="pc-skel-label" style="font-size:11px;">constructiva</text>
+            <ellipse cx="48" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="48" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="76" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="76" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
+            <text x="10" y="120" class="pc-skel-label" style="font-size:10px;">lóbulos adyacentes: mismo signo</text>
+            <text x="220" y="14" class="pc-skel-label" style="font-size:11px;">destructiva</text>
+            <ellipse cx="208" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="208" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="236" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/><ellipse cx="236" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/>
+            <text x="180" y="120" class="pc-skel-label" style="font-size:10px;">lóbulos adyacentes: signo opuesto</text>
+        </svg>`;
+
+    window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, renderScheme, pSigns, MOLS: BUILDERS, SCHEMES, DIAGRAMS };
 
 })();
 
