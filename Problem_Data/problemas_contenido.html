@@ -179,7 +179,7 @@ const contenidoProblemas = {
         titulo: "El maloliente mundo de los isocianuros",
         numero: "Q2",
         fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
-        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA.",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras están redibujadas con un motor propio (ChemDraw), no son imágenes.",
 
         enunciado: `
             <p class="pc-q-title">Q2 — Esta pregunta trata sobre los isocianuros</p>
@@ -187,14 +187,17 @@ const contenidoProblemas = {
             <div class="pc-intro">
                 <p>Los isocianuros son moléculas orgánicas con olores extremadamente desagradables. Los químicos los han descrito como "horribles", "extremadamente angustiantes" e incluso como "el Godzilla de los olores". Pese a ello, los isocianuros son intermedios importantes en muchas reacciones orgánicas.</p>
             </div>
-            <p class="pc-eq">R&ndash;N<sup>+</sup>&equiv;C<sup>&minus;</sup>: &nbsp;&nbsp;&nbsp;<span class="pc-eq-label">(un isocianuro)</span></p>
+            <p class="pc-eq">R&ndash;N<sup>+</sup>&equiv;C<sup>&minus;</sup>: &nbsp;&nbsp;&nbsp;<span class="pc-eq-label">(un isocianuro; R = resto de la molécula)</span></p>
 
             <div class="pc-part">
                 <span class="pc-part-label">(a)</span>
                 <div class="pc-part-body"><p>Dibuja la estructura resonante del isocianuro indicado arriba. Indica todos los pares solitarios.</p></div>
             </div>
 
-            <p>Los isocianuros pueden prepararse por sustitución nucleofílica. Cuando se añade AgCN al bromuro de alilo (CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;Br), los productos son el compuesto <strong>A</strong> y un precipitado de color crema. Repitiendo la reacción con NaCN en lugar de AgCN se obtiene el producto <strong>B</strong>.</p>
+            <p>Los isocianuros pueden prepararse por sustitución nucleofílica. Cuando se añade AgCN al bromuro de alilo, los productos son el compuesto <strong>A</strong> y un precipitado de color crema. Repitiendo la reacción con NaCN en lugar de AgCN se obtiene el producto <strong>B</strong>.</p>
+            <div class="pc-compounds">
+                <div class="pc-compound"><span class="pc-mol" data-mol="bromuro-alilo"></span><span class="pc-compound-name">bromuro de alilo</span></div>
+            </div>
 
             <div class="pc-part">
                 <span class="pc-part-label">(b)</span>
@@ -234,22 +237,23 @@ const contenidoProblemas = {
                 <div class="pc-part-body">
                     <p>Indica cuáles de los siguientes compuestos darían un resultado positivo en el test de Zaytsev:</p>
                     <div class="pc-compounds">
-                        <div class="pc-compound"><span class="pc-compound-name">N-metilalilamina</span><span class="pc-compound-formula">CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;NH&ndash;CH<sub>3</sub></span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">piridina</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>5</sub>N</span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">butan-2-amina</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CH(NH<sub>2</sub>)&ndash;CH<sub>2</sub>&ndash;CH<sub>3</sub></span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">3-metoxianilina</span><span class="pc-compound-formula">CH<sub>3</sub>O&ndash;C<sub>6</sub>H<sub>4</sub>&ndash;NH<sub>2</sub></span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">N-metilformamida</span><span class="pc-compound-formula">HCO&ndash;NH&ndash;CH<sub>3</sub></span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">acetamida</span><span class="pc-compound-formula">CH<sub>3</sub>CONH<sub>2</sub></span></div>
-                        <div class="pc-compound"><span class="pc-compound-name">pirrolidina</span><span class="pc-compound-formula">C<sub>4</sub>H<sub>8</sub>NH (amina cíclica)</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="n-metilalilamina"></span><span class="pc-compound-name">N-metilalilamina</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="piridina"></span><span class="pc-compound-name">piridina</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="butan-2-amina"></span><span class="pc-compound-name">butan-2-amina</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="3-metoxianilina"></span><span class="pc-compound-name">3-metoxianilina</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="n-metilformamida"></span><span class="pc-compound-name">N-metilformamida</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="acetamida"></span><span class="pc-compound-name">acetamida</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="pirrolidina"></span><span class="pc-compound-name">pirrolidina</span></div>
                     </div>
                 </div>
             </div>
 
             <p>Los isocianuros pueden reaccionar con un ácido carboxílico y un aldehído o cetona en un solo paso para formar un único producto. Esto se llama la <strong>reacción de Passerini</strong>. R<sup>1</sup>&ndash;R<sup>4</sup> representan grupos sustituyentes variables.</p>
-            <p class="pc-eq">R<sup>1</sup>COOH &nbsp;+&nbsp; R<sup>2</sup>NC &nbsp;+&nbsp; R<sup>3</sup>R<sup>4</sup>C=O &nbsp;&rarr;&nbsp; R<sup>1</sup>COO&ndash;C(R<sup>3</sup>)(R<sup>4</sup>)&ndash;C(=O)NH&ndash;R<sup>2</sup></p>
+            <div class="pc-compounds">
+                <div class="pc-compound" style="min-width:280px"><span class="pc-mol" data-mol="passerini-general"></span><span class="pc-compound-name">esquema general de la reacción de Passerini</span></div>
+            </div>
 
-            <p>Un intermedio clave en la síntesis del fármaco antiviral <strong>telaprevir</strong>, el compuesto <strong>E</strong>, se forma mediante una reacción de Passerini, donde "R" representa el resto de la molécula de telaprevir:</p>
-            <p class="pc-eq pc-eq-small">E &nbsp;=&nbsp; ciclopropil&ndash;C(=O)NH&ndash;CH(CH<sub>2</sub>CH<sub>3</sub>)&ndash;C(=O)&ndash;[anillo bicíclico&ndash;R]&ndash;CH(O&ndash;C(=O)CH<sub>3</sub>)&ndash;&hellip;</p>
+            <p>Un intermedio clave en la síntesis del fármaco antiviral <strong>telaprevir</strong>, el compuesto <strong>E</strong>, se forma mediante una reacción de Passerini, donde "R" representa el resto de la molécula de telaprevir.</p>
 
             <div class="pc-part">
                 <span class="pc-part-label">(g)</span>
@@ -259,14 +263,14 @@ const contenidoProblemas = {
             <p>Combinando distintos isocianuros, ácidos carboxílicos y aldehídos/cetonas se pueden preparar muchos productos distintos.</p>
             <p>La química <strong>Isobel</strong> tiene los siguientes compuestos en su armario:</p>
             <div class="pc-compounds">
-                <div class="pc-compound"><span class="pc-compound-name">fenilisocianuro</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;NC</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">1-isocianopropano</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>&ndash;NC</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">acetona</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CO&ndash;CH<sub>3</sub></span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">benzofenona</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;CO&ndash;C<sub>6</sub>H<sub>5</sub></span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido acético</span><span class="pc-compound-formula">CH<sub>3</sub>COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido 2-metilpropanoico</span><span class="pc-compound-formula">(CH<sub>3</sub>)<sub>2</sub>CH&ndash;COOH</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="fenilisocianuro"></span><span class="pc-compound-name">fenilisocianuro</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="1-isocianopropano"></span><span class="pc-compound-name">1-isocianopropano</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acetona"></span><span class="pc-compound-name">acetona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="ciclopentanona"></span><span class="pc-compound-name">ciclopentanona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="benzofenona"></span><span class="pc-compound-name">benzofenona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-acetico"></span><span class="pc-compound-name">ácido acético</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-benzoico"></span><span class="pc-compound-name">ácido benzoico</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-2-metilpropanoico"></span><span class="pc-compound-name">ácido 2-metilpropanoico</span></div>
             </div>
 
             <div class="pc-part">
@@ -278,18 +282,21 @@ const contenidoProblemas = {
                 <span class="pc-part-label">(i)</span>
                 <div class="pc-part-body"><p>Sobre la estructura general del producto de Passerini, indica con un asterisco qué átomo de carbono tiene el potencial de ser un estereocentro.</p></div>
             </div>
+            <div class="pc-compounds">
+                <div class="pc-compound" style="min-width:220px"><span class="pc-mol" data-mol="passerini-producto-general"></span><span class="pc-compound-name">estructura general del producto</span></div>
+            </div>
 
             <p>La química <strong>Cynthia</strong> tiene los siguientes compuestos en su armario:</p>
             <div class="pc-compounds">
-                <div class="pc-compound"><span class="pc-compound-name">fenilisocianuro</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>&ndash;NC</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">1-isocianopropano</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>&ndash;NC</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido acético</span><span class="pc-compound-formula">CH<sub>3</sub>COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido 2-metilpropanoico</span><span class="pc-compound-formula">(CH<sub>3</sub>)<sub>2</sub>CH&ndash;COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">propanal</span><span class="pc-compound-formula">CH<sub>3</sub>CH<sub>2</sub>CHO</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">benzaldehído</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>CHO</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">butan-2-ona</span><span class="pc-compound-formula">CH<sub>3</sub>CO&ndash;CH<sub>2</sub>CH<sub>3</sub></span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="fenilisocianuro"></span><span class="pc-compound-name">fenilisocianuro</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="1-isocianopropano"></span><span class="pc-compound-name">1-isocianopropano</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-acetico"></span><span class="pc-compound-name">ácido acético</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-benzoico"></span><span class="pc-compound-name">ácido benzoico</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-2-metilpropanoico"></span><span class="pc-compound-name">ácido 2-metilpropanoico</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="propanal"></span><span class="pc-compound-name">propanal</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="ciclopentanona"></span><span class="pc-compound-name">ciclopentanona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="benzaldehido"></span><span class="pc-compound-name">benzaldehído</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="butan-2-ona"></span><span class="pc-compound-name">butan-2-ona</span></div>
             </div>
 
             <div class="pc-part">
@@ -299,14 +306,14 @@ const contenidoProblemas = {
 
             <p>El químico <strong>Galvin</strong> tiene los siguientes compuestos en su armario:</p>
             <div class="pc-compounds">
-                <div class="pc-compound"><span class="pc-compound-name">4-metil-1,2-diisocianobenceno</span><span class="pc-compound-formula">anillo de benceno con dos &ndash;NC en posiciones distintas + CH<sub>3</sub></span></div>
-                <div class="pc-compound"><span class="pc-compound-name">1,3-diisocianopropano</span><span class="pc-compound-formula">NC&ndash;CH<sub>2</sub>&ndash;CH<sub>2</sub>&ndash;NC</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">trisisocianometano</span><span class="pc-compound-formula">CH(NC)<sub>3</sub></span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ciclopentanona</span><span class="pc-compound-formula">C<sub>5</sub>H<sub>8</sub>O</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">acetona</span><span class="pc-compound-formula">CH<sub>3</sub>&ndash;CO&ndash;CH<sub>3</sub></span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido benzoico</span><span class="pc-compound-formula">C<sub>6</sub>H<sub>5</sub>COOH</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido 2-hidroxi-4,5-dicarboxibenzoico</span><span class="pc-compound-formula">anillo de benceno con &ndash;OH y dos &ndash;COOH adicionales</span></div>
-                <div class="pc-compound"><span class="pc-compound-name">ácido 4-hidroxibenzoico</span><span class="pc-compound-formula">HO&ndash;C<sub>6</sub>H<sub>4</sub>&ndash;COOH</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="diisocianobenceno"></span><span class="pc-compound-name">4-metil-1,2-diisocianobenceno</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="diisocianopropano"></span><span class="pc-compound-name">1,3-diisocianopropano</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="trisisocianometano"></span><span class="pc-compound-name">trisisocianometano</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="ciclopentanona"></span><span class="pc-compound-name">ciclopentanona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acetona"></span><span class="pc-compound-name">acetona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-benzoico"></span><span class="pc-compound-name">ácido benzoico</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-2-hidroxi-dicarboxibenzoico"></span><span class="pc-compound-name">ácido 2-hidroxi-4,5-dicarboxibenzoico</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acido-4-hidroxibenzoico"></span><span class="pc-compound-name">ácido 4-hidroxibenzoico</span></div>
             </div>
 
             <div class="pc-part">
@@ -326,7 +333,7 @@ const contenidoProblemas = {
 
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(b)(i)</span><span class="pc-marks">1 punto</span></div>
-                <p><strong>B</strong> = isocianuro de alilo &nbsp;<span class="pc-formula-inline">CH<sub>2</sub>=CH&ndash;CH<sub>2</sub>&ndash;NC</span></p>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="alil-isocianuro"></span><span class="pc-compound-name">B = isocianuro de alilo</span></div></div>
                 <p class="pc-note">Se acepta si el grupo isocianuro se escribe de forma desarrollada o abreviada (NC).</p>
             </div>
             <div class="pc-answer">
@@ -343,12 +350,12 @@ const contenidoProblemas = {
 
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(d)(i)</span><span class="pc-marks">1 punto</span></div>
-                <p><strong>C</strong> = una formamida N-sustituida, &nbsp;<span class="pc-formula-inline">R&ndash;NH&ndash;CHO</span></p>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="formamida-generica"></span><span class="pc-compound-name">C = formamida N-sustituida</span></div></div>
             </div>
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(d)(ii)</span><span class="pc-marks">1 punto</span></div>
-                <p><strong>D</strong> = ácido fórmico (metanoico), &nbsp;<span class="pc-formula-inline">HCOOH</span></p>
-                <p class="pc-note">Se acepta si el estudiante escribe "ácido fórmico", HCO<sub>2</sub>H o HCOOH, ya que demuestran conocer el grupo funcional. Si solo escriben la fórmula molecular CH<sub>2</sub>O<sub>2</sub> sin más, no se concede el punto (no demuestra el grupo funcional).</p>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="acido-formico"></span><span class="pc-compound-name">D = ácido fórmico</span></div></div>
+                <p class="pc-note">Se acepta si el estudiante escribe "ácido fórmico", HCO<sub>2</sub>H o HCOOH. Si solo escriben la fórmula molecular CH<sub>2</sub>O<sub>2</sub> sin más, no se concede el punto (no demuestra el grupo funcional).</p>
             </div>
 
             <div class="pc-answer">
@@ -360,23 +367,23 @@ const contenidoProblemas = {
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">2 puntos</span></div>
                 <div class="pc-compounds">
-                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">N-metilalilamina</span><span class="pc-compound-formula">amina secundaria &mdash; negativo</span></div>
-                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">piridina</span><span class="pc-compound-formula">amina aromática sin H en N &mdash; negativo</span></div>
-                    <div class="pc-compound pc-compound-yes"><span class="pc-compound-name">butan-2-amina</span><span class="pc-compound-formula">amina primaria &mdash; POSITIVO</span></div>
-                    <div class="pc-compound pc-compound-yes"><span class="pc-compound-name">3-metoxianilina</span><span class="pc-compound-formula">amina primaria aromática &mdash; POSITIVO</span></div>
-                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">N-metilformamida</span><span class="pc-compound-formula">amida &mdash; negativo</span></div>
-                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">acetamida</span><span class="pc-compound-formula">amida &mdash; negativo</span></div>
-                    <div class="pc-compound pc-compound-no"><span class="pc-compound-name">pirrolidina</span><span class="pc-compound-formula">amina secundaria &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="n-metilalilamina"></span><span class="pc-compound-name">amina secundaria &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="piridina"></span><span class="pc-compound-name">sin H en N &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="butan-2-amina"></span><span class="pc-compound-name">amina primaria &mdash; POSITIVO</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="3-metoxianilina"></span><span class="pc-compound-name">amina primaria &mdash; POSITIVO</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="n-metilformamida"></span><span class="pc-compound-name">amida &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="acetamida"></span><span class="pc-compound-name">amida &mdash; negativo</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="pirrolidina"></span><span class="pc-compound-name">amina secundaria &mdash; negativo</span></div>
                 </div>
-                <p class="pc-note">El test de Zaytsev solo da positivo con <strong>aminas primarias</strong> (alifáticas o aromáticas). 2 puntos si se marcan exactamente las 2 correctas y ninguna incorrecta. 1 punto si se marcan las 2 correctas más una incorrecta, o solo una correcta (con o sin una incorrecta). 0 puntos si se marcan dos o más incorrectas.</p>
+                <p class="pc-note">El test de Zaytsev solo da positivo con <strong>aminas primarias</strong> (alifáticas o aromáticas). 2 puntos si se marcan exactamente las 2 correctas y ninguna incorrecta. 1 punto si se marcan las 2 correctas más una incorrecta, o solo una correcta. 0 puntos si se marcan dos o más incorrectas.</p>
             </div>
 
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">3 puntos</span></div>
                 <div class="pc-compounds">
-                    <div class="pc-compound"><span class="pc-compound-name">ácido ciclopropanocarboxílico</span><span class="pc-compound-formula">ciclopropil&ndash;COOH</span></div>
-                    <div class="pc-compound"><span class="pc-compound-name">isocianuro bicíclico</span><span class="pc-compound-formula">R<sup>2</sup>&ndash;NC (el anillo bicíclico saturado con el grupo R del telaprevir)</span></div>
-                    <div class="pc-compound"><span class="pc-compound-name">acetaldehído</span><span class="pc-compound-formula">CH<sub>3</sub>CHO</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="acido-ciclopropanocarboxilico"></span><span class="pc-compound-name">ácido ciclopropanocarboxílico</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="isocianuro-biciclico-telaprevir"></span><span class="pc-compound-name">isocianuro bicíclico (R = resto de telaprevir)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="acetaldehido"></span><span class="pc-compound-name">acetaldehído</span></div>
                 </div>
                 <p class="pc-note">1 punto por cada estructura correcta. No se evalúa la estereoquímica.</p>
             </div>
@@ -385,13 +392,13 @@ const contenidoProblemas = {
                 <div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">1 punto</span></div>
                 <p class="pc-eq">n = 2 isocianuros &times; 3 cetonas &times; 3 ácidos</p>
                 <p class="pc-eq"><strong>n = 18</strong></p>
-                <p class="pc-note">1 punto por el número correcto. No hace falta mostrar el desarrollo. No se concede el punto por el razonamiento si el número final es incorrecto.</p>
+                <p class="pc-note">1 punto por el número correcto. No hace falta mostrar el desarrollo.</p>
             </div>
 
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">1 punto</span></div>
-                <p>El estereocentro es el carbono central que porta simultáneamente los grupos R<sup>3</sup>, R<sup>4</sup>, el grupo &ndash;O&ndash;C(=O)R<sup>1</sup> y el grupo &ndash;C(=O)NHR<sup>2</sup> (el carbono marcado con un asterisco en la fórmula general del producto de Passerini).</p>
-                <p class="pc-note">No se concede el punto si se marca cualquier otro átomo.</p>
+                <div class="pc-compounds"><div class="pc-compound" style="min-width:220px"><span class="pc-mol" data-mol="passerini-producto-general"></span><span class="pc-compound-name">el carbono marcado con &#10033; es el estereocentro</span></div></div>
+                <p class="pc-note">Es el carbono central que porta simultáneamente R<sup>3</sup>, R<sup>4</sup>, el grupo &ndash;O&ndash;C(=O)R<sup>1</sup> y el grupo &ndash;C(=O)NHR<sup>2</sup>. No se concede el punto si se marca cualquier otro átomo.</p>
             </div>
 
             <div class="pc-answer">
@@ -399,7 +406,7 @@ const contenidoProblemas = {
                 <p>Los sustituyentes R<sup>3</sup> y R<sup>4</sup> son distintos entre sí en los dos aldehídos (propanal y benzaldehído) y en una de las dos cetonas (butan-2-ona), lo que genera un estereocentro (y por tanto un par de enantiómeros) en cada uno de esos tres casos. La ciclopentanona es simétrica &mdash; R<sup>3</sup> y R<sup>4</sup> forman parte del mismo anillo &mdash; y no genera estereocentro. Esto da 7 posibilidades para el compañero carbonílico (2+2+2+1 = 7).</p>
                 <p class="pc-eq">n = 2 isocianuros &times; 7 (aldehídos/cetonas, contando enantiómeros) &times; 3 ácidos</p>
                 <p class="pc-eq"><strong>n = 42</strong></p>
-                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial. No hace falta mostrar el desarrollo.</p>
+                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial.</p>
             </div>
 
             <div class="pc-answer">
@@ -407,10 +414,556 @@ const contenidoProblemas = {
                 <p>Hay cinco grupos isocianuro químicamente distinguibles, dos grupos cetona químicamente distinguibles y cinco grupos ácido químicamente distinguibles (contando cada posición reactiva distinta dentro de las moléculas polifuncionales de Galvin como un grupo aparte).</p>
                 <p class="pc-eq">n = 5 isocianuros &times; 2 cetonas &times; 5 ácidos</p>
                 <p class="pc-eq"><strong>n = 50</strong></p>
-                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial. No hace falta mostrar el desarrollo.</p>
+                <p class="pc-note">2 puntos por el número correcto. Sin crédito parcial.</p>
+            </div>
+        `
+    },
+
+    // ────────────────────────────────────────────────────────────────
+    // Q3 — Compuestos en los tatuajes de henna (lawsona)
+    // ────────────────────────────────────────────────────────────────
+    "q3-henna": {
+        titulo: "Compuestos en los tatuajes de henna",
+        numero: "Q3",
+        fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA. Estructuras dibujadas con ChemDraw (motor propio).",
+
+        enunciado: `
+            <p class="pc-q-title">Q3 — Esta pregunta trata sobre compuestos en los tatuajes de henna</p>
+
+            <div class="pc-intro">
+                <p>Los tatuajes de henna contienen un compuesto llamado <strong>lawsona</strong>, que reacciona con la queratina de la piel para formar un producto coloreado. La lawsona tiene tres grupos ceto/enol y es un ejemplo de una molécula que sufre tautomería.</p>
+            </div>
+            <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="lawsone-ceto"></span><span class="pc-compound-name">lawsona (forma ceto)</span></div></div>
+
+            <p>Ciertas cetonas existen en equilibrio con un isómero alternativo llamado enol. Las formas ceto y enol se interconvierten rápidamente a medida que un átomo de hidrógeno y un doble enlace cambian de posición. Estos pares de isómeros se llaman tautómeros, y su equilibrio se describe mediante una constante de equilibrio.</p>
+            <p class="pc-eq">K = [enol] / [ceto]</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body"><p>En el equilibrio, una determinada cetona existe en un 99.997&nbsp;% en forma ceto, <strong>A</strong>, y en un 0.003&nbsp;% en forma enol, <strong>B</strong>. Calcula la constante de equilibrio, K<sub>1</sub> = [B]/[A].</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body"><p>La constante de equilibrio, K<sub>2</sub>, entre la forma ceto, <strong>C</strong>, y la forma enol, <strong>D</strong>, de otra cetona es 0.23. Calcula el porcentaje de <strong>C</strong> y <strong>D</strong> presentes en el equilibrio.</p></div>
+            </div>
+
+            <p>Los enoles también pueden formarse a partir de aldehídos. Sin embargo, para formar un enol, el átomo de carbono contiguo al carbono del grupo C=O debe tener un átomo de hidrógeno que pueda eliminarse (un "hidrógeno alfa").</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body"><p>Indica cuáles de los siguientes aldehídos y cetonas pueden formar tautómeros:</p></div>
+            </div>
+            <div class="pc-compounds">
+                <div class="pc-compound"><span class="pc-mol" data-mol="ciclohexanona"></span><span class="pc-compound-name">ciclohexanona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="benzaldehido"></span><span class="pc-compound-name">benzaldehído</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="pivalona"></span><span class="pc-compound-name">3,3-dimetilbutan-2-ona</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="acroleina"></span><span class="pc-compound-name">propenal (acroleína)</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="formaldehido"></span><span class="pc-compound-name">formaldehído</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="benzil"></span><span class="pc-compound-name">benzil (dibenzoílo)</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="pivalaldehido"></span><span class="pc-compound-name">2,2-dimetilpropanal</span></div>
+                <div class="pc-compound"><span class="pc-mol" data-mol="metilvinilcetona"></span><span class="pc-compound-name">but-3-en-2-ona</span></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(d)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>La lawsona puede formar dos isómeros enólicos distintos. Dibuja la estructura de <strong>ambas</strong> formas enol.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Uno de los isómeros enólicos está estabilizado por un puente de hidrógeno intramolecular. Añade ese puente de hidrógeno a tu dibujo.</p></div>
+                </div>
+            </div>
+
+            <p>Al aplicarse sobre la piel, la lawsona de la henna reacciona con aniones tiolato presentes en la cadena lateral de las proteínas de queratina de la piel. Esto da a la piel un color naranja. Con el tiempo, tiene lugar una reacción química y el color cambia a marrón.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(e)</span>
+                <div class="pc-part-body"><p>Clasifica la reacción que provoca el cambio de color de naranja a marrón (sustitución electrófila aromática / sustitución nucleófila aromática / reducción / oxidación / hidrólisis).</p></div>
+            </div>
+
+            <p>La tautomería se observa en una amplia variedad de grupos funcionales. Puede representarse mediante la ecuación general X=Y&ndash;Z&ndash;H &#8652; X(H)&ndash;Y=Z, donde X, Y y Z representan átomos que pueden o no ser iguales. La tautomerización suele producirse cuando el átomo X es muy electronegativo (p. ej. X = O o N), lo que polariza fuertemente el enlace X=Y y hace que los enlaces X&ndash;H y Z&ndash;H sean relativamente ácidos.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(f)</span>
+                <div class="pc-part-body">
+                    <p>Dibuja el tautómero de los siguientes compuestos:</p>
+                    <div class="pc-compounds">
+                        <div class="pc-compound"><span class="pc-mol" data-mol="fosforo-tautomero-a"></span><span class="pc-compound-name">(i) éster tiofosfónico</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="nitro-normal"></span><span class="pc-compound-name">(ii) grupo nitro</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(g)</span>
+                <div class="pc-part-body">
+                    <p>Dibuja <strong>todos los tautómeros posibles</strong> de los siguientes compuestos. No es necesario considerar la estereoquímica.</p>
+                    <div class="pc-compounds">
+                        <div class="pc-compound"><span class="pc-mol" data-mol="acetamida"></span><span class="pc-compound-name">(i) acetamida</span></div>
+                        <div class="pc-compound"><span class="pc-mol" data-mol="imina-inicial"></span><span class="pc-compound-name">(ii) 3-hidroxibutanimina</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <p>El cambio de entalpía estándar, &Delta;<sub>r</sub>H&deg;, de la tautomerización de una cetona a un enol en fase gaseosa puede estimarse a partir de entalpías de enlace medias.</p>
+            <table class="pc-table">
+                <thead><tr><th>Enlace</th><th>&Delta;H&deg; / kJ mol<sup>&minus;1</sup></th><th>Enlace</th><th>&Delta;H&deg; / kJ mol<sup>&minus;1</sup></th></tr></thead>
+                <tbody>
+                    <tr><td>C&ndash;C</td><td>348</td><td>C&ndash;O</td><td>360</td></tr>
+                    <tr><td>C=C</td><td>612</td><td>C=O</td><td>743</td></tr>
+                    <tr><td>C&ndash;H</td><td>412</td><td>O&ndash;H</td><td>463</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(h)</span>
+                <div class="pc-part-body"><p>Calcula &Delta;<sub>r</sub>H&deg; para una tautomerización típica de cetona a enol.</p></div>
+            </div>
+
+            <p>En la lawsona también hay que considerar la contribución del puente de hidrógeno (y otros factores). En fase gaseosa, el &Delta;<sub>r</sub>H&deg; para la tautomerización de cetona a enol del tautómero preferido de la lawsona es &minus;32.58 kJ mol<sup>&minus;1</sup>. El cambio de entropía estándar, &Delta;<sub>r</sub>S&deg;, de esta reacción es &minus;11.48 J K<sup>&minus;1</sup> mol<sup>&minus;1</sup>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(i)</span>
+                <div class="pc-part-body"><p>Calcula la constante de equilibrio, K<sub>gas</sub>, para esta tautomerización ceto&rarr;enol de la lawsona en fase gaseosa a 298 K.</p></div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (i), asume que la respuesta es 3.05&times;10<sup>6</sup>.</p>
+
+            <p>La energía libre de Gibbs de solvatación, &Delta;<sub>sol</sub>G&deg;, difiere entre las formas ceto y enol de la lawsona: &Delta;<sub>sol</sub>G&deg;<sub>ceto</sub> = &minus;126.0 kJ mol<sup>&minus;1</sup>; &Delta;<sub>sol</sub>G&deg;<sub>enol</sub> = &minus;109.2 kJ mol<sup>&minus;1</sup>. Las energías libres de Gibbs pueden sumarse en un ciclo similar a un ciclo de Hess usado para cambios de entalpía.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(j)</span>
+                <div class="pc-part-body"><p>Calcula la constante de equilibrio, K<sub>agua</sub>, para la tautomerización ceto&rarr;enol de la lawsona en agua a 298 K.</p></div>
+            </div>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q3 — Esta pregunta trata sobre compuestos en los tatuajes de henna <span class="pc-total-chip">Total: 19 puntos</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">K<sub>1</sub> = [B]/[A] = 0.003 / 99.997 = <strong>3.00&times;10<sup>&minus;5</sup></strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">K<sub>2</sub> = [D]/[C] = 0.23, &nbsp; [C]+[D] = 100%</p>
+                <p class="pc-eq">[D] = 23% &minus; 0.23[D] &rArr; 1.23[D] = 23% &rArr; <strong>[D] = 18.7%</strong>, &nbsp; <strong>[C] = 81.3%</strong></p>
+                <p class="pc-note">2 puntos si ambos números son correctos. 1 punto si el planteamiento (sistema de ecuaciones) es correcto pero el resultado final tiene un error trivial, o si solo se da uno de los dos porcentajes.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">2 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="ciclohexanona"></span><span class="pc-compound-name">SÍ &mdash; tiene H&alpha;</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="benzaldehido"></span><span class="pc-compound-name">no &mdash; sin H&alpha;</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="pivalona"></span><span class="pc-compound-name">SÍ &mdash; tiene H&alpha; (CH<sub>3</sub>)</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="acroleina"></span><span class="pc-compound-name">SÍ &mdash; tiene H&alpha; vinílico</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="formaldehido"></span><span class="pc-compound-name">no &mdash; sin carbono &alpha;</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="benzil"></span><span class="pc-compound-name">no &mdash; sin H&alpha; entre carbonilos</span></div>
+                    <div class="pc-compound pc-compound-no"><span class="pc-mol" data-mol="pivalaldehido"></span><span class="pc-compound-name">no &mdash; carbono &alpha; cuaternario</span></div>
+                    <div class="pc-compound pc-compound-yes"><span class="pc-mol" data-mol="metilvinilcetona"></span><span class="pc-compound-name">SÍ &mdash; tiene H&alpha; (CH<sub>3</sub>)</span></div>
+                </div>
+                <p class="pc-note">4 marcados correctamente y ninguno incorrecto: 2 puntos. 3 correctos y ninguno incorrecto: 1 punto. 3 correctos y 1 incorrecto: 1 punto. Cualquier otro caso: 0 puntos.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">3 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound"><span class="pc-mol" data-mol="lawsone-enol-a"></span><span class="pc-compound-name">enol A (sin puente de H)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="lawsone-enol-b"></span><span class="pc-compound-name">enol B (con puente de H intramolecular entre el &ndash;OH y el C=O adyacente)</span></div>
+                </div>
+                <p class="pc-note">1 punto por cada tautómero correcto. El tercer punto se concede si el puente de hidrógeno está dibujado en el lugar correcto sobre el tautómero correcto (entre el grupo OH de la posición 2 y el oxígeno carbonílico adyacente).</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>Oxidación.</strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)(i)</span><span class="pc-marks">1 punto</span></div>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="fosforo-tautomero-b"></span><span class="pc-compound-name">tautómero tiol (P=O, P&ndash;SH)</span></div></div>
+                <p class="pc-note">Se acepta si el estudiante escribe "SH" en vez de dibujar el enlace S&ndash;H explícitamente.</p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="nitro-aci"></span><span class="pc-compound-name">forma aci-nitro</span></div></div>
+                <p class="pc-note">No se acepta ninguna versión sin cargas formales, ni con el nitrógeno mostrando cinco enlaces.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(g)(i)</span><span class="pc-marks">1 punto</span></div>
+                <div class="pc-compounds"><div class="pc-compound"><span class="pc-mol" data-mol="acetamida-tautomero"></span><span class="pc-compound-name">único tautómero: forma imídica (enol)</span></div></div>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(g)(ii)</span><span class="pc-marks">2 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound"><span class="pc-mol" data-mol="imina-tautomero-1"></span><span class="pc-compound-name">tautómero 1 (enol&ndash;enamina)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="imina-tautomero-2"></span><span class="pc-compound-name">tautómero 2 (amino-aldehído)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="imina-tautomero-3"></span><span class="pc-compound-name">tautómero 3 (enol terminal)</span></div>
+                </div>
+                <p class="pc-note">2 puntos si se dibujan las tres estructuras correctas. 1 punto si se dibujan dos correctas (máximo una incorrecta). No se evalúa la estereoquímica.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">&Delta;<sub>r</sub>H&deg; = &sum;(enlaces rotos) &minus; &sum;(enlaces formados)</p>
+                <p class="pc-eq">&Delta;<sub>r</sub>H&deg; = [(743+348+412) &minus; (463+360+612)] kJ mol<sup>&minus;1</sup> = <strong>+68 kJ mol<sup>&minus;1</sup></strong></p>
+                <p class="pc-note">El signo positivo no es obligatorio, pero si se escribe como negativo no se concede el punto.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">&Delta;G&deg; = &Delta;H&deg; &minus; T&Delta;S&deg; = &minus;32\u2009580 &minus; (298 &times; &minus;11.48) = <strong>&minus;29\u2009160 J mol<sup>&minus;1</sup></strong></p>
+                <p class="pc-eq">K<sub>gas</sub> = e<sup>&minus;&Delta;G&deg;/RT</sup> = e<sup>29160/(8.314&times;298)</sup> = <strong>1.29&times;10<sup>5</sup></strong></p>
+                <p class="pc-note">1 punto por el cálculo correcto de &Delta;G&deg;, 1 punto por el cálculo correcto de K<sub>gas</sub>.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(j)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">&Delta;<sub>r</sub>G&deg;<sub>agua</sub> = &minus;&Delta;<sub>sol</sub>G&deg;<sub>ceto</sub> + &Delta;<sub>r</sub>G&deg;<sub>gas</sub> + &Delta;<sub>sol</sub>G&deg;<sub>enol</sub></p>
+                <p class="pc-eq">&Delta;<sub>r</sub>G&deg;<sub>agua</sub> = 126\u2009000 &minus; 29\u2009160 &minus; 109\u2009200 = <strong>&minus;12\u2009360 J mol<sup>&minus;1</sup></strong></p>
+                <p class="pc-eq">K<sub>agua</sub> = e<sup>12360/(8.314&times;298)</sup> = <strong>147</strong></p>
+                <p class="pc-note">1 punto por &Delta;G&deg;<sub>agua</sub> correcto, 1 punto por K<sub>agua</sub> correcto. Se admite arrastre de error desde (i): si se usó K<sub>gas</sub>=3.05&times;10<sup>6</sup>, entonces &Delta;G&deg;<sub>agua</sub>=&minus;20.19 kJ mol<sup>&minus;1</sup> y K<sub>agua</sub>=3460.</p>
+            </div>
+        `
+    },
+
+    // ────────────────────────────────────────────────────────────────
+    // Q4 — Arroz, especias y ratones (carotenos, orbitales moleculares, tartrazina)
+    // ────────────────────────────────────────────────────────────────
+    "q4-arroz-especias": {
+        titulo: "Arroz, especias y ratones",
+        numero: "Q4",
+        fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA. Los diagramas de orbitales y las estructuras están generados por código propio (ChemDraw), no son imágenes ni fotografías.",
+
+        enunciado: `
+            <p class="pc-q-title">Q4 — Esta pregunta trata sobre arroz, especias y ratones</p>
+
+            <div class="pc-intro">
+                <p>El plato nacional de Uzbekistán, país anfitrión de la Olimpiada Internacional de Química 2026, se llama pilaf: un plato de arroz que suele llevar cordero, zanahorias y especias. Su color característico proviene del pigmento caroteno de las zanahorias, que tiene varios isómeros distintos.</p>
+                <p>El &beta;-caroteno contiene 40 átomos de carbono, 11 enlaces C=C y dos anillos.</p>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body"><p>Escribe la fórmula molecular del &beta;-caroteno.</p></div>
+            </div>
+
+            <p>Los colores de los carotenos provienen de sus largas cadenas de enlaces C=C y C&ndash;C alternados. Decimos que los enlaces C=C de este tipo de cadenas (p. ej. &ndash;C=C&ndash;C=C&ndash;) están <strong>conjugados</strong>. El &alpha;-caroteno tiene un color más amarillento y el &beta;-caroteno más anaranjado, debido a que tienen un número distinto de enlaces C=C conjugados.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Número de enlaces C=C conjugados en el &alpha;-caroteno.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Número de enlaces C=C conjugados en el &beta;-caroteno.</p></div>
+                </div>
+            </div>
+
+            <p>Los orbitales moleculares nos ayudan a entender por qué las moléculas con enlaces C=C conjugados absorben luz visible. Se pueden generar considerando la interferencia entre orbitales p adyacentes: cuando dos lóbulos vecinos tienen el mismo signo, la interferencia es constructiva; cuando tienen signo opuesto, es destructiva (aparece un nodo entre ellos).</p>
+            <p>En el butadieno, los cuatro orbitales p de los enlaces C=C conjugados interfieren para formar cuatro orbitales moleculares, mostrados aquí en un orden que <strong>no</strong> corresponde a su energía real:</p>
+
+            <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">A</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="2"></div></div>
+            <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">B</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="1"></div></div>
+            <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">C</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="4"></div></div>
+            <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">D</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="3"></div></div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body"><p>Considerando la cantidad de interferencia constructiva y destructiva entre orbitales p vecinos, ordena estos orbitales moleculares de menor a mayor energía.</p></div>
+            </div>
+
+            <p>En el hexatrieno, los seis orbitales p de los enlaces C=C conjugados interfieren para formar seis orbitales moleculares.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(d)</span>
+                <div class="pc-part-body"><p>Completa el diagrama de los seis orbitales moleculares del hexatrieno, sombreando correctamente cada lóbulo según su fase, ordenados de menor a mayor energía (ver la respuesta para la solución completa).</p></div>
+            </div>
+
+            <p>Los alquenos conjugados absorben luz cuya longitud de onda corresponde al hueco energético entre dos de estos orbitales moleculares. Podemos aproximar el hueco energético con esta ecuación:</p>
+            <p class="pc-eq">&Delta;E = 4&beta; sin( 90&deg; / (N+1) )</p>
+            <p><em>N</em> = número de orbitales p en el sistema conjugado. Para el hexatrieno, &beta; = 6.85&times;10<sup>&minus;19</sup> J.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(e)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Calcula el hueco energético en el hexatrieno.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Calcula la longitud de onda de la luz absorbida por el hexatrieno, en nanómetros (nm), redondeada al número entero más próximo.</p></div>
+                </div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (e)(ii), asume que la respuesta es 200 nm.</p>
+
+            <p>La luz visible tiene longitudes de onda entre 380 nm (violeta) y 720 nm (rojo).</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(f)</span>
+                <div class="pc-part-body"><p>Según tu respuesta a (e)(ii), indica si el hexatrieno absorbe luz visible o no.</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(g)</span>
+                <div class="pc-part-body"><p>Indica qué le ocurre a la longitud de onda de la luz absorbida a medida que aumenta el número de enlaces C=C conjugados (suponiendo que &beta; no cambia): ¿disminuye, se mantiene igual, o aumenta?</p></div>
+            </div>
+
+            <p>Un colorante alimentario relacionado, la <strong>tartrazina</strong>, es conocido por dar a los Doritos su color amarillo-naranja característico, pero también tiene una aplicación más inusual: al aplicarse sobre la piel de un ratón, la vuelve temporalmente transparente, ya que cambia el índice de refracción de las regiones acuosas de la piel para igualarlo al de las regiones grasas (permitiendo así estudiar vasos sanguíneos, músculos y órganos internos sin cirugía invasiva).</p>
+            <p>Región acuosa: índice de refracción = 1.33. Región grasa: índice de refracción = 1.45.</p>
+            <p class="pc-eq">&Delta;n = 0.143 &times; c<sub>t</sub> &nbsp;&nbsp;<span class="pc-eq-label">(c<sub>t</sub> en mol dm<sup>&minus;3</sup>)</span></p>
+            <p>M<sub>r</sub>(tartrazina) = 534.4 g mol<sup>&minus;1</sup>.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(h)</span>
+                <div class="pc-part-body"><p>Suponiendo que el volumen total de las regiones acuosas en la piel de un ratón es 8.50 cm<sup>3</sup>, calcula la masa mínima de tartrazina necesaria para hacer transparente la piel de ese ratón.</p></div>
+            </div>
+
+            <p>La síntesis de la tartrazina a partir del nitrobenceno se muestra a continuación (pista: el Na<sub>2</sub>SO<sub>3</sub> es un agente reductor):</p>
+            <p class="pc-eq-label" style="text-align:center;display:block;margin-bottom:8px;">nitrobenceno &rarr;(Sn/HCl) A (C<sub>6</sub>H<sub>7</sub>N) &rarr;(H<sub>2</sub>SO<sub>4</sub> conc., 200&deg;C) B (C<sub>6</sub>H<sub>7</sub>NO<sub>3</sub>S) &rarr;(NaNO<sub>2</sub>/HCl) C ([C<sub>6</sub>H<sub>5</sub>N<sub>2</sub>O<sub>3</sub>S]<sup>+</sup>Cl<sup>&minus;</sup>) &rarr;(i. Na<sub>2</sub>SO<sub>3</sub>/Na<sub>2</sub>CO<sub>3</sub>; ii. H<sup>+</sup>/H<sub>2</sub>O) D (C<sub>6</sub>H<sub>8</sub>N<sub>2</sub>O<sub>3</sub>S)</p>
+            <p class="pc-eq-label" style="text-align:center;display:block;">D &rarr;(dietil oxalacetato, &minus;H<sub>2</sub>O, &minus;CH<sub>3</sub>CH<sub>2</sub>OH) E &rarr;(compuesto C) F &rarr;(exceso de NaOH) tartrazina</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(i)</span>
+                <div class="pc-part-body"><p>Dibuja las estructuras de los compuestos <strong>A</strong>&ndash;<strong>F</strong>.</p></div>
+            </div>
+
+            <p>Una forma de diferenciar entre &beta;-caroteno y tartrazina es investigar qué longitudes de onda de luz absorben mediante espectroscopía UV-visible.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(j)</span>
+                <div class="pc-part-body"><p>El espectro UV-vis de la sustancia <strong>X</strong> muestra un pico de absorción máxima en torno a 660 nm (poca absorción en el resto del visible). Sugiere el color de la sustancia <strong>X</strong>.</p></div>
+            </div>
+
+            <p>Una muestra que contiene tartrazina, &beta;-caroteno y un indicador de pH se añadió a éter dietílico. Se añadió HCl acuoso, se agitó la mezcla y se dejaron separar las capas. Después se añadió una base a la capa orgánica, lo que provocó un cambio de color. Finalmente se evaporó el éter dietílico de la capa orgánica y se añadió etanol al residuo; los sólidos no disueltos se filtraron y se disolvieron en hexano.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(k)</span>
+                <div class="pc-part-body"><p>Explica, para cada una de las cinco disoluciones obtenidas en el proceso anterior (capa acuosa tras HCl; capa orgánica tras HCl; capa orgánica tras la base; la disolución en etanol; la disolución en hexano), qué compuesto(s) esperarías encontrar en cada una y por qué.</p></div>
+            </div>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q4 — Esta pregunta trata sobre arroz, especias y ratones <span class="pc-total-chip">Total: 26 puntos</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq"><strong>C<sub>40</sub>H<sub>56</sub></strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">2 puntos</span></div>
+                <p>(i) &alpha;-caroteno: <strong>10</strong> enlaces C=C conjugados. &nbsp; (ii) &beta;-caroteno: <strong>11</strong> enlaces C=C conjugados.</p>
+                <p class="pc-note">1 punto cada uno. Sin crédito si están intercambiados.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">2 puntos</span></div>
+                <p>De menor a mayor energía: <strong>B, A, D, C</strong> (es decir, cero nodos &rarr; un nodo &rarr; dos nodos &rarr; tres nodos entre orbitales p vecinos).</p>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">B (mín.)</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="1"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">A</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="2"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">D</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="3"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">C (máx.)</span><div class="pc-orbitals" data-orbitals data-n="4" data-index="4"></div></div>
+                <p class="pc-note">2 puntos si los cuatro están en el lugar correcto. 1 punto si dos están en el lugar correcto.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">3 puntos</span></div>
+                <p>Los seis orbitales moleculares del hexatrieno, de menor a mayor energía (0 a 5 nodos):</p>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 1 (mín.)</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="1"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 2</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="2"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 3</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="3"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 4</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="4"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 5</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="5"></div></div>
+                <div class="pc-orbitals-row"><span class="pc-orbitals-row-label">MO 6 (máx.)</span><div class="pc-orbitals" data-orbitals data-n="6" data-index="6"></div></div>
+                <p class="pc-note">Cada fila se evalúa por separado. Las seis filas correctas: 3 puntos. Cuatro o cinco correctas: 2 puntos. Dos o tres correctas: 1 punto.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">(i) &Delta;E = 4(6.85&times;10<sup>&minus;19</sup> J) sin(90&deg;/7) = <strong>6.10&times;10<sup>&minus;19</sup> J</strong></p>
+                <p class="pc-eq">(ii) &lambda; = hc/&Delta;E = (6.626&times;10<sup>&minus;34</sup> &times; 2.998&times;10<sup>8</sup>) / 6.10&times;10<sup>&minus;19</sup> = <strong>326 nm</strong></p>
+                <p class="pc-note">No se concede el punto de (ii) si la respuesta no se da en nm.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>No</strong> absorbe luz visible (326 nm está en el ultravioleta, por debajo de 380 nm). Se admite arrastre de error desde (e)(ii): si esa respuesta cae entre 380&ndash;720 nm, entonces "sí" es la respuesta correcta por arrastre.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">1 punto</span></div>
+                <p><strong>Aumenta.</strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">&Delta;n = 1.45 &minus; 1.33 = 0.12 &rArr; c<sub>t</sub> = 0.12 / 0.143 = 0.839 mol dm<sup>&minus;3</sup></p>
+                <p class="pc-eq">n<sub>t</sub> = 0.839 &times; 8.50&times;10<sup>&minus;3</sup> dm<sup>3</sup> = 7.13&times;10<sup>&minus;3</sup> mol</p>
+                <p class="pc-eq">m<sub>t</sub> = 7.13&times;10<sup>&minus;3</sup> &times; 534.4 = <strong>3.81 g</strong></p>
+                <p class="pc-note">1 punto por calcular correctamente la concentración de tartrazina, 1 punto por la masa mínima.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">8 puntos</span></div>
+                <div class="pc-compounds">
+                    <div class="pc-compound"><span class="pc-mol" data-mol="anilina"></span><span class="pc-compound-name">A &mdash; anilina (reducción del nitro)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="acido-sulfanilico"></span><span class="pc-compound-name">B &mdash; ácido sulfanílico (sulfonación)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="sal-diazonio"></span><span class="pc-compound-name">C &mdash; sal de diazonio</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="hidrazina-sulfonica"></span><span class="pc-compound-name">D &mdash; hidracina (reducción con Na<sub>2</sub>SO<sub>3</sub>)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="pirazolona-ester"></span><span class="pc-compound-name">E &mdash; hidrazona ciclada (pirazolona-éster)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-mol="tartrazina-simplificada"></span><span class="pc-compound-name">F/tartrazina &mdash; tras acoplamiento azoico con C e hidrólisis del éster</span></div>
+                </div>
+                <p class="pc-note">1 punto por A, 1 por B, 1 por C, 2 por D, 2 por E, 1 por F (arrastre de error permitido en cada paso si la estructura previa es consistente con la fórmula molecular dada).</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(j)</span><span class="pc-marks">1 punto</span></div>
+                <p>Si <strong>X</strong> absorbe con máximo hacia 660 nm (la región roja/naranja del espectro), el color que se observa es el complementario: <strong>azul</strong>.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(k)</span><span class="pc-marks">3 puntos</span></div>
+                <p>La tartrazina (ácida, con grupos &ndash;SO<sub>3</sub>H/&ndash;COOH) pasa a la capa acuosa tras la extracción ácida, mientras que el &beta;-caroteno (apolar, sin grupos ácidos) permanece en la capa orgánica de éter. Al añadir base a la capa orgánica, cualquier resto de indicador de pH cambia de color al desprotonarse. Tras evaporar el éter y añadir etanol, la tartrazina remanente (si la hubiera) se disuelve en etanol (polar), mientras que el &beta;-caroteno, muy apolar, no se disuelve en etanol pero sí en hexano.</p>
+                <p class="pc-note">3 puntos por identificar correctamente el compuesto mayoritario en cada una de las disoluciones y justificar la separación en términos de polaridad/acidez.</p>
+            </div>
+        `
+    },
+
+    // ────────────────────────────────────────────────────────────────
+    // Q5 — Minerales (turquesa)
+    // ────────────────────────────────────────────────────────────────
+    "q5-minerales": {
+        titulo: "Minerales: la turquesa de Al-Bīrūnī",
+        numero: "Q5",
+        fuente: "58ª Olimpiada Internacional de Química (IChO) · UK Round One 2026",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 58th IChO, UK Round One 2026. Autores originales: P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, B. Pilgrim, P. Robotham, A. Taylor, A. Thom. Publicado bajo licencia Creative Commons BY-NC-SA. Fotografías/diagramas originales del enunciado alojados externamente (Imgur) por el autor del sitio.",
+
+        enunciado: `
+            <p class="pc-q-title">Q5 — Esta pregunta trata sobre minerales</p>
+
+            <div class="pc-intro">
+                <p>El químico del siglo X al-Bīrūnī nació en Uzbekistán. Al-Bīrūnī desarrolló pruebas para distinguir minerales de aspecto similar entre sí, por lo que se le considera uno de los primeros mineralogistas científicos. Estudió la turquesa, una valiosa gema azul-verdosa.</p>
+                <p>La turquesa tiene una fórmula idealizada de CuAl<sub>6</sub>(PO<sub>4</sub>)<sub>4</sub>(OH)<sub>x</sub>&middot;yH<sub>2</sub>O. El estado de oxidación del cobre en este mineral es 2+.</p>
+            </div>
+
+            <div class="pc-gallery" data-gallery="q5-turquesa"></div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body"><p>Determina el número de iones hidróxido, x, presentes en esta fórmula.</p></div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (a), asume que la respuesta es x = 10.</p>
+
+            <p>Una forma sencilla de identificar una gema es el análisis destructivo para determinar su contenido elemental. El contenido de agua de la turquesa es variable, y <em>y</em> puede variar entre 2 y 8; este agua puede eliminarse calentando en un horno. Se realizó un análisis elemental sobre una muestra de turquesa pura deshidratada.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body"><p>Determina el porcentaje de cobre en masa en esta muestra deshidratada, con tres cifras significativas.</p></div>
+            </div>
+
+            <p>La libetenita, Cu<sub>2</sub>PO<sub>4</sub>OH, es un mineral azul-verdoso que contiene cobre, de aspecto similar a la turquesa. Se analizaron seis muestras minerales:</p>
+            <table class="pc-table">
+                <thead><tr><th>Muestra</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr></thead>
+                <tbody><tr><td>% Cu en masa</td><td>0%</td><td>7%</td><td>11%</td><td>17%</td><td>46%</td><td>53%</td></tr></tbody>
+            </table>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body"><p>Calcula qué muestra de la tabla era libetenita pura y cuál era turquesa pura.</p></div>
+            </div>
+
+            <p>La turquesa tiene una composición intermedia entre la libetenita y otro mineral azul-verdoso, la variscita, AlPO<sub>4</sub>&middot;2H<sub>2</sub>O. Estos minerales pueden distinguirse fácilmente mediante análisis químico. Al-Bīrūnī solo tenía acceso a análisis químicos sencillos; tuvo que recurrir a otras medidas, como la comparación de densidades minerales. Las densidades pueden calcularse a partir del tamaño y la composición de la celda unidad del cristal (la unidad que se repite periódicamente formando el cristal).</p>
+
+            <div class="pc-gallery" data-gallery="q5-variscita"></div>
+
+            <p>Dentro de la celda unidad se observan octaedros 'AlO<sub>6</sub>' (un Al<sup>3+</sup> rodeado de seis oxígenos en forma octaédrica; dos de esos oxígenos forman parte de moléculas de agua, y los demás se consideran iones O<sup>2&minus;</sup>) y tetraedros 'PO<sub>4</sub>' (un centro P(V) rodeado de un tetraedro de cuatro oxígenos, como en el anión fosfato). Todos los iones O<sup>2&minus;</sup> se comparten entre dos poliedros (octaedros o tetraedros).</p>
+            <p>Un tetraedro regular de arista <em>a</em> tiene volumen V<sub>tet</sub> = a<sup>3</sup> / (6&radic;2). La distancia de enlace P&ndash;O es 1.54 &Aring;.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(d)</span>
+                <div class="pc-part-body"><p>Determina el volumen del tetraedro PO<sub>4</sub> en &Aring;<sup>3</sup>.</p></div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (d), asume que la respuesta es 1.50 &Aring;<sup>3</sup>.</p>
+
+            <p>El volumen de la celda unidad puede aproximarse como la suma del volumen de los octaedros, los tetraedros, las moléculas de agua y los espacios vacíos. Cada molécula de agua contribuye con 20 &Aring;<sup>3</sup> extra de volumen. El octaedro AlO<sub>6</sub> tiene un volumen de 9.00 &Aring;<sup>3</sup>. La celda unidad de la variscita contiene 8 unidades fórmula.</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(e)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Calcula el volumen de la celda unidad de la variscita en &Aring;<sup>3</sup>, suponiendo que la celda está ocupada en un 50% por tetraedros, octaedros y agua.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Calcula la densidad de la variscita en g cm<sup>&minus;3</sup>.</p></div>
+                </div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (e)(i), asume que la respuesta es 969 &Aring;<sup>3</sup>.</p>
+
+            <p>La turquesa está formada por seis octaedros 'AlO<sub>6</sub>', un octaedro 'CuO<sub>6</sub>' y varios tetraedros fosfato 'PO<sub>4</sub>'. La distancia de enlace Cu&ndash;O es 2.29 &Aring;. Las distancias Al&ndash;O (1.89 &Aring;) y P&ndash;O (1.54 &Aring;) son las mismas que en la variscita. Un octaedro regular de arista <em>a</em> tiene volumen V<sub>oct</sub> = (&radic;2/3)a<sup>3</sup>.</p>
+            <p>Supón que la turquesa contiene seis moléculas de agua de cristalización en la fórmula unidad (y = 6) y que la celda está ocupada en un 70% por tetraedros, octaedros y agua/hidróxido (cada hidróxido también contribuye con 20 &Aring;<sup>3</sup> extra, igual que el agua).</p>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(f)</span>
+                <div class="pc-part-body">
+                    <div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Calcula el volumen de la celda unidad de la turquesa en &Aring;<sup>3</sup>.</p></div>
+                    <div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Determina la densidad de la turquesa en g cm<sup>&minus;3</sup>.</p></div>
+                </div>
+            </div>
+            <p class="pc-note">Si no obtienes una respuesta para (f)(i), asume que la respuesta es 444 &Aring;<sup>3</sup>.</p>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q5 — Esta pregunta trata sobre minerales <span class="pc-total-chip">Total: 13 puntos</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div>
+                <p>Balance de cargas: Cu(+2) + 6&times;Al(+3) + 4&times;PO<sub>4</sub>(&minus;3) = +2+18&minus;12 = +8. Carga restante para el OH<sup>&minus;</sup>: &minus;8.</p>
+                <p class="pc-eq"><strong>x = 8</strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">1 punto</span></div>
+                <p>M<sub>r</sub>(turquesa deshidratada) = 605.31 + 17.008x g mol<sup>&minus;1</sup>. Con x = 8: M<sub>r</sub> = 741.4 g mol<sup>&minus;1</sup>.</p>
+                <p class="pc-eq">%Cu = 63.55 / 741.4 &times; 100 = <strong>8.57%</strong></p>
+                <p class="pc-note">Se admite arrastre de error desde (a): con x = 10, %Cu = 8.20%.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">2 puntos</span></div>
+                <p>M<sub>r</sub>(libetenita) = 239.08 g mol<sup>&minus;1</sup> &rArr; %Cu = 2&times;63.55/239.08 = 53.2% &rArr; coincide con la <strong>muestra F</strong>.</p>
+                <p>Para la turquesa (x=8, y entre 2 y 8): %Cu entre 7.18% y 8.17% &rArr; coincide con la <strong>muestra B</strong>.</p>
+                <p class="pc-note">1 punto por identificar F como libetenita, 1 punto por identificar B como turquesa.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">2 puntos</span></div>
+                <p>La arista del tetraedro, a, se relaciona con la distancia P&ndash;O (r) mediante a = 2&radic;2&middot;r/&radic;3.</p>
+                <p class="pc-eq">a = 2&radic;2 &times; 1.54 / &radic;3 = 2.515 &Aring;</p>
+                <p class="pc-eq">V<sub>tet</sub> = a<sup>3</sup>/(6&radic;2) = <strong>1.87 &Aring;<sup>3</sup></strong></p>
+                <p class="pc-note">1 punto por la expresión algebraica correcta de a, 1 punto por el valor final.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)(i)</span><span class="pc-marks">2 puntos</span></div>
+                <p class="pc-eq">volumen ocupado = 8&times;1.87 + 8&times;9.00 + 16&times;20 = 406.96 &Aring;<sup>3</sup></p>
+                <p class="pc-eq">volumen total = 406.96 / 0.5 = <strong>814 &Aring;<sup>3</sup></strong></p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(e)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">M<sub>r</sub>(celda, 8 unidades) = 1263.86 g mol<sup>&minus;1</sup> &rArr; masa = 2.099&times;10<sup>&minus;21</sup> g</p>
+                <p class="pc-eq">densidad = 2.099&times;10<sup>&minus;21</sup> / (814&times;10<sup>&minus;24</sup> cm<sup>3</sup>) = <strong>2.58 g cm<sup>&minus;3</sup></strong></p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)(i)</span><span class="pc-marks">3 puntos</span></div>
+                <p>V<sub>CuO6</sub> = (2.29/1.89)<sup>3</sup> &times; 9.00 = 16.01 &Aring;<sup>3</sup></p>
+                <p class="pc-eq">volumen ocupado = 4&times;1.87 + 16.01 + 6&times;9.00 + 14&times;20 = 357.49 &Aring;<sup>3</sup></p>
+                <p class="pc-eq">volumen total = 357.49 / 0.7 = <strong>511 &Aring;<sup>3</sup></strong></p>
+                <p class="pc-note">1 punto por el volumen del octaedro CuO<sub>6</sub>, 1 punto por el volumen ocupado, 1 punto por el resultado final.</p>
+            </div>
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(f)(ii)</span><span class="pc-marks">1 punto</span></div>
+                <p class="pc-eq">M<sub>r</sub>(unidad fórmula) = 849.47 g mol<sup>&minus;1</sup> &rArr; masa = 1.411&times;10<sup>&minus;21</sup> g</p>
+                <p class="pc-eq">densidad = 1.411&times;10<sup>&minus;21</sup> / (511&times;10<sup>&minus;24</sup>) = <strong>2.76 g cm<sup>&minus;3</sup></strong></p>
             </div>
         `
     }
+
 
 };
 
