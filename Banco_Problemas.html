@@ -294,9 +294,9 @@
         <div class="bp-filter-group">
             <p class="bp-filter-label" id="bp-lbl-dificultad">Dificultad</p>
             <div class="bp-chips" id="bp-chips-dificultad">
-                <button class="bp-chip" data-dif="1" onclick="bpToggleDificultad(1, this)"><span class="bp-chip-dot" style="background:#1b7a43;"></span><span class="bp-dif-stars">★</span> <span data-dif-text>Dificultad 1</span></button>
-                <button class="bp-chip" data-dif="2" onclick="bpToggleDificultad(2, this)"><span class="bp-chip-dot" style="background:#b8860b;"></span><span class="bp-dif-stars">★★</span> <span data-dif-text>Dificultad 2</span></button>
-                <button class="bp-chip" data-dif="3" onclick="bpToggleDificultad(3, this)"><span class="bp-chip-dot" style="background:#9a2020;"></span><span class="bp-dif-stars">★★★</span> <span data-dif-text>Dificultad 3</span></button>
+                <button class="bp-chip" data-dif="1" onclick="bpToggleDificultad(1, this)"><span class="bp-chip-dot" style="background:#1b7a43;"></span><span class="bp-dif-stars">★</span></button>
+                <button class="bp-chip" data-dif="2" onclick="bpToggleDificultad(2, this)"><span class="bp-chip-dot" style="background:#b8860b;"></span><span class="bp-dif-stars">★★</span></button>
+                <button class="bp-chip" data-dif="3" onclick="bpToggleDificultad(3, this)"><span class="bp-chip-dot" style="background:#9a2020;"></span><span class="bp-dif-stars">★★★</span></button>
             </div>
         </div>
 
@@ -447,9 +447,6 @@ function bpAplicarIdioma() {
     document.getElementById('bp-reset-btn').textContent = _bpT('reset');
     document.getElementById('bp-lbl-dificultad').textContent = _bpT('lblDificultad');
     document.getElementById('bp-lbl-tema').textContent = _bpT('lblTema');
-    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[0].lastChild.textContent = _bpT('dif1');
-    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[1].lastChild.textContent = _bpT('dif2');
-    document.querySelectorAll('#bp-chips-dificultad .bp-chip')[2].lastChild.textContent = _bpT('dif3');
     document.querySelectorAll('[data-i18n-tema]').forEach(el => {
         const k = el.getAttribute('data-i18n-tema');
         const map = { inorganica: 'temaInorganica', fisica: 'temaFisica', analitica: 'temaAnalitica', organica: 'temaOrganica' };
@@ -460,9 +457,7 @@ function bpAplicarIdioma() {
     bpRenderizar();
 }
 function bpToggleIdioma() {
-    const next = _bpLang() === 'es' ? 'en' : 'es';
-    try { localStorage.setItem('lang', next); } catch(e) {}
-    bpAplicarIdioma();
+    alert('Idioma no disponible de momento');
 }
 
 function _bpTemaOscuroPorDefecto() {
