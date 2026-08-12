@@ -189,7 +189,55 @@
     .pc-dc-dot { fill: var(--navy); }
     [data-theme="dark"] .pc-dc-dot { fill: var(--gold-light); }
     .pc-dc-cross { font-size: 15px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
+
+    /* ── Estructuras esqueléticas dibujadas por ChemDraw ── */
+    .pc-mol { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+    .pc-mol-rendered .pc-skel-svg { display: block; }
+    .pc-skel-svg { width: 100%; height: auto; max-width: 190px; }
+    .pc-skel-bond { stroke: var(--text); stroke-width: 2.1; stroke-linecap: round; }
+    .pc-skel-dashed { stroke-dasharray: 4 3; }
+    .pc-skel-bg { fill: var(--card-bg); }
+    .pc-skel-label { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+    .pc-skel-charge { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
+    .pc-skel-star { font-size: 17px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
+    .pc-mol-missing { font-size: 11px; color: var(--red-soft); font-style: italic; }
+
+    .pc-compounds { display: flex; flex-wrap: wrap; gap: 14px; margin: 12px 0 18px; }
+    .pc-compound {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        background: rgba(4,18,43,.03); border: 1px solid var(--border);
+        border-radius: 12px; padding: 12px 14px 10px; min-width: 130px;
+    }
+    [data-theme="dark"] .pc-compound { background: rgba(255,255,255,.03); }
+    .pc-compound-name { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; }
+    .pc-compound-formula { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-muted); text-align: center; }
+    .pc-compound-yes { border-color: var(--green); background: rgba(31,122,77,.08); }
+    .pc-compound-yes .pc-compound-name { color: var(--green); }
+    .pc-compound-no { opacity: .6; }
+
+    /* ── Diagramas de orbitales moleculares ── */
+    .pc-orbitals-row { display: flex; align-items: center; gap: 14px; margin: 8px 0; }
+    .pc-orbitals-row-label { flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--text-muted); width: 74px; }
+    .pc-orbitals { display: inline-block; }
+    .pc-orb-svg { display: block; height: 58px; width: auto; }
+    .pc-orb-lobe { stroke: var(--text); stroke-width: 1.3; }
+    .pc-orb-pos { fill: var(--card-bg); }
+    .pc-orb-neg { fill: var(--navy); }
+    [data-theme="dark"] .pc-orb-neg { fill: var(--gold); }
+    .pc-orb-axis { stroke: var(--text); stroke-width: 1; opacity: .55; }
+
+    /* ── Galería de imágenes (Q5, cargadas desde un listado externo) ── */
+    .pc-gallery { display: flex; flex-direction: column; gap: 16px; margin: 14px 0 20px; }
+    .pc-gallery-item {
+        background: rgba(4,18,43,.03); border: 1px solid var(--border); border-radius: 12px;
+        padding: 12px; text-align: center;
+    }
+    [data-theme="dark"] .pc-gallery-item { background: rgba(255,255,255,.03); }
+    .pc-gallery-item img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto 8px; }
+    .pc-gallery-caption { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+    .pc-gallery-empty { font-size: 13px; color: var(--text-muted); font-style: italic; padding: 14px; text-align: center; }
 </style>
+
 </head>
 <body>
 
@@ -266,19 +314,41 @@ let _pvTab = _pvParams.get('tab') === 'respuesta' ? 'respuesta' : 'enunciado';
 //    Esto permite que el contenido sea HTML real en español, con comillas,
 //    subíndices, tablas, etc. sin restricciones. ──
 let _pvDatos = null;
-async function _pvCargar() {
-    const resp = await fetch('problemas_contenido.html');
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+async function _pvCargarScript(url, globalName) {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status + ' cargando ' + url);
     const html = await resp.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const el = doc.getElementById('problemas-contenido');
-    if (!el) throw new Error('No se encontró #problemas-contenido en problemas_contenido.html');
-
+    const el = doc.body.querySelector('script[id]');
+    if (!el) throw new Error('No se encontró <script id="..."> en ' + url);
     const s = document.createElement('script');
     s.textContent = el.textContent;
     document.head.appendChild(s);
+    return window[globalName];
+}
+async function _pvCargar() {
+    const contenido = await _pvCargarScript('problemas_contenido.html', 'contenidoProblemas');
+    // ChemDraw e imágenes son opcionales: si faltan, seguimos sin romper la página.
+    try { await _pvCargarScript('chem-draw.html', 'ChemDraw'); } catch (e) { console.warn('ChemDraw no disponible:', e); }
+    try { window._pvImagenes = await _pvCargarScript('imagenes.html', 'imagenesProblemas'); } catch (e) { window._pvImagenes = {}; }
+    return contenido || {};
+}
 
-    return window.contenidoProblemas || {};
+function pvRenderGalerias(root) {
+    root.querySelectorAll('[data-gallery]').forEach(el => {
+        const key = el.getAttribute('data-gallery');
+        const items = (window._pvImagenes && window._pvImagenes[key]) || [];
+        if (!items.length) {
+            el.innerHTML = `<div class="pc-gallery-empty">📷 Imágenes pendientes de añadir (${key}).</div>`;
+            return;
+        }
+        el.innerHTML = items.map(it => `
+            <div class="pc-gallery-item">
+                <img src="${it.url}" alt="${it.nombre || ''}" loading="lazy">
+                ${it.nombre ? `<div class="pc-gallery-caption">${it.nombre}</div>` : ''}
+            </div>
+        `).join('');
+    });
 }
 
 function pvSetTab(tab) {
@@ -311,9 +381,13 @@ function pvRender() {
             <button class="pv-tab ${_pvTab === 'enunciado' ? 'activo' : ''}" onclick="pvSetTab('enunciado')">${_pvT('tabEnunciado')}</button>
             <button class="pv-tab ${_pvTab === 'respuesta' ? 'activo' : ''}" onclick="pvSetTab('respuesta')">${_pvT('tabRespuesta')}</button>
         </div>
-        <article class="pv-articulo">${cuerpo}</article>
+        <article class="pv-articulo" id="pv-articulo">${cuerpo}</article>
         ${p.creditos ? `<p class="pv-creditos">${p.creditos}</p>` : ''}
     `;
+
+    const articulo = document.getElementById('pv-articulo');
+    if (window.ChemDraw) window.ChemDraw.renderAll(articulo);
+    pvRenderGalerias(articulo);
 }
 
 async function pvInicializar() {
