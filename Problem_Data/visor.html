@@ -133,6 +133,11 @@
         margin: 4px 0 16px !important; line-height: 1.8; overflow-x: auto;
     }
     [data-theme="dark"] .pc-eq { background: rgba(255,255,255,.04); }
+    .pc-eq-inline {
+        font-family: 'JetBrains Mono', monospace; font-size: 14.5px;
+        display: inline; padding: 0 2px;
+    }
+    .pc-eq-inline sup, .pc-eq-inline sub { font-size: 75%; }
     .pc-eq-small { font-size: 13px; }
     .pc-eq-label { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-muted); }
     .pc-formula-inline { font-family: 'JetBrains Mono', monospace; font-size: 14px; }
@@ -272,6 +277,11 @@
     .pc-figure { margin: 10px 0 18px; text-align: center; }
     .pc-figure img { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); }
     .pc-figure figcaption { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    /* ── Fila del título con botón de compartir ── */
+    .pv-title-row { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
+    .pv-title-row .pv-heading { margin: 0; }
+    .pv-title-row .mp-icon-btn { flex-shrink: 0; }
 </style>
 
 </head>
@@ -286,7 +296,6 @@
         <span class="mp-crumb-current" id="pv-crumb-actual">📝</span>
     </div>
     <div class="mp-topbar-actions">
-        <button class="mp-icon-btn" id="pv-share-btn" onclick="pvCompartir()" title="Compartir">🔗</button>
         <button class="mp-icon-btn" id="pv-theme-btn" onclick="pvToggleThemeMode()" title="Tema">🌙</button>
         <button class="mp-icon-btn" id="pv-lang-btn" onclick="pvToggleIdioma()" title="Idioma / Language">ES</button>
     </div>
@@ -433,7 +442,10 @@ function pvRender() {
 
     document.getElementById('pv-main').innerHTML = `
         <span class="pv-q-badge">${p.numero || ''}</span>
-        <h1 class="pv-heading">${titulo}</h1>
+        <div class="pv-title-row">
+            <h1 class="pv-heading">${titulo}</h1>
+            <button class="mp-icon-btn" id="pv-share-btn" onclick="pvCompartir()" title="Compartir">🔗</button>
+        </div>
         <p class="pv-fuente">${p.fuente || ''}</p>
         <div class="pv-tabs">
             <button class="pv-tab ${_pvTab === 'enunciado' ? 'activo' : ''}" onclick="pvSetTab('enunciado')">${_pvT('tabEnunciado')}</button>
