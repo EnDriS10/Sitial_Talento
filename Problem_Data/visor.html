@@ -194,6 +194,37 @@
     .pc-mol { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
     .pc-mol-rendered .pc-skel-svg { display: block; }
     .pc-skel-svg { width: 100%; height: auto; max-width: 190px; }
+    .pc-mol-sm .pc-skel-svg { max-width: 108px; }
+    .pc-mol-lg .pc-skel-svg { max-width: 260px; }
+
+    /* ── Esquemas de síntesis / reacción (flechas con reactivos) ── */
+    .pc-scheme-box {
+        background: rgba(4,18,43,.03); border: 1px solid var(--border); border-radius: 12px;
+        padding: 14px 16px; margin: 10px 0 18px; overflow-x: auto;
+    }
+    [data-theme="dark"] .pc-scheme-box { background: rgba(255,255,255,.03); }
+    .pc-scheme-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; margin: 6px 0; }
+    .pc-scheme-node { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 40px; }
+    .pc-scheme-mol .pc-skel-svg { max-width: 100px; }
+    .pc-scheme-label { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; white-space: nowrap; }
+    .pc-scheme-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: center; white-space: nowrap; }
+    .pc-scheme-plus { font-size: 16px; font-weight: 700; color: var(--text-muted); padding: 0 2px; }
+    .pc-scheme-arrow { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
+    .pc-scheme-arrow-above, .pc-scheme-arrow-below { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
+    .pc-scheme-arrow-svg { width: 60px; height: 14px; display: block; }
+    .pc-scheme-arrowhead { fill: var(--text); }
+
+    /* ── Ecuaciones / fórmulas destacadas (cajas de cálculo, p.ej. Q5) ── */
+    .pc-eq-box {
+        font-family: 'JetBrains Mono', monospace; font-size: 14.5px; text-align: center;
+        background: rgba(4,18,43,.035); border: 1px solid var(--border); border-radius: 10px;
+        padding: 14px 16px; margin: 10px 0 18px; line-height: 2; overflow-x: auto;
+    }
+    [data-theme="dark"] .pc-eq-box { background: rgba(255,255,255,.04); }
+    .pc-eq-box sup, .pc-eq-box sub { font-size: 75%; }
+    .pc-eq-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
+    .pc-eq-frac-num, .pc-eq-frac-den { padding: 0 4px; }
+    .pc-eq-frac-num { border-bottom: 1.4px solid var(--text); }
     .pc-skel-bond { stroke: var(--text); stroke-width: 2.1; stroke-linecap: round; }
     .pc-skel-dashed { stroke-dasharray: 4 3; }
     .pc-skel-bg { fill: var(--card-bg); }
@@ -236,6 +267,11 @@
     .pc-gallery-item img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto 8px; }
     .pc-gallery-caption { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
     .pc-gallery-empty { font-size: 13px; color: var(--text-muted); font-style: italic; padding: 14px; text-align: center; }
+
+    /* ── Figura/foto suelta embebida en el enunciado ── */
+    .pc-figure { margin: 10px 0 18px; text-align: center; }
+    .pc-figure img { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); }
+    .pc-figure figcaption { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 </style>
 
 </head>
@@ -250,6 +286,7 @@
         <span class="mp-crumb-current" id="pv-crumb-actual">📝</span>
     </div>
     <div class="mp-topbar-actions">
+        <button class="mp-icon-btn" id="pv-share-btn" onclick="pvCompartir()" title="Compartir">🔗</button>
         <button class="mp-icon-btn" id="pv-theme-btn" onclick="pvToggleThemeMode()" title="Tema">🌙</button>
         <button class="mp-icon-btn" id="pv-lang-btn" onclick="pvToggleIdioma()" title="Idioma / Language">ES</button>
     </div>
@@ -349,6 +386,27 @@ function pvRenderGalerias(root) {
             </div>
         `).join('');
     });
+}
+
+async function pvCompartir() {
+    const p = _pvDatos && _pvDatos[_pvId];
+    const titulo = p ? p.titulo : document.title;
+    const url = location.href;
+    const btn = document.getElementById('pv-share-btn');
+    try {
+        if (navigator.share) {
+            await navigator.share({ title: titulo, url });
+            return;
+        }
+    } catch (e) { /* el usuario canceló o falló: probamos con el portapapeles */ }
+    try {
+        await navigator.clipboard.writeText(url);
+        const original = btn.textContent;
+        btn.textContent = '✅';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+    } catch (e) {
+        prompt(_pvLang() === 'es' ? 'Copia este enlace:' : 'Copy this link:', url);
+    }
 }
 
 function pvSetTab(tab) {
