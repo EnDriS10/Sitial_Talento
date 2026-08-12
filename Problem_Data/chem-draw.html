@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="chem-draw">
+
+// ════════════════════════════════════════════════════════════════════
+// ChemDraw — motor de dibujo químico reutilizable, 100% código (sin
+// imágenes). Genera SVG a partir de coordenadas: fórmulas esqueléticas
+// (líneas/ángulos, como se dibujan a mano) y diagramas de orbitales
+// moleculares (lóbulos p con sombreado de fase).
+//
+// Uso desde el contenido de un problema:
+//   <span class="pc-mol" data-mol="fenilisocianuro"></span>
+//   <div class="pc-orbitals" data-n="6" data-index="3"></div>
+// y luego, tras inyectar el HTML, se llama a ChemDraw.renderAll(root).
+// ════════════════════════════════════════════════════════════════════
+
+(function () {
+
+    // ── Helpers geométricos para construir moléculas fácilmente ──
+    const DEG = Math.PI / 180;
+
+    // Cadena en zigzag de n vértices (ángulos de 30°, longitud de enlace 1)
+    function zz(x0, y0, n, upFirst) {
+        if (upFirst === undefined) upFirst = true;
+        const pts = [{ x: x0, y: y0 }];
+        let up = upFirst;
+        for (let i = 1; i < n; i++) {
+            const p = pts[i - 1];
+            pts.push({ x: p.x + Math.cos(30 * DEG), y: p.y + (up ? 1 : -1) * Math.sin(30 * DEG) });
+            up = !up;
+        }
+        return pts;
+    }
+    // Anillo regular de n vértices centrado en (cx,cy)
+    function ring(cx, cy, n, startDeg) {
+        if (startDeg === undefined) startDeg = 90;
+        const R = 1 / (2 * Math.sin(Math.PI / n));
+        const pts = [];
+        for (let k = 0; k < n; k++) {
+            const a = (startDeg - k * (360 / n)) * DEG;
+            pts.push({ x: cx + R * Math.cos(a), y: cy + R * Math.sin(a) });
+        }
+        return pts;
+    }
+    // Traslada un array de puntos
+    function tr(pts, dx, dy) { return pts.map(p => ({ x: p.x + dx, y: p.y + dy })); }
+    // Punto a distancia d y ángulo deg desde otro punto
+    function pt(from, deg, d) {
+        if (d === undefined) d = 1;
+        return { x: from.x + d * Math.cos(deg * DEG), y: from.y + d * Math.sin(deg * DEG) };
+    }
+    // Construye lista de átomos a partir de puntos [{x,y}] + mapa de etiquetas {idx:'O'} + cargas {idx:'+'}
+    function atoms(pts, labels, charges) {
+        labels = labels || {}; charges = charges || {};
+        return pts.map((p, i) => ({ x: p.x, y: p.y, label: labels[i] || null, charge: charges[i] || null }));
+    }
+
+    // ── Renderizador de fórmulas esqueléticas ──
+    function renderSkeletal(mol, opts) {
+        opts = opts || {};
+        const unit = opts.unit || 40;
+        const pad = opts.pad || 24;
+        const xs = mol.atoms.map(a => a.x), ys = mol.atoms.map(a => a.y);
+        const minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+        const minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+        const W = (maxX - minX) * unit + pad * 2;
+        const H = (maxY - minY) * unit + pad * 2;
+        const px = x => (x - minX) * unit + pad;
+        const py = y => (maxY - y) * unit + pad;
+
+        function shrinkPoint(P, Q, amt) {
+            const dx = Q.x - P.x, dy = Q.y - P.y, len = Math.hypot(dx, dy);
+            if (len === 0) return P;
+            return { x: P.x + dx / len * amt, y: P.y + dy / len * amt };
+        }
+        function offsetLine(x1, y1, x2, y2, off) {
+            const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+            const nx = -dy / len * off, ny = dx / len * off;
+            return { x1: x1 + nx, y1: y1 + ny, x2: x2 + nx, y2: y2 + ny };
+        }
+
+        let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-skel-svg">';
+
+        (mol.bonds || []).forEach(b => {
+            const i = b[0], j = b[1], order = b[2] || 1;
+            const a = mol.atoms[i], c = mol.atoms[j];
+            let P1 = { x: px(a.x), y: py(a.y) }, P2 = { x: px(c.x), y: py(c.y) };
+            if (a.label) P1 = shrinkPoint(P1, P2, 15);
+            if (c.label) P2 = shrinkPoint(P2, P1, 15);
+
+            if (order === 1) {
+                svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
+            } else if (order === 2) {
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 3.6);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -3.6);
+                svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
+            } else if (order === 3) {
+                svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 5.2);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -5.2);
+                svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
+            } else if (order === 'wedge') {
+                svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond pc-skel-dashed"/>`;
+            }
+        });
+
+        mol.atoms.forEach(a => {
+            if (a.label) {
+                const x = px(a.x), y = py(a.y);
+                const w = 11 + a.label.length * 8;
+                svg += `<rect x="${x - w/2}" y="${y - 11}" width="${w}" height="22" rx="3" class="pc-skel-bg"/>`;
+                svg += `<text x="${x}" y="${y + 6}" class="pc-skel-label">${a.label}</text>`;
+                if (a.charge) svg += `<text x="${x + w/2 - 2}" y="${y - 8}" class="pc-skel-charge">${a.charge}</text>`;
+            }
+            if (a.star) {
+                const x = px(a.x), y = py(a.y);
+                svg += `<text x="${x + 12}" y="${y - 10}" class="pc-skel-star">&#10033;</text>`;
+            }
+        });
+
+        svg += '</svg>';
+        return svg;
+    }
+
+    // ── Renderizador de diagramas de orbitales moleculares (lóbulos p) ──
+    // Genera los signos de los coeficientes para el MO nº `moIndex` (1 =
+    // más baja energía) de una cadena conjugada lineal de N orbitales p
+    // (modelo de partícula en una caja / Hückel simplificado, igual que
+    // el usado en el enunciado original).
+    function pSigns(N, moIndex) {
+        const signs = [];
+        for (let i = 1; i <= N; i++) {
+            const v = Math.sin(i * moIndex * Math.PI / (N + 1));
+            signs.push(v >= 0 ? 1 : -1);
+        }
+        return signs;
+    }
+    function renderOrbitalRow(N, moIndex, opts) {
+        opts = opts || {};
+        const signs = opts.signs || pSigns(N, moIndex);
+        const spacing = 46, lobeW = 20, lobeH = 34, pad = 20;
+        const W = spacing * (N - 1) + pad * 2 + lobeW;
+        const H = lobeH * 2 + pad * 1.4;
+        const cy = H / 2;
+        let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">';
+        for (let i = 0; i < N; i++) {
+            const cx = pad + lobeW / 2 + i * spacing;
+            const topNeg = signs[i] < 0; // true => lóbulo superior sombreado (fase negativa arriba)
+            svg += `<ellipse cx="${cx}" cy="${cy - lobeH/2 + 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-neg' : 'pc-orb-pos'}"/>`;
+            svg += `<ellipse cx="${cx}" cy="${cy + lobeH/2 - 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-pos' : 'pc-orb-neg'}"/>`;
+            svg += `<line x1="${cx}" y1="${cy - lobeH + 4}" x2="${cx}" y2="${cy + lobeH - 4}" class="pc-orb-axis"/>`;
+        }
+        svg += '</svg>';
+        return svg;
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // BIBLIOTECA DE MOLÉCULAS
+    // Cada entrada: función que construye {atoms, bonds} usando los
+    // helpers de arriba. Se evalúan una vez y se cachean.
+    // ════════════════════════════════════════════════════════════════
+    const BUILDERS = {};
+    const CACHE = {};
+    function def(id, fn) { BUILDERS[id] = fn; }
+    function get(id) {
+        if (CACHE[id]) return CACHE[id];
+        const fn = BUILDERS[id];
+        if (!fn) return null;
+        const mol = fn();
+        CACHE[id] = mol;
+        return mol;
+    }
+
+    // ---- fragmentos comunes ----
+    function benzeneAt(cx, cy, startDeg) {
+        const p = ring(cx, cy, 6, startDeg || 90);
+        return { atoms: atoms(p), bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]] };
+    }
+    function mergeMol(parts) {
+        // parts: array of {atoms, bonds, offset?} -> concatena reindexando bonds
+        let allAtoms = [], allBonds = [];
+        let base = 0;
+        parts.forEach(p => {
+            allAtoms = allAtoms.concat(p.atoms);
+            (p.bonds || []).forEach(b => allBonds.push([b[0] + base, b[1] + base, b[2] || 1]));
+            base += p.atoms.length;
+        });
+        return { atoms: allAtoms, bonds: allBonds };
+    }
+
+    // ═══ Q2 — isocianuros ═══
+
+    def('bromuro-alilo', () => {
+        const c = zz(0, 0, 3);
+        const a = atoms(c.concat([pt(c[2], -30, 1)]), { 3: 'Br' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1]] };
+    });
+
+    def('alil-isocianuro', () => {
+        // CH2=CH-CH2-N≡C:
+        const c = zz(0, 0, 3);
+        const n = pt(c[2], -30, 1);
+        const cIso = pt(n, -90, 1);
+        const a = atoms(c.concat([n, cIso]), { 3: 'N', 4: 'C' }, { 4: '\u2212', 3:'' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1],[3,4,3]] };
+    });
+
+    def('formamida-generica', () => {
+        // R-NH-CHO
+        const r = { x: -1, y: 0.6 };
+        const n = { x: 0, y: 0 };
+        const c = pt(n, -30, 1);
+        const o = pt(c, -90, 1);
+        const a = atoms([r, n, c, o], { 0: 'R', 1: 'NH', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,2]] };
+    });
+
+    def('acido-formico', () => {
+        const c = { x: 0, y: 0 };
+        const oh = pt(c, 150, 1);
+        const o2 = pt(c, 90, 1);
+        const h = pt(c, -30, 0.9);
+        const a = atoms([h, c, oh, o2], { 2: 'OH', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2]] };
+    });
+
+    def('n-metilalilamina', () => {
+        const c = zz(0, 0, 3);
+        const n = pt(c[2], -30, 1);
+        const me = pt(n, -90, 1);
+        const a = atoms(c.concat([n, me]), { 3: 'NH' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1],[3,4,1]] };
+    });
+
+    def('piridina', () => {
+        const p = ring(0, 0, 6, 90);
+        const a = atoms(p, { 0: 'N' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]] };
+    });
+
+    def('butan-2-amina', () => {
+        const c = zz(0, 0, 4);
+        const nh2 = pt(c[1], 90, 1);
+        const a = atoms(c.concat([nh2]), { 4: 'NH2' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[1,4,1]] };
+    });
+
+    def('3-metoxianilina', () => {
+        const ringPts = ring(0, 0, 6, 90);
+        const nh2 = pt(ringPts[0], 90, 1);
+        const ome = pt(ringPts[2], -30, 1);
+        const a = atoms(ringPts.concat([nh2, ome]), { 6: 'NH2', 7: 'OMe' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1],[0,6,1],[2,7,1]] };
+    });
+
+    def('n-metilformamida', () => {
+        const c = { x: 0, y: 0 };
+        const o = pt(c, 90, 1);
+        const n = pt(c, -30, 1);
+        const me = pt(n, -90, 1);
+        const h = pt(c, 210, 0.9);
+        const a = atoms([h, c, o, n, me], { 2: 'O', 3: 'NH' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,1]] };
+    });
+
+    def('acetamida', () => {
+        const c2 = { x: 0, y: 0 };
+        const me = pt(c2, 210, 1);
+        const o = pt(c2, 90, 1);
+        const n = pt(c2, -30, 1);
+        const a = atoms([me, c2, o, n], { 2: 'O', 3: 'NH2' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1]] };
+    });
+
+    def('pirrolidina', () => {
+        const p = ring(0, 0, 5, 90);
+        const a = atoms(p, { 0: 'NH' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,0,1]] };
+    });
+
+    def('acido-ciclopropanocarboxilico', () => {
+        const tri = ring(0, 0, 3, 90);
+        const c = pt(tri[0], 90, 1);
+        const oh = pt(c, 150, 1);
+        const o2 = pt(c, 30, 1);
+        const a = atoms(tri.concat([c, oh, o2]), { 4: 'OH', 5: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,0,1],[0,3,1],[3,4,1],[3,5,2]] };
+    });
+
+    def('isocianuro-biciclico-telaprevir', () => {
+        // representación simplificada del fragmento bicíclico (hexahidrociclopenta-pirrol) con -NC y el grupo R
+        const penta = ring(-0.9, 0, 5, 90);
+        const hexa = ring(0.75, 0, 6, 90);
+        const n = pt(penta[0], 150, 1);
+        const cIso = pt(n, 150, 1);
+        const rGroup = pt(hexa[2], -30, 1);
+        const parts = mergeMol([
+            { atoms: atoms(penta), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,0,1]] },
+            { atoms: atoms(hexa), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1]] },
+        ]);
+        parts.atoms.push({ x: n.x, y: n.y, label: 'N', charge: null });
+        parts.atoms.push({ x: cIso.x, y: cIso.y, label: 'C', charge: '\u2212' });
+        parts.atoms.push({ x: rGroup.x, y: rGroup.y, label: 'R', charge: null });
+        parts.bonds.push([0, 11, 1]); // penta[0] - N   (penta has 5 atoms idx0-4, hexa idx5-10)
+        parts.bonds.push([11, 12, 3]); // N - C triple
+        parts.bonds.push([7, 13, 1]); // hexa[2]=idx7 - R
+        parts.bonds.push([4, 5, 1]); // fusión penta-hexa (comparten arista aproximada)
+        return parts;
+    });
+
+    def('acetaldehido', () => {
+        const c = { x: 0, y: 0 };
+        const me = pt(c, 210, 1);
+        const o = pt(c, 90, 1);
+        const h = pt(c, -30, 0.9);
+        const a = atoms([me, c, o, h], { 2: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1]] };
+    });
+
+    def('fenilisocianuro', () => {
+        const b = benzeneAt(0, 0);
+        const n = pt(b.atoms[0], 90, 1);
+        const c2 = pt(n, 90, 1);
+        b.atoms.push({ x: n.x, y: n.y, label: 'N', charge: null });
+        b.atoms.push({ x: c2.x, y: c2.y, label: 'C', charge: '\u2212' });
+        b.bonds.push([0, 6, 1], [6, 7, 3]);
+        return b;
+    });
+
+    def('1-isocianopropano', () => {
+        const c = zz(0, 0, 3);
+        const n = pt(c[2], -30, 1);
+        const cIso = pt(n, -90, 1);
+        const a = atoms(c.concat([n, cIso]), { 3: 'N', 4: 'C' }, { 4: '\u2212' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,3]] };
+    });
+
+    def('acetona', () => {
+        const c = zz(0, 0, 3);
+        const o = pt(c[1], 90, 1);
+        const a = atoms(c.concat([o]), { 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2]] };
+    });
+
+    def('ciclopentanona', () => {
+        const p = ring(0, 0, 5, 90);
+        const o = pt(p[0], 90, 1);
+        const a = atoms(p.concat([o]), { 5: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,0,1],[0,5,2]] };
+    });
+
+    def('benzofenona', () => {
+        const b1 = benzeneAt(-1.7, -0.5);
+        const b2 = benzeneAt(1.7, -0.5);
+        const cCarbonyl = { x: 0, y: -0.5 };
+        const o = pt(cCarbonyl, 90, 1);
+        const m = mergeMol([b1, b2]);
+        m.atoms.push({ x: cCarbonyl.x, y: cCarbonyl.y, label: null });
+        m.atoms.push({ x: o.x, y: o.y, label: 'O' });
+        const cIdx = m.atoms.length - 2, oIdx = m.atoms.length - 1;
+        // vértice 2 de cada anillo (ángulo -30°, lado más próximo al centro) para evitar que el enlace cruce el anillo
+        m.bonds.push([2, cIdx, 1], [cIdx, 10, 1], [cIdx, oIdx, 2]);
+        return m;
+    });
+
+    def('acido-acetico', () => {
+        const c = { x: 0, y: 0 };
+        const me = pt(c, 210, 1);
+        const oh = pt(c, 90, 1);
+        const o2 = pt(c, -30, 1);
+        const a = atoms([me, c, oh, o2], { 2: 'OH', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2]] };
+    });
+
+    def('acido-benzoico', () => {
+        const b = benzeneAt(0, 0);
+        const c = pt(b.atoms[0], 90, 1);
+        const oh = pt(c, 150, 1);
+        const o2 = pt(c, 30, 1);
+        b.atoms.push({ x: c.x, y: c.y, label: null }, { x: oh.x, y: oh.y, label: 'OH' }, { x: o2.x, y: o2.y, label: 'O' });
+        b.bonds.push([0, 6, 1], [6, 7, 1], [6, 8, 2]);
+        return b;
+    });
+
+    def('acido-2-metilpropanoico', () => {
+        const c1 = { x: 0, y: 0 };
+        const ch = pt(c1, 150, 1);
+        const me1 = pt(ch, 150, 1);
+        const me2 = pt(ch, 90, 1);
+        const oh = pt(c1, 90, 1);
+        const o2 = pt(c1, -30, 1);
+        const a = atoms([c1, ch, me1, me2, oh, o2], { 4: 'OH', 5: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,1],[0,4,1],[0,5,2]] };
+    });
+
+    def('propanal', () => {
+        const c = zz(0, 0, 3);
+        const o = pt(c[2], 30, 1);
+        const a = atoms(c.concat([o]), { 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,2]] };
+    });
+
+    def('benzaldehido', () => {
+        const b = benzeneAt(0, 0);
+        const c = pt(b.atoms[0], 90, 1);
+        const o = pt(c, 30, 1);
+        b.atoms.push({ x: c.x, y: c.y, label: null }, { x: o.x, y: o.y, label: 'O' });
+        b.bonds.push([0, 6, 1], [6, 7, 2]);
+        return b;
+    });
+
+    def('butan-2-ona', () => {
+        const c = zz(0, 0, 4);
+        const o = pt(c[1], 90, 1);
+        const a = atoms(c.concat([o]), { 4: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[1,4,2]] };
+    });
+
+    def('diisocianobenceno', () => {
+        const b = benzeneAt(0, 0);
+        const n1 = pt(b.atoms[0], 90, 1), c1 = pt(n1, 90, 1);
+        const n2 = pt(b.atoms[1], 30, 1), c2 = pt(n2, 30, 1);
+        const me = pt(b.atoms[3], -90, 1);
+        b.atoms.push({ x: n1.x, y: n1.y, label: 'N' }, { x: c1.x, y: c1.y, label: 'C', charge: '\u2212' });
+        b.atoms.push({ x: n2.x, y: n2.y, label: 'N' }, { x: c2.x, y: c2.y, label: 'C', charge: '\u2212' });
+        b.atoms.push({ x: me.x, y: me.y, label: null });
+        b.bonds.push([0,6,1],[6,7,3], [1,8,1],[8,9,3], [3,10,1]);
+        return b;
+    });
+
+    def('diisocianopropano', () => {
+        const c = zz(0, 0, 2);
+        const n1 = pt(c[0], 150, 1), c1 = pt(n1, 150, 1);
+        const n2 = pt(c[1], -30, 1), c2 = pt(n2, -30, 1);
+        const a = atoms(c.concat([n1, c1, n2, c2]), { 2: 'N', 3: 'C', 4: 'N', 5: 'C' }, { 3: '\u2212', 5: '\u2212' });
+        return { atoms: a, bonds: [[0,1,1],[0,2,1],[2,3,3],[1,4,1],[4,5,3]] };
+    });
+
+    def('trisisocianometano', () => {
+        const c0 = { x: 0, y: 0 };
+        const dirs = [90, 210, 330];
+        const a = [{ x: 0, y: 0, label: null }];
+        const bonds = [];
+        dirs.forEach((d, k) => {
+            const n = pt(c0, d, 1), ciso = pt(n, d, 1);
+            a.push({ x: n.x, y: n.y, label: 'N' });
+            a.push({ x: ciso.x, y: ciso.y, label: 'C', charge: '\u2212' });
+            const nIdx = a.length - 2, cIdx = a.length - 1;
+            bonds.push([0, nIdx, 1], [nIdx, cIdx, 3]);
+        });
+        return { atoms: a, bonds };
+    });
+
+    def('acido-2-hidroxi-dicarboxibenzoico', () => {
+        const b = benzeneAt(0, 0);
+        const oh = pt(b.atoms[0], 90, 1);
+        const c1 = pt(b.atoms[2], -30, 1), o1a = pt(c1, -90, 1), o1b = pt(c1, 30, 1);
+        const c2 = pt(b.atoms[4], -150, 1), o2a = pt(c2, -150, 1), o2b = pt(c2, -30, 1);
+        b.atoms.push({ x: oh.x, y: oh.y, label: 'OH' });
+        b.atoms.push({ x: c1.x, y: c1.y, label: null }, { x: o1a.x, y: o1a.y, label: 'OH' }, { x: o1b.x, y: o1b.y, label: 'O' });
+        b.atoms.push({ x: c2.x, y: c2.y, label: null }, { x: o2a.x, y: o2a.y, label: 'OH' }, { x: o2b.x, y: o2b.y, label: 'O' });
+        b.bonds.push([0,6,1], [2,7,1],[7,8,1],[7,9,2], [4,10,1],[10,11,1],[10,12,2]);
+        return b;
+    });
+
+    def('acido-4-hidroxibenzoico', () => {
+        const b = benzeneAt(0, 0);
+        const oh = pt(b.atoms[0], 90, 1);
+        const c = pt(b.atoms[3], -90, 1), oh2 = pt(c, -150, 1), o2 = pt(c, -30, 1);
+        b.atoms.push({ x: oh.x, y: oh.y, label: 'OH' });
+        b.atoms.push({ x: c.x, y: c.y, label: null }, { x: oh2.x, y: oh2.y, label: 'OH' }, { x: o2.x, y: o2.y, label: 'O' });
+        b.bonds.push([0,6,1], [3,7,1],[7,8,1],[7,9,2]);
+        return b;
+    });
+
+    def('passerini-general', () => {
+        // R1-COOH + R2-NC + R3R4C=O  (esquema con grupos R como etiquetas)
+        const c1 = { x: 0, y: 0 };
+        const r1 = pt(c1, 150, 1), oh = pt(c1, 90, 1), o1 = pt(c1, -30, 1);
+        const n = { x: 2.6, y: 0 }, r2 = pt(n, 150, 1), ciso = pt(n, -30, 1);
+        const c2 = { x: 5.2, y: 0 }, r3 = pt(c2, 150, 1), r4 = pt(c2, -150, 1), o2 = pt(c2, 90, 1);
+        const a = atoms([r1, c1, oh, o1, r2, n, ciso, r3, c2, r4, o2],
+            { 0: 'R\u00b9', 2: 'OH', 3: 'O', 4: 'R\u00b2', 5: 'N', 6: 'C', 7: 'R\u00b3', 9: 'R\u2074', 10: 'O' },
+            { 6: '\u2212' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2], [4,5,1],[5,6,3], [7,8,1],[9,8,1],[8,10,2]] };
+    });
+
+    def('passerini-producto-general', () => {
+        // producto general con el estereocentro marcado con *
+        const cCentral = { x: 0, y: 0 };
+        const r3 = pt(cCentral, 150, 1), r4 = pt(cCentral, 30, 1);
+        const oEst = pt(cCentral, -90, 1), cEst = pt(oEst, -150, 1), r1 = pt(cEst, -150, 1), oDbl = pt(cEst, -90, 1);
+        const nAmide = pt(cCentral, -30, 1), r2 = pt(nAmide, -90, 1), cAmide = pt(nAmide, 30, 1), oAmide = pt(cAmide, 90, 1);
+        const a = atoms(
+            [cCentral, r3, r4, oEst, cEst, r1, oDbl, nAmide, r2, cAmide, oAmide],
+            { 1: 'R\u00b3', 2: 'R\u2074', 3: 'O', 5: 'R\u00b9', 6: 'O', 7: 'NH', 8: 'R\u00b2', 10: 'O' }
+        );
+        a[0].star = true;
+        return {
+            atoms: a,
+            bonds: [[0,1,1],[0,2,1],[0,3,1],[3,4,1],[4,5,1],[4,6,2],[0,7,1],[7,8,1],[0,9,1],[9,10,2]]
+        };
+    });
+
+    // ═══ Q3 — lawsone y tautomería ═══
+
+    def('lawsone-ceto', () => {
+        const b1 = ring(-0.87, 0, 6, 90);
+        const b2 = ring(0.87, 0, 6, 90);
+        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
+                             { atoms: atoms(b2), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1]] }]);
+        // b2 vértices 6-11; añadimos dos C=O y un OH sobre el anillo de la quinona
+        const v = i => m.atoms[i];
+        const o4 = pt(v(7), 30, 1);   // C=O en posición 1 (comparte con b1)
+        const o1 = pt(v(10), -30, 1); // C=O en posición 4
+        const oh = pt(v(9), 90, 1);   // OH en posición 2
+        m.atoms.push({ x: o4.x, y: o4.y, label: 'O' });
+        m.atoms.push({ x: o1.x, y: o1.y, label: 'O' });
+        m.atoms.push({ x: oh.x, y: oh.y, label: 'OH' });
+        m.bonds.push([7, 12, 2], [10, 13, 2], [9, 14, 1]);
+        return m;
+    });
+
+    def('lawsone-enol-a', () => {
+        // tautómero enólico sin puente de H intramolecular (OH en posición 4, C=O en 1, OH en 2)
+        const b1 = ring(-0.87, 0, 6, 90);
+        const b2 = ring(0.87, 0, 6, 90);
+        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
+                             { atoms: atoms(b2), bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,1],[5,0,1]] }]);
+        const v = i => m.atoms[i];
+        const o4 = pt(v(7), 30, 1);
+        const oh1 = pt(v(10), -30, 1);
+        const oh2 = pt(v(9), 90, 1);
+        m.atoms.push({ x: o4.x, y: o4.y, label: 'O' });
+        m.atoms.push({ x: oh1.x, y: oh1.y, label: 'OH' });
+        m.atoms.push({ x: oh2.x, y: oh2.y, label: 'OH' });
+        m.bonds.push([7, 12, 2], [10, 13, 1], [9, 14, 1]);
+        return m;
+    });
+
+    def('lawsone-enol-b', () => {
+        // segundo tautómero enólico, estabilizado por puente de H intramolecular (OH junto a C=O adyacente)
+        const b1 = ring(-0.87, 0, 6, 90);
+        const b2 = ring(0.87, 0, 6, 90);
+        const m = mergeMol([{ atoms: atoms(b1), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]] },
+                             { atoms: atoms(b2), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,1]] }]);
+        const v = i => m.atoms[i];
+        const oh4 = pt(v(7), 30, 1);
+        const o1 = pt(v(10), -30, 1);
+        const oh2 = pt(v(9), 90, 1);
+        m.atoms.push({ x: oh4.x, y: oh4.y, label: 'OH' });
+        m.atoms.push({ x: o1.x, y: o1.y, label: 'O' });
+        m.atoms.push({ x: oh2.x, y: oh2.y, label: 'OH' });
+        m.bonds.push([7, 12, 1], [10, 13, 2], [9, 14, 1]);
+        return m;
+    });
+
+    def('ciclohexanona', () => {
+        const p = ring(0, 0, 6, 90);
+        const o = pt(p[0], 90, 1);
+        const a = atoms(p.concat([o]), { 6: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1],[0,6,2]] };
+    });
+
+    def('pivalona', () => {
+        // 3,3-dimetilbutan-2-ona: tBu-CO-CH3 (SÍ tiene H en alfa, en el CH3)
+        const c = { x: 0, y: 0 };
+        const cq = pt(c, 150, 1);
+        const me1 = pt(cq, 150, 1), me2 = pt(cq, 90, 1), me3 = pt(cq, 210, 1);
+        const me4 = pt(c, -30, 1);
+        const o = pt(c, 90, 1);
+        const a = atoms([c, cq, me1, me2, me3, me4, o], { 6: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,1],[1,4,1],[0,5,1],[0,6,2]] };
+    });
+
+    def('acroleina', () => {
+        const c = zz(0, 0, 3, false);
+        const o = pt(c[2], 30, 1);
+        const a = atoms(c.concat([o]), { 3: 'O' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2]] };
+    });
+
+    def('formaldehido', () => {
+        const c = { x: 0, y: 0 };
+        const h1 = pt(c, 150, 0.9), o = pt(c, 90, 1), h2 = pt(c, -30, 0.9);
+        const a = atoms([h1, c, o, h2], { 2: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1]] };
+    });
+
+    def('benzil', () => {
+        const b1 = benzeneAt(-2.4, 0);
+        const b2 = benzeneAt(2.4, 0, 90);
+        const c1 = pt(b1.atoms[0], 30, 1), o1 = pt(c1, 90, 1);
+        const c2 = pt(b2.atoms[0], 150, 1), o2 = pt(c2, 90, 1);
+        const m = mergeMol([b1, b2]);
+        m.atoms.push({ x: c1.x, y: c1.y, label: null }, { x: o1.x, y: o1.y, label: 'O' });
+        m.atoms.push({ x: c2.x, y: c2.y, label: null }, { x: o2.x, y: o2.y, label: 'O' });
+        const c1i = m.atoms.length - 4, o1i = m.atoms.length - 3, c2i = m.atoms.length - 2, o2i = m.atoms.length - 1;
+        m.bonds.push([0, c1i, 1], [c1i, o1i, 2], [c1i, c2i, 1], [6, c2i, 1], [c2i, o2i, 2]);
+        return m;
+    });
+
+    def('pivalaldehido', () => {
+        const c = { x: 0, y: 0 };
+        const cq = pt(c, 150, 1);
+        const me1 = pt(cq, 150, 1), me2 = pt(cq, 90, 1), me3 = pt(cq, 210, 1);
+        const h = pt(c, -30, 0.9), o = pt(c, 90, 1);
+        const a = atoms([c, cq, me1, me2, me3, h, o], { 6: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,1],[1,4,1],[0,5,1],[0,6,2]] };
+    });
+
+    def('metilvinilcetona', () => {
+        const me = { x: -1, y: 0.4 };
+        const c = { x: 0, y: 0 };
+        const o = pt(c, 90, 1);
+        const c2 = pt(c, -30, 1), c3 = pt(c2, 30, 1);
+        const a = atoms([me, c, o, c2, c3], { 2: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,2]] };
+    });
+
+    def('acetamida-tautomero', () => {
+        // forma imínica/enol del acetamida: CH2=C(OH)-NH2
+        const c2 = { x: 0, y: 0 };
+        const ch2 = pt(c2, 210, 1);
+        const oh = pt(c2, 90, 1);
+        const n = pt(c2, -30, 1);
+        const a = atoms([ch2, c2, oh, n], { 2: 'OH', 3: 'NH2' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[1,3,1]] };
+    });
+
+    // ═══ Q4 — síntesis de la tartrazina ═══
+
+    def('anilina', () => {
+        const b = benzeneAt(0, 0);
+        const nh2 = pt(b.atoms[0], 90, 1);
+        b.atoms.push({ x: nh2.x, y: nh2.y, label: 'NH2' });
+        b.bonds.push([0, 6, 1]);
+        return b;
+    });
+
+    def('acido-sulfanilico', () => {
+        const b = benzeneAt(0, 0);
+        const nh2 = pt(b.atoms[0], 90, 1);
+        const s = pt(b.atoms[3], -90, 1);
+        const o1 = pt(s, -150, 1), o2 = pt(s, -30, 1), o3 = pt(s, -90, 1);
+        b.atoms.push({ x: nh2.x, y: nh2.y, label: 'NH2' });
+        b.atoms.push({ x: s.x, y: s.y, label: 'S' });
+        b.atoms.push({ x: o1.x, y: o1.y, label: 'O' }, { x: o2.x, y: o2.y, label: 'OH' }, { x: o3.x, y: o3.y, label: 'O' });
+        b.bonds.push([0,6,1], [3,7,1], [7,8,2], [7,9,1], [7,10,2]);
+        return b;
+    });
+
+    def('sal-diazonio', () => {
+        const b = benzeneAt(0, 0);
+        const n1 = pt(b.atoms[0], 90, 1), n2 = pt(n1, 90, 1), cl = pt(n2, 30, 1.1);
+        const s = pt(b.atoms[3], -90, 1);
+        const o1 = pt(s, -150, 1), o2 = pt(s, -30, 1), o3 = pt(s, -90, 1);
+        b.atoms.push({ x: n1.x, y: n1.y, label: 'N', charge: '' }, { x: n2.x, y: n2.y, label: 'N', charge: '+' });
+        b.atoms.push({ x: cl.x, y: cl.y, label: 'Cl', charge: '\u2212' });
+        b.atoms.push({ x: s.x, y: s.y, label: 'S' });
+        b.atoms.push({ x: o1.x, y: o1.y, label: 'O' }, { x: o2.x, y: o2.y, label: 'OH' }, { x: o3.x, y: o3.y, label: 'O' });
+        b.bonds.push([0,6,1],[6,7,3], [3,9,1],[9,10,2],[9,11,1],[9,12,2]);
+        return b;
+    });
+
+    def('hidrazina-sulfonica', () => {
+        // reducción con Na2SO3 del diazonio -> ArNH-NH2
+        const b = benzeneAt(0, 0);
+        const n1 = pt(b.atoms[0], 90, 1), n2 = pt(n1, 30, 1);
+        const s = pt(b.atoms[3], -90, 1);
+        const o1 = pt(s, -150, 1), o2 = pt(s, -30, 1), o3 = pt(s, -90, 1);
+        b.atoms.push({ x: n1.x, y: n1.y, label: 'NH' }, { x: n2.x, y: n2.y, label: 'NH2' });
+        b.atoms.push({ x: s.x, y: s.y, label: 'S' });
+        b.atoms.push({ x: o1.x, y: o1.y, label: 'O' }, { x: o2.x, y: o2.y, label: 'OH' }, { x: o3.x, y: o3.y, label: 'O' });
+        b.bonds.push([0,6,1],[6,7,1], [3,8,1],[8,9,2],[8,10,1],[8,11,2]);
+        return b;
+    });
+
+    def('pirazolona-ester', () => {
+        // hidrazona del éster oxalacético, tras ciclación con -H2O: anillo de pirazolona
+        const p = ring(0, 0, 5, 90);
+        // etiquetas: 0=N(Ar), 1=N, 2=C(-OH tautómero), 3=C(-COOEt), 4=C(=O)
+        const ar = pt(p[0], 150, 1);
+        const oh = pt(p[2], -30, 1);
+        const cEst = pt(p[3], -90, 1), oEst1 = pt(cEst, -150, 1), oEst2 = pt(cEst, -30, 1), et = pt(oEst2, -30, 1);
+        const a = atoms(p.concat([ar, oh, cEst, oEst1, oEst2, et]),
+            { 0: 'N', 1: 'N', 5: 'Ar', 6: 'OH', 8: 'O', 9: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,0,1],[0,5,1],[2,6,1],[3,7,1],[7,8,2],[7,9,1],[9,10,1]] };
+    });
+
+    def('tartrazina-simplificada', () => {
+        // núcleo de pirazolona con dos anillos de ácido sulfanílico (uno vía N-arilo, otro vía azo) y un carboxilato
+        const p = ring(0, 0, 5, 90);
+        const arN = benzeneAt(-2.3, 1.1);
+        const azoN1 = pt(p[3], -90, 1), azoN2 = pt(azoN1, -90, 1);
+        const arAzo = benzeneAt(azoN2.x, azoN2.y - 2, 90);
+        const cCarbox = pt(p[2], -30, 1), o1 = pt(cCarbox, -90, 1), o2 = pt(cCarbox, 30, 1);
+        const m = mergeMol([{ atoms: atoms(p), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,0,1]] }, arN, arAzo]);
+        const nArIdx = 5; // primer atomo del anillo arN (idx 5..10)
+        m.bonds.push([0, nArIdx, 1]);
+        m.atoms.push({ x: azoN1.x, y: azoN1.y, label: 'N' }, { x: azoN2.x, y: azoN2.y, label: 'N' });
+        const azoN1i = m.atoms.length - 2, azoN2i = m.atoms.length - 1;
+        m.bonds.push([3, azoN1i, 1], [azoN1i, azoN2i, 2], [azoN2i, 11, 1]); // arAzo empieza en idx 11
+        m.atoms.push({ x: cCarbox.x, y: cCarbox.y, label: null }, { x: o1.x, y: o1.y, label: 'OH' }, { x: o2.x, y: o2.y, label: 'O' });
+        const cIdx = m.atoms.length - 3;
+        m.bonds.push([2, cIdx, 1], [cIdx, cIdx + 1, 1], [cIdx, cIdx + 2, 2]);
+        // grupos SO3H simplificados como etiqueta directa en cada anillo (para no saturar el dibujo)
+        const so3a = pt(arN.atoms[3], -90, 1);
+        const so3b = pt(arAzo.atoms[3], -90, 1);
+        m.atoms.push({ x: so3a.x, y: so3a.y, label: 'SO3H' });
+        m.atoms.push({ x: so3b.x, y: so3b.y, label: 'SO3H' });
+        m.bonds.push([8, m.atoms.length - 2, 1]); // arN vertex3 = idx 5+3=8
+        m.bonds.push([14, m.atoms.length - 1, 1]); // arAzo vertex3 = idx 11+3=14
+        return m;
+    });
+
+    // ═══ Q3 — pares de tautómeros con P y N (no carbonados) ═══
+
+    def('fosforo-tautomero-a', () => {
+        const p0 = { x: 0, y: 0 };
+        const s = pt(p0, 90, 1), oh = pt(p0, 210, 1), oet = pt(p0, -30, 1), et = pt(oet, -30, 1);
+        const a = atoms([p0, s, oh, oet, et], { 0: 'P', 1: 'S', 2: 'OH', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,2],[0,2,1],[0,3,1],[3,4,1]] };
+    });
+    def('fosforo-tautomero-b', () => {
+        const p0 = { x: 0, y: 0 };
+        const sh = pt(p0, 90, 1), o = pt(p0, 210, 1), oet = pt(p0, -30, 1), et = pt(oet, -30, 1);
+        const a = atoms([p0, sh, o, oet, et], { 0: 'P', 1: 'SH', 2: 'O', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[0,2,2],[0,3,1],[3,4,1]] };
+    });
+    def('nitro-normal', () => {
+        const n = { x: 0, y: 0 };
+        const r = pt(n, 150, 1), o1 = pt(n, -30, 1), o2 = pt(n, 90, 1);
+        const a = atoms([r, n, o1, o2], { 1: 'N', 2: 'O', 3: 'O' }, { 1: '+', 3: '\u2212' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1]] };
+    });
+    def('nitro-aci', () => {
+        const c = { x: 0, y: 0 };
+        const r = pt(c, 210, 1), n = pt(c, -30, 1), oh = pt(n, -90, 1), o = pt(n, 30, 1);
+        const a = atoms([r, c, n, oh, o], { 3: 'OH', 4: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[2,3,1],[2,4,1]] };
+    });
+
+    def('imina-inicial', () => {
+        // CH3-CH(OH)-CH=NH
+        const c = zz(0, 0, 3);
+        const oh = pt(c[1], 90, 1);
+        const nh = pt(c[2], 30, 1);
+        const a = atoms(c.concat([oh, nh]), { 3: 'OH', 4: 'NH' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1],[2,4,2]] };
+    });
+    def('imina-tautomero-1', () => {
+        // CH3-C(OH)=CH-NH2  (enol-enamina)
+        const c = zz(0, 0, 3);
+        const oh = pt(c[1], 90, 1);
+        const nh2 = pt(c[2], 30, 1);
+        const a = atoms(c.concat([oh, nh2]), { 3: 'OH', 4: 'NH2' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,1],[2,4,1]] };
+    });
+    def('imina-tautomero-2', () => {
+        // CH3-CH(NH2)-CH=O (amino-aldehído)
+        const c = zz(0, 0, 3);
+        const nh2 = pt(c[1], 90, 1);
+        const o = pt(c[2], 30, 1);
+        const a = atoms(c.concat([nh2, o]), { 3: 'NH2', 4: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,1],[2,4,2]] };
+    });
+    def('imina-tautomero-3', () => {
+        // CH2=C(OH)-CH2-NH2
+        const c = zz(0, 0, 3);
+        const oh = pt(c[1], 90, 1);
+        const nh2 = pt(c[2], 30, 1);
+        const a = atoms(c.concat([oh, nh2]), { 3: 'OH', 4: 'NH2' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[1,3,1],[2,4,1]] };
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // API pública
+    // ════════════════════════════════════════════════════════════════
+    function renderMolById(id) {
+        const mol = get(id);
+        if (!mol) return '<span class="pc-mol-missing">[' + id + ']</span>';
+        return renderSkeletal(mol);
+    }
+
+    function renderAll(root) {
+        root = root || document;
+        root.querySelectorAll('[data-mol]').forEach(el => {
+            el.innerHTML = renderMolById(el.getAttribute('data-mol'));
+            el.classList.add('pc-mol-rendered');
+        });
+        root.querySelectorAll('[data-orbitals]').forEach(el => {
+            const N = parseInt(el.getAttribute('data-n') || '6', 10);
+            const idx = parseInt(el.getAttribute('data-index') || '1', 10);
+            el.innerHTML = renderOrbitalRow(N, idx);
+            el.classList.add('pc-orb-rendered');
+        });
+    }
+
+    window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, pSigns, MOLS: BUILDERS };
+
+})();
+
+</script>
+</body>
+</html>

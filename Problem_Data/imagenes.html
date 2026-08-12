@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="imagenes-problemas">
+
+// ════════════════════════════════════════════════════════════════════
+// Listado de imágenes externas por problema.
+//
+// Estas imágenes NO se guardan en el repositorio: se suben a un
+// servicio externo (Imgur) y aquí solo se referencia su URL directa
+// (la que termina en .png/.jpg, del botón "Copy image link" de Imgur).
+// Problem_Data/visor.html las carga y las muestra donde el contenido
+// tenga un <div class="pc-gallery" data-gallery="ID_DEL_PROBLEMA"></div>.
+//
+// Para añadir más fotos a un problema: sube la imagen a imgur.com,
+// copia su enlace directo (botón "Copy image link", termina en una
+// extensión de imagen) y añade una fila { nombre: "...", url: "..." }
+// en el array correspondiente.
+// ════════════════════════════════════════════════════════════════════
+
+const imagenesProblemas = {
+
+    "q5-turquesa": [
+        {
+            nombre: "Estructura de la turquesa, CuAl6(PO4)4(OH)x·yH2O",
+            url: "https://i.imgur.com/ocy5jUw.png"
+        }
+        // Añade aquí más filas si subes más fotos de este problema, p. ej.:
+        // { nombre: "Al-Bīrūnī", url: "https://i.imgur.com/XXXXXXX.jpg" }
+    ],
+
+    "q5-variscita": [
+        {
+            nombre: "Celda unidad de la variscita (8 unidades fórmula, octaedros AlO6 y tetraedros PO4)",
+            url: "https://i.imgur.com/EA8U5VB.png"
+        }
+    ]
+
+};
+
+window.imagenesProblemas = imagenesProblemas;
+
+</script>
+</body>
+</html>
