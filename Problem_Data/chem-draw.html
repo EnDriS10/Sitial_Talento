@@ -1077,7 +1077,150 @@
         return `<div class="pc-scheme-box">${inner}</div>`;
     }
 
+    // ═══ Q6 — síntesis total de la acitretina ═══
+
     const SCHEMES = {};
+
+    function acitretinAr() {
+        // Anillo 4-metoxi-2,3,6-trimetilfenilo (fragmento aromático común
+        // a todos los intermedios de esta síntesis).
+        const b = benzeneAt(0, 0, 90);
+        const me1 = pt(b.atoms[0], 90, 0.85);
+        const me2 = pt(b.atoms[5], 150, 0.85);
+        const ome = pt(b.atoms[4], -150, 0.85);
+        const me3 = pt(b.atoms[3], -90, 0.85);
+        b.atoms.push({ x: me1.x, y: me1.y, label: null });
+        b.atoms.push({ x: me2.x, y: me2.y, label: null });
+        b.atoms.push({ x: ome.x, y: ome.y, label: 'OMe' });
+        b.atoms.push({ x: me3.x, y: me3.y, label: null });
+        b.bonds.push([0,6,1], [5,7,1], [4,8,1], [3,9,1]);
+        return b; // 10 átomos (0-9); el punto de anclaje de la cadena es atoms[1]
+    }
+
+    def('acitretina-s0', () => {
+        // Compuesto de partida: cetona vinílica aromática
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const o3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1);
+        const chain = atoms([c1, c2, c3, o3, c4], { 3: 'O' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push([1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,2], [b+2,b+4,1]);
+        return m;
+    });
+
+    def('acitretina-s1', () => {
+        // Tras acilación de Claisen con formiato: enolato sódico del β-cetoaldehído
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const o3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const ona = pt(c5, 30, 1);
+        const chain = atoms([c1, c2, c3, o3, c4, c5, ona], { 3: 'O', 6: 'ONa' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push([1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,2], [b+2,b+4,1], [b+4,b+5,2], [b+5,b+6,1]);
+        return m;
+    });
+
+    def('acitretina-s2', () => {
+        // Tras hidrólisis ácida (tautomerización) y protección MeOH/H2SO4: acetal dimetílico
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const o3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const ome1 = pt(c5, 30, 1), ome2 = pt(c5, -90, 1);
+        const chain = atoms([c1, c2, c3, o3, c4, c5, ome1, ome2], { 3: 'O', 6: 'OMe', 7: 'OMe' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push([1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,2], [b+2,b+4,1], [b+4,b+5,1], [b+5,b+6,1], [b+5,b+7,1]);
+        return m;
+    });
+
+    def('acitretina-s3', () => {
+        // Wittig de metilenación + isomerización: dieno conjugado con metilo, acetal intacto
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const me3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const ome1 = pt(c5, 30, 1), ome2 = pt(c5, -90, 1);
+        const chain = atoms([c1, c2, c3, me3, c4, c5, ome1, ome2], { 6: 'OMe', 7: 'OMe' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push([1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,1], [b+2,b+4,2], [b+4,b+5,1], [b+5,b+6,1], [b+5,b+7,1]);
+        return m;
+    });
+
+    def('acitretina-s4', () => {
+        // Desprotección ácida a aldehído (enal), conjugación extendida
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const me3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const o5 = pt(c5, 30, 1);
+        const chain = atoms([c1, c2, c3, me3, c4, c5, o5], { 6: 'O' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push([1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,1], [b+2,b+4,2], [b+4,b+5,1], [b+5,b+6,2]);
+        return m;
+    });
+
+    def('acitretina-s5', () => {
+        // Tras condensación de Stobbe con un succinato metilado: éster/ácido vecinales
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const me3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const c6 = pt(c5, 30, 1), co2me = pt(c6, 90, 1), c7 = pt(c6, -30, 1);
+        const me7 = pt(c7, -90, 1), co2h = pt(c7, 30, 1);
+        const chain = atoms([c1, c2, c3, me3, c4, c5, c6, co2me, c7, me7, co2h], { 7: 'CO2Me', 10: 'CO2H' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push(
+            [1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,1], [b+2,b+4,2], [b+4,b+5,1],
+            [b+5,b+6,2], [b+6,b+7,1], [b+6,b+8,1], [b+8,b+9,1], [b+8,b+10,1]
+        );
+        return m;
+    });
+
+    def('acitretina-s6', () => {
+        // Tras hidrólisis con NaOH: diácido vecinal
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const me3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const c6 = pt(c5, 30, 1), co2h1 = pt(c6, 90, 1), c7 = pt(c6, -30, 1);
+        const me7 = pt(c7, -90, 1), co2h2 = pt(c7, 30, 1);
+        const chain = atoms([c1, c2, c3, me3, c4, c5, c6, co2h1, c7, me7, co2h2], { 7: 'CO2H', 10: 'CO2H' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push(
+            [1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,1], [b+2,b+4,2], [b+4,b+5,1],
+            [b+5,b+6,2], [b+6,b+7,1], [b+6,b+8,1], [b+8,b+9,1], [b+8,b+10,1]
+        );
+        return m;
+    });
+
+    def('acitretina-final', () => {
+        // Acitretina: tras descarboxilación térmica (piridina), ácido tetraénico final
+        const ar = acitretinAr();
+        const ap = ar.atoms[1];
+        const c1 = pt(ap, -30, 1), c2 = pt(c1, 30, 1), c3 = pt(c2, -30, 1);
+        const me3 = pt(c3, -90, 1), c4 = pt(c3, 30, 1), c5 = pt(c4, -30, 1);
+        const c6 = pt(c5, 30, 1), c7 = pt(c6, -30, 1), me7 = pt(c7, -90, 1);
+        const c8 = pt(c7, 30, 1), co2h = pt(c8, -30, 1);
+        const chain = atoms([c1, c2, c3, me3, c4, c5, c6, c7, me7, c8, co2h], { 10: 'CO2H' });
+        const m = mergeMol([ar, { atoms: chain, bonds: [] }]);
+        const b = ar.atoms.length;
+        m.bonds.push(
+            [1,b+0,1], [b+0,b+1,2], [b+1,b+2,1], [b+2,b+3,1], [b+2,b+4,2], [b+4,b+5,1],
+            [b+5,b+6,2], [b+6,b+7,1], [b+7,b+8,1], [b+7,b+9,2], [b+9,b+10,1]
+        );
+        return m;
+    });
+
+
 
     SCHEMES['q2-agcn-nacn'] = () => renderScheme(null, {
         size: 'sm',
@@ -1119,6 +1262,80 @@
                 { mol: 'tartrazina-simplificada', label: 'F' },
                 { arrow: true, above: 'exceso NaOH' },
                 { mol: 'tartrazina-simplificada', label: 'tartrazina' }
+            ]
+        ]
+    });
+
+    // ═══ Q6 — esquemas de la síntesis de la acitretina ═══
+    SCHEMES['q6-sintesis-enunciado'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'acitretina-s0', label: 'compuesto de partida' },
+                { arrow: true, above: 'MeONa', below: 'HCO&#8322;Me' },
+                { text: '<span class="pc-scheme-unknown">1</span>' },
+                { arrow: true, above: 'MeOH', below: 'H&#8322;SO&#8324;' },
+                { text: '<span class="pc-scheme-unknown">2</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">2</span>' },
+                { arrow: true, above: 'Ph&#8323;P=CH&#8322;', below: 'KO&#7488;Bu' },
+                { text: '<span class="pc-scheme-unknown">3</span>' },
+                { arrow: true, above: '1. HCO&#8322;H, H&#8322;SO&#8324;', below: '2. NEt&#8323;' },
+                { text: '<span class="pc-scheme-unknown">4</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">4</span>' },
+                { arrow: true, above: 'succinato de metilo', below: 'Triton B' },
+                { text: '<span class="pc-scheme-unknown">5</span>' },
+                { arrow: true, above: 'NaOH' },
+                { text: '<span class="pc-scheme-unknown">6</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">6</span>' },
+                { arrow: true, above: 'piridina, &Delta;' },
+                { mol: 'acitretina-final', label: 'acitretina (producto final)' }
+            ]
+        ]
+    });
+
+    SCHEMES['q6-sintesis-respuesta'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'acitretina-s0', label: '1 &middot; cetona de partida' },
+                { arrow: true, above: 'MeONa', below: 'HCO&#8322;Me &middot; acilación de Claisen' },
+                { mol: 'acitretina-s1', label: '2 &middot; enolato sódico' }
+            ],
+            [
+                { mol: 'acitretina-s1', label: '2' },
+                { arrow: true, above: 'MeOH / H&#8322;SO&#8324;', below: 'protección como acetal' },
+                { mol: 'acitretina-s2', label: '3 &middot; acetal dimetílico' }
+            ],
+            [
+                { mol: 'acitretina-s2', label: '3' },
+                { arrow: true, above: 'Ph&#8323;P=CH&#8322;, KO&#7488;Bu', below: 'Wittig &middot; metilenación/isomerización' },
+                { mol: 'acitretina-s3', label: '4 &middot; dieno conjugado' }
+            ],
+            [
+                { mol: 'acitretina-s3', label: '4' },
+                { arrow: true, above: '1. HCO&#8322;H, H&#8322;SO&#8324;', below: '2. NEt&#8323; &middot; desprotección a enal' },
+                { mol: 'acitretina-s4', label: '5 &middot; aldehído conjugado' }
+            ],
+            [
+                { mol: 'acitretina-s4', label: '5' },
+                { arrow: true, above: 'succinato de metilo, Triton B', below: 'condensación de Stobbe' },
+                { mol: 'acitretina-s5', label: '6 &middot; éster/ácido vecinales' }
+            ],
+            [
+                { mol: 'acitretina-s5', label: '6' },
+                { arrow: true, above: 'NaOH', below: 'hidrólisis del éster' },
+                { mol: 'acitretina-s6', label: '7 &middot; diácido' }
+            ],
+            [
+                { mol: 'acitretina-s6', label: '7' },
+                { arrow: true, above: 'piridina, &Delta;', below: 'descarboxilación térmica' },
+                { mol: 'acitretina-final', label: 'acitretina &middot; producto final' }
             ]
         ]
     });
