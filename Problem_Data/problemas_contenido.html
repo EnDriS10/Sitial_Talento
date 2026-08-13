@@ -992,6 +992,76 @@ const contenidoProblemas = {
                 <p>M<sub>r</sub>(unidad fórmula) = 849.47 g mol<sup>&minus;1</sup> &rArr; masa = 1.411&times;10<sup>&minus;21</sup> g. Densidad = 1.411&times;10<sup>&minus;21</sup> / (511&times;10<sup>&minus;24</sup>) = <strong>2.76 g cm<sup>&minus;3</sup></strong>.</p>
             </div>
         `
+    },
+
+    "q6-acitretina": {
+        titulo: "Síntesis total de la acitretina",
+        numero: "Q6",
+        fuente: "Andriamialisoa, Z.; Valla, A.; Cartier, D.; Labia, R. <em>Helv. Chim. Acta</em> <strong>2002</strong>, <em>85</em>, 2926.",
+        creditos: "Problema elaborado a partir de una ruta de síntesis total publicada en la literatura química. Ver la referencia completa en la pestaña de respuesta.",
+
+        enunciado: `
+            <p class="pc-q-title">Q6 — Síntesis total de la acitretina</p>
+
+            <div class="pc-intro">
+                <p>La <strong>acitretina</strong> es un retinoide aromático usado en el tratamiento de la psoriasis grave. Su síntesis parte de una cetona vinílica aromática y avanza mediante una secuencia de reacciones clásicas en química orgánica: acilación de Claisen, protección de un grupo carbonilo como acetal, olefinación de Wittig, condensación de Stobbe, hidrólisis de un éster y descarboxilación térmica.</p>
+                <p>A continuación se muestra el esquema de la síntesis. Se indican los reactivos empleados en cada paso, pero <strong>no el tipo de reacción ni la estructura de los productos intermedios</strong> (numerados del 1 al 6): esa es tu tarea. Se te da la estructura del compuesto de partida y la del producto final (acitretina).</p>
+            </div>
+
+            <div class="pc-scheme" data-scheme="q6-sintesis-enunciado"></div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(a)</span>
+                <div class="pc-part-body"><p>Dibuja la estructura de los compuestos <strong>1</strong> a <strong>6</strong>.</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(b)</span>
+                <div class="pc-part-body"><p>Para cada paso, indica el <strong>tipo de reacción</strong> que tiene lugar.</p></div>
+            </div>
+
+            <div class="pc-part">
+                <span class="pc-part-label">(c)</span>
+                <div class="pc-part-body"><p>El último paso (piridina, calor) elimina una molécula pequeña. ¿Cuál es, y por qué esta eliminación es termodinámicamente favorable en este sistema conjugado?</p></div>
+            </div>
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q6 — Síntesis total de la acitretina <span class="pc-total-chip">Problema de práctica</span></p>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(a) y (b)</span></div>
+                <p>Esquema completo de la síntesis, con la estructura de cada intermedio y el tipo de reacción de cada paso:</p>
+                <div class="pc-scheme" data-scheme="q6-sintesis-respuesta"></div>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">Resumen de reactivos y reacciones</span></div>
+                <table class="pc-table">
+                    <thead><tr><th>Paso</th><th>Reactivos</th><th>Tipo de reacción</th></tr></thead>
+                    <tbody>
+                        <tr><td>1 &rarr; 2</td><td>MeONa, HCO<sub>2</sub>Me</td><td>Acilación de Claisen (formiato)</td></tr>
+                        <tr><td>2 &rarr; 3</td><td>MeOH, H<sub>2</sub>SO<sub>4</sub></td><td>Protección del aldehído como acetal dimetílico</td></tr>
+                        <tr><td>3 &rarr; 4</td><td>Ph<sub>3</sub>P=CH<sub>2</sub>, KO<sup>t</sup>Bu</td><td>Olefinación de Wittig (metilenación) + isomerización a dieno conjugado</td></tr>
+                        <tr><td>4 &rarr; 5</td><td>1. HCO<sub>2</sub>H, H<sub>2</sub>SO<sub>4</sub>; 2. NEt<sub>3</sub></td><td>Hidrólisis del acetal a aldehído (enal) con isomerización del alqueno</td></tr>
+                        <tr><td>5 &rarr; 6</td><td>Succinato de metilo, Triton B</td><td>Condensación de Stobbe</td></tr>
+                        <tr><td>6 &rarr; 7</td><td>NaOH</td><td>Hidrólisis del éster metílico a ácido carboxílico</td></tr>
+                        <tr><td>7 &rarr; acitretina</td><td>Piridina, calor</td><td>Descarboxilación térmica</td></tr>
+                    </tbody>
+                </table>
+                <p class="pc-note">Este resumen se presenta a nivel de tipo de reacción y reactivos, sin detallar el mecanismo completo paso a paso.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">(c)</span></div>
+                <p>El calentamiento con piridina provoca la pérdida de <strong>CO&#8322; (dióxido de carbono)</strong> desde el ácido carboxílico no conjugado con el resto de la cadena. La descarboxilación es favorable porque el sistema resultante extiende la conjugación &pi; a lo largo de toda la cadena poliénica hasta el grupo carboxilo final, estabilizando el producto por deslocalización electrónica adicional &mdash; la fuerza motriz termodinámica típica de estas eliminaciones en síntesis de retinoides y carotenoides.</p>
+            </div>
+
+            <div class="pc-answer">
+                <div class="pc-answer-head"><span class="pc-part-label">Referencia</span></div>
+                <p class="pc-note">Andriamialisoa, Z.; Valla, A.; Cartier, D.; Labia, R. <em>Helvetica Chimica Acta</em> <strong>2002</strong>, <em>85</em>, 2926&ndash;2932.</p>
+            </div>
+        `
     }
 
 
