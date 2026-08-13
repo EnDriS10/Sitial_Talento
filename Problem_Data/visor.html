@@ -213,6 +213,13 @@
     .pc-scheme-mol .pc-skel-svg { max-width: 100px; }
     .pc-scheme-label { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; white-space: nowrap; }
     .pc-scheme-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: center; white-space: nowrap; }
+    .pc-scheme-unknown {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 34px; height: 34px; border: 2px dashed var(--border);
+        border-radius: 8px; font-family: 'Playfair Display', serif;
+        font-weight: 900; font-size: 17px; color: var(--navy);
+    }
+    [data-theme="dark"] .pc-scheme-unknown { color: var(--gold-light); }
     .pc-scheme-plus { font-size: 16px; font-weight: 700; color: var(--text-muted); padding: 0 2px; }
     .pc-scheme-arrow { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
     .pc-scheme-arrow-above, .pc-scheme-arrow-below { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
@@ -261,6 +268,19 @@
     .pc-orb-neg { fill: var(--navy); }
     [data-theme="dark"] .pc-orb-neg { fill: var(--gold); }
     .pc-orb-axis { stroke: var(--text); stroke-width: 1; opacity: .55; }
+    .pc-diagram-rendered { display: block; margin: 14px 0; }
+    .pc-diagram-rendered .pc-orb-svg { height: auto; width: 100%; max-width: 420px; }
+    .pc-orb-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; fill: var(--text); }
+    .pc-orb-label { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; fill: var(--text); }
+    .pc-orb-leader { stroke: var(--text); stroke-width: 1; opacity: .6; }
+    .pc-orb-caption { font-family: 'Inter', sans-serif; font-size: 11.5px; line-height: 1.35; color: var(--text); text-align: center; }
+
+    .pc-orb-energy-diagram { display: flex; align-items: stretch; gap: 14px; margin: 14px 0; padding: 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; }
+    .pc-orb-energy-rows { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .pc-orb-energy-rows .pc-orbitals-row { margin: 0; }
+    .pc-orb-energy-axis { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 46px; }
+    .pc-orb-energy-arrow { font-size: 20px; color: var(--gold-dark, var(--navy)); }
+    .pc-orb-energy-text { font-size: 10.5px; font-weight: 700; text-align: center; color: var(--text-muted); line-height: 1.2; }
 
     /* ── Galería de imágenes (Q5, cargadas desde un listado externo) ── */
     .pc-gallery { display: flex; flex-direction: column; gap: 16px; margin: 14px 0 20px; }
