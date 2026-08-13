@@ -10,14 +10,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
-        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --navy: #04122b;
+        --navy-text: var(--navy); --navy-mid: #0b2150; --navy-light: #122d6b;
         --gold: #c9a227; --gold-light: #f0c84a;
         --accent: #1a6fb5;
         --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
         --radius: 14px;
     }
     [data-theme="dark"] {
-        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --navy: #141a2b;
+        --navy-text: #a9c2ee; --navy-mid: #1a2840; --navy-light: #3a5a9a;
         --gold: #d4a82a; --gold-light: #f5d060;
         --accent: #5ba3e8;
         --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
@@ -85,7 +87,7 @@
         display: flex; align-items: center; justify-content: center;
         font-size: 24px; box-shadow: 0 8px 18px rgba(26,111,181,.28);
     }
-    .np-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(22px,3.4vw,30px); margin: 4px 0 4px; color: var(--navy); }
+    .np-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(22px,3.4vw,30px); margin: 4px 0 4px; color: var(--navy-text); }
     .np-sub { color: var(--text-muted); font-size: 14px; margin: 0; max-width: 60ch; line-height: 1.55; }
 
     .np-section { margin-top: 52px; }
@@ -103,7 +105,7 @@
     [data-theme="dark"] .np-section-title-icon { background: rgba(91,163,232,.16); }
     .np-section-title h2 {
         font-family: 'Playfair Display', serif; font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-        color: var(--navy); font-weight: 700; margin: 0;
+        color: var(--navy-text); font-weight: 700; margin: 0;
     }
 
     /* ── Filtro de años ── */
@@ -120,7 +122,7 @@
         font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
         color: var(--text-muted); transition: all .2s;
     }
-    .filtro-año-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+    .filtro-año-btn:hover { border-color: var(--navy-light); color: var(--navy-text); }
     .filtro-año-btn.activo { background: var(--navy); color: var(--bg); border-color: var(--navy); }
     .year-navigator {
         display: inline-flex; align-items: center;
@@ -133,11 +135,11 @@
         font-size: 10px; color: var(--text-muted);
         transition: background .18s, color .18s;
     }
-    .year-nav-btn:hover { background: var(--bg); color: var(--navy); }
+    .year-nav-btn:hover { background: var(--bg); color: var(--navy-text); }
     #año-input {
         width: 52px; border: none; outline: none; text-align: center;
         font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-        color: var(--navy); padding: 4px 0; background: transparent;
+        color: var(--navy-text); padding: 4px 0; background: transparent;
     }
     #año-input::placeholder { color: var(--text-muted); font-weight: 400; }
  
@@ -156,7 +158,7 @@
     .noticia-full:hover .foto-noticia-wrap img { transform: scale(1.06); }
     .info-noticia { padding: 20px 26px; display: flex; flex-direction: column; justify-content: center; }
     .info-noticia h4 {
-        margin: 0 0 8px; font-family: 'Playfair Display', serif; color: var(--navy);
+        margin: 0 0 8px; font-family: 'Playfair Display', serif; color: var(--navy-text);
         font-size: clamp(1.05rem, 2.4vw, 1.35rem); line-height: 1.35;
         overflow-wrap: break-word; transition: color .25s ease;
     }
@@ -213,7 +215,7 @@
     .ent-eyebrow::before { content: '●'; font-size: 8px; }
     .ent-section-head h2 {
         font-family: 'Playfair Display', serif; font-weight: 900;
-        font-size: clamp(1.3rem, 3vw, 1.7rem); color: var(--navy); margin: 0 0 8px;
+        font-size: clamp(1.3rem, 3vw, 1.7rem); color: var(--navy-text); margin: 0 0 8px;
     }
     .ent-section-head p { color: var(--text-muted); font-size: 14px; max-width: 62ch; margin: 0; line-height: 1.6; }
 
@@ -272,7 +274,7 @@
     }
     .ent-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .ent-avatar-initials { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--gold-light); font-size: 15px; }
-    .ent-card-name h4 { margin: 0 0 2px; font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+    .ent-card-name h4 { margin: 0 0 2px; font-size: 14px; font-weight: 700; color: var(--navy-text); line-height: 1.3; }
     .ent-card-name span { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .ent-card p.ent-snippet { font-size: 13px; line-height: 1.55; color: var(--text-muted); margin: 0; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .ent-card-foot { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); }
@@ -604,7 +606,7 @@ function renderVideos() {
         <a href="${item.link}" target="_blank" rel="noopener" class="video-item">
             ${thumbHTML}
             <span class="fecha-etiqueta">${item.fecha}</span>
-            <h4 style="font-size:1.05rem;font-family:'Playfair Display',serif;color:var(--navy);overflow-wrap:break-word;margin:0;">${item.titulo}</h4>
+            <h4 style="font-size:1.05rem;font-family:'Playfair Display',serif;color: var(--navy-text);overflow-wrap:break-word;margin:0;">${item.titulo}</h4>
         </a>`;
     }).join('');
     btn.style.display = filtrados.length > visibles.length ? 'block' : 'none';
