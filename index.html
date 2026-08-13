@@ -10,6 +10,7 @@
     <style>
         :root {
             --navy: #04122b;
+            --navy-text: var(--navy);
             --navy-mid: #0b2150;
             --navy-light: #122d6b;
             --gold: #c9a227;
@@ -44,7 +45,8 @@
            DARK MODE
         ═══════════════════════════════════════════ */
         [data-theme="dark"] {
-            --navy: #d0e0ff;
+            --navy: #141a2b;
+            --navy-text: #a9c2ee;
             --navy-mid: #1a2840;
             --navy-light: #3a5a9a;
             --gold: #d4a82a;
@@ -408,7 +410,7 @@
         /* LAYOUT */
         .contenedor { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; flex: 1 0 auto; width: 100%; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 700; color: var(--navy); margin-bottom: 6px; letter-spacing: -.2px; line-height: 1.2; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 700; color: var(--navy-text); margin-bottom: 6px; letter-spacing: -.2px; line-height: 1.2; }
         .section-sub { font-size: var(--font-base); color: var(--text-muted); margin-bottom: 32px; max-width: 68ch; line-height: 1.65; }
 
         /* CARDS */
@@ -419,7 +421,7 @@
         .tarjeta-avatar { width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 14px; overflow: hidden; border: 3px solid var(--border); background: #e8ecf5; display: flex; align-items: center; justify-content: center; position: relative; }
         .tarjeta-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-initials { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--navy-light); }
-        .tarjeta h3 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+        .tarjeta h3 { font-size: 15px; font-weight: 600; color: var(--navy-text); margin-bottom: 4px; }
         .tarjeta-years { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
         .medallas-tarjeta { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
         .medalla-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; line-height: 1; }
@@ -444,7 +446,7 @@
         #tarjeta-modal-avatar-wrap.tiene-foto:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(201,162,39,.45); }
         #tarjeta-modal-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .modal-avatar-initials-big { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: var(--navy-light); }
-        #tarjeta-modal-nombre { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 5px; line-height: 1.2; }
+        #tarjeta-modal-nombre { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--navy-text); margin-bottom: 5px; line-height: 1.2; }
         #tarjeta-modal-subtitulo { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
         .tarjeta-modal-divider { width: 44px; height: 3px; background: var(--gold); border-radius: 2px; margin: 0 auto 20px; }
         #tarjeta-modal-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -479,7 +481,7 @@
         /* FILTROS */
         .filtros-sitial { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
         .filtro-btn { padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all .2s; }
-        .filtro-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+        .filtro-btn:hover { border-color: var(--navy-light); color: var(--navy-text); }
         .filtro-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
         .filtro-btn:disabled { display: none; }
         .search-input { margin-left: auto; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; width: 200px; transition: border-color .2s; }
@@ -493,7 +495,7 @@
         .sort-controls { display: flex; gap: 8px; margin-left: auto; align-items: center; }
         .sort-label { font-size: 12px; color: var(--text-muted); }
         .sort-btn { padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 4px; transition: all .2s; }
-        .sort-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+        .sort-btn:hover { border-color: var(--navy-light); color: var(--navy-text); }
         .sort-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
         .tabla-wrapper { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 2px 16px rgba(4,18,43,.07); position: relative; }
         /* Remove the static ::after fade - it scrolled with nothing and looked broken on mobile */
@@ -679,7 +681,7 @@
         .cnq-gate-card:active { transform: scale(.97); }
         .cnq-gate-icon { font-size: 52px; display: block; margin-bottom: 18px; line-height: 1; filter: drop-shadow(0 4px 10px rgba(4,18,43,.12)); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
         .cnq-gate-card:hover .cnq-gate-icon { transform: scale(1.1) translateY(-4px); }
-        .cnq-gate-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .cnq-gate-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--navy-text); margin-bottom: 10px; }
         .cnq-gate-card p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
 
         /* PDF Viewer Area */
@@ -778,7 +780,7 @@
         }
 
         [data-theme="dark"] .cnq-gate-card { background: var(--card-bg); }
-        [data-theme="dark"] .cnq-gate-card h3 { color: var(--navy); }
+        [data-theme="dark"] .cnq-gate-card h3 { color: var(--navy-text); }
         [data-theme="dark"] .cnq-pdf-actions,
         [data-theme="dark"] .cnq-pdf-btn { background: var(--card-bg); color: var(--text); }
         [data-theme="dark"] .cnq-pdf-embed-wrap { background: #1a2030; }
@@ -818,7 +820,7 @@
         .contacto-enlaces-title {
             font-family: 'Playfair Display', serif;
             font-size: 15px; font-weight: 700;
-            color: var(--navy);
+            color: var(--navy-text);
             margin-bottom: 12px;
             display: flex; align-items: center; gap: 8px;
         }
@@ -842,7 +844,7 @@
             transform: translateX(3px);
         }
         .contacto-enlace-icon { font-size: 18px; flex-shrink: 0; }
-        .contacto-enlace-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+        .contacto-enlace-name { font-size: 13px; font-weight: 600; color: var(--navy-text); }
         .contacto-enlace-url { font-size: 11px; color: var(--text-muted); }
         .contacto-enlace-arrow { margin-left: auto; color: var(--accent); font-size: 13px; opacity: .6; flex-shrink: 0; }
 
@@ -850,7 +852,7 @@
         .contacto-colab-title {
             font-family: 'Playfair Display', serif;
             font-size: 15px; font-weight: 700;
-            color: var(--navy);
+            color: var(--navy-text);
             margin-top: 24px;
             margin-bottom: 14px;
             display: flex; align-items: center; gap: 8px;
@@ -890,7 +892,7 @@
         .contacto-colab-info { min-width: 0; }
         .contacto-colab-name {
             font-size: 11px; font-weight: 700;
-            color: var(--navy);
+            color: var(--navy-text);
             line-height: 1.3;
         }
         .contacto-colab-role {
@@ -909,7 +911,7 @@
         .honor-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2.5px solid var(--gold); overflow: hidden; }
         .honor-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .honor-initials { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--gold-light); }
-        .honor-info h3 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; line-height: 1.3; }
+        .honor-info h3 { font-size: 13px; font-weight: 600; color: var(--navy-text); margin-bottom: 3px; line-height: 1.3; }
         .honor-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--gold); margin-bottom: 5px; }
         .honor-desc { font-size: 12px; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .honor-años { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 5px; font-family: 'Playfair Display', serif; letter-spacing: .3px; }
@@ -976,7 +978,7 @@
             line-height: 1.2;
             margin-bottom: 10px;
             letter-spacing: -.2px;
-            color: var(--navy);
+            color: var(--navy-text);
         }
 
         .honor-gate-content p {
@@ -1046,7 +1048,7 @@
             font-family: 'Playfair Display', serif;
             font-size: 20px;
             font-weight: 700;
-            color: var(--navy);
+            color: var(--navy-text);
         }
         .honor-back-header .honor-cat-badge {
             font-size: 11px;
@@ -1095,7 +1097,7 @@
         /* NOTICIAS */
         .empty-section { text-align: center; padding: 60px 20px; color: var(--text-muted); }
         .empty-section .empty-icon { font-size: 48px; margin-bottom: 16px; }
-        .empty-section h3 { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+        .empty-section h3 { font-size: 18px; font-weight: 600; color: var(--navy-text); margin-bottom: 8px; }
         .empty-section p { font-size: 14px; }
 
         /* ── Encabezado de Noticias ── */
@@ -1186,7 +1188,7 @@
         .info-noticia h4 {
             margin: 0 0 8px 0;
             font-family: 'Playfair Display', serif;
-            color: var(--navy);
+            color: var(--navy-text);
             font-size: clamp(1.1rem, 2.5vw, 1.5rem);
             line-height: 1.35;
             overflow-wrap: break-word;
@@ -1296,7 +1298,7 @@
         .subtitulo-seccion {
             font-family: 'Playfair Display', serif;
             font-size: clamp(1.1rem, 2.2vw, 1.35rem);
-            color: var(--navy);
+            color: var(--navy-text);
             margin-bottom: 8px;
             font-weight: 700;
             letter-spacing: -.1px;
@@ -1305,7 +1307,7 @@
             font-family: 'Playfair Display', serif;
             font-size: clamp(1.55rem, 3vw, 2rem);
             font-weight: 700;
-            color: var(--navy);
+            color: var(--navy-text);
             margin-bottom: 6px;
             line-height: 1.2;
             letter-spacing: -.2px;
@@ -1481,7 +1483,7 @@
             margin: 0 auto 48px;
             font-size: var(--font-lg); color: var(--text-muted); line-height: 1.75;
         }
-        .inicio-bienvenida strong { color: var(--navy); }
+        .inicio-bienvenida strong { color: var(--navy-text); }
         .inicio-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -1498,7 +1500,7 @@
         .inicio-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 16px 38px rgba(4,18,43,.14); border-color: var(--gold); }
         .inicio-card:active { transform: scale(.97); }
         .inicio-card-icon { font-size: 42px; margin-bottom: 16px; display: block; }
-        .inicio-card h3 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 8px; line-height: 1.25; }
+        .inicio-card h3 { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy-text); margin-bottom: 8px; line-height: 1.25; }
         .inicio-card p { font-size: 13px; color: var(--text-muted); line-height: 1.62; }
         .inicio-footer-links { display: flex; justify-content: center; gap: 40px; padding: 32px 0 8px; border-top: 1px solid var(--border); flex-wrap: wrap; }
         .inicio-footer-links a { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600; transition: opacity .2s; }
@@ -1519,7 +1521,7 @@
             font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
             color: var(--text-muted); transition: all .2s;
         }
-        .filtro-año-btn:hover { border-color: var(--navy-light); color: var(--navy); }
+        .filtro-año-btn:hover { border-color: var(--navy-light); color: var(--navy-text); }
         .filtro-año-btn.activo { background: var(--navy); color: white; border-color: var(--navy); }
         /* Year navigator */
         .year-navigator {
@@ -1533,11 +1535,11 @@
             font-size: 10px; color: var(--text-muted);
             transition: background .18s, color .18s;
         }
-        .year-nav-btn:hover { background: var(--bg); color: var(--navy); }
+        .year-nav-btn:hover { background: var(--bg); color: var(--navy-text); }
         #año-input {
             width: 52px; border: none; outline: none; text-align: center;
             font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-            color: var(--navy); padding: 4px 0; background: transparent;
+            color: var(--navy-text); padding: 4px 0; background: transparent;
         }
         #año-input::placeholder { color: var(--text-muted); font-weight: 400; }
 
@@ -1643,7 +1645,7 @@
         .icho-cd-finished {
             font-family: 'Playfair Display', serif;
             font-size: 21px; font-weight: 800;
-            color: var(--navy);
+            color: var(--navy-text);
             text-align: center;
             margin-bottom: 10px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -1907,7 +1909,7 @@
         .en-numeros-title {
             font-family: 'Playfair Display', serif;
             font-size: 24px; font-weight: 900;
-            color: var(--navy);
+            color: var(--navy-text);
             line-height: 1.1;
         }
         .en-numeros-title em {
@@ -1950,7 +1952,7 @@
         /* Colors: Rojo · Azul · Navy (legible on light bg) */
         .en-numeros-item:nth-child(1) .en-numeros-num { color: var(--cu-red); }
         .en-numeros-item:nth-child(2) .en-numeros-num { color: var(--cu-blue); }
-        .en-numeros-item:nth-child(3) .en-numeros-num { color: var(--navy); }
+        .en-numeros-item:nth-child(3) .en-numeros-num { color: var(--navy-text); }
 
         @media (max-width: 500px) {
             .en-numeros-outer { margin-left: 4px; margin-right: 4px; }
@@ -2927,7 +2929,7 @@ function generarContenidoArticulo(d) {
             const pais  = r.pais  || '';
             const { label: badgeLabel, col } = _badgeOlimp(olimp);
             return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(4,18,43,.06);font-size:13px;">
-                <span style="font-weight:700;color:var(--navy);min-width:36px;">${año}</span>
+                <span style="font-weight:700;color: var(--navy-text);min-width:36px;">${año}</span>
                 ${badgeLabel ? `<span style="background:${col.bg};color:${col.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;">${badgeLabel}</span>` : ''}
                 ${sede ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais ? pais + ' · ' : ''}${sede}</span>` : (pais ? `<span style="color:var(--text-muted);font-size:12px;margin-left:auto;">${pais}</span>` : '')}
             </div>`;
@@ -2940,7 +2942,7 @@ function generarContenidoArticulo(d) {
             const medalla = r.medalla || 'participante';
             const { label: badgeLabel, col } = _badgeOlimp(olimp);
             return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(4,18,43,.06);font-size:13px;">
-                <span style="font-weight:700;color:var(--navy);min-width:36px;">${año}</span>
+                <span style="font-weight:700;color: var(--navy-text);min-width:36px;">${año}</span>
                 ${badgeLabel ? `<span style="background:${col.bg};color:${col.color};padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.3px;">${badgeLabel}</span>` : ''}
                 <span class="badge badge-${medalla}" style="margin-left:auto;"><span class="badge-dot dot-${medalla}"></span>${medallaLabel[medalla] || medalla}</span>
             </div>`;
@@ -2965,7 +2967,7 @@ function generarContenidoArticulo(d) {
                     <span style="font-size:20px;">📅</span>
                     <div>
                         <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.years.active')}</p>
-                        <p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${añosRef.añoMin === añosRef.añoMax ? añosRef.añoMin : añosRef.añoMin + ' – ' + añosRef.añoMax}</p>
+                        <p style="font-size:16px;font-weight:700;color: var(--navy-text);font-family:'Playfair Display',serif;">${añosRef.añoMin === añosRef.añoMax ? añosRef.añoMin : añosRef.añoMin + ' – ' + añosRef.añoMax}</p>
                     </div>
                 </div>` : ''}
                 ${act ? `
@@ -2974,11 +2976,11 @@ function generarContenidoArticulo(d) {
                     <div>
                         <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.events.as.coach')}</p>
                         ${tieneEventos
-                          ? `<button onclick="toggleEventosEntrenador('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">
+                          ? `<button onclick="toggleEventosEntrenador('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color: var(--navy-text);">
                                 ${act.totalEventos}
                                 <span id="${arrowId}" style="font-size:13px;transition:transform .25s;display:inline-block;">▼</span>
                              </button>`
-                          : `<p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${act.totalEventos}</p>`
+                          : `<p style="font-size:16px;font-weight:700;color: var(--navy-text);font-family:'Playfair Display',serif;">${act.totalEventos}</p>`
                         }
                     </div>
                 </div>` : ''}
@@ -2988,11 +2990,11 @@ function generarContenidoArticulo(d) {
                     <div>
                         <p style="font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);font-weight:600;margin-bottom:2px;">${T('honor.events.as.student')}</p>
                         ${tieneEventosEst
-                          ? `<button onclick="toggleEventosEstudiante('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">
+                          ? `<button onclick="toggleEventosEstudiante('${d.id}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color: var(--navy-text);">
                                 ${actEstudiante.totalEventos}
                                 <span id="${arrowEstId}" style="font-size:13px;transition:transform .25s;display:inline-block;">▼</span>
                              </button>`
-                          : `<p style="font-size:16px;font-weight:700;color:var(--navy);font-family:'Playfair Display',serif;">${actEstudiante.totalEventos}</p>`
+                          : `<p style="font-size:16px;font-weight:700;color: var(--navy-text);font-family:'Playfair Display',serif;">${actEstudiante.totalEventos}</p>`
                         }
                     </div>
                 </div>` : ''}
@@ -3410,7 +3412,13 @@ function renderCNQRanking() {
         const clsPar = grupoIdx % 2 === 0 ? 'fila-ed-par' : 'fila-ed-impar';
 
         const provNombre = prov[r.prov] || r.prov || '';
-        const foto       = (window.fotosCNQPorNombre || {})[r.nombre];
+        // Primero se busca la foto propia del Concurso Nacional; si no existe
+        // (la mayoría de las fichas de la CNQ no traen foto propia), se
+        // reutiliza —por nombre— la foto ya disponible en el sitial
+        // internacional (medallistas de IChO/OIAQ, etc.), sin mostrar por
+        // ello sus resultados internacionales en esta tabla nacional.
+        const foto       = (window.fotosCNQPorNombre || {})[r.nombre]
+                         || (window.fotosPorNombre    || {})[r.nombre];
         const nombreEsc  = r.nombre.replace(/'/g, "\\'");
 
         // Avatar: si tiene medallas internacionales → abrir tarjeta sitial
@@ -5393,7 +5401,7 @@ function renderVideos() {
         <a href="${item.link}" target="_blank" rel="noopener" class="video-item">
             ${thumbHTML}
             <span class="fecha-etiqueta">${item.fecha}</span>
-            <h4 style="font-size:1.1rem;font-family:'Playfair Display',serif;color:var(--navy);overflow-wrap:break-word;">${item.titulo}</h4>
+            <h4 style="font-size:1.1rem;font-family:'Playfair Display',serif;color: var(--navy-text);overflow-wrap:break-word;">${item.titulo}</h4>
         </a>`;
     }).join('');
     btn.style.display = filtrados.length > visibles.length ? 'block' : 'none';
