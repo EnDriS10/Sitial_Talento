@@ -58,6 +58,16 @@
     }
 
     // ── Renderizador de fórmulas esqueléticas ──
+    // Estimación del ancho (en px de la unidad de dibujo interna) que ocupa
+    // la etiqueta de un átomo, para poder retraer el enlace exactamente
+    // hasta el borde del rótulo (y no más allá ni quedarse corto), sea
+    // cual sea su longitud: "O", "OH", "OMe", "CO2Me", "NH2"...
+    function labelHalfWidth(label) {
+        if (!label) return 0;
+        // Aproximación de ancho de carácter para la fuente usada en las etiquetas
+        // (DM Sans 14.5px 700), afinada para que "CO2Me"/"OMe"/"ONa" queden bien.
+        return 5.5 + label.length * 4.6;
+    }
     function renderSkeletal(mol, opts) {
         opts = opts || {};
         const unit = opts.unit || 40;
@@ -73,12 +83,27 @@
         function shrinkPoint(P, Q, amt) {
             const dx = Q.x - P.x, dy = Q.y - P.y, len = Math.hypot(dx, dy);
             if (len === 0) return P;
-            return { x: P.x + dx / len * amt, y: P.y + dy / len * amt };
+            const clamped = Math.min(amt, len * 0.62); // nunca invierte el segmento en enlaces muy cortos
+            return { x: P.x + dx / len * clamped, y: P.y + dy / len * clamped };
         }
         function offsetLine(x1, y1, x2, y2, off) {
             const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
             const nx = -dy / len * off, ny = dx / len * off;
             return { x1: x1 + nx, y1: y1 + ny, x2: x2 + nx, y2: y2 + ny };
+        }
+        // Retrae un extremo de enlace según el ÁNGULO con el que llega al
+        // rótulo: si llega casi horizontal, retrocede hasta el borde
+        // horizontal de la caja de texto; si llega más vertical, hasta el
+        // borde vertical. Así un -OMe que sale hacia la derecha no atraviesa
+        // el texto, y uno que sale hacia arriba tampoco se queda flotando.
+        function shrinkToLabel(P, Q, label) {
+            const halfW = labelHalfWidth(label) + 2.5, halfH = 13.5;
+            const dx = Q.x - P.x, dy = Q.y - P.y, len = Math.hypot(dx, dy) || 1;
+            const ux = dx / len, uy = dy / len;
+            const sx = ux !== 0 ? Math.abs(halfW / ux) : Infinity;
+            const sy = uy !== 0 ? Math.abs(halfH / uy) : Infinity;
+            const amt = Math.min(sx, sy) + 2;
+            return shrinkPoint(P, Q, amt);
         }
 
         let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-skel-svg">';
@@ -87,8 +112,8 @@
             const i = b[0], j = b[1], order = b[2] || 1;
             const a = mol.atoms[i], c = mol.atoms[j];
             let P1 = { x: px(a.x), y: py(a.y) }, P2 = { x: px(c.x), y: py(c.y) };
-            if (a.label) P1 = shrinkPoint(P1, P2, 15);
-            if (c.label) P2 = shrinkPoint(P2, P1, 15);
+            if (a.label) P1 = shrinkToLabel(P1, P2, a.label);
+            if (c.label) P2 = shrinkToLabel(P2, P1, c.label);
 
             if (order === 1) {
                 svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
@@ -100,35 +125,56 @@
                 const mx = (P1.x + P2.x) / 2, my = (P1.y + P2.y) / 2;
                 let dx0 = cx - mx, dy0 = cy - my;
                 const dlen = Math.hypot(dx0, dy0) || 1;
-                dx0 = dx0 / dlen * 4.4; dy0 = dy0 / dlen * 4.4;
+                const gap = unit * 0.11;
+                dx0 = dx0 / dlen * gap; dy0 = dy0 / dlen * gap;
                 const bx = P2.x - P1.x, by = P2.y - P1.y, blen = Math.hypot(bx, by) || 1;
                 const ux = bx / blen, uy = by / blen, inset = blen * 0.18;
                 const ix1 = P1.x + ux * inset + dx0, iy1 = P1.y + uy * inset + dy0;
                 const ix2 = P2.x - ux * inset + dx0, iy2 = P2.y - uy * inset + dy0;
                 svg += `<line x1="${ix1}" y1="${iy1}" x2="${ix2}" y2="${iy2}" class="pc-skel-bond"/>`;
             } else if (order === 2) {
-                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 4.4);
-                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -4.4);
+                const off = unit * 0.11;
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, off);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -off);
                 svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
                 svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
             } else if (order === 3) {
+                const off = unit * 0.155;
                 svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
-                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 6.2);
-                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -6.2);
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, off);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -off);
                 svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
                 svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
             } else if (order === 'wedge') {
-                svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond pc-skel-dashed"/>`;
+                // Cuña sólida (enlace hacia el observador): triángulo relleno,
+                // estrecho en el átomo de origen y ancho en el de destino.
+                const dx = P2.x - P1.x, dy = P2.y - P1.y, len = Math.hypot(dx, dy) || 1;
+                const nx = -dy / len, ny = dx / len, halfBase = unit * 0.085;
+                const bx1 = P2.x + nx * halfBase, by1 = P2.y + ny * halfBase;
+                const bx2 = P2.x - nx * halfBase, by2 = P2.y - ny * halfBase;
+                svg += `<polygon points="${P1.x},${P1.y} ${bx1},${by1} ${bx2},${by2}" class="pc-skel-wedge"/>`;
+            } else if (order === 'hash') {
+                // Cuña discontinua (enlace hacia atrás del observador): serie
+                // de trazos paralelos, crecientes hacia el átomo de destino.
+                const dx = P2.x - P1.x, dy = P2.y - P1.y, len = Math.hypot(dx, dy) || 1;
+                const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+                const steps = 6;
+                for (let s = 1; s <= steps; s++) {
+                    const t = s / steps;
+                    const cx = P1.x + dx * t, cy = P1.y + dy * t;
+                    const half = unit * 0.085 * t;
+                    svg += `<line x1="${cx - nx*half}" y1="${cy - ny*half}" x2="${cx + nx*half}" y2="${cy + ny*half}" class="pc-skel-bond pc-skel-hash"/>`;
+                }
             }
         });
 
         mol.atoms.forEach(a => {
             if (a.label) {
                 const x = px(a.x), y = py(a.y);
-                const w = 11 + a.label.length * 8;
+                const w = (labelHalfWidth(a.label)) * 2;
                 svg += `<rect x="${x - w/2}" y="${y - 11}" width="${w}" height="22" rx="3" class="pc-skel-bg"/>`;
-                svg += `<text x="${x}" y="${y + 6}" class="pc-skel-label">${a.label}</text>`;
-                if (a.charge) svg += `<text x="${x + w/2 - 2}" y="${y - 8}" class="pc-skel-charge">(${a.charge})</text>`;
+                svg += `<text x="${x}" y="${y + 5.5}" class="pc-skel-label">${a.label}</text>`;
+                if (a.charge) svg += `<text x="${x + w/2 - 1}" y="${y - 9}" class="pc-skel-charge">(${a.charge})</text>`;
             }
             if (a.star) {
                 const x = px(a.x), y = py(a.y);
@@ -1013,12 +1059,71 @@
     // ════════════════════════════════════════════════════════════════
     // Tamaños predefinidos para moléculas: "sm" (rejillas con muchos
     // compuestos), "md" (por defecto) y "lg" (una sola molécula protagonista).
-    const SIZE_PRESETS = { sm: { unit: 26, pad: 14 }, md: { unit: 36, pad: 20 }, lg: { unit: 46, pad: 24 } };
+    const SIZE_PRESETS = { sm: { unit: 32, pad: 16 }, md: { unit: 40, pad: 20 }, lg: { unit: 48, pad: 24 } };
 
     function renderMolById(id, size) {
         const mol = get(id);
         if (!mol) return '<span class="pc-mol-missing">[' + id + ']</span>';
         return renderSkeletal(mol, SIZE_PRESETS[size] || SIZE_PRESETS.md);
+    }
+
+    // ── Ajuste automático "serpiente" (boustrophedon) de esquemas de síntesis ──
+    // Un .pc-scheme-row puede contener muchos pasos (molécula, flecha,
+    // molécula, flecha...) en un único flujo lógico. Con CSS flex-wrap el
+    // navegador ya los reparte en varias líneas al llegar al borde en vez de
+    // desbordar horizontalmente; esta función agrupa cada línea resultante
+    // en su propio contenedor y alterna el sentido de lectura (izq→der,
+    // der→izq, izq→der...) para que el ojo pueda seguir la síntesis como un
+    // camino continuo que baja de línea en línea, tal como en un esquema de
+    // síntesis dibujado a mano.
+    function snakeifySchemeRows(root) {
+        root.querySelectorAll('.pc-scheme-row').forEach(row => {
+            if (row.dataset.snaked === '1') return;
+            const children = Array.from(row.children);
+            if (children.length <= 1) return;
+            // Agrupa por línea visual comparando el offsetTop tras el layout.
+            // Se fuerza temporalmente align-items:flex-start: con
+            // align-items:center (el normal) dos elementos de distinta
+            // altura en la MISMA línea (p. ej. una molécula grande junto a
+            // una flecha con etiquetas cortas) quedan centrados y por tanto
+            // con offsetTop distinto, lo que rompería la detección de línea.
+            const prevAlign = row.style.alignItems;
+            row.style.alignItems = 'flex-start';
+            const lines = [];
+            let curTop = null, curLine = [];
+            children.forEach(ch => {
+                const top = ch.offsetTop;
+                if (curTop === null || Math.abs(top - curTop) < 6) {
+                    curLine.push(ch);
+                    if (curTop === null) curTop = top;
+                } else {
+                    lines.push(curLine);
+                    curLine = [ch];
+                    curTop = top;
+                }
+            });
+            if (curLine.length) lines.push(curLine);
+            row.style.alignItems = prevAlign;
+            row.dataset.snaked = '1';
+            if (lines.length <= 1) return; // cabe en una sola línea: no hace falta serpentear
+            row.classList.add('pc-scheme-row-snake');
+            const frag = document.createDocumentFragment();
+            lines.forEach((line, i) => {
+                const div = document.createElement('div');
+                const reversed = i % 2 === 1;
+                div.className = 'pc-scheme-line' + (reversed ? ' pc-scheme-line-rev' : '');
+                line.forEach(ch => div.appendChild(ch));
+                if (i < lines.length - 1) {
+                    const turn = document.createElement('div');
+                    turn.className = 'pc-scheme-turn' + (reversed ? ' pc-scheme-turn-left' : ' pc-scheme-turn-right');
+                    turn.innerHTML = '<svg viewBox="0 0 20 20" class="pc-scheme-turn-svg"><path d="M10 1 L10 13 M5 9 L10 15 L15 9" class="pc-scheme-turn-path"/></svg>';
+                    div.appendChild(turn);
+                }
+                frag.appendChild(div);
+            });
+            row.innerHTML = '';
+            row.appendChild(frag);
+        });
     }
 
     function renderAll(root) {
@@ -1045,6 +1150,10 @@
             el.innerHTML = fn ? fn() : '<span class="pc-mol-missing">[' + el.getAttribute('data-scheme') + ']</span>';
             el.classList.add('pc-scheme-rendered');
         });
+        // El agrupado en líneas necesita que el navegador ya haya calculado
+        // el flex-wrap de cada fila, así que se hace en el frame siguiente.
+        const raf = (typeof requestAnimationFrame === 'function') ? requestAnimationFrame : (fn => setTimeout(fn, 0));
+        raf(() => snakeifySchemeRows(root));
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -1058,7 +1167,7 @@
         if (node.arrow) {
             return `<div class="pc-scheme-arrow">
                 <span class="pc-scheme-arrow-above">${node.above || ''}</span>
-                <svg viewBox="0 0 60 14" class="pc-scheme-arrow-svg"><line x1="2" y1="7" x2="52" y2="7" class="pc-skel-bond"/><polygon points="52,2 60,7 52,12" class="pc-scheme-arrowhead"/></svg>
+                <svg viewBox="0 0 68 16" class="pc-scheme-arrow-svg"><line x1="2" y1="8" x2="58" y2="8" class="pc-scheme-arrow-line"/><polygon points="58,2 68,8 58,14" class="pc-scheme-arrowhead"/></svg>
                 <span class="pc-scheme-arrow-below">${node.below || ''}</span>
             </div>`;
         }
