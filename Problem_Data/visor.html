@@ -10,13 +10,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
     :root {
-        --navy: #04122b; --navy-mid: #0b2150; --navy-light: #122d6b;
+        --navy: #04122b;
+        --navy-text: var(--navy); --navy-mid: #0b2150; --navy-light: #122d6b;
         --gold: #c9a227; --gold-light: #f0c84a;
         --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
         --green: #1f7a4d; --red-soft: #b3455a;
     }
     [data-theme="dark"] {
-        --navy: #d0e0ff; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --navy: #141a2b;
+        --navy-text: #a9c2ee; --navy-mid: #1a2840; --navy-light: #3a5a9a;
         --gold: #d4a82a; --gold-light: #f5d060;
         --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
         --green: #3fbf80; --red-soft: #e37b8c;
@@ -120,7 +122,7 @@
     }
     .pc-total-chip {
         font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
-        color: var(--navy); background: rgba(201,162,39,.18);
+        color: var(--navy-text); background: rgba(201,162,39,.18);
         padding: 4px 12px; border-radius: 999px; white-space: nowrap;
     }
     [data-theme="dark"] .pc-total-chip { color: var(--gold-light); background: rgba(212,168,42,.16); }
@@ -144,7 +146,7 @@
 
     .pc-part { display: flex; gap: 10px; margin: 4px 0 16px; }
     .pc-part-label {
-        flex-shrink: 0; font-weight: 800; color: var(--navy); background: rgba(4,18,43,.06);
+        flex-shrink: 0; font-weight: 800; color: var(--navy-text); background: rgba(4,18,43,.06);
         border-radius: 7px; padding: 2px 9px; height: fit-content; font-size: 14px;
     }
     [data-theme="dark"] .pc-part-label { color: var(--gold-light); background: rgba(255,255,255,.08); }
@@ -191,39 +193,60 @@
     .pc-dotcross svg { width: 260px; height: auto; }
     .pc-dc-atom-circle { fill: var(--card-bg); stroke: var(--text); stroke-width: 1.4; }
     .pc-dc-atom-label { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; fill: var(--text); text-anchor: middle; }
-    .pc-dc-dot { fill: var(--navy); }
+    .pc-dc-dot { fill: var(--navy-text); }
     [data-theme="dark"] .pc-dc-dot { fill: var(--gold-light); }
     .pc-dc-cross { font-size: 15px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
 
     /* ── Estructuras esqueléticas dibujadas por ChemDraw ── */
     .pc-mol { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
     .pc-mol-rendered .pc-skel-svg { display: block; }
-    .pc-skel-svg { width: 100%; height: auto; max-width: 190px; }
-    .pc-mol-sm .pc-skel-svg { max-width: 108px; }
-    .pc-mol-lg .pc-skel-svg { max-width: 260px; }
+    .pc-skel-svg { width: 100%; height: auto; max-width: 210px; }
+    .pc-mol-sm .pc-skel-svg { max-width: 130px; }
+    .pc-mol-lg .pc-skel-svg { max-width: 300px; }
 
-    /* ── Esquemas de síntesis / reacción (flechas con reactivos) ── */
+    /* ── Esquemas de síntesis / reacción (flechas con reactivos) ──
+       Cada .pc-scheme-row es un flujo de pasos (molécula → flecha →
+       molécula → …). Se deja que el navegador reparta los pasos en varias
+       líneas (flex-wrap) en vez de desbordar horizontalmente, y ChemDraw
+       reagrupa el resultado en .pc-scheme-line, alternando el sentido de
+       lectura línea a línea (izq→der, der→izq, …) con un pequeño conector
+       en "codo" entre líneas — como una síntesis dibujada a mano que sigue
+       hacia la derecha, baja al llegar al borde, continúa hacia la
+       izquierda, vuelve a bajar, y así sucesivamente. ── */
     .pc-scheme-box {
         background: rgba(4,18,43,.03); border: 1px solid var(--border); border-radius: 12px;
-        padding: 14px 16px; margin: 10px 0 18px; overflow-x: auto;
+        padding: 16px 18px; margin: 10px 0 18px; overflow-x: auto;
     }
     [data-theme="dark"] .pc-scheme-box { background: rgba(255,255,255,.03); }
-    .pc-scheme-row { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; margin: 6px 0; }
-    .pc-scheme-node { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 40px; }
-    .pc-scheme-mol .pc-skel-svg { max-width: 100px; }
-    .pc-scheme-label { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; white-space: nowrap; }
+    .pc-scheme-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 10px 0; row-gap: 18px; }
+    .pc-scheme-row-snake { flex-direction: column; align-items: stretch; row-gap: 4px; }
+    .pc-scheme-line { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 14px; justify-content: flex-start; }
+    .pc-scheme-line-rev { flex-direction: row-reverse; justify-content: flex-end; }
+    .pc-scheme-turn { display: flex; align-items: center; flex-shrink: 0; }
+    .pc-scheme-turn-right { justify-content: flex-end; margin-left: auto; }
+    .pc-scheme-turn-left { justify-content: flex-start; margin-right: auto; }
+    .pc-scheme-line-rev .pc-scheme-turn-right { margin-left: 0; margin-right: auto; order: -1; }
+    .pc-scheme-turn-svg { width: 20px; height: 22px; }
+    .pc-scheme-turn-path { fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .55; }
+    .pc-scheme-node { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 40px; flex-shrink: 0; }
+    .pc-scheme-mol .pc-skel-svg { max-width: 168px; }
+    .pc-scheme-label { font-size: 11.5px; font-weight: 700; color: var(--text); text-align: center; white-space: nowrap; }
     .pc-scheme-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: center; white-space: nowrap; }
     .pc-scheme-unknown {
         display: inline-flex; align-items: center; justify-content: center;
         width: 34px; height: 34px; border: 2px dashed var(--border);
         border-radius: 8px; font-family: 'Playfair Display', serif;
-        font-weight: 900; font-size: 17px; color: var(--navy);
+        font-weight: 900; font-size: 17px; color: var(--navy-text);
     }
     [data-theme="dark"] .pc-scheme-unknown { color: var(--gold-light); }
-    .pc-scheme-plus { font-size: 16px; font-weight: 700; color: var(--text-muted); padding: 0 2px; }
-    .pc-scheme-arrow { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
-    .pc-scheme-arrow-above, .pc-scheme-arrow-below { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
-    .pc-scheme-arrow-svg { width: 60px; height: 14px; display: block; }
+    .pc-scheme-plus { font-size: 16px; font-weight: 700; color: var(--text-muted); padding: 0 2px; flex-shrink: 0; }
+    .pc-scheme-arrow { display: flex; flex-direction: column; align-items: center; min-width: 72px; flex-shrink: 0; }
+    .pc-scheme-arrow-above, .pc-scheme-arrow-below { font-size: 10.8px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
+    .pc-scheme-arrow-above { margin-bottom: 1px; }
+    .pc-scheme-arrow-below { margin-top: 1px; }
+    .pc-scheme-arrow-svg { width: 68px; height: 16px; display: block; }
+    .pc-scheme-line-rev .pc-scheme-arrow-svg { transform: scaleX(-1); }
+    .pc-scheme-arrow-line { stroke: var(--text); stroke-width: 2; stroke-linecap: round; }
     .pc-scheme-arrowhead { fill: var(--text); }
 
     /* ── Ecuaciones / fórmulas destacadas (cajas de cálculo, p.ej. Q5) ── */
@@ -239,6 +262,8 @@
     .pc-eq-frac-num { border-bottom: 1.4px solid var(--text); }
     .pc-skel-bond { stroke: var(--text); stroke-width: 2.1; stroke-linecap: round; }
     .pc-skel-dashed { stroke-dasharray: 4 3; }
+    .pc-skel-wedge { fill: var(--text); stroke: none; }
+    .pc-skel-hash { stroke-width: 1.8; }
     .pc-skel-bg { fill: var(--card-bg); }
     .pc-skel-label { font-family: 'DM Sans', sans-serif; font-size: 14.5px; font-weight: 700; fill: var(--text); text-anchor: middle; }
     .pc-skel-charge { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
@@ -265,7 +290,7 @@
     .pc-orb-svg { display: block; height: 58px; width: auto; }
     .pc-orb-lobe { stroke: var(--text); stroke-width: 1.3; }
     .pc-orb-pos { fill: var(--card-bg); }
-    .pc-orb-neg { fill: var(--navy); }
+    .pc-orb-neg { fill: var(--navy-text); }
     [data-theme="dark"] .pc-orb-neg { fill: var(--gold); }
     .pc-orb-axis { stroke: var(--text); stroke-width: 1; opacity: .55; }
     .pc-diagram-rendered { display: block; margin: 14px 0; }
@@ -279,7 +304,7 @@
     .pc-orb-energy-rows { display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .pc-orb-energy-rows .pc-orbitals-row { margin: 0; }
     .pc-orb-energy-axis { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 46px; }
-    .pc-orb-energy-arrow { font-size: 20px; color: var(--gold-dark, var(--navy)); }
+    .pc-orb-energy-arrow { font-size: 20px; color: var(--gold-dark, var(--navy-text)); }
     .pc-orb-energy-text { font-size: 10.5px; font-weight: 700; text-align: center; color: var(--text-muted); line-height: 1.2; }
 
     /* ── Galería de imágenes (Q5, cargadas desde un listado externo) ── */
