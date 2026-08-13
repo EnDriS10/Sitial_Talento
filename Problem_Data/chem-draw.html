@@ -52,9 +52,9 @@
         return { x: from.x + d * Math.cos(deg * DEG), y: from.y + d * Math.sin(deg * DEG) };
     }
     // Construye lista de átomos a partir de puntos [{x,y}] + mapa de etiquetas {idx:'O'} + cargas {idx:'+'}
-    function atoms(pts, labels, charges) {
-        labels = labels || {}; charges = charges || {};
-        return pts.map((p, i) => ({ x: p.x, y: p.y, label: labels[i] || null, charge: charges[i] || null }));
+    function atoms(pts, labels, charges, stars) {
+        labels = labels || {}; charges = charges || {}; stars = stars || {};
+        return pts.map((p, i) => ({ x: p.x, y: p.y, label: labels[i] || null, charge: charges[i] || null, star: stars[i] || false }));
     }
 
     // ── Renderizador de fórmulas esqueléticas ──
@@ -107,14 +107,14 @@
                 const ix2 = P2.x - ux * inset + dx0, iy2 = P2.y - uy * inset + dy0;
                 svg += `<line x1="${ix1}" y1="${iy1}" x2="${ix2}" y2="${iy2}" class="pc-skel-bond"/>`;
             } else if (order === 2) {
-                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 3.6);
-                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -3.6);
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 4.4);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -4.4);
                 svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
                 svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
             } else if (order === 3) {
                 svg += `<line x1="${P1.x}" y1="${P1.y}" x2="${P2.x}" y2="${P2.y}" class="pc-skel-bond"/>`;
-                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 5.2);
-                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -5.2);
+                const o1 = offsetLine(P1.x, P1.y, P2.x, P2.y, 6.2);
+                const o2 = offsetLine(P1.x, P1.y, P2.x, P2.y, -6.2);
                 svg += `<line x1="${o1.x1}" y1="${o1.y1}" x2="${o1.x2}" y2="${o1.y2}" class="pc-skel-bond"/>`;
                 svg += `<line x1="${o2.x1}" y1="${o2.y1}" x2="${o2.x2}" y2="${o2.y2}" class="pc-skel-bond"/>`;
             } else if (order === 'wedge') {
@@ -128,7 +128,7 @@
                 const w = 11 + a.label.length * 8;
                 svg += `<rect x="${x - w/2}" y="${y - 11}" width="${w}" height="22" rx="3" class="pc-skel-bg"/>`;
                 svg += `<text x="${x}" y="${y + 6}" class="pc-skel-label">${a.label}</text>`;
-                if (a.charge) svg += `<text x="${x + w/2 - 2}" y="${y - 8}" class="pc-skel-charge">${a.charge}</text>`;
+                if (a.charge) svg += `<text x="${x + w/2 - 2}" y="${y - 8}" class="pc-skel-charge">(${a.charge})</text>`;
             }
             if (a.star) {
                 const x = px(a.x), y = py(a.y);
@@ -155,6 +155,7 @@
     }
     function renderOrbitalRow(N, moIndex, opts) {
         opts = opts || {};
+        const blank = !!opts.blank;
         const signs = opts.signs || pSigns(N, moIndex);
         const spacing = 46, lobeW = 20, lobeH = 34, pad = 20;
         const W = spacing * (N - 1) + pad * 2 + lobeW;
@@ -163,7 +164,7 @@
         let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">';
         for (let i = 0; i < N; i++) {
             const cx = pad + lobeW / 2 + i * spacing;
-            const topNeg = signs[i] < 0; // true => lóbulo superior sombreado (fase negativa arriba)
+            const topNeg = !blank && signs[i] < 0; // true => lóbulo superior sombreado (fase negativa arriba)
             svg += `<ellipse cx="${cx}" cy="${cy - lobeH/2 + 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-neg' : 'pc-orb-pos'}"/>`;
             svg += `<ellipse cx="${cx}" cy="${cy + lobeH/2 - 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-pos' : 'pc-orb-neg'}"/>`;
             svg += `<line x1="${cx}" y1="${cy - lobeH + 4}" x2="${cx}" y2="${cy + lobeH - 4}" class="pc-orb-axis"/>`;
@@ -227,6 +228,15 @@
         return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1],[3,4,3]] };
     });
 
+    def('alil-nitrilo', () => {
+        // CH2=CH-CH2-C≡N  (nitrilo, producto de ataque por carbono con NaCN)
+        const c = zz(0, 0, 3);
+        const cNit = pt(c[2], -30, 1);
+        const n = pt(cNit, -90, 1);
+        const a = atoms(c.concat([cNit, n]), { 4: 'N' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1],[3,4,3]] };
+    });
+
     def('formamida-generica', () => {
         // R-NH-CHO
         const r = { x: -1, y: 0.6 };
@@ -256,8 +266,9 @@
 
     def('piridina', () => {
         const p = ring(0, 0, 6, 90);
+        const c = { x: 0, y: 0 };
         const a = atoms(p, { 0: 'N' });
-        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]] };
+        return { atoms: a, bonds: [[0,1,2,{ring:c}],[1,2,1],[2,3,2,{ring:c}],[3,4,1],[4,5,2,{ring:c}],[5,0,1]] };
     });
 
     def('butan-2-amina', () => {
@@ -269,10 +280,11 @@
 
     def('3-metoxianilina', () => {
         const ringPts = ring(0, 0, 6, 90);
+        const c = { x: 0, y: 0 };
         const nh2 = pt(ringPts[0], 90, 1);
         const ome = pt(ringPts[2], -30, 1);
         const a = atoms(ringPts.concat([nh2, ome]), { 6: 'NH2', 7: 'OMe' });
-        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1],[0,6,1],[2,7,1]] };
+        return { atoms: a, bonds: [[0,1,2,{ring:c}],[1,2,1],[2,3,2,{ring:c}],[3,4,1],[4,5,2,{ring:c}],[5,0,1],[0,6,1],[2,7,1]] };
     });
 
     def('n-metilformamida', () => {
@@ -341,20 +353,17 @@
 
     def('fenilisocianuro', () => {
         const b = benzeneAt(0, 0);
-        const n = pt(b.atoms[0], 90, 1);
-        const c2 = pt(n, 90, 1);
-        b.atoms.push({ x: n.x, y: n.y, label: 'N', charge: null });
-        b.atoms.push({ x: c2.x, y: c2.y, label: 'C', charge: '\u2212' });
-        b.bonds.push([0, 6, 1], [6, 7, 3]);
+        const nc = pt(b.atoms[0], 90, 1);
+        b.atoms.push({ x: nc.x, y: nc.y, label: 'NC' });
+        b.bonds.push([0, 6, 1]);
         return b;
     });
 
     def('1-isocianopropano', () => {
         const c = zz(0, 0, 3);
-        const n = pt(c[2], -30, 1);
-        const cIso = pt(n, -90, 1);
-        const a = atoms(c.concat([n, cIso]), { 3: 'N', 4: 'C' }, { 4: '\u2212' });
-        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,3]] };
+        const nc = pt(c[2], -30, 1);
+        const a = atoms(c.concat([nc]), { 3: 'CN' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[2,3,1]] };
     });
 
     def('acetona', () => {
@@ -440,22 +449,23 @@
 
     def('diisocianobenceno', () => {
         const b = benzeneAt(0, 0);
-        const n1 = pt(b.atoms[0], 90, 1), c1 = pt(n1, 90, 1);
-        const n2 = pt(b.atoms[1], 30, 1), c2 = pt(n2, 30, 1);
+        const nc1 = pt(b.atoms[0], 90, 1);
+        const nc2 = pt(b.atoms[1], 30, 1);
         const me = pt(b.atoms[3], -90, 1);
-        b.atoms.push({ x: n1.x, y: n1.y, label: 'N' }, { x: c1.x, y: c1.y, label: 'C', charge: '\u2212' });
-        b.atoms.push({ x: n2.x, y: n2.y, label: 'N' }, { x: c2.x, y: c2.y, label: 'C', charge: '\u2212' });
+        b.atoms.push({ x: nc1.x, y: nc1.y, label: 'NC' });
+        b.atoms.push({ x: nc2.x, y: nc2.y, label: 'CN' });
         b.atoms.push({ x: me.x, y: me.y, label: null });
-        b.bonds.push([0,6,1],[6,7,3], [1,8,1],[8,9,3], [3,10,1]);
+        b.bonds.push([0,6,1], [1,7,1], [3,8,1]);
         return b;
     });
 
     def('diisocianopropano', () => {
-        const c = zz(0, 0, 2);
-        const n1 = pt(c[0], 150, 1), c1 = pt(n1, 150, 1);
-        const n2 = pt(c[1], -30, 1), c2 = pt(n2, -30, 1);
-        const a = atoms(c.concat([n1, c1, n2, c2]), { 2: 'N', 3: 'C', 4: 'N', 5: 'C' }, { 3: '\u2212', 5: '\u2212' });
-        return { atoms: a, bonds: [[0,1,1],[0,2,1],[2,3,3],[1,4,1],[4,5,3]] };
+        // NC-CH2-CH2-CH2-CN (propano-1,3-diilo con isocianuro en ambos extremos)
+        const c = zz(0, 0, 3);
+        const nc1 = pt(c[0], 150, 1);
+        const nc2 = pt(c[2], -30, 1);
+        const a = atoms(c.concat([nc1, nc2]), { 3: 'CN', 4: 'CN' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[0,3,1],[2,4,1]] };
     });
 
     def('trisisocianometano', () => {
@@ -463,12 +473,10 @@
         const dirs = [90, 210, 330];
         const a = [{ x: 0, y: 0, label: null }];
         const bonds = [];
-        dirs.forEach((d, k) => {
-            const n = pt(c0, d, 1), ciso = pt(n, d, 1);
-            a.push({ x: n.x, y: n.y, label: 'N' });
-            a.push({ x: ciso.x, y: ciso.y, label: 'C', charge: '\u2212' });
-            const nIdx = a.length - 2, cIdx = a.length - 1;
-            bonds.push([0, nIdx, 1], [nIdx, cIdx, 3]);
+        dirs.forEach((d) => {
+            const nc = pt(c0, d, 1);
+            a.push({ x: nc.x, y: nc.y, label: 'CN' });
+            bonds.push([0, a.length - 1, 1]);
         });
         return { atoms: a, bonds };
     });
@@ -525,6 +533,45 @@
     });
 
     // ═══ Q3 — lawsone y tautomería ═══
+
+    // Equilibrio ceto-enol genérico (ilustrativo, antes de las partes a/b)
+    def('tautomeria-ceto-ejemplo', () => {
+        // R-C(=O)-CH2(H*)
+        const r = { x: -1.1, y: 0.6 };
+        const c1 = { x: 0, y: 0 };
+        const o = pt(c1, 90, 1);
+        const c2 = pt(c1, -30, 1);
+        const hStar = pt(c2, -90, 0.9);
+        const a = atoms([r, c1, o, c2, hStar], { 0: 'R', 2: 'O', 4: 'H' }, {}, { 4: true });
+        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,1]] };
+    });
+    def('tautomeria-enol-ejemplo', () => {
+        // R-C(OH*)=CH2
+        const r = { x: -1.1, y: 0.6 };
+        const c1 = { x: 0, y: 0 };
+        const oh = pt(c1, 90, 1);
+        const c2 = pt(c1, -30, 1);
+        const a = atoms([r, c1, oh, c2], { 0: 'R', 2: 'OH' }, {}, { 2: true });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2]] };
+    });
+
+    // Ecuación general de tautomería X=Y-Z-H ⇌ X(H)-Y=Z
+    def('tautomeria-xyz-izq', () => {
+        const x = { x: 0, y: 1 };
+        const y = { x: 0, y: 0 };
+        const z = pt(y, -30, 1);
+        const h = pt(z, -90, 0.9);
+        const a = atoms([x, y, z, h], { 0: 'X', 1: 'Y', 2: 'Z', 3: 'H' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1]] };
+    });
+    def('tautomeria-xyz-der', () => {
+        const x = { x: 0, y: 1 };
+        const h = pt(x, 150, 0.9);
+        const y = { x: 0, y: 0 };
+        const z = pt(y, -30, 1);
+        const a = atoms([x, h, y, z], { 0: 'X', 1: 'H', 2: 'Y', 3: 'Z' });
+        return { atoms: a, bonds: [[0,1,1],[0,2,1],[2,3,2]] };
+    });
 
     // Esqueleto de naftaleno REALMENTE fusionado (comparte la arista C4a-C8a
     // entre los dos anillos, en vez de dos hexágonos sueltos sin enlazar).
@@ -584,6 +631,33 @@
         ] };
     });
 
+    def('lawsona-aducto-naranja', () => {
+        // Aducto naranja: adición del tiolato de la queratina al C2 de la
+        // lawsona, con el anillo B ahora totalmente aromático (dihidroxinaftaleno).
+        const { pts, ringA, ringB } = lawsoneSkeleton();
+        const oh1 = pt(pts[0], 90, 1), s2 = pt(pts[1], 30, 1), oh4 = pt(pts[3], -90, 1);
+        const q = pt(s2, 30, 1);
+        const a = atoms(pts.concat([oh1, s2, oh4, q]), { 10: 'OH', 11: 'S', 12: 'OH', 13: 'queratina' });
+        return { atoms: a, bonds: [
+            [5,0,1], [0,1,2,{ring:ringB}], [1,2,1], [2,3,2,{ring:ringB}], [3,4,1],
+            [0,10,1], [1,11,1], [11,13,1], [3,12,1],
+            ...lawsoneAromaticBonds(ringA)
+        ] };
+    });
+
+    def('lawsona-aducto-marron', () => {
+        // Aducto marrón: oxidación del aducto naranja de vuelta a la forma
+        // quinónica, conservando el tioéter con la queratina en C2.
+        const { pts, ringA } = lawsoneSkeleton();
+        const o1 = pt(pts[0], 90, 1), s2 = pt(pts[1], 30, 1), o4 = pt(pts[3], -90, 1);
+        const q = pt(s2, 30, 1);
+        const a = atoms(pts.concat([o1, s2, o4, q]), { 10: 'O', 11: 'S', 12: 'O', 13: 'queratina' });
+        return { atoms: a, bonds: [
+            [5,0,1], [0,10,2], [0,1,1], [1,11,1], [11,13,1], [1,2,2], [2,3,1], [3,12,2], [3,4,1],
+            ...lawsoneAromaticBonds(ringA)
+        ] };
+    });
+
     def('ciclohexanona', () => {
         const p = ring(0, 0, 6, 90);
         const o = pt(p[0], 90, 1);
@@ -620,7 +694,7 @@
         const b1 = benzeneAt(-2.4, 0);
         const b2 = benzeneAt(2.4, 0, 90);
         const c1 = pt(b1.atoms[0], 30, 1), o1 = pt(c1, 90, 1);
-        const c2 = pt(b2.atoms[0], 150, 1), o2 = pt(c2, 90, 1);
+        const c2 = pt(b2.atoms[0], 150, 1), o2 = pt(c2, -90, 1);
         const m = mergeMol([b1, b2]);
         m.atoms.push({ x: c1.x, y: c1.y, label: null }, { x: o1.x, y: o1.y, label: 'O' });
         m.atoms.push({ x: c2.x, y: c2.y, label: null }, { x: o2.x, y: o2.y, label: 'O' });
@@ -717,13 +791,14 @@
     def('pirazolona-ester', () => {
         // hidrazona del éster oxalacético, tras ciclación con -H2O: anillo de pirazolona
         const p = ring(0, 0, 5, 90);
+        const centro = { x: 0, y: 0 };
         // etiquetas: 0=N(Ar), 1=N, 2=C(-OH tautómero), 3=C(-COOEt), 4=C(=O)
         const ar = pt(p[0], 150, 1);
         const oh = pt(p[2], -30, 1);
         const cEst = pt(p[3], -90, 1), oEst1 = pt(cEst, -150, 1), oEst2 = pt(cEst, -30, 1), et = pt(oEst2, -30, 1);
         const a = atoms(p.concat([ar, oh, cEst, oEst1, oEst2, et]),
             { 0: 'N', 1: 'N', 5: 'Ar', 6: 'OH', 8: 'O', 9: 'O' });
-        return { atoms: a, bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,0,1],[0,5,1],[2,6,1],[3,7,1],[7,8,2],[7,9,1],[9,10,1]] };
+        return { atoms: a, bonds: [[0,1,1],[1,2,2,{ring:centro}],[2,3,1],[3,4,1],[4,0,1],[0,5,1],[2,6,1],[3,7,1],[7,8,2],[7,9,1],[9,10,1]] };
     });
 
     def('tartrazina-simplificada', () => {
@@ -733,7 +808,7 @@
         const azoN1 = pt(p[3], -90, 1), azoN2 = pt(azoN1, -90, 1);
         const arAzo = benzeneAt(azoN2.x, azoN2.y - 2, 90);
         const cCarbox = pt(p[2], -30, 1), o1 = pt(cCarbox, -90, 1), o2 = pt(cCarbox, 30, 1);
-        const m = mergeMol([{ atoms: atoms(p), bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,0,1]] }, arN, arAzo]);
+        const m = mergeMol([{ atoms: atoms(p), bonds: [[0,1,1],[1,2,2,{ring:{x:0,y:0}}],[2,3,1],[3,4,1],[4,0,1]] }, arN, arAzo]);
         const nArIdx = 5; // primer atomo del anillo arN (idx 5..10)
         m.bonds.push([0, nArIdx, 1]);
         m.atoms.push({ x: azoN1.x, y: azoN1.y, label: 'N' }, { x: azoN2.x, y: azoN2.y, label: 'N' });
@@ -755,9 +830,14 @@
     // ═══ Q4 — polienos conjugados y carotenos ═══
 
     def('butadieno', () => {
-        // CH2=CH-CH=CH2 (1,3-butadieno)
+        // CH2=CH-CH=CH2 (1,3-butadieno), con todos los hidrógenos explícitos
         const c = zz(0, 0, 4);
-        return { atoms: atoms(c), bonds: [[0,1,2],[1,2,1],[2,3,2]] };
+        const h0a = pt(c[0], 150, 1), h0b = pt(c[0], -90, 1);
+        const h1 = pt(c[1], 90, 1);
+        const h2 = pt(c[2], -90, 1);
+        const h3a = pt(c[3], -30, 1), h3b = pt(c[3], 90, 1);
+        const a = atoms(c.concat([h0a, h0b, h1, h2, h3a, h3b]), { 4:'H', 5:'H', 6:'H', 7:'H', 8:'H', 9:'H' });
+        return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,2],[0,4,1],[0,5,1],[1,6,1],[2,7,1],[3,8,1],[3,9,1]] };
     });
 
     def('hexatrieno', () => {
@@ -780,13 +860,13 @@
         return { atoms: a, bonds: bonds.concat([[4,6,1],[4,7,1],[2,8,1]]), attachIdx: 0 };
     }
     function caroteneChain(startX) {
-        // Cadena central conjugada de 11 dobles enlaces con metilos alternos
+        // Cadena central conjugada con alternancia estricta simple/doble
         // (representación esquemática, no numeración IUPAC exacta).
         const pts = zz(startX, 0, 15, false);
         const meIdxs = [1, 4, 7, 10, 13];
         const meAtoms = [];
         const bonds = [];
-        for (let i = 0; i < pts.length - 1; i++) bonds.push([i, i + 1, (i % 3 === 1) ? 1 : 2]);
+        for (let i = 0; i < pts.length - 1; i++) bonds.push([i, i + 1, (i % 2 === 0) ? 2 : 1]);
         meIdxs.forEach((idx, k) => {
             const dir = (idx % 4 < 2) ? 90 : -90;
             const m = pt(pts[idx], dir, 0.85);
@@ -951,7 +1031,8 @@
         root.querySelectorAll('[data-orbitals]').forEach(el => {
             const N = parseInt(el.getAttribute('data-n') || '6', 10);
             const idx = parseInt(el.getAttribute('data-index') || '1', 10);
-            el.innerHTML = renderOrbitalRow(N, idx);
+            const blank = el.getAttribute('data-blank') === 'true';
+            el.innerHTML = renderOrbitalRow(N, idx, { blank });
             el.classList.add('pc-orb-rendered');
         });
         root.querySelectorAll('[data-diagram]').forEach(el => {
@@ -1002,14 +1083,14 @@
         size: 'sm',
         rows: [
             [ { mol: 'bromuro-alilo', label: 'bromuro de alilo' }, { arrow: true, above: 'AgCN' }, { mol: 'alil-isocianuro', label: 'A + precipitado color crema' } ],
-            [ { text: '' }, { arrow: true, above: 'NaCN' }, { mol: 'alil-isocianuro', label: 'B' } ]
+            [ { text: '' }, { arrow: true, above: 'NaCN' }, { text: '<span class="pc-scheme-unknown">B</span>' } ]
         ]
     });
     SCHEMES['q2-c-d'] = () => renderScheme(null, {
         size: 'sm',
         rows: [
-            [ { mol: 'formamida-generica', label: 'C' }, { arrow: true, above: '&minus;H\u2082O' }, { mol: 'alil-isocianuro', label: 'isocianuro R&ndash;N\u2261C' } ],
-            [ { mol: 'formamida-generica', label: 'C' }, { arrow: true, above: '+H\u2082O' }, { mol: 'n-metilalilamina', label: 'R&ndash;NH\u2082' }, { plus: true }, { mol: 'acido-formico', label: 'D' } ]
+            [ { text: '<span class="pc-scheme-unknown">C</span>' }, { arrow: true, above: '&minus;H\u2082O' }, { mol: 'alil-isocianuro', label: 'isocianuro R&ndash;N\u2261C' } ],
+            [ { text: '<span class="pc-scheme-unknown">C</span>' }, { arrow: true, above: '+H\u2082O' }, { mol: 'n-metilalilamina', label: 'R&ndash;NH\u2082' }, { plus: true }, { text: '<span class="pc-scheme-unknown">D</span>' } ]
         ]
     });
 
@@ -1049,37 +1130,46 @@
             { plus: true },
             { text: 'queratina&ndash;S<sup>&minus;</sup>' },
             { arrow: true, above: 'adición', below: 'al anillo' },
-            { text: 'aducto <span style="color:#c9862c">naranja</span><br>(lawsona&ndash;S&ndash;queratina)' },
+            { mol: 'lawsona-aducto-naranja', label: '<span style="color:#c9862c">aducto naranja</span>' },
             { arrow: true, above: 'oxidación', below: '(tiempo)' },
-            { text: 'aducto <span style="color:#7a4a1e">marrón</span>' }
+            { mol: 'lawsona-aducto-marron', label: '<span style="color:#7a4a1e">aducto marrón</span>' }
         ]]
     });
 
+    SCHEMES['q3-ceto-enol-general'] = () => `<div class="pc-scheme-box"><div class="pc-scheme-row">
+        <div class="pc-scheme-node"><div class="pc-scheme-mol">${renderMolById('tautomeria-ceto-ejemplo', 'sm')}</div><div class="pc-scheme-label">forma ceto</div></div>
+        <div class="pc-scheme-arrow"><svg viewBox="0 0 60 22" class="pc-scheme-arrow-svg" style="height:22px"><line x1="4" y1="7" x2="56" y2="7" class="pc-skel-bond"/><polygon points="4,4 -2,7 4,10" class="pc-scheme-arrowhead"/><line x1="4" y1="15" x2="56" y2="15" class="pc-skel-bond"/><polygon points="56,12 62,15 56,18" class="pc-scheme-arrowhead"/></svg></div>
+        <div class="pc-scheme-node"><div class="pc-scheme-mol">${renderMolById('tautomeria-enol-ejemplo', 'sm')}</div><div class="pc-scheme-label">forma enol</div></div>
+        </div></div>`;
+
     SCHEMES['q3-tautomeria-general'] = () => `<div class="pc-scheme-box"><div class="pc-scheme-row">
-        <div class="pc-scheme-node"><div class="pc-scheme-text">X<sub>‖</sub><br>Y<sub>&#8211;</sub>Z&#8211;H</div></div>
-        <div class="pc-scheme-arrow"><span class="pc-scheme-arrow-above">&#8652;</span><svg viewBox="0 0 60 14" class="pc-scheme-arrow-svg"><line x1="2" y1="7" x2="52" y2="7" class="pc-skel-bond"/><polygon points="52,2 60,7 52,12" class="pc-scheme-arrowhead"/></svg></div>
-        <div class="pc-scheme-node"><div class="pc-scheme-text">X&#8211;H<br>Y<sub>‖</sub>Z</div></div>
+        <div class="pc-scheme-node"><div class="pc-scheme-mol">${renderMolById('tautomeria-xyz-izq', 'sm')}</div></div>
+        <div class="pc-scheme-arrow"><svg viewBox="0 0 60 22" class="pc-scheme-arrow-svg" style="height:22px"><line x1="4" y1="7" x2="56" y2="7" class="pc-skel-bond"/><polygon points="4,4 -2,7 4,10" class="pc-scheme-arrowhead"/><line x1="4" y1="15" x2="56" y2="15" class="pc-skel-bond"/><polygon points="56,12 62,15 56,18" class="pc-scheme-arrowhead"/></svg></div>
+        <div class="pc-scheme-node"><div class="pc-scheme-mol">${renderMolById('tautomeria-xyz-der', 'sm')}</div></div>
         </div></div>`;
 
     const DIAGRAMS = {};
     DIAGRAMS['p-orbital-fases'] = () => `
-        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
-            <line x1="80" y1="10" x2="80" y2="110" class="pc-orb-axis"/>
-            <ellipse cx="80" cy="36" rx="22" ry="26" class="pc-orb-lobe pc-orb-pos"/>
-            <ellipse cx="80" cy="84" rx="22" ry="26" class="pc-orb-lobe pc-orb-neg"/>
-            <text x="120" y="32" class="pc-skel-label" style="font-size:11px;text-anchor:start;">+ positivo</text>
-            <text x="120" y="90" class="pc-skel-label" style="font-size:11px;text-anchor:start;">&#8211; negativo</text>
+        <svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <text x="80" y="20" class="pc-orb-title" text-anchor="middle">orbital p</text>
+            <line x1="80" y1="30" x2="80" y2="130" class="pc-orb-axis"/>
+            <ellipse cx="80" cy="56" rx="24" ry="28" class="pc-orb-lobe pc-orb-pos"/>
+            <ellipse cx="80" cy="104" rx="24" ry="28" class="pc-orb-lobe pc-orb-neg"/>
+            <line x1="106" y1="56" x2="170" y2="40" class="pc-orb-leader"/>
+            <text x="176" y="44" class="pc-orb-label" text-anchor="start">valor positivo</text>
+            <line x1="106" y1="104" x2="170" y2="120" class="pc-orb-leader"/>
+            <text x="176" y="124" class="pc-orb-label" text-anchor="start">valor negativo</text>
         </svg>`;
     DIAGRAMS['interferencia-mo'] = () => `
-        <svg viewBox="0 0 300 130" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
-            <text x="60" y="14" class="pc-skel-label" style="font-size:11px;">constructiva</text>
-            <ellipse cx="48" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="48" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
-            <ellipse cx="76" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="76" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
-            <text x="10" y="120" class="pc-skel-label" style="font-size:10px;">lóbulos adyacentes: mismo signo</text>
-            <text x="220" y="14" class="pc-skel-label" style="font-size:11px;">destructiva</text>
-            <ellipse cx="208" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="208" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/>
-            <ellipse cx="236" cy="42" rx="14" ry="22" class="pc-orb-lobe pc-orb-neg"/><ellipse cx="236" cy="80" rx="14" ry="22" class="pc-orb-lobe pc-orb-pos"/>
-            <text x="180" y="120" class="pc-skel-label" style="font-size:10px;">lóbulos adyacentes: signo opuesto</text>
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <text x="70" y="18" class="pc-orb-title" text-anchor="middle">interferencia constructiva</text>
+            <ellipse cx="52" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="52" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="86" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="86" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <foreignObject x="10" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>del mismo signo</div></foreignObject>
+            <text x="266" y="18" class="pc-orb-title" text-anchor="middle">interferencia destructiva</text>
+            <ellipse cx="248" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="248" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="282" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/><ellipse cx="282" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/>
+            <foreignObject x="206" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>de signo opuesto</div></foreignObject>
         </svg>`;
 
     window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, renderScheme, pSigns, MOLS: BUILDERS, SCHEMES, DIAGRAMS };
