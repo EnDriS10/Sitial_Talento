@@ -684,6 +684,61 @@
         .cnq-gate-card h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--navy-text); margin-bottom: 10px; }
         .cnq-gate-card p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
 
+        /* ═══ ESTADÍSTICAS POR PROVINCIAS ═══ */
+        .stats-toggle-vista-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 26px; margin-left: 10px; vertical-align: middle;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            background: var(--card-bg); color: var(--accent);
+            cursor: pointer; font-size: 13px; line-height: 1;
+            transition: background .18s, border-color .18s, transform .18s;
+        }
+        .stats-toggle-vista-btn:hover { background: rgba(26,111,181,.08); border-color: var(--accent); transform: scale(1.06); }
+        .stats-toggle-vista-btn.en-tabla { transform: rotate(180deg); }
+        .stats-toggle-vista-btn.en-tabla:hover { transform: rotate(180deg) scale(1.06); }
+
+        .stats-modo-tabs { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+        .stats-modo-btn {
+            padding: 9px 18px; border-radius: 999px; border: 1.5px solid var(--border);
+            background: var(--card-bg); color: var(--text-muted); font-weight: 600; font-size: 13.5px;
+            cursor: pointer; transition: all .2s;
+        }
+        .stats-modo-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .stats-modo-btn.activo { background: var(--navy); border-color: var(--navy); color: #fff; }
+        [data-theme="dark"] .stats-modo-btn.activo { background: var(--accent); border-color: var(--accent); }
+
+        .stats-filtros {
+            display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+            margin-bottom: 26px; padding: 14px 18px; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 14px;
+        }
+        .stats-filtro-grupo { display: flex; align-items: center; gap: 8px; font-size: 13.5px; }
+        .stats-filtro-grupo label { font-weight: 700; color: var(--navy-text); white-space: nowrap; }
+        .stats-filtro-grupo .stats-sep { color: var(--text-muted); }
+
+        .stats-chart-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 24px 20px 18px; margin-bottom: 24px; box-shadow: 0 2px 14px rgba(4,18,43,.06);
+        }
+        .stats-chart-card h4 { font-family: 'Playfair Display', serif; font-size: 1.08rem; color: var(--navy-text); margin-bottom: 4px; }
+        .stats-nota { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+        .stats-nota-años { font-size: 12.5px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+
+        .stats-svg-chart { width: 100%; height: auto; display: block; margin-top: 6px; }
+        .stats-svg-chart rect { transition: opacity .15s; }
+        .stats-svg-chart rect:hover { opacity: .78; }
+
+        .stats-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); }
+        .stats-legend-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+        .stats-legend-swatch { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+
+        #stats-tabla thead th { white-space: nowrap; }
+
+        @media (max-width: 640px) {
+            .stats-filtros { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .stats-chart-card { padding: 18px 12px 14px; }
+        }
+
         /* PDF Viewer Area */
         .cnq-pdf-block {
             background: var(--card-bg);
@@ -2243,7 +2298,7 @@
         <p class="section-sub" id="section-sub-eventos">Historial completo de participaciones y medallas por olimpiada</p>
         <div class="controles-evento">
             <label for="selector-olimpiada"><strong id="lbl-olimpiada">Olimpiada:</strong></label>
-            <select class="custom-select" id="selector-olimpiada" onchange="cargarTabla()">
+            <select class="custom-select" id="selector-olimpiada" onchange="cargarTabla(); _sincronizarURL();">
                 <option value="icho">🌍 IChO — Internacional</option>
                 <option value="imcho">🧪 IMChO — Mendeléiev</option>
                 <option value="oiaq">🌎 OIAQ — Iberoamericana</option>
@@ -2251,7 +2306,7 @@
                 <option value="otras">🌐 Otras Olimpiadas</option>
             </select>
             <label for="selector-rol"><strong id="lbl-rol">Rol:</strong></label>
-            <select class="custom-select" id="selector-rol" onchange="cargarTabla()">
+            <select class="custom-select" id="selector-rol" onchange="cargarTabla(); _sincronizarURL();">
                 <option value="estudiante">👨‍🎓 Estudiante</option>
                 <option value="profesor">👨‍🏫 Profesor</option>
                 <option value="todos">🏛️ Delegación</option>
@@ -2303,6 +2358,11 @@
                     <span class="cnq-gate-icon">📄</span>
                     <h3 id="cnq-btn-concurso-title" data-i18n="cnq.btn.concurso">Concurso Nacional</h3>
                     <p id="cnq-btn-concurso-desc" data-i18n="cnq.btn.concurso.desc">Exámenes, soluciones y resultados oficiales por edición</p>
+                </div>
+                <div class="cnq-gate-card" id="cnq-btn-estadisticas" onclick="mostrarSubseccionCNQ('estadisticas')">
+                    <span class="cnq-gate-icon">📊</span>
+                    <h3 id="cnq-btn-estadisticas-title" data-i18n="cnq.btn.estadisticas">Estadísticas por Provincias</h3>
+                    <p id="cnq-btn-estadisticas-desc" data-i18n="cnq.btn.estadisticas.desc">Resultados y medallas por provincia, en histogramas y tablas</p>
                 </div>
             </div>
         </div>
@@ -2397,6 +2457,82 @@
 
             <!-- Área de PDFs -->
             <div id="cnq-pdf-area"></div>
+        </div>
+
+        <!-- ══ ESTADÍSTICAS POR PROVINCIAS ══ -->
+        <div id="cnq-estadisticas-view" style="display:none;">
+            <div class="honor-back-header">
+                <button class="honor-back-btn" onclick="volverAlGatewayCNQ()">← <span data-i18n="honor.back2">Volver</span></button>
+                <h3 id="stats-view-title"><span data-i18n="stats.title">Estadísticas por Provincias</span>
+                    <button class="stats-toggle-vista-btn" id="stats-toggle-vista-btn" onclick="_statsToggleVista()" title="Ver como tabla">▷</button>
+                </h3>
+            </div>
+
+            <div class="stats-modo-tabs">
+                <button class="stats-modo-btn activo" data-modo="cnq" onclick="_statsCambiarModo('cnq')">
+                    🇨🇺 <span data-i18n="stats.modo.cnq">Concurso Nacional (CNQ)</span>
+                </button>
+                <button class="stats-modo-btn" data-modo="intl" onclick="_statsCambiarModo('intl')">
+                    🌍 <span data-i18n="stats.modo.intl">Olimpiadas Internacionales</span>
+                </button>
+            </div>
+
+            <div class="stats-filtros">
+                <div class="stats-filtro-grupo" id="stats-filtro-olimpiada" style="display:none;">
+                    <label data-i18n="stats.label.olimpiada">Olimpiada:</label>
+                    <select class="custom-select" id="stats-selector-olimpiada" onchange="renderEstadisticasProvincias()">
+                        <option value="general" data-i18n-opt="stats.ol.general">🌐 General (todas)</option>
+                        <option value="icho">🌍 IChO</option>
+                        <option value="imcho">🧪 IMChO</option>
+                        <option value="oiaq">🌎 OIAQ</option>
+                        <option value="ocacq">🌴 OCACQ</option>
+                        <option value="otras" data-i18n-opt="stats.ol.otras">🌐 Otras</option>
+                    </select>
+                </div>
+                <div class="stats-filtro-grupo">
+                    <label data-i18n="stats.label.periodo">Periodo:</label>
+                    <select class="custom-select" id="stats-selector-año-desde" onchange="renderEstadisticasProvincias()"></select>
+                    <span class="stats-sep">–</span>
+                    <select class="custom-select" id="stats-selector-año-hasta" onchange="renderEstadisticasProvincias()"></select>
+                </div>
+            </div>
+
+            <!-- Vista de histogramas -->
+            <div id="stats-vista-chart">
+                <div class="stats-chart-card">
+                    <h4 data-i18n="stats.chart1.title">Resultados y Medallas por Provincia</h4>
+                    <p class="stats-nota" data-i18n="stats.chart1.sub">Cantidad total de resultados registrados y de medallas obtenidas (incluye menciones) por provincia</p>
+                    <div id="stats-chart-conteo"></div>
+                </div>
+                <div class="stats-chart-card">
+                    <h4 data-i18n="stats.chart2.title">Puntuación Ponderada por Provincia</h4>
+                    <p class="stats-nota" data-i18n="stats.chart2.sub">Oro = 3 pts · Plata = 2 pts · Bronce = 1 pt · Mención = 0.5 pts</p>
+                    <div id="stats-chart-puntos"></div>
+                </div>
+            </div>
+
+            <!-- Vista de tabla -->
+            <div id="stats-vista-tabla" style="display:none;">
+                <div class="tabla-wrapper">
+                    <table id="stats-tabla">
+                        <thead>
+                            <tr>
+                                <th data-i18n="stats.th.prov">Provincia</th>
+                                <th data-i18n="stats.th.total">Resultados</th>
+                                <th data-i18n="stats.th.medallas">Medallas</th>
+                                <th>🥇</th>
+                                <th>🥈</th>
+                                <th>🥉</th>
+                                <th data-i18n="stats.th.mencion">Mención</th>
+                                <th data-i18n="stats.th.puntos">Puntos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tabla-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <p class="stats-nota-años" id="stats-nota-años" style="display:none;"></p>
         </div>
 
     </div><!-- /#cnq -->
@@ -3094,6 +3230,7 @@ let _honorDataGlobal = [];
 
 function mostrarCategoriaHonor(categoria) {
     _honorCategoriaActual = categoria;
+    window._articuloAbiertoId = null;
     const gateway   = document.getElementById('honor-gateway');
     const listView  = document.getElementById('honor-list-view');
     const titleEl   = document.getElementById('honor-list-title');
@@ -3115,14 +3252,17 @@ function mostrarCategoriaHonor(categoria) {
     }
     renderHonorGrid(filtered);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    _sincronizarURL();
 }
 
 function volverAlGatewayHonor() {
     _honorCategoriaActual = null;
+    window._articuloAbiertoId = null;
     const gateway  = document.getElementById('honor-gateway');
     const listView = document.getElementById('honor-list-view');
     if (gateway)  gateway.style.display = '';
     if (listView) listView.classList.remove('visible');
+    _sincronizarURL();
 }
 
 async function cargarHonorData() {
@@ -3172,10 +3312,18 @@ function abrirArticulo(id) {
     const overlay = document.getElementById('modal-overlay');
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    if (window._seccionActual === 'honor' && _honorCategoriaActual) {
+        window._articuloAbiertoId = id;
+        _sincronizarURL();
+    }
 }
 function cerrarArticulo() {
     document.getElementById('modal-overlay').style.display = 'none';
     document.body.style.overflow = '';
+    if (window._seccionActual === 'honor' && window._articuloAbiertoId) {
+        window._articuloAbiertoId = null;
+        _sincronizarURL();
+    }
 }
 </script>
 <script>
@@ -3244,9 +3392,13 @@ async function cargarCNQData() {
 
 // ─── Gate navigation ───────────────────────────────
 async function mostrarSubseccionCNQ(sub) {
-    document.getElementById('cnq-gateway').style.display       = 'none';
-    document.getElementById('cnq-ranking-view').style.display  = 'none';
-    document.getElementById('cnq-concurso-view').style.display = 'none';
+    document.getElementById('cnq-gateway').style.display        = 'none';
+    document.getElementById('cnq-ranking-view').style.display    = 'none';
+    document.getElementById('cnq-concurso-view').style.display   = 'none';
+    const estEl = document.getElementById('cnq-estadisticas-view');
+    if (estEl) estEl.style.display = 'none';
+
+    window._cnqSubActual = sub;
 
     if (sub === 'ranking') {
         document.getElementById('cnq-ranking-view').style.display = 'block';
@@ -3255,15 +3407,262 @@ async function mostrarSubseccionCNQ(sub) {
     } else if (sub === 'concurso') {
         document.getElementById('cnq-concurso-view').style.display = 'block';
         await _inicializarBotonesAñosConcurso();
+    } else if (sub === 'estadisticas') {
+        if (estEl) estEl.style.display = 'block';
+        _statsCambiarModo(window._statsModo || 'cnq');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    _sincronizarURL();
 }
 
 function volverAlGatewayCNQ() {
-    document.getElementById('cnq-gateway').style.display    = '';
+    document.getElementById('cnq-gateway').style.display       = '';
     document.getElementById('cnq-ranking-view').style.display  = 'none';
     document.getElementById('cnq-concurso-view').style.display = 'none';
+    const estEl = document.getElementById('cnq-estadisticas-view');
+    if (estEl) estEl.style.display = 'none';
+    window._cnqSubActual = null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    _sincronizarURL();
+}
+
+// ════════════════════════════════════════════════════
+// ESTADÍSTICAS POR PROVINCIAS
+// ════════════════════════════════════════════════════
+window._statsModo  = window._statsModo  || 'cnq';   // 'cnq' | 'intl'
+window._statsVista = window._statsVista || 'chart';  // 'chart' | 'tabla'
+
+// Oro = 3, Plata = 2, Bronce = 1, Mención = 0.5, resto no puntúa.
+function _pesoMedalla(m) {
+    return { oro: 3, plata: 2, bronce: 1, mencion: 0.5 }[m] || 0;
+}
+
+// Universo de registros para el modo/filtro actual, SIN filtrar aún por año.
+function _statsRecordsBase(modo) {
+    if (modo === 'cnq') return (window.datosCNQ || []).slice();
+    const otras = (typeof datosOtras !== 'undefined') ? datosOtras : [];
+    const sel = document.getElementById('stats-selector-olimpiada');
+    const ol  = sel ? sel.value : 'general';
+    if (ol === 'general') return Object.values(todasLasOlimpiadas).flat().concat(otras);
+    if (ol === 'otras')   return otras.slice();
+    return (todasLasOlimpiadas[ol] || []).slice();
+}
+
+// Rango de años disponible para un modo (independiente del filtro de año
+// activo, para poder poblar los selectores de "Periodo").
+function _statsAñosDatos(modo) {
+    const otras = (typeof datosOtras !== 'undefined') ? datosOtras : [];
+    const recs = modo === 'cnq'
+        ? (window.datosCNQ || [])
+        : Object.values(todasLasOlimpiadas).flat().concat(otras);
+    const años = recs.map(r => r.año).filter(a => typeof a === 'number' && !isNaN(a));
+    if (!años.length) return { min: null, max: null };
+    return { min: Math.min(...años), max: Math.max(...años) };
+}
+
+// Universo de provincias a mostrar (con su nombre completo), según el modo:
+// CNQ usa su propio diccionario (incluye GT/MY/IJ/UH); las internacionales
+// usan PROVINCIAS.
+function _statsProvinciasUniverso(modo) {
+    const dict = modo === 'cnq' ? (window.nombreProvincia || {}) : PROVINCIAS;
+    return Object.keys(dict).map(code => ({ code, label: dict[code] }));
+}
+
+// Agrega resultados/medallas/puntos por provincia, aplicando el filtro de
+// periodo (año desde/hasta) actualmente seleccionado.
+function _statsCalcular(modo) {
+    let recs = _statsRecordsBase(modo);
+    const desdeSel = document.getElementById('stats-selector-año-desde');
+    const hastaSel = document.getElementById('stats-selector-año-hasta');
+    const desde = (desdeSel && desdeSel.value) ? parseInt(desdeSel.value, 10) : null;
+    const hasta = (hastaSel && hastaSel.value) ? parseInt(hastaSel.value, 10) : null;
+    if (desde != null) recs = recs.filter(r => r.año >= desde);
+    if (hasta != null) recs = recs.filter(r => r.año <= hasta);
+
+    const out = {};
+    recs.forEach(r => {
+        if (!r.prov) return;
+        if (!out[r.prov]) out[r.prov] = { total: 0, oro: 0, plata: 0, bronce: 0, mencion: 0, medallas: 0, puntos: 0 };
+        out[r.prov].total++;
+        if (r.medalla && r.medalla !== 'participante') {
+            out[r.prov][r.medalla] = (out[r.prov][r.medalla] || 0) + 1;
+            out[r.prov].medallas++;
+            out[r.prov].puntos += _pesoMedalla(r.medalla);
+        }
+    });
+    return out;
+}
+
+// Rellena los selectores de "Periodo" con el rango de años disponible para
+// el modo activo (todo el periodo por defecto; el usuario puede acotarlo).
+function _statsPoblarAños() {
+    const { min, max } = _statsAñosDatos(window._statsModo);
+    const desdeSel = document.getElementById('stats-selector-año-desde');
+    const hastaSel = document.getElementById('stats-selector-año-hasta');
+    if (!desdeSel || !hastaSel || min == null) return;
+    let opts = '';
+    for (let a = min; a <= max; a++) opts += `<option value="${a}">${a}</option>`;
+    desdeSel.innerHTML = opts;
+    hastaSel.innerHTML = opts;
+    desdeSel.value = String(min);
+    hastaSel.value = String(max);
+}
+
+function _statsCambiarModo(modo) {
+    window._statsModo = modo;
+    document.querySelectorAll('.stats-modo-btn').forEach(b => b.classList.toggle('activo', b.dataset.modo === modo));
+    const olGrupo = document.getElementById('stats-filtro-olimpiada');
+    if (olGrupo) olGrupo.style.display = modo === 'intl' ? '' : 'none';
+    _statsPoblarAños();
+    renderEstadisticasProvincias();
+}
+
+function _statsToggleVista() {
+    window._statsVista = window._statsVista === 'chart' ? 'tabla' : 'chart';
+    renderEstadisticasProvincias();
+}
+
+// Redondea un máximo de eje Y a un valor "bonito" (1/2/5 × 10^n).
+function _statsNiceMax(v) {
+    if (v <= 0) return 1;
+    const mag  = Math.pow(10, Math.floor(Math.log10(v)));
+    const norm = v / mag;
+    const nice = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+    return nice * mag;
+}
+function _statsFmtNum(v) {
+    const r = Math.round(v * 10) / 10;
+    return (r % 1 === 0) ? String(r) : r.toFixed(1);
+}
+
+// Histograma de barras agrupadas en SVG (colores tomados de las variables
+// CSS del sitio, así respeta claro/oscuro automáticamente).
+function _svgGroupedBarChart(opts) {
+    const W = opts.width || 720, H = opts.height || 320;
+    const padL = 42, padR = 16, padT = 18, padB = 56;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const cats  = opts.categories;
+    const n     = Math.max(cats.length, 1);
+    const groupW = plotW / n;
+    const seriesN = opts.series.length;
+    const barGap = 3;
+    const barW = Math.max(3, (groupW - 14) / seriesN - barGap);
+
+    let maxVal = 0;
+    opts.series.forEach(s => cats.forEach(c => { maxVal = Math.max(maxVal, s.values[c.code] || 0); }));
+    const niceMax = _statsNiceMax(maxVal || 1);
+    const yTicks = 5;
+
+    let gridLines = '', yLabels = '';
+    for (let i = 0; i <= yTicks; i++) {
+        const val = niceMax * i / yTicks;
+        const y = padT + plotH - (val / niceMax) * plotH;
+        gridLines += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>`;
+        yLabels   += `<text x="${padL - 8}" y="${(y + 3.5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--text-muted)">${_statsFmtNum(val)}</text>`;
+    }
+
+    let bars = '', xLabels = '';
+    cats.forEach((c, ci) => {
+        const groupX = padL + ci * groupW;
+        const totalW = seriesN * barW + (seriesN - 1) * barGap;
+        const startX = groupX + (groupW - totalW) / 2;
+        opts.series.forEach((s, si) => {
+            const val = s.values[c.code] || 0;
+            const h = niceMax > 0 ? (val / niceMax) * plotH : 0;
+            const x = startX + si * (barW + barGap);
+            const y = padT + plotH - h;
+            bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" rx="3" fill="${s.color}"><title>${c.label} — ${s.name}: ${_statsFmtNum(val)}</title></rect>`;
+        });
+        const labelX = groupX + groupW / 2;
+        xLabels += `<text x="${labelX.toFixed(1)}" y="${(padT + plotH + 18).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--text)">${c.code}<title>${c.label}</title></text>`;
+    });
+
+    const yAxisTitle = opts.yLabel
+        ? `<text x="12" y="${(padT + plotH/2).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-muted)" transform="rotate(-90 12 ${(padT + plotH/2).toFixed(1)})">${opts.yLabel}</text>`
+        : '';
+    const xAxisTitle = opts.xLabel
+        ? `<text x="${(padL + plotW/2).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text-muted)">${opts.xLabel}</text>`
+        : '';
+
+    return `<svg viewBox="0 0 ${W} ${H}" class="stats-svg-chart" role="img" aria-label="${opts.yLabel || ''}">
+        ${gridLines}
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="var(--border)" stroke-width="1.5"/>
+        <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="var(--border)" stroke-width="1.5"/>
+        ${yLabels}${bars}${xLabels}${yAxisTitle}${xAxisTitle}
+    </svg>`;
+}
+
+function _svgLegendHTML(series) {
+    return `<div class="stats-legend">` + series.map(s =>
+        `<span class="stats-legend-item"><span class="stats-legend-swatch" style="background:${s.color}"></span>${s.name}</span>`
+    ).join('') + `</div>`;
+}
+
+function renderEstadisticasProvincias() {
+    const modo  = window._statsModo  || 'cnq';
+    const vista = window._statsVista || 'chart';
+
+    const chartWrap = document.getElementById('stats-vista-chart');
+    const tablaWrap = document.getElementById('stats-vista-tabla');
+    const toggleBtn = document.getElementById('stats-toggle-vista-btn');
+    if (chartWrap) chartWrap.style.display = vista === 'chart' ? '' : 'none';
+    if (tablaWrap) tablaWrap.style.display = vista === 'tabla' ? '' : 'none';
+    if (toggleBtn) {
+        toggleBtn.classList.toggle('en-tabla', vista === 'tabla');
+        toggleBtn.title = vista === 'chart' ? T('stats.toggle.tabla') : T('stats.toggle.chart');
+    }
+
+    const desdeSel = document.getElementById('stats-selector-año-desde');
+    if (desdeSel && !desdeSel.options.length) _statsPoblarAños();
+
+    const categories = _statsProvinciasUniverso(modo);
+    const stats = _statsCalcular(modo);
+
+    if (vista === 'chart') {
+        const serieConteo = [
+            { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).total || 0])) },
+            { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).medallas || 0])) },
+        ];
+        const seriePuntos = [
+            { name: T('stats.serie.puntos'), color: 'var(--cu-red)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).puntos || 0])) },
+        ];
+        const c1 = document.getElementById('stats-chart-conteo');
+        const c2 = document.getElementById('stats-chart-puntos');
+        if (c1) c1.innerHTML = _svgGroupedBarChart({ categories, series: serieConteo, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
+        if (c2) c2.innerHTML = _svgGroupedBarChart({ categories, series: seriePuntos,  yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
+    } else {
+        const tbody = document.getElementById('stats-tabla-body');
+        if (tbody) {
+            const filas = categories
+                .map(c => ({ c, s: stats[c.code] || { total:0, oro:0, plata:0, bronce:0, mencion:0, medallas:0, puntos:0 } }))
+                .sort((a, b) => b.s.total - a.s.total);
+            tbody.innerHTML = filas.map(({ c, s }) => `
+                <tr>
+                    <td style="font-weight:600;">${c.label}</td>
+                    <td style="text-align:center;">${s.total}</td>
+                    <td style="text-align:center;font-weight:700;">${s.medallas}</td>
+                    <td style="text-align:center;">${s.oro || 0}</td>
+                    <td style="text-align:center;">${s.plata || 0}</td>
+                    <td style="text-align:center;">${s.bronce || 0}</td>
+                    <td style="text-align:center;">${s.mencion || 0}</td>
+                    <td style="text-align:center;font-weight:700;">${_statsFmtNum(s.puntos)}</td>
+                </tr>`).join('');
+        }
+    }
+
+    // Nota de años disponibles (el año inicial se consulta directamente a
+    // los datos del CNQ, así que si algún día se añaden ediciones
+    // anteriores a 2017 el texto se actualiza solo).
+    const nota = document.getElementById('stats-nota-años');
+    if (nota) {
+        if (modo === 'cnq' && window.añosCNQ && window.añosCNQ.length) {
+            const minA = Math.min(...window.añosCNQ);
+            nota.style.display = '';
+            nota.textContent = `¹ ${T('stats.nota.desde')} ${minA}.`;
+        } else {
+            nota.style.display = 'none';
+        }
+    }
 }
 
 // ─── Ranking ───────────────────────────────────────
@@ -3817,6 +4216,8 @@ function _refreshCNQ() {
     }
     const rv = document.getElementById('cnq-ranking-view');
     if (rv && rv.style.display !== 'none') renderCNQRanking();
+    const ev = document.getElementById('cnq-estadisticas-view');
+    if (ev && ev.style.display !== 'none') renderEstadisticasProvincias();
 }
 </script>
 <script>
@@ -3896,10 +4297,20 @@ const _origInit = () => {
     //      dentro de la misma pestaña.
     const secciones = ['inicio','sitial','eventos','cnq','honor','noticias','media','contacto'];
 
-    // 1) Nuevo esquema de URL "bonita" (sin index.html, con un query sin
-    //    valor): ?Historial_Eventos, ?Historial_Medallas, ?Olimpiada_Cubana,
-    //    ?Honor_Merece — ver _seccionQueryMap más abajo. Máxima prioridad,
-    //    ya que es el formato de enlace que ahora se comparte y se guarda.
+    // Sección (y subsección) inicial a mostrar. Prioridad:
+    //   1) El nuevo esquema de rutas "bonitas" (sin index.html, con
+    //      segmentos): /Historial_Eventos/IChO, /Olimpiada_Cubana/Ranking,
+    //      /Honor_Merece/Entrenadores/<id>, /Historial_Medallas/cuadrito=<slug>
+    //      — ver _parseRutaActual() más abajo. Máxima prioridad, ya que es
+    //      el formato de enlace que ahora se comparte y se guarda.
+    //   2) El antiguo esquema de query (?Historial_Eventos, etc.) o el hash
+    //      de la URL (#noticias, #contacto, …) — compatibilidad con enlaces
+    //      ya compartidos antes de este cambio, o desde el footer de otras
+    //      páginas del sitio (p.ej. media.html).
+    //   3) La sección guardada en sessionStorage — para sobrevivir recargas
+    //      dentro de la misma pestaña.
+    const rutaActual   = _parseRutaActual();
+    const seccionRuta  = rutaActual ? rutaActual.seccion : null;
     const seccionQuery = (() => {
         try {
             for (const key of new URLSearchParams(location.search).keys()) {
@@ -3915,7 +4326,7 @@ const _origInit = () => {
     const seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    const seccionInicial = seccionQuery || seccionHash || (secciones.includes(seccionGuardada) ? seccionGuardada : null);
+    const seccionInicial = seccionRuta || seccionQuery || seccionHash || (secciones.includes(seccionGuardada) ? seccionGuardada : null);
 
     if (seccionInicial && seccionInicial !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
@@ -3932,6 +4343,23 @@ const _origInit = () => {
             if (seccionInicial === 'eventos') { statsParaEvento(); cargarTabla(); }
             if (seccionInicial === 'media')   { cargarGaleriaMedia(); }
             try { sessionStorage.setItem('seccionActiva', seccionInicial); } catch(e) {}
+
+            // Restaurar subsección (solo disponible si la ruta vino del
+            // nuevo esquema de rutas, que es el único que la codifica).
+            const resto = (seccionRuta === seccionInicial && rutaActual) ? rutaActual.resto : [];
+            if (seccionInicial === 'eventos' && resto[0] && _pathToEventosOl[resto[0]]) {
+                const sel = document.getElementById('selector-olimpiada');
+                if (sel) { sel.value = _pathToEventosOl[resto[0]]; cargarTabla(); }
+            } else if (seccionInicial === 'cnq' && resto[0] && _pathToCnqSub[resto[0]]) {
+                mostrarSubseccionCNQ(_pathToCnqSub[resto[0]]);
+            } else if (seccionInicial === 'honor' && resto[0] && _pathToHonorSub[resto[0]]) {
+                mostrarCategoriaHonor(_pathToHonorSub[resto[0]]);
+                if (resto[1]) abrirArticulo(decodeURIComponent(resto[1]));
+            } else if (seccionInicial === 'sitial' && resto[0] && resto[0].startsWith('cuadrito=')) {
+                const slug = resto[0].slice('cuadrito='.length);
+                const est = _estudiantePorSlug(slug);
+                if (est) abrirTarjetaModal(est.nombre);
+            }
         }
     } else {
         actualizarStatsBar('inicio');
@@ -3939,16 +4367,16 @@ const _origInit = () => {
             try { sessionStorage.setItem('seccionActiva', 'inicio'); } catch(e) {}
         }
     }
-    // Normalizar la URL visible al nuevo esquema "bonito" (sin index.html;
-    // ?Historial_Eventos, ?Olimpiada_Cubana, etc. según corresponda) — esto
-    // también limpia cualquier hash antiguo (#eventos, #contacto, …) que
-    // haya traído el enlace de entrada.
-    _actualizarURLSeccion(seccionInicial || 'inicio');
+    // Normalizar la URL visible al nuevo esquema de rutas (sin index.html;
+    // /Historial_Eventos, /Olimpiada_Cubana, etc. con su subsección si
+    // corresponde) — esto también limpia cualquier hash o query antiguos
+    // que haya traído el enlace de entrada.
+    _sincronizarURL();
 
-    // Enlace compartido de una tarjeta del sitial (?tarjeta=slug, ver
-    // _slugTarjeta): abrir esa tarjeta directamente al cargar la página.
+    // Compatibilidad con el antiguo enlace ?tarjeta=slug (sin el esquema de
+    // rutas nuevo): abrir esa tarjeta directamente al cargar la página.
     const tarjetaParam = _queryParam('tarjeta');
-    if (tarjetaParam) {
+    if (tarjetaParam && !(seccionInicial === 'sitial')) {
         const est = _estudiantePorSlug(tarjetaParam);
         if (est) abrirTarjetaModal(est.nombre);
     }
@@ -4966,19 +5394,31 @@ function actualizarStatsBar(seccion) {
 }
 
 // ════════════════════════════════════════════════════
-// URL "bonita" por sección (sin index.html; ?Historial_Eventos, etc.)
+// URL "bonita" por sección y subsección (sin index.html;
+// segmentos de ruta, p.ej. /Historial_Eventos/IChO)
 // ════════════════════════════════════════════════════
-// Solo las secciones con enlace propio pedido llevan marcador de query;
-// el resto (inicio, noticias, media, contacto) usa la ruta base limpia.
-const _seccionQueryMap = {
+const _seccionPathMap = {
     eventos: 'Historial_Eventos',
     sitial:  'Historial_Medallas',
     cnq:     'Olimpiada_Cubana',
     honor:   'Honor_Merece',
 };
-const _queryToSeccion = Object.fromEntries(
-    Object.entries(_seccionQueryMap).map(([sec, q]) => [q, sec])
+const _pathToSeccion = Object.fromEntries(
+    Object.entries(_seccionPathMap).map(([sec, p]) => [p, sec])
 );
+// Alias de compatibilidad con el esquema anterior (?Historial_Eventos, etc.)
+const _seccionQueryMap = _seccionPathMap;
+const _queryToSeccion  = _pathToSeccion;
+
+// Subsecciones con su propio segmento de ruta, por sección padre.
+const _eventosOlPath   = { icho:'IChO', imcho:'IMChO', oiaq:'OIAQ', ocacq:'OCACQ', otras:'Otros' };
+const _pathToEventosOl = Object.fromEntries(Object.entries(_eventosOlPath).map(([k,v]) => [v, k]));
+
+const _cnqSubPath   = { ranking:'Ranking', concurso:'Concursos', estadisticas:'Estadisticas' };
+const _pathToCnqSub = Object.fromEntries(Object.entries(_cnqSubPath).map(([k,v]) => [v, k]));
+
+const _honorSubPath   = { entrenadores:'Entrenadores', cientificos:'Proceres' };
+const _pathToHonorSub = Object.fromEntries(Object.entries(_honorSubPath).map(([k,v]) => [v, k]));
 
 // "/Sitial_Talento/index.html" → "/Sitial_Talento/" (se conserva la barra
 // final a propósito: sin ella, todos los fetch()/rutas relativas del sitio
@@ -4990,25 +5430,67 @@ function _rutaBaseSinIndex() {
     return path;
 }
 
-// Actualiza la URL visible (sin recargar ni añadir entradas al historial)
-// para reflejar la sección activa, preservando cualquier otro parámetro
-// que no sea el marcador de sección (p.ej. ?tarjeta=slug).
-function _actualizarURLSeccion(p) {
+// Lee la ruta actual buscando, en cualquier posición de location.pathname,
+// el primer segmento que coincida con una de las palabras clave de sección
+// (Historial_Eventos, Historial_Medallas, Olimpiada_Cubana, Honor_Merece).
+// Así funciona sin necesidad de conocer de antemano bajo qué subruta está
+// publicado el sitio (GitHub Pages, dominio propio, etc.): todo lo que va
+// ANTES de esa palabra clave es la "base" del sitio, y todo lo que va
+// DESPUÉS son los segmentos de subsección/id.
+function _parseRutaActual() {
     try {
+        const segs = location.pathname.split('/').filter(Boolean).map(s => decodeURIComponent(s));
+        const idx = segs.findIndex(s => _pathToSeccion[s]);
+        if (idx === -1) return null;
+        return { seccion: _pathToSeccion[segs[idx]], resto: segs.slice(idx + 1) };
+    } catch(e) { return null; }
+}
+
+// Actualiza la URL visible (sin recargar ni añadir entradas al historial)
+// para reflejar el estado de navegación actual: sección activa y, si
+// corresponde, su subsección (pestaña de Olimpiada dentro de Historial por
+// Eventos, subvista de Olimpiada Cubana, categoría/artículo de Honor a
+// quien Honor Merece, o tarjeta abierta en Historial por Medallas).
+function _sincronizarURL() {
+    try {
+        const p = window._seccionActual || 'inicio';
+        let subPath = '';
+        let hash    = '';
+
+        if (p === 'eventos') {
+            const sel = document.getElementById('selector-olimpiada');
+            const ol  = sel ? sel.value : null;
+            if (ol && _eventosOlPath[ol]) subPath = _eventosOlPath[ol];
+        } else if (p === 'cnq') {
+            const sub = window._cnqSubActual;
+            if (sub && _cnqSubPath[sub]) subPath = _cnqSubPath[sub];
+        } else if (p === 'honor') {
+            if (_honorCategoriaActual && _honorSubPath[_honorCategoriaActual]) {
+                subPath = _honorSubPath[_honorCategoriaActual];
+                if (window._articuloAbiertoId) subPath += '/' + encodeURIComponent(window._articuloAbiertoId);
+            }
+        } else if (p === 'sitial') {
+            if (_tarjetaModalActual && _tarjetaModalActual.nombre) {
+                subPath = 'cuadrito=' + encodeURIComponent(_slugTarjeta(_tarjetaModalActual.nombre));
+                hash = 'sitial';
+            }
+        }
+
         const base = _rutaBaseSinIndex();
-        const usp = new URLSearchParams(location.search);
-        Object.values(_seccionQueryMap).forEach(k => usp.delete(k));
-        const otros = usp.toString();
-        const q = _seccionQueryMap[p];
-        let search = '';
-        if (q && otros)      search = '?' + q + '&' + otros;
-        else if (q)          search = '?' + q;
-        else if (otros)      search = '?' + otros;
-        const nueva = base + search;
-        if (location.pathname + location.search !== nueva) {
-            history.replaceState(null, '', nueva);
+        let path = base + (_seccionPathMap[p] || '');
+        if (subPath) path += '/' + subPath;
+        const h = hash ? ('#' + hash) : '';
+        if (location.pathname + location.hash !== path + h) {
+            history.replaceState(null, '', path + h);
         }
     } catch(e) {}
+}
+
+// Alias de compatibilidad: código existente que solo necesita fijar la
+// sección (sin tocar subsección) puede seguir llamando a esta función.
+function _actualizarURLSeccion(p) {
+    window._seccionActual = p;
+    _sincronizarURL();
 }
 
 function cambiarSeccion(p) {
@@ -5083,8 +5565,8 @@ function cambiarSeccion(p) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         // Persistir sección activa para sobrevivir recargas
         try { sessionStorage.setItem('seccionActiva', p); } catch(e) {}
-        // Reflejar la sección en la URL visible (esquema "bonito")
-        _actualizarURLSeccion(p);
+        // Reflejar la sección (y su subsección, si la hay) en la URL visible
+        _sincronizarURL();
     });
 }
 
@@ -5151,6 +5633,7 @@ function abrirTarjetaModal(nombre) {
     }).join('');
     document.getElementById('tarjeta-modal-overlay').classList.add('abierto');
     document.body.style.overflow = 'hidden';
+    if (window._seccionActual === 'sitial') _sincronizarURL();
 }
 
 function toggleChipPopup(wrapId, e) {
@@ -5170,9 +5653,11 @@ function cerrarTarjetaModal(e, forzar) {
     cerrarPanelCompartir('tarjeta-share-panel');
     document.body.style.overflow = '';
     _tarjetaModalActual = null;
-    // Si llegamos aquí desde un enlace ?tarjeta=slug, limpiar el parámetro
-    // de la URL al cerrar para no reabrir la tarjeta en una futura recarga.
-    if (_queryParam('tarjeta')) {
+    // Si llegamos aquí desde un enlace .../Historial_Medallas/cuadrito=slug
+    // (o el antiguo ?tarjeta=slug), limpiar la URL al cerrar para no
+    // reabrir la tarjeta en una futura recarga.
+    if (window._seccionActual === 'sitial') _sincronizarURL();
+    else if (_queryParam('tarjeta')) {
         try { history.replaceState(null, '', location.pathname + location.hash); } catch(err) {}
     }
 }
@@ -5224,12 +5709,12 @@ function cerrarPanelCompartir(panelId) {
 // sección Media y abre esa foto en zoom; en cualquier otro caso, enlaza a la
 // página principal del sitial.
 function _enlaceCompartirActual(panelId) {
-    const base = location.origin + location.pathname;
+    const base = location.origin + _rutaBaseSinIndex();
     if (panelId === 'foto-share-panel' && _mediaLightboxActual && _mediaLightboxActual.nombre) {
         return `${base}?media=${encodeURIComponent(_mediaLightboxActual.nombre)}`;
     }
     if (panelId === 'tarjeta-share-panel' && _tarjetaModalActual && _tarjetaModalActual.nombre) {
-        return `${base}?tarjeta=${encodeURIComponent(_slugTarjeta(_tarjetaModalActual.nombre))}#sitial`;
+        return `${base}${_seccionPathMap.sitial}/cuadrito=${encodeURIComponent(_slugTarjeta(_tarjetaModalActual.nombre))}#sitial`;
     }
     return base;
 }
@@ -5947,6 +6432,33 @@ const _i18n = {
         'cnq.btn.ranking.desc':     'Tabla completa de medallistas y puntajes por grado y año',
         'cnq.btn.concurso':         'Concurso Nacional',
         'cnq.btn.concurso.desc':    'Exámenes, soluciones y resultados oficiales por edición',
+        'cnq.btn.estadisticas':     'Estadísticas por Provincias',
+        'cnq.btn.estadisticas.desc':'Resultados y medallas por provincia, en histogramas y tablas',
+        'stats.title':              'Estadísticas por Provincias',
+        'stats.modo.cnq':           'Concurso Nacional (CNQ)',
+        'stats.modo.intl':          'Olimpiadas Internacionales',
+        'stats.label.olimpiada':    'Olimpiada:',
+        'stats.label.periodo':      'Periodo:',
+        'stats.ol.general':         '🌐 General (todas)',
+        'stats.ol.otras':           '🌐 Otras',
+        'stats.chart1.title':       'Resultados y Medallas por Provincia',
+        'stats.chart1.sub':         'Cantidad total de resultados registrados y de medallas obtenidas (incluye menciones) por provincia',
+        'stats.chart2.title':       'Puntuación Ponderada por Provincia',
+        'stats.chart2.sub':         'Oro = 3 pts · Plata = 2 pts · Bronce = 1 pt · Mención = 0.5 pts',
+        'stats.axis.cantidad':      'Cantidad',
+        'stats.axis.puntos':        'Puntos',
+        'stats.axis.provincia':     'Provincia',
+        'stats.serie.total':        'Resultados totales',
+        'stats.serie.medallas':     'Medallas totales',
+        'stats.serie.puntos':       'Puntos ponderados',
+        'stats.th.prov':            'Provincia',
+        'stats.th.total':           'Resultados',
+        'stats.th.medallas':        'Medallas',
+        'stats.th.mencion':         'Mención',
+        'stats.th.puntos':          'Puntos',
+        'stats.toggle.tabla':       'Ver como tabla',
+        'stats.toggle.chart':       'Ver como histograma',
+        'stats.nota.desde':         'Datos del Concurso Nacional de Química disponibles a partir de',
         'cnq.ranking.title':        'Ranking — Concurso Nacional de Química',
         'cnq.concurso.title':       'Concurso Nacional — Exámenes y Soluciones',
         'cnq.label.grade':          'Grado:',
@@ -6137,6 +6649,33 @@ const _i18n = {
         'cnq.btn.ranking.desc':     'Full table of medal winners and scores by grade and year',
         'cnq.btn.concurso':         'National Contest',
         'cnq.btn.concurso.desc':    'Exams, solutions and official results by edition',
+        'cnq.btn.estadisticas':     'Statistics by Province',
+        'cnq.btn.estadisticas.desc':'Results and medals by province, in histograms and tables',
+        'stats.title':              'Statistics by Province',
+        'stats.modo.cnq':           'National Contest (CNQ)',
+        'stats.modo.intl':          'International Olympiads',
+        'stats.label.olimpiada':    'Olympiad:',
+        'stats.label.periodo':      'Period:',
+        'stats.ol.general':         '🌐 General (all)',
+        'stats.ol.otras':           '🌐 Other',
+        'stats.chart1.title':       'Results and Medals by Province',
+        'stats.chart1.sub':         'Total number of recorded results and medals earned (mentions included) by province',
+        'stats.chart2.title':       'Weighted Score by Province',
+        'stats.chart2.sub':         'Gold = 3 pts · Silver = 2 pts · Bronze = 1 pt · Mention = 0.5 pts',
+        'stats.axis.cantidad':      'Count',
+        'stats.axis.puntos':        'Points',
+        'stats.axis.provincia':     'Province',
+        'stats.serie.total':        'Total results',
+        'stats.serie.medallas':     'Total medals',
+        'stats.serie.puntos':       'Weighted points',
+        'stats.th.prov':            'Province',
+        'stats.th.total':           'Results',
+        'stats.th.medallas':        'Medals',
+        'stats.th.mencion':         'Mention',
+        'stats.th.puntos':          'Points',
+        'stats.toggle.tabla':       'View as table',
+        'stats.toggle.chart':       'View as histogram',
+        'stats.nota.desde':         'National Chemistry Contest data available from',
         'cnq.ranking.title':        'Ranking — Cuban National Chemistry Contest',
         'cnq.concurso.title':       'National Contest — Exams & Solutions',
         'cnq.label.grade':          'Grade:',
