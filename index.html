@@ -1,6 +1,23 @@
 <!DOCTYPE html> 
 <html lang="es">
 <head>
+    <!-- Single Page Apps for GitHub Pages (truco de rafgraph, ver 404.html)
+         Debe ir lo primero de todo: decodifica el "?/ruta" que dejó 404.html
+         y restaura la URL bonita real (p.ej. /Historial_Eventos/IChO) ANTES
+         de que corra cualquier otro script, incluida nuestra propia lógica
+         de enrutado más abajo en la página. -->
+    <script>
+        (function (l) {
+            if (l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function (s) {
+                    return s.replace(/~and~/g, '&');
+                }).join('?');
+                window.history.replaceState(null, null,
+                    l.pathname.slice(0, -1) + decoded + l.hash
+                );
+            }
+        }(window.location));
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talentos Cubanos — Olimpiadas de Química</title>
@@ -733,6 +750,8 @@
         .stats-legend-swatch { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
 
         #stats-tabla thead th { white-space: nowrap; }
+        #stats-tabla thead th.stats-th-activo { color: var(--accent); }
+        #stats-tabla thead th.stats-th-activo .sort-arrow { opacity: 1; color: var(--accent); font-weight: 700; }
 
         @media (max-width: 640px) {
             .stats-filtros { flex-direction: column; align-items: flex-start; gap: 12px; }
@@ -2517,14 +2536,14 @@
                     <table id="stats-tabla">
                         <thead>
                             <tr>
-                                <th data-i18n="stats.th.prov">Provincia</th>
-                                <th data-i18n="stats.th.total">Resultados</th>
-                                <th data-i18n="stats.th.medallas">Medallas</th>
-                                <th>🥇</th>
-                                <th>🥈</th>
-                                <th>🥉</th>
-                                <th data-i18n="stats.th.mencion">Mención</th>
-                                <th data-i18n="stats.th.puntos">Puntos</th>
+                                <th data-campo="prov" onclick="_statsOrdenarTabla('prov')" style="cursor:pointer;"><span data-i18n="stats.th.prov">Provincia</span> <span class="sort-arrow">↕</span></th>
+                                <th data-campo="total" onclick="_statsOrdenarTabla('total')" style="cursor:pointer;"><span data-i18n="stats.th.total">Resultados</span> <span class="sort-arrow">↓</span></th>
+                                <th data-campo="medallas" onclick="_statsOrdenarTabla('medallas')" style="cursor:pointer;"><span data-i18n="stats.th.medallas">Medallas</span> <span class="sort-arrow">↕</span></th>
+                                <th data-campo="oro" onclick="_statsOrdenarTabla('oro')" style="cursor:pointer;">🥇 <span class="sort-arrow">↕</span></th>
+                                <th data-campo="plata" onclick="_statsOrdenarTabla('plata')" style="cursor:pointer;">🥈 <span class="sort-arrow">↕</span></th>
+                                <th data-campo="bronce" onclick="_statsOrdenarTabla('bronce')" style="cursor:pointer;">🥉 <span class="sort-arrow">↕</span></th>
+                                <th data-campo="mencion" onclick="_statsOrdenarTabla('mencion')" style="cursor:pointer;"><span data-i18n="stats.th.mencion">Mención</span> <span class="sort-arrow">↕</span></th>
+                                <th data-campo="puntos" onclick="_statsOrdenarTabla('puntos')" style="cursor:pointer;"><span data-i18n="stats.th.puntos">Puntos</span> <span class="sort-arrow">↕</span></th>
                             </tr>
                         </thead>
                         <tbody id="stats-tabla-body"></tbody>
@@ -3535,11 +3554,26 @@ function _statsFmtNum(v) {
     return (r % 1 === 0) ? String(r) : r.toFixed(1);
 }
 
+// Alterna la visibilidad de una etiqueta SVG (valor sobre una barra, o
+// nombre completo de una provincia) al tocarla — mismo espíritu que
+// toggleChipPopup() en las tarjetas del sitial, adaptado a SVG.
+function _statsToggleLabel(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const visible = el.style.display !== 'none' && el.getAttribute('data-oculto') !== '1';
+    el.style.display = visible ? 'none' : '';
+    el.setAttribute('data-oculto', visible ? '1' : '0');
+}
+
 // Histograma de barras agrupadas en SVG (colores tomados de las variables
-// CSS del sitio, así respeta claro/oscuro automáticamente).
+// CSS del sitio, así respeta claro/oscuro automáticamente). Las provincias
+// llegan ya ordenadas de mayor a menor por quien las llama (ver
+// _statsOrdenarCategorias). Tocar una barra muestra su valor exacto encima;
+// tocar el diminutivo de una provincia muestra su nombre completo debajo,
+// igual que los chips de medallas en las tarjetas del sitial.
 function _svgGroupedBarChart(opts) {
-    const W = opts.width || 720, H = opts.height || 320;
-    const padL = 42, padR = 16, padT = 18, padB = 56;
+    const W = opts.width || 720, H = opts.height || 340;
+    const padL = 42, padR = 16, padT = 26, padB = 70;
     const plotW = W - padL - padR, plotH = H - padT - padB;
     const cats  = opts.categories;
     const n     = Math.max(cats.length, 1);
@@ -3547,6 +3581,7 @@ function _svgGroupedBarChart(opts) {
     const seriesN = opts.series.length;
     const barGap = 3;
     const barW = Math.max(3, (groupW - 14) / seriesN - barGap);
+    const chartId = opts.chartId || 'c';
 
     let maxVal = 0;
     opts.series.forEach(s => cats.forEach(c => { maxVal = Math.max(maxVal, s.values[c.code] || 0); }));
@@ -3561,7 +3596,7 @@ function _svgGroupedBarChart(opts) {
         yLabels   += `<text x="${padL - 8}" y="${(y + 3.5).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--text-muted)">${_statsFmtNum(val)}</text>`;
     }
 
-    let bars = '', xLabels = '';
+    let bars = '', xLabels = '', valueTags = '', nameTags = '';
     cats.forEach((c, ci) => {
         const groupX = padL + ci * groupW;
         const totalW = seriesN * barW + (seriesN - 1) * barGap;
@@ -3571,10 +3606,14 @@ function _svgGroupedBarChart(opts) {
             const h = niceMax > 0 ? (val / niceMax) * plotH : 0;
             const x = startX + si * (barW + barGap);
             const y = padT + plotH - h;
-            bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" rx="3" fill="${s.color}"><title>${c.label} — ${s.name}: ${_statsFmtNum(val)}</title></rect>`;
+            const valId = `${chartId}-bv-${ci}-${si}`;
+            bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" rx="3" fill="${s.color}" style="cursor:pointer;" onclick="_statsToggleLabel('${valId}')"><title>${c.label} — ${s.name}: ${_statsFmtNum(val)} (toca para ver el valor)</title></rect>`;
+            valueTags += `<text id="${valId}" x="${(x + barW/2).toFixed(1)}" y="${Math.max(y - 6, padT + 10).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${s.color}" style="display:none;pointer-events:none;" data-oculto="1">${_statsFmtNum(val)}</text>`;
         });
         const labelX = groupX + groupW / 2;
-        xLabels += `<text x="${labelX.toFixed(1)}" y="${(padT + plotH + 18).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--text)">${c.code}<title>${c.label}</title></text>`;
+        const nameId = `${chartId}-bn-${ci}`;
+        xLabels  += `<text x="${labelX.toFixed(1)}" y="${(padT + plotH + 18).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--accent)" style="cursor:pointer;" onclick="_statsToggleLabel('${nameId}')">${c.code}<title>${c.label} (toca para ver el nombre)</title></text>`;
+        nameTags += `<text id="${nameId}" x="${labelX.toFixed(1)}" y="${(padT + plotH + 33).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="600" fill="var(--text-muted)" style="display:none;pointer-events:none;" data-oculto="1">${c.label}</text>`;
     });
 
     const yAxisTitle = opts.yLabel
@@ -3588,7 +3627,7 @@ function _svgGroupedBarChart(opts) {
         ${gridLines}
         <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="var(--border)" stroke-width="1.5"/>
         <line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="var(--border)" stroke-width="1.5"/>
-        ${yLabels}${bars}${xLabels}${yAxisTitle}${xAxisTitle}
+        ${yLabels}${bars}${xLabels}${nameTags}${valueTags}${yAxisTitle}${xAxisTitle}
     </svg>`;
 }
 
@@ -3615,27 +3654,40 @@ function renderEstadisticasProvincias() {
     const desdeSel = document.getElementById('stats-selector-año-desde');
     if (desdeSel && !desdeSel.options.length) _statsPoblarAños();
 
-    const categories = _statsProvinciasUniverso(modo);
+    const categoriesBase = _statsProvinciasUniverso(modo);
     const stats = _statsCalcular(modo);
+    const valorDe = (code, campo) => (stats[code] || {})[campo] || 0;
 
     if (vista === 'chart') {
+        // Cada histograma se ordena de mayor a menor según SU PROPIA
+        // métrica principal: el de resultados/medallas por "Resultados
+        // totales", el de puntos por "Puntos ponderados".
+        const catsConteo = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'total') - valorDe(a.code, 'total'));
+        const catsPuntos = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'puntos') - valorDe(a.code, 'puntos'));
+
         const serieConteo = [
-            { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).total || 0])) },
-            { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).medallas || 0])) },
+            { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'total')])) },
+            { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'medallas')])) },
         ];
         const seriePuntos = [
-            { name: T('stats.serie.puntos'), color: 'var(--cu-red)', values: Object.fromEntries(categories.map(c => [c.code, (stats[c.code] || {}).puntos || 0])) },
+            { name: T('stats.serie.puntos'), color: 'var(--cu-red)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'puntos')])) },
         ];
         const c1 = document.getElementById('stats-chart-conteo');
         const c2 = document.getElementById('stats-chart-puntos');
-        if (c1) c1.innerHTML = _svgGroupedBarChart({ categories, series: serieConteo, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
-        if (c2) c2.innerHTML = _svgGroupedBarChart({ categories, series: seriePuntos,  yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
+        if (c1) c1.innerHTML = _svgGroupedBarChart({ chartId: 'conteo', categories: catsConteo, series: serieConteo, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
+        if (c2) c2.innerHTML = _svgGroupedBarChart({ chartId: 'puntos', categories: catsPuntos, series: seriePuntos,  yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
     } else {
         const tbody = document.getElementById('stats-tabla-body');
         if (tbody) {
-            const filas = categories
+            const sort = window._statsTablaSort || { campo: 'total', dir: 'desc' };
+            const filas = categoriesBase
                 .map(c => ({ c, s: stats[c.code] || { total:0, oro:0, plata:0, bronce:0, mencion:0, medallas:0, puntos:0 } }))
-                .sort((a, b) => b.s.total - a.s.total);
+                .sort((a, b) => {
+                    const va = sort.campo === 'prov' ? a.c.label : a.s[sort.campo] || 0;
+                    const vb = sort.campo === 'prov' ? b.c.label : b.s[sort.campo] || 0;
+                    const cmp = sort.campo === 'prov' ? va.localeCompare(vb) : va - vb;
+                    return sort.dir === 'desc' ? -cmp : cmp;
+                });
             tbody.innerHTML = filas.map(({ c, s }) => `
                 <tr>
                     <td style="font-weight:600;">${c.label}</td>
@@ -3647,6 +3699,7 @@ function renderEstadisticasProvincias() {
                     <td style="text-align:center;">${s.mencion || 0}</td>
                     <td style="text-align:center;font-weight:700;">${_statsFmtNum(s.puntos)}</td>
                 </tr>`).join('');
+            _statsActualizarIconosOrden();
         }
     }
 
@@ -3663,6 +3716,36 @@ function renderEstadisticasProvincias() {
             nota.style.display = 'none';
         }
     }
+}
+
+window._statsTablaSort = { campo: 'total', dir: 'desc' };
+
+// Ordena la tabla de estadísticas al tocar un encabezado: si es la misma
+// columna invierte el sentido, si es una nueva columna empieza en
+// descendente (excepto "Provincia", que empieza alfabético ascendente).
+function _statsOrdenarTabla(campo) {
+    const actual = window._statsTablaSort || { campo: null, dir: 'desc' };
+    if (actual.campo === campo) {
+        window._statsTablaSort = { campo, dir: actual.dir === 'desc' ? 'asc' : 'desc' };
+    } else {
+        window._statsTablaSort = { campo, dir: campo === 'prov' ? 'asc' : 'desc' };
+    }
+    renderEstadisticasProvincias();
+}
+
+function _statsActualizarIconosOrden() {
+    const sort = window._statsTablaSort || {};
+    document.querySelectorAll('#stats-tabla th[data-campo]').forEach(th => {
+        const icon = th.querySelector('.sort-arrow');
+        if (!icon) return;
+        if (th.getAttribute('data-campo') === sort.campo) {
+            icon.textContent = sort.dir === 'desc' ? '↓' : '↑';
+            th.classList.add('stats-th-activo');
+        } else {
+            icon.textContent = '↕';
+            th.classList.remove('stats-th-activo');
+        }
+    });
 }
 
 // ─── Ranking ───────────────────────────────────────
