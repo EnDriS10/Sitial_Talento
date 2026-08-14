@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirigiendo… — Sitial de Talentos Cubanos</title>
+    <!--
+        Single Page Apps for GitHub Pages
+        https://github.com/rafgraph/spa-github-pages
+
+        GitHub Pages es hosting estático puro: no hay servidor que reescriba
+        rutas, así que una URL "bonita" como
+            /Sitial_Talento/Historial_Eventos/IChO
+        no corresponde a ningún archivo real y GitHub Pages sirve este
+        404.html en su lugar. Este script toma esa ruta, la codifica dentro
+        de la query string y redirige a index.html, donde un script gemelo
+        en el <head> la decodifica y restaura la URL original con
+        history.replaceState — todo esto ocurre antes de que la aplicación
+        arranque, así que la sección/subsección correcta se muestra igual
+        que si se hubiera navegado ahí dentro de la propia página.
+
+        pathSegmentsToKeep = 1 porque el sitio vive bajo un único segmento
+        de ruta fijo: /Sitial_Talento/ (el nombre del repositorio en
+        GitHub Pages). Si el sitio se moviera a la raíz de un dominio
+        propio (sin ese segmento), este valor pasaría a 0.
+    -->
+    <script>
+        var pathSegmentsToKeep = 1;
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+            l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+        );
+    </script>
+    <style>
+        html, body { height: 100%; margin: 0; display: flex; align-items: center; justify-content: center;
+            background: #04122b; color: #f0c84a; font-family: 'DM Sans', system-ui, sans-serif; }
+        p { font-size: 15px; opacity: .85; }
+    </style>
+</head>
+<body>
+    <p>Redirigiendo…</p>
+</body>
+</html>
