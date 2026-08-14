@@ -2345,8 +2345,8 @@
                             <th id="cnq-th-grade">Grado</th>
                             <th id="cnq-th-province">Provincia</th>
                             <th id="cnq-th-school">Escuela</th>
-                            <th id="cnq-th-pts">Puntos</th>
                             <th id="cnq-th-medal">Medalla</th>
+                            <th id="cnq-th-pts">Puntos</th>
                             <th id="cnq-th-psn">PSN</th>
                         </tr>
                     </thead>
@@ -3423,7 +3423,7 @@ function renderCNQRanking() {
         }
 
         const medallaClass = {oro:'badge-oro', plata:'badge-plata', bronce:'badge-bronce', mencion:'badge-mencion'}[r.medalla] || 'badge-participante';
-        const medallaText  = T('medal.'+r.medalla) || r.medalla;
+        const medallaText  = medallaLabel[r.medalla] || r.medalla;
         const dotClass     = {oro:'dot-oro',plata:'dot-plata',bronce:'dot-bronce',mencion:'dot-mencion'}[r.medalla] || 'dot-participante';
 
         const gradoStr = gradoLabel[r.grado] || r.grado;
@@ -3439,8 +3439,8 @@ function renderCNQRanking() {
             <td><span class="cnq-grado-badge">${gradoStr}</span></td>
             <td><span class="prov-badge" data-prov="${provNombre}" title="${provNombre}">${r.prov}</span></td>
             <td style="font-size:12px;color:var(--text-muted);">${r.escuela || '—'}</td>
-            <td style="font-weight:700;text-align:center;">${r.pts}</td>
             <td><span class="badge ${medallaClass}"><span class="badge-dot ${dotClass}"></span>${medallaText}</span></td>
+            <td style="font-weight:700;text-align:center;">${r.pts}</td>
             <td style="text-align:center;">${psnHTML}</td>
         </tr>`;
     }).join('');
@@ -3895,6 +3895,19 @@ const _origInit = () => {
     //   2) La sección guardada en sessionStorage — para sobrevivir recargas
     //      dentro de la misma pestaña.
     const secciones = ['inicio','sitial','eventos','cnq','honor','noticias','media','contacto'];
+
+    // 1) Nuevo esquema de URL "bonita" (sin index.html, con un query sin
+    //    valor): ?Historial_Eventos, ?Historial_Medallas, ?Olimpiada_Cubana,
+    //    ?Honor_Merece — ver _seccionQueryMap más abajo. Máxima prioridad,
+    //    ya que es el formato de enlace que ahora se comparte y se guarda.
+    const seccionQuery = (() => {
+        try {
+            for (const key of new URLSearchParams(location.search).keys()) {
+                if (_queryToSeccion[key]) return _queryToSeccion[key];
+            }
+        } catch(e) {}
+        return null;
+    })();
     const seccionHash = (() => {
         const h = (location.hash || '').replace('#', '').trim();
         return secciones.includes(h) ? h : null;
@@ -3902,7 +3915,7 @@ const _origInit = () => {
     const seccionGuardada = (() => {
         try { return sessionStorage.getItem('seccionActiva'); } catch(e) { return null; }
     })();
-    const seccionInicial = seccionHash || (secciones.includes(seccionGuardada) ? seccionGuardada : null);
+    const seccionInicial = seccionQuery || seccionHash || (secciones.includes(seccionGuardada) ? seccionGuardada : null);
 
     if (seccionInicial && seccionInicial !== 'inicio') {
         // Activar sin animación de entrada para que sea instantáneo en la recarga
@@ -3926,11 +3939,11 @@ const _origInit = () => {
             try { sessionStorage.setItem('seccionActiva', 'inicio'); } catch(e) {}
         }
     }
-    // Limpiar el hash de la URL una vez aplicado, para que no interfiera
-    // luego con la navegación normal dentro del SPA.
-    if (seccionHash) {
-        try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
-    }
+    // Normalizar la URL visible al nuevo esquema "bonito" (sin index.html;
+    // ?Historial_Eventos, ?Olimpiada_Cubana, etc. según corresponda) — esto
+    // también limpia cualquier hash antiguo (#eventos, #contacto, …) que
+    // haya traído el enlace de entrada.
+    _actualizarURLSeccion(seccionInicial || 'inicio');
 
     // Enlace compartido de una tarjeta del sitial (?tarjeta=slug, ver
     // _slugTarjeta): abrir esa tarjeta directamente al cargar la página.
@@ -4952,6 +4965,52 @@ function actualizarStatsBar(seccion) {
     }
 }
 
+// ════════════════════════════════════════════════════
+// URL "bonita" por sección (sin index.html; ?Historial_Eventos, etc.)
+// ════════════════════════════════════════════════════
+// Solo las secciones con enlace propio pedido llevan marcador de query;
+// el resto (inicio, noticias, media, contacto) usa la ruta base limpia.
+const _seccionQueryMap = {
+    eventos: 'Historial_Eventos',
+    sitial:  'Historial_Medallas',
+    cnq:     'Olimpiada_Cubana',
+    honor:   'Honor_Merece',
+};
+const _queryToSeccion = Object.fromEntries(
+    Object.entries(_seccionQueryMap).map(([sec, q]) => [q, sec])
+);
+
+// "/Sitial_Talento/index.html" → "/Sitial_Talento/" (se conserva la barra
+// final a propósito: sin ella, todos los fetch()/rutas relativas del sitio
+// (Data/CNQ_data.html, etc.) resolverían mal en cuanto la URL visible deje
+// de tener "index.html").
+function _rutaBaseSinIndex() {
+    let path = location.pathname.replace(/index\.html$/, '');
+    if (!path.endsWith('/')) path += '/';
+    return path;
+}
+
+// Actualiza la URL visible (sin recargar ni añadir entradas al historial)
+// para reflejar la sección activa, preservando cualquier otro parámetro
+// que no sea el marcador de sección (p.ej. ?tarjeta=slug).
+function _actualizarURLSeccion(p) {
+    try {
+        const base = _rutaBaseSinIndex();
+        const usp = new URLSearchParams(location.search);
+        Object.values(_seccionQueryMap).forEach(k => usp.delete(k));
+        const otros = usp.toString();
+        const q = _seccionQueryMap[p];
+        let search = '';
+        if (q && otros)      search = '?' + q + '&' + otros;
+        else if (q)          search = '?' + q;
+        else if (otros)      search = '?' + otros;
+        const nueva = base + search;
+        if (location.pathname + location.search !== nueva) {
+            history.replaceState(null, '', nueva);
+        }
+    } catch(e) {}
+}
+
 function cambiarSeccion(p) {
     if (_transicionEnCurso) return;
     cerrarMenu();
@@ -5024,6 +5083,8 @@ function cambiarSeccion(p) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         // Persistir sección activa para sobrevivir recargas
         try { sessionStorage.setItem('seccionActiva', p); } catch(e) {}
+        // Reflejar la sección en la URL visible (esquema "bonito")
+        _actualizarURLSeccion(p);
     });
 }
 
