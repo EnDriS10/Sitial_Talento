@@ -3223,40 +3223,20 @@ async function cargarCNQData() {
     try {
         const resp = await fetch('Data/CNQ_data.html');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const text = await resp.text();
+        const html = await resp.text();
+        const doc    = new DOMParser().parseFromString(html, 'text/html');
+        const script = doc.getElementById('cnq-data');
+        if (!script) throw new Error('No se encontró #cnq-data en CNQ_data.html');
+        // Igual que con olympiad_data.html: CNQ_data.html define datosCNQDecimo/
+        // Onceno/Duodecimo/Noveno, todasLasCNQ, datosCNQ, fotosCNQPorNombre,
+        // añosCNQ y nombreProvincia como JS (no JSON), así que ejecutamos el
+        // script en el contexto de la página principal. El propio script se
+        // encarga de exponer todo en window (window.datosCNQ, etc.).
+        const s = document.createElement('script');
+        s.textContent = script.textContent;
+        document.head.appendChild(s);
 
-        // ── 1. Extraer datosCNQ (array completo por conteo de corchetes) ──
-        const arrMarker = text.indexOf('const datosCNQ = [');
-        if (arrMarker === -1) throw new Error('No se encontró datosCNQ');
-        let dep = 0, ai = text.indexOf('[', arrMarker);
-        const aStart = ai;
-        for (; ai < text.length; ai++) {
-            if (text[ai] === '[') dep++;
-            else if (text[ai] === ']') { dep--; if (dep === 0) break; }
-        }
-        window.datosCNQ = JSON.parse(_jsLiteralToJSON(text.slice(aStart, ai + 1)));
-
-        // ── 2. Extraer nombreProvincia ──
-        const provMarker = text.indexOf('const nombreProvincia = {');
-        if (provMarker !== -1) {
-            let pd = 0, pi = text.indexOf('{', provMarker);
-            const pStart = pi;
-            for (; pi < text.length; pi++) {
-                if (text[pi] === '{') pd++;
-                else if (text[pi] === '}') { pd--; if (pd === 0) break; }
-            }
-            window.nombreProvincia = JSON.parse(_jsLiteralToJSON(text.slice(pStart, pi + 1)));
-        }
-
-        // ── 3. Índices derivados ──
-        window.fotosCNQPorNombre = {};
-        window.datosCNQ.forEach(r => {
-            if (r.foto && !window.fotosCNQPorNombre[r.nombre])
-                window.fotosCNQPorNombre[r.nombre] = r.foto;
-        });
-        window.añosCNQ = [...new Set(window.datosCNQ.map(r => r.año))].sort((a, b) => b - a);
-
-        console.log(`CNQ: ${window.datosCNQ.length} registros, años: ${window.añosCNQ.join(', ')}`);
+        console.log(`CNQ: ${(window.datosCNQ||[]).length} registros, años: ${(window.añosCNQ||[]).join(', ')}`);
     } catch(err) {
         console.error('Error cargando CNQ_data.html:', err.message, err.stack);
     }
@@ -3418,7 +3398,7 @@ function renderCNQRanking() {
         // internacional (medallistas de IChO/OIAQ, etc.), sin mostrar por
         // ello sus resultados internacionales en esta tabla nacional.
         const foto       = (window.fotosCNQPorNombre || {})[r.nombre]
-                         || (window.fotosPorNombre    || {})[r.nombre];
+                         || (fotosPorNombre           || {})[r.nombre];
         const nombreEsc  = r.nombre.replace(/'/g, "\\'");
 
         // Avatar: si tiene medallas internacionales → abrir tarjeta sitial
@@ -4017,7 +3997,7 @@ function abrirClickProfesor(nombre) {
 function abrirClickPersona(nombre, rolActivo, esMentor) {
     const articulo = (window.articulosPorNombre || {})[nombre.trim()];
     const foto     = (window.fotosPorNombreProfesor || {})[nombre]
-                   || (window.fotosPorNombre        || {})[nombre];
+                   || (fotosPorNombre               || {})[nombre];
 
     if (rolActivo === 'estudiante') {
         // Rol estudiante → siempre tarjeta sitial de honor
@@ -4041,7 +4021,7 @@ function abrirClickPersona(nombre, rolActivo, esMentor) {
         // Es estudiante en la tabla todos → tarjeta sitial si existe, sino zoom foto estudiante
         const enSitial = (window._estudiantesTodos || []).find(e => e.nombre === nombre);
         if (enSitial) { abrirTarjetaModal(nombre); return; }
-        const fotoEst = (window.fotosPorNombre || {})[nombre];
+        const fotoEst = (fotosPorNombre || {})[nombre];
         if (fotoEst) abrirFotoDirecta(fotoEst, nombre);
     }
 }
