@@ -317,6 +317,7 @@
     .footer-social-icon svg { width: 20px; height: 20px; display: block; }
     .footer-social-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 </style>
+<link rel="stylesheet" href="Assets/UI/modern-ui.css">
 </head>
 <body>
 
@@ -505,14 +506,14 @@ function _temaOscuroPorDefecto() {
 function npAplicarTema() {
     const dark = _temaOscuroPorDefecto();
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.getElementById('np-theme-btn').textContent = dark ? '🌙' : '☀️';
+    /* icono gestionado por modern-ui.js */
 }
 function npToggleTheme() {
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     const next = dark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('theme', next); } catch(e) {}
-    document.getElementById('np-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+    /* icono gestionado por modern-ui.js */
 }
 
 npAplicarTema();
@@ -813,5 +814,6 @@ npAplicarIdioma();
 inicializarNoticias();
 inicializarEntrevistas();
 </script>
+<script type="module" src="Assets/UI/modern-ui.js"></script>
 </body>
 </html>
