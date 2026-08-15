@@ -329,6 +329,7 @@
     .pv-title-row .mp-icon-btn { flex-shrink: 0; }
 </style>
 
+<link rel="stylesheet" href="../Assets/UI/modern-ui.css">
 </head>
 <body>
 
@@ -379,14 +380,14 @@ function pvAplicarTema() {
         dark = g ? g === 'dark' : !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     } catch(e) { dark = false; }
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    document.getElementById('pv-theme-btn').textContent = dark ? '🌙' : '☀️';
+    /* icono gestionado por modern-ui.js */
 }
 function pvToggleThemeMode() {
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
     const next = dark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     try { localStorage.setItem('theme', next); } catch(e) {}
-    document.getElementById('pv-theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+    /* icono gestionado por modern-ui.js */
 }
 function pvToggleIdioma() {
     const next = _pvLang() === 'es' ? 'en' : 'es';
@@ -517,5 +518,6 @@ async function pvInicializar() {
 }
 pvInicializar();
 </script>
+<script type="module" src="../Assets/UI/modern-ui.js"></script>
 </body>
 </html>
