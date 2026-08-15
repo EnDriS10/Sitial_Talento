@@ -1,11 +1,28 @@
 <!DOCTYPE html> 
 <html lang="es">
 <head>
+    <!-- Fija la "carpeta real" del sitio ANTES de que cualquier otra cosa
+         (incluido el truco de rafgraph justo abajo) toque el history de la
+         URL. Sin esto, en cuanto la URL visible pasa a algo como
+         /Historial_Eventos/IChO (sin barra final), el navegador empieza a
+         resolver TODAS las rutas relativas de la página (fetch('Data/...'),
+         <img src="Assets/...">, location.href='media.html', etc.) contra la
+         carpeta equivocada — que es exactamente lo que causaba que la Data
+         no cargara y que Media/Noticias/Banco de Problemas no abrieran. -->
+    <base id="app-base-href" href="/">
+    <script>
+        (function () {
+            var p = location.pathname.replace(/index\.html$/, '');
+            if (!p.endsWith('/')) p += '/';
+            document.getElementById('app-base-href').href = location.origin + p;
+        })();
+    </script>
     <!-- Single Page Apps for GitHub Pages (truco de rafgraph, ver 404.html)
-         Debe ir lo primero de todo: decodifica el "?/ruta" que dejó 404.html
-         y restaura la URL bonita real (p.ej. /Historial_Eventos/IChO) ANTES
-         de que corra cualquier otro script, incluida nuestra propia lógica
-         de enrutado más abajo en la página. -->
+         Decodifica el "?/ruta" que dejó 404.html y restaura la URL bonita
+         real (p.ej. /Historial_Eventos/IChO) ANTES de que corra cualquier
+         otro script, incluida nuestra propia lógica de enrutado más abajo
+         en la página. Va después de fijar el <base> a propósito: necesita
+         leer location.pathname todavía "limpio" (ver arriba). -->
     <script>
         (function (l) {
             if (l.search[1] === '/') {
@@ -2519,9 +2536,14 @@
             <!-- Vista de histogramas -->
             <div id="stats-vista-chart">
                 <div class="stats-chart-card">
-                    <h4 data-i18n="stats.chart1.title">Resultados y Medallas por Provincia</h4>
-                    <p class="stats-nota" data-i18n="stats.chart1.sub">Cantidad total de resultados registrados y de medallas obtenidas (incluye menciones) por provincia</p>
+                    <h4 data-i18n="stats.chart1.title">Resultados por Provincia</h4>
+                    <p class="stats-nota" data-i18n="stats.chart1.sub">Cantidad total de participantes registrados y de medallas obtenidas (incluye menciones) por provincia</p>
                     <div id="stats-chart-conteo"></div>
+                </div>
+                <div class="stats-chart-card">
+                    <h4 data-i18n="stats.chart.medallas.title">Medallas por Provincia</h4>
+                    <p class="stats-nota" data-i18n="stats.chart.medallas.sub">Cantidad de medallas obtenidas (incluye menciones) por provincia</p>
+                    <div id="stats-chart-medallas"></div>
                 </div>
                 <div class="stats-chart-card">
                     <h4 data-i18n="stats.chart2.title">Puntuación Ponderada por Provincia</h4>
@@ -3660,22 +3682,32 @@ function renderEstadisticasProvincias() {
 
     if (vista === 'chart') {
         // Cada histograma se ordena de mayor a menor según SU PROPIA
-        // métrica principal: el de resultados/medallas por "Resultados
-        // totales", el de puntos por "Puntos ponderados".
-        const catsConteo = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'total') - valorDe(a.code, 'total'));
-        const catsPuntos = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'puntos') - valorDe(a.code, 'puntos'));
+        // métrica principal: el de resultados por "Resultados totales", el
+        // de medallas por "Medallas totales", el de puntos por "Puntos
+        // ponderados".
+        const catsConteo   = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'total') - valorDe(a.code, 'total'));
+        const catsMedallas = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'medallas') - valorDe(a.code, 'medallas'));
+        const catsPuntos   = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'puntos') - valorDe(a.code, 'puntos'));
 
         const serieConteo = [
             { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'total')])) },
             { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'medallas')])) },
         ];
+        const serieMedallas = [
+            { name: T('stats.serie.oro'),     color: 'var(--gold)',   values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'oro')])) },
+            { name: T('stats.serie.plata'),   color: 'var(--silver)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'plata')])) },
+            { name: T('stats.serie.bronce'),  color: 'var(--bronze)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'bronce')])) },
+            { name: T('stats.serie.mencion'), color: 'var(--accent)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'mencion')])) },
+        ];
         const seriePuntos = [
             { name: T('stats.serie.puntos'), color: 'var(--cu-red)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'puntos')])) },
         ];
         const c1 = document.getElementById('stats-chart-conteo');
-        const c2 = document.getElementById('stats-chart-puntos');
-        if (c1) c1.innerHTML = _svgGroupedBarChart({ chartId: 'conteo', categories: catsConteo, series: serieConteo, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
-        if (c2) c2.innerHTML = _svgGroupedBarChart({ chartId: 'puntos', categories: catsPuntos, series: seriePuntos,  yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
+        const c2 = document.getElementById('stats-chart-medallas');
+        const c3 = document.getElementById('stats-chart-puntos');
+        if (c1) c1.innerHTML = _svgGroupedBarChart({ chartId: 'conteo',   categories: catsConteo,   series: serieConteo,   yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
+        if (c2) c2.innerHTML = _svgGroupedBarChart({ chartId: 'medallas', categories: catsMedallas, series: serieMedallas, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieMedallas);
+        if (c3) c3.innerHTML = _svgGroupedBarChart({ chartId: 'puntos',   categories: catsPuntos,   series: seriePuntos,   yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
     } else {
         const tbody = document.getElementById('stats-tabla-body');
         if (tbody) {
@@ -5503,11 +5535,18 @@ const _pathToCnqSub = Object.fromEntries(Object.entries(_cnqSubPath).map(([k,v])
 const _honorSubPath   = { entrenadores:'Entrenadores', cientificos:'Proceres' };
 const _pathToHonorSub = Object.fromEntries(Object.entries(_honorSubPath).map(([k,v]) => [v, k]));
 
-// "/Sitial_Talento/index.html" → "/Sitial_Talento/" (se conserva la barra
-// final a propósito: sin ella, todos los fetch()/rutas relativas del sitio
-// (Data/CNQ_data.html, etc.) resolverían mal en cuanto la URL visible deje
-// de tener "index.html").
+// Carpeta real del sitio, p.ej. "/Sitial_Talento/" — se lee del <base> fijado
+// una sola vez al cargar la página (ver <head>), NUNCA de location.pathname
+// directamente: la URL visible cambia de profundidad con cada navegación
+// (/Historial_Eventos/IChO, /Honor_Merece/Entrenadores/<id>, …), así que
+// recalcularla desde ahí en cada llamada iría acumulando segmentos sobre
+// segmentos en vez de partir siempre de la raíz real del sitio.
 function _rutaBaseSinIndex() {
+    try {
+        const baseEl = document.getElementById('app-base-href');
+        if (baseEl && baseEl.href) return new URL(baseEl.href).pathname;
+    } catch(e) {}
+    // Respaldo por si el <base> no está disponible por alguna razón.
     let path = location.pathname.replace(/index\.html$/, '');
     if (!path.endsWith('/')) path += '/';
     return path;
@@ -6524,8 +6563,10 @@ const _i18n = {
         'stats.label.periodo':      'Periodo:',
         'stats.ol.general':         '🌐 General (todas)',
         'stats.ol.otras':           '🌐 Otras',
-        'stats.chart1.title':       'Resultados y Medallas por Provincia',
-        'stats.chart1.sub':         'Cantidad total de resultados registrados y de medallas obtenidas (incluye menciones) por provincia',
+        'stats.chart1.title':       'Resultados por Provincia',
+        'stats.chart1.sub':         'Cantidad total de participantes registrados y de medallas obtenidas (incluye menciones) por provincia',
+        'stats.chart.medallas.title':'Medallas por Provincia',
+        'stats.chart.medallas.sub': 'Cantidad de medallas obtenidas (incluye menciones) por provincia',
         'stats.chart2.title':       'Puntuación Ponderada por Provincia',
         'stats.chart2.sub':         'Oro = 3 pts · Plata = 2 pts · Bronce = 1 pt · Mención = 0.5 pts',
         'stats.axis.cantidad':      'Cantidad',
@@ -6533,6 +6574,10 @@ const _i18n = {
         'stats.axis.provincia':     'Provincia',
         'stats.serie.total':        'Resultados totales',
         'stats.serie.medallas':     'Medallas totales',
+        'stats.serie.oro':          'Oro',
+        'stats.serie.plata':        'Plata',
+        'stats.serie.bronce':       'Bronce',
+        'stats.serie.mencion':      'Mención',
         'stats.serie.puntos':       'Puntos ponderados',
         'stats.th.prov':            'Provincia',
         'stats.th.total':           'Resultados',
@@ -6741,8 +6786,10 @@ const _i18n = {
         'stats.label.periodo':      'Period:',
         'stats.ol.general':         '🌐 General (all)',
         'stats.ol.otras':           '🌐 Other',
-        'stats.chart1.title':       'Results and Medals by Province',
-        'stats.chart1.sub':         'Total number of recorded results and medals earned (mentions included) by province',
+        'stats.chart1.title':       'Results by Province',
+        'stats.chart1.sub':         'Total number of recorded participants and medals earned (mentions included) by province',
+        'stats.chart.medallas.title':'Medals by Province',
+        'stats.chart.medallas.sub': 'Number of medals earned (mentions included) by province',
         'stats.chart2.title':       'Weighted Score by Province',
         'stats.chart2.sub':         'Gold = 3 pts · Silver = 2 pts · Bronze = 1 pt · Mention = 0.5 pts',
         'stats.axis.cantidad':      'Count',
@@ -6750,6 +6797,10 @@ const _i18n = {
         'stats.axis.provincia':     'Province',
         'stats.serie.total':        'Total results',
         'stats.serie.medallas':     'Total medals',
+        'stats.serie.oro':          'Gold',
+        'stats.serie.plata':        'Silver',
+        'stats.serie.bronce':       'Bronze',
+        'stats.serie.mencion':      'Mention',
         'stats.serie.puntos':       'Weighted points',
         'stats.th.prov':            'Province',
         'stats.th.total':           'Results',
