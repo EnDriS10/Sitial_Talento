@@ -1,6 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Fija la carpeta REAL del archivo (Problem_Data/) como base ANTES de
+     que el script de más abajo cambie lo que se ve en la barra de
+     direcciones a la ruta bonita (p.ej. /Banco_Problemas/q1-piscina/
+     enunciado). Sin esto, en cuanto la URL visible aparenta estar 2
+     niveles más profunda de lo que realmente está, el navegador
+     resolvería mal todas las rutas relativas de esta página
+     (fetch('problemas_contenido.html'), '../Banco_Problemas.html', etc.)
+     — el mismo problema que motivó el <base> de index.html. -->
+<base id="pv-base-href" href="/">
+<script>
+    (function () {
+        // En este punto location.pathname es siempre la ruta REAL
+        // (.../Problem_Data/visor.html), ya que cualquier acceso por la
+        // ruta bonita pasa antes por 404.html, que redirige aquí de
+        // verdad (ver 404.html). Así que basta con quitar el nombre de
+        // archivo para quedarnos con la carpeta real.
+        var p = location.pathname.replace(/visor\.html$/, '');
+        document.getElementById('pv-base-href').href = location.origin + p;
+    })();
+</script>
+<!-- Oculta la ruta real (Problem_Data/visor.html?id=..&tab=..) y muestra
+     la bonita (Banco_Problemas/<id>/<tab>) en la barra de direcciones,
+     tanto si se llegó aquí por un enlace directo como por la
+     redirección de 404.html. Guarda id/tab en variables globales ANTES
+     de reescribir la URL, porque el replaceState() de abajo borra el
+     query string (?id=..&tab=..) que el script principal, más abajo en
+     la página, necesita leer. -->
+<script>
+    (function (l) {
+        var params = new URLSearchParams(l.search);
+        window.__pvId  = params.get('id') || '';
+        window.__pvTab = params.get('tab') === 'respuesta' ? 'respuesta' : 'enunciado';
+        if (/\/Problem_Data\/visor\.html$/.test(l.pathname) && window.__pvId) {
+            var repoRoot = l.pathname.replace(/Problem_Data\/visor\.html$/, '');
+            history.replaceState(null, '',
+                repoRoot + 'Banco_Problemas/' + encodeURIComponent(window.__pvId) + '/' + window.__pvTab + l.hash
+            );
+        }
+    }(window.location));
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Problema — Sitial de Talentos</title>
@@ -397,9 +437,10 @@ function pvToggleIdioma() {
 pvAplicarTema();
 
 // ── Parámetros de la URL ──
-const _pvParams = new URLSearchParams(location.search);
-const _pvId = _pvParams.get('id') || '';
-let _pvTab = _pvParams.get('tab') === 'respuesta' ? 'respuesta' : 'enunciado';
+// Leídos por el script del <head> ANTES de reescribir la URL a su forma
+// bonita (Banco_Problemas/<id>/<tab>), que ya no lleva query string.
+const _pvId = window.__pvId || '';
+let _pvTab = window.__pvTab === 'respuesta' ? 'respuesta' : 'enunciado';
 
 // ── Carga de contenido: mismo patrón que CNQ_data.html / professor_data.html
 //    (fetch + DOMParser + inyectar el <script> real, no un parser JSON casero).
@@ -466,8 +507,17 @@ async function pvCompartir() {
 
 function pvSetTab(tab) {
     _pvTab = tab;
+    // La URL visible ya está en su forma bonita (.../Banco_Problemas/<id>/
+    // <tab>, ver script del <head>); al cambiar de pestaña solo hace falta
+    // reemplazar ese último segmento.
     const url = new URL(location.href);
-    url.searchParams.set('tab', tab);
+    if (/\/Banco_Problemas\/[^/]+\/[^/]+$/.test(url.pathname)) {
+        url.pathname = url.pathname.replace(/[^/]+$/, tab);
+    } else {
+        // Por si acaso todavía estamos en la ruta real (poco probable: el
+        // script del <head> ya la reescribe al cargar).
+        url.searchParams.set('tab', tab);
+    }
     history.replaceState(null, '', url);
     pvRender();
 }
