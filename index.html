@@ -521,6 +521,23 @@
         .search-input { margin-left: auto; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; width: 200px; transition: border-color .2s; }
         .search-input:focus { border-color: var(--accent); }
 
+        /* ── Filtro por provincia (Sitial de Honor) — pequeño, opcional, junto a Buscar ── */
+        .prov-filter-wrap { display: inline-flex; align-items: center; gap: 6px; }
+        .prov-filter-select {
+            padding: 8px 12px; border-radius: 20px; border: 1.5px solid var(--border);
+            font-family: 'DM Sans', sans-serif; font-size: 12.5px; outline: none;
+            max-width: 180px; background: var(--card-bg, #fff); color: inherit;
+            cursor: pointer; transition: border-color .2s;
+        }
+        .prov-filter-select:focus { border-color: var(--accent); }
+        .prov-filter-clear {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border);
+            background: var(--card-bg, #fff); color: var(--text-muted); font-size: 12px;
+            cursor: pointer; line-height: 1; padding: 0; transition: all .18s; flex-shrink: 0;
+        }
+        .prov-filter-clear:hover { border-color: var(--accent); color: var(--accent); }
+
         /* TABLA */
         .controles-evento { display: flex; gap: 14px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
         .controles-evento label { font-size: 13px; font-weight: 500; color: var(--text-muted); }
@@ -617,6 +634,8 @@
             .filtros-sitial { gap: 7px; }
             .filtro-btn { padding: 6px 12px; font-size: 12px; }
             .search-input { width: 100%; margin-left: 0; font-size: 13px; }
+            .prov-filter-wrap { width: 100%; }
+            .prov-filter-select { width: 100%; max-width: none; font-size: 13px; padding: 8px 12px; }
             .controles-evento { gap: 10px; }
             .custom-select { font-size: 13px; padding: 8px 12px; width: 100%; }
             .sort-controls { margin-left: 0; width: 100%; flex-wrap: wrap; }
@@ -774,6 +793,76 @@
             .stats-filtros { flex-direction: column; align-items: flex-start; gap: 12px; }
             .stats-chart-card { padding: 18px 12px 14px; }
         }
+
+        /* ── Botón "ampliar" (⤢) en cada tarjeta de gráfica ── */
+        .stats-chart-zoom-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 24px; margin-left: 6px; vertical-align: middle;
+            border: 1.5px solid var(--border); border-radius: 8px;
+            background: var(--card-bg); color: var(--accent);
+            cursor: pointer; font-size: 13px; line-height: 1;
+            transition: background .18s, border-color .18s, transform .18s;
+        }
+        .stats-chart-zoom-btn:hover { background: rgba(26,111,181,.08); border-color: var(--accent); transform: scale(1.08); }
+
+        /* ── Modal de zoom para gráficas (pantalla completa, pellizco/rueda) ── */
+        .chart-zoom-overlay {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(4,10,22,.94);
+            display: none; flex-direction: column;
+            opacity: 0; transition: opacity .22s ease;
+        }
+        .chart-zoom-overlay.visible { display: flex; }
+        .chart-zoom-overlay.mostrando { opacity: 1; }
+        .chart-zoom-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; flex-shrink: 0;
+        }
+        .chart-zoom-title { color: #fff; font-weight: 700; font-size: 14px; font-family: 'Playfair Display', serif; }
+        .chart-zoom-close {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,.12); color: #fff; font-size: 17px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: background .2s;
+        }
+        .chart-zoom-close:hover { background: rgba(255,255,255,.22); }
+        .chart-zoom-stage {
+            flex: 1; overflow: hidden; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            touch-action: none; cursor: grab;
+        }
+        .chart-zoom-stage.arrastrando { cursor: grabbing; }
+        .chart-zoom-inner {
+            width: 92%; max-width: 900px; will-change: transform;
+            background: #fff; border-radius: 12px; padding: 18px 14px 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+        }
+        [data-theme="dark"] .chart-zoom-inner { background: var(--card-bg); }
+        .chart-zoom-inner .stats-svg-chart { cursor: default; }
+        .chart-zoom-inner .stats-legend { justify-content: center; }
+        .chart-zoom-toolbar {
+            position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%);
+            display: flex; gap: 10px; z-index: 3;
+        }
+        .chart-zoom-btn {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,.14); color: #fff; font-size: 20px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s;
+            backdrop-filter: blur(4px);
+        }
+        .chart-zoom-btn:hover { background: rgba(255,255,255,.26); transform: scale(1.06); }
+        .chart-zoom-btn-reset { font-size: 16px; }
+        .chart-zoom-hint {
+            text-align: center; color: rgba(255,255,255,.55); font-size: 11.5px;
+            margin: 0; padding: 8px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+            flex-shrink: 0;
+        }
+        @media (max-width: 560px) {
+            .chart-zoom-inner { width: 96%; padding: 14px 10px 10px; }
+            .chart-zoom-toolbar { bottom: 40px; }
+            .chart-zoom-btn { width: 40px; height: 40px; font-size: 18px; }
+            .chart-zoom-hint { font-size: 10.5px; }
+        }
+
 
         /* PDF Viewer Area */
         .cnq-pdf-block {
@@ -2325,6 +2414,12 @@
             <button class="filtro-btn" onclick="filtrarSitial('bronce', this)">🥉 Bronce</button>
             <button class="filtro-btn" onclick="filtrarSitial('mencion', this)">🎖 Mención</button>
             <input class="search-input" type="text" placeholder="🔎 Buscar estudiante…" oninput="buscarSitial(this.value)">
+            <div class="prov-filter-wrap">
+                <select class="prov-filter-select" id="prov-filter-select" onchange="filtrarProvinciaSitial(this.value)">
+                    <option value="" id="prov-filter-placeholder-opt">📍 Filtrar por provincia…</option>
+                </select>
+                <button class="prov-filter-clear" id="prov-filter-clear-btn" onclick="filtrarProvinciaSitial('')" title="Quitar filtro" style="display:none;">✕</button>
+            </div>
         </div>
         <div class="cuadricula-sitial" id="cuadricula-sitial"></div>
         <div class="ver-mas-wrap" id="ver-mas-wrap"></div>
@@ -2537,19 +2632,25 @@
             <!-- Vista de histogramas -->
             <div id="stats-vista-chart">
                 <div class="stats-chart-card">
-                    <h4 data-i18n="stats.chart1.title">Resultados por Provincia</h4>
-                    <p class="stats-nota" data-i18n="stats.chart1.sub">Cantidad total de participantes registrados y de medallas obtenidas (incluye menciones) por provincia</p>
+                    <h4><span data-i18n="stats.chart1.title">Resultados por Provincia</span> <button class="stats-chart-zoom-btn" onclick="abrirZoomGrafica('stats-chart-conteo', T('stats.chart1.title'))" title="Ampliar" aria-label="Ampliar gráfica">⤢</button></h4>
+                    <p class="stats-nota" id="stats-chart1-sub">Cantidad total de participantes registrados y de medallas obtenidas (incluye menciones) por provincia</p>
                     <div id="stats-chart-conteo"></div>
                 </div>
                 <div class="stats-chart-card">
-                    <h4 data-i18n="stats.chart.medallas.title">Medallas por Provincia</h4>
+                    <h4><span data-i18n="stats.chart.medallas.title">Medallas por Provincia</span> <button class="stats-chart-zoom-btn" onclick="abrirZoomGrafica('stats-chart-medallas', T('stats.chart.medallas.title'))" title="Ampliar" aria-label="Ampliar gráfica">⤢</button></h4>
                     <p class="stats-nota" data-i18n="stats.chart.medallas.sub">Cantidad de medallas obtenidas (incluye menciones) por provincia</p>
                     <div id="stats-chart-medallas"></div>
                 </div>
                 <div class="stats-chart-card">
-                    <h4 data-i18n="stats.chart2.title">Puntuación Ponderada por Provincia</h4>
+                    <h4><span data-i18n="stats.chart2.title">Puntuación Ponderada por Provincia</span> <button class="stats-chart-zoom-btn" onclick="abrirZoomGrafica('stats-chart-puntos', T('stats.chart2.title'))" title="Ampliar" aria-label="Ampliar gráfica">⤢</button></h4>
                     <p class="stats-nota" data-i18n="stats.chart2.sub">Oro = 3 pts · Plata = 2 pts · Bronce = 1 pt · Mención = 0.5 pts</p>
                     <div id="stats-chart-puntos"></div>
+                </div>
+                <div class="stats-chart-card" id="stats-chart-card-ponderado-intl" style="display:none;">
+                    <h4><span data-i18n="stats.chart3.title">Puntuación por Tipo de Olimpiada</span> <button class="stats-chart-zoom-btn" onclick="abrirZoomGrafica('stats-chart-ponderado-intl', T('stats.chart3.title'))" title="Ampliar" aria-label="Ampliar gráfica">⤢</button></h4>
+                    <p class="stats-nota" data-i18n="stats.chart3.sub">Cada olimpiada pesa distinto según su nivel de exigencia — por eso una medalla en una y en otra no valen igual. La escala usada, de menor a mayor:</p>
+                    <p class="stats-nota" id="stats-chart3-escala" style="line-height:1.7;"></p>
+                    <div id="stats-chart-ponderado-intl"></div>
                 </div>
             </div>
 
@@ -3479,6 +3580,65 @@ function _pesoMedalla(m) {
     return { oro: 3, plata: 2, bronce: 1, mencion: 0.5 }[m] || 0;
 }
 
+// ── Ponderación por TIPO de olimpiada (solo para el modo Internacional +
+// filtro "General") ──────────────────────────────────────────────────
+// Cada olimpiada tiene un nivel de exigencia distinto, así que una medalla
+// no "vale" lo mismo en todas: una de Centroamericana no es comparable a
+// una de la IChO. Esta tabla asigna el peso correspondiente según de dónde
+// viene la medalla, para poder sumar puntos de forma justa entre provincias
+// que participan en distintas olimpiadas.
+const PESO_POR_OLIMPIADA = {
+    ocacq: { mencion: 0.5, bronce: 1, plata: 2, oro: 3 }, // Centroamericana
+    otras: { mencion: 0.5, bronce: 1, plata: 2, oro: 3 }, // Otras Olimpiadas
+    oiaq:  { mencion: 2.5, bronce: 3, plata: 4, oro: 5 }, // Iberoamericana
+    imcho: { mencion: 4.5, bronce: 5, plata: 6, oro: 7 }, // IMChO
+    icho:  { mencion: 4.5, bronce: 5, plata: 6, oro: 7 }, // IChO
+};
+// Nombres legibles de cada categoría (para el eje/leyenda del histograma).
+const NOMBRE_PESO_OLIMPIADA = {
+    ocacq: 'Centroamericana', otras: 'Otras Olimpiadas',
+    oiaq: 'Iberoamericana',   imcho: 'IMChO',   icho: 'IChO',
+};
+function _pesoMedallaPonderado(key, medalla) {
+    const tabla = PESO_POR_OLIMPIADA[key];
+    return tabla ? (tabla[medalla] || 0) : 0;
+}
+
+// Suma de puntos ponderados por provincia, aplicando la ponderación
+// distinta por tipo de olimpiada (ver PESO_POR_OLIMPIADA) y el filtro de
+// periodo activo. Solo tiene sentido cuando se muestran TODAS las
+// olimpiadas a la vez (filtro "General"), ya que es ahí donde hace falta
+// comparar medallas de distinto "peso" entre sí.
+function _statsCalcularPonderadoPorTipo() {
+    const desdeSel = document.getElementById('stats-selector-año-desde');
+    const hastaSel = document.getElementById('stats-selector-año-hasta');
+    const desde = (desdeSel && desdeSel.value) ? parseInt(desdeSel.value, 10) : null;
+    const hasta = (hastaSel && hastaSel.value) ? parseInt(hastaSel.value, 10) : null;
+
+    const otras = (typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) ? datosOtras : [];
+    const fuentes = {
+        icho:  todasLasOlimpiadas.icho  || [],
+        imcho: todasLasOlimpiadas.imcho || [],
+        oiaq:  todasLasOlimpiadas.oiaq  || [],
+        ocacq: todasLasOlimpiadas.ocacq || [],
+        otras: otras,
+    };
+
+    const out = {};
+    Object.entries(fuentes).forEach(([key, arr]) => {
+        arr.forEach(r => {
+            if (!r.prov || !r.medalla || r.medalla === 'participante') return;
+            if (desde != null && r.año < desde) return;
+            if (hasta != null && r.año > hasta) return;
+            const peso = _pesoMedallaPonderado(key, r.medalla);
+            if (!peso) return;
+            if (!out[r.prov]) out[r.prov] = 0;
+            out[r.prov] += peso;
+        });
+    });
+    return out;
+}
+
 // Universo de registros para el modo/filtro actual, SIN filtrar aún por año.
 function _statsRecordsBase(modo) {
     if (modo === 'cnq') return (window.datosCNQ || []).slice();
@@ -3686,14 +3846,22 @@ function renderEstadisticasProvincias() {
         // métrica principal: el de resultados por "Resultados totales", el
         // de medallas por "Medallas totales", el de puntos por "Puntos
         // ponderados".
-        const catsConteo   = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'total') - valorDe(a.code, 'total'));
+        const campoOrdenConteo = modo === 'intl' ? 'total' : 'medallas';
+        const catsConteo   = categoriesBase.slice().sort((a, b) => valorDe(b.code, campoOrdenConteo) - valorDe(a.code, campoOrdenConteo));
         const catsMedallas = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'medallas') - valorDe(a.code, 'medallas'));
         const catsPuntos   = categoriesBase.slice().sort((a, b) => valorDe(b.code, 'puntos') - valorDe(a.code, 'puntos'));
 
-        const serieConteo = [
-            { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'total')])) },
-            { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'medallas')])) },
-        ];
+        // En modo CNQ solo se muestran las medallas totales (no hay dato
+        // fiable de "participaciones totales" separado de las medallas para
+        // el Concurso Nacional); en modo Internacional se muestran ambas.
+        const serieConteo = modo === 'intl'
+            ? [
+                { name: T('stats.serie.total'), color: 'var(--accent)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'total')])) },
+                { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'medallas')])) },
+              ]
+            : [
+                { name: T('stats.serie.medallas'), color: 'var(--gold)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'medallas')])) },
+              ];
         const serieMedallas = [
             { name: T('stats.serie.oro'),     color: 'var(--gold)',   values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'oro')])) },
             { name: T('stats.serie.plata'),   color: 'var(--silver)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorDe(c.code, 'plata')])) },
@@ -3709,6 +3877,46 @@ function renderEstadisticasProvincias() {
         if (c1) c1.innerHTML = _svgGroupedBarChart({ chartId: 'conteo',   categories: catsConteo,   series: serieConteo,   yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieConteo);
         if (c2) c2.innerHTML = _svgGroupedBarChart({ chartId: 'medallas', categories: catsMedallas, series: serieMedallas, yLabel: T('stats.axis.cantidad'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(serieMedallas);
         if (c3) c3.innerHTML = _svgGroupedBarChart({ chartId: 'puntos',   categories: catsPuntos,   series: seriePuntos,   yLabel: T('stats.axis.puntos'),   xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePuntos);
+
+        // Subtítulo del primer histograma: cambia según el modo, ya que en
+        // CNQ solo se muestran medallas (ver comentario más arriba).
+        const sub1 = document.getElementById('stats-chart1-sub');
+        if (sub1) sub1.textContent = modo === 'intl' ? T('stats.chart1.sub') : T('stats.chart1.sub.cnq');
+
+        // ── 4ª gráfica: Puntuación por Tipo de Olimpiada ──
+        // Solo tiene sentido con Internacional + filtro "General" (todas las
+        // olimpiadas a la vez); en cualquier otro caso se oculta la tarjeta.
+        const olSel = document.getElementById('stats-selector-olimpiada');
+        const olValor = olSel ? olSel.value : 'general';
+        const mostrarPonderado = modo === 'intl' && olValor === 'general';
+        const cardPonderado = document.getElementById('stats-chart-card-ponderado-intl');
+        if (cardPonderado) cardPonderado.style.display = mostrarPonderado ? '' : 'none';
+        if (mostrarPonderado) {
+            const puntosPonderados = _statsCalcularPonderadoPorTipo();
+            const valorPond = code => puntosPonderados[code] || 0;
+            const catsPonderado = categoriesBase.slice().sort((a, b) => valorPond(b.code) - valorPond(a.code));
+            const seriePonderado = [
+                { name: T('stats.serie.ponderado'), color: 'var(--cu-red)', values: Object.fromEntries(categoriesBase.map(c => [c.code, valorPond(c.code)])) },
+            ];
+            const c4 = document.getElementById('stats-chart-ponderado-intl');
+            if (c4) c4.innerHTML = _svgGroupedBarChart({ chartId: 'ponderado', categories: catsPonderado, series: seriePonderado, yLabel: T('stats.axis.puntos'), xLabel: T('stats.axis.provincia') }) + _svgLegendHTML(seriePonderado);
+
+            // Leyenda "gentil" con la escala de pesos, de menor a mayor
+            // exigencia, para que quede claro por qué una medalla no vale
+            // lo mismo en todas las olimpiadas.
+            const escalaEl = document.getElementById('stats-chart3-escala');
+            if (escalaEl) {
+                const orden = ['ocacq', 'otras', 'oiaq', 'imcho', 'icho'];
+                escalaEl.innerHTML = orden.map(key => {
+                    const p = PESO_POR_OLIMPIADA[key];
+                    const nombre = T('stats.ponderado.nombre.' + key) || NOMBRE_PESO_OLIMPIADA[key];
+                    return `<strong>${nombre}:</strong> ${T('stats.serie.mencion')} ${_statsFmtNum(p.mencion)} · `
+                         + `${T('stats.serie.bronce')} ${_statsFmtNum(p.bronce)} · `
+                         + `${T('stats.serie.plata')} ${_statsFmtNum(p.plata)} · `
+                         + `${T('stats.serie.oro')} ${_statsFmtNum(p.oro)}`;
+                }).join('<br>');
+            }
+        }
     } else {
         const tbody = document.getElementById('stats-tabla-body');
         if (tbody) {
@@ -3780,6 +3988,125 @@ function _statsActualizarIconosOrden() {
         }
     });
 }
+
+// ════════════════════════════════════════════════════
+// ZOOM DE GRÁFICAS (modal a pantalla completa, pellizco/rueda/arrastre)
+// Reutilizable para cualquier tarjeta de histograma de Estadísticas —
+// pensado sobre todo para que las gráficas se vean bien en el teléfono.
+// ════════════════════════════════════════════════════
+let _czScale = 1, _czX = 0, _czY = 0;
+const _CZ_MIN = 1, _CZ_MAX = 5;
+let _czPointers = new Map();
+let _czPinchStartDist = 0, _czPinchStartScale = 1;
+let _czDragStart = null, _czDragMoved = false;
+let _czLastTap = 0;
+
+function abrirZoomGrafica(sourceId, titulo) {
+    const src = document.getElementById(sourceId);
+    const inner = document.getElementById('chart-zoom-inner');
+    const overlay = document.getElementById('chart-zoom-overlay');
+    const titleEl = document.getElementById('chart-zoom-title');
+    if (!src || !inner || !overlay) return;
+    inner.innerHTML = src.innerHTML;
+    if (titleEl) titleEl.textContent = titulo || '';
+    _chartZoomReset(false);
+    overlay.classList.add('visible');
+    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('mostrando')));
+    document.addEventListener('keydown', _czTeclado);
+}
+
+function cerrarZoomGrafica() {
+    const overlay = document.getElementById('chart-zoom-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('mostrando');
+    setTimeout(() => overlay.classList.remove('visible'), 220);
+    document.removeEventListener('keydown', _czTeclado);
+}
+
+function _czTeclado(e) {
+    if (e.key === 'Escape') cerrarZoomGrafica();
+}
+
+function _chartZoomApply(animate) {
+    const inner = document.getElementById('chart-zoom-inner');
+    if (!inner) return;
+    inner.style.transition = animate ? 'transform .25s ease' : 'none';
+    inner.style.transform = `translate(${_czX}px, ${_czY}px) scale(${_czScale})`;
+}
+
+function _chartZoomReset(animate) {
+    _czScale = 1; _czX = 0; _czY = 0;
+    _chartZoomApply(animate);
+}
+
+function _chartZoomSet(newScale, animate) {
+    _czScale = Math.max(_CZ_MIN, Math.min(_CZ_MAX, newScale));
+    if (_czScale <= 1) { _czScale = 1; _czX = 0; _czY = 0; }
+    _chartZoomApply(animate);
+}
+
+function _chartZoomStep(delta) { _chartZoomSet(_czScale + delta, true); }
+
+function _czPointerDown(e) {
+    const stage = e.currentTarget;
+    stage.setPointerCapture(e.pointerId);
+    _czPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_czPointers.size === 2) {
+        const pts = [..._czPointers.values()];
+        _czPinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        _czPinchStartScale = _czScale;
+    } else if (_czPointers.size === 1) {
+        _czDragStart = { x: e.clientX - _czX, y: e.clientY - _czY };
+        _czDragMoved = false;
+        stage.classList.add('arrastrando');
+    }
+}
+function _czPointerMove(e) {
+    if (!_czPointers.has(e.pointerId)) return;
+    _czPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_czPointers.size === 2) {
+        const pts = [..._czPointers.values()];
+        const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (_czPinchStartDist > 0) _chartZoomSet(_czPinchStartScale * (dist / _czPinchStartDist), false);
+    } else if (_czPointers.size === 1 && _czDragStart && _czScale > 1) {
+        _czDragMoved = true;
+        _czX = e.clientX - _czDragStart.x;
+        _czY = e.clientY - _czDragStart.y;
+        _chartZoomApply(false);
+    }
+}
+function _czPointerUp(e) {
+    const stage = e.currentTarget;
+    _czPointers.delete(e.pointerId);
+    if (_czPointers.size < 2) _czPinchStartDist = 0;
+    if (_czPointers.size === 0) {
+        stage.classList.remove('arrastrando');
+        if (_czScale <= 1) { _czX = 0; _czY = 0; _chartZoomApply(true); }
+        if (!_czDragMoved) {
+            // Toque simple (sin arrastre) — detectar doble toque para alternar zoom.
+            const now = Date.now();
+            if (now - _czLastTap < 320) {
+                _chartZoomSet(_czScale > 1 ? 1 : 2.2, true);
+            }
+            _czLastTap = now;
+        }
+        _czDragStart = null;
+    }
+}
+function _czWheel(e) {
+    e.preventDefault();
+    _chartZoomSet(_czScale + (e.deltaY < 0 ? 0.3 : -0.3), false);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const stage = document.getElementById('chart-zoom-stage');
+    if (!stage) return;
+    stage.addEventListener('pointerdown', _czPointerDown);
+    stage.addEventListener('pointermove', _czPointerMove);
+    stage.addEventListener('pointerup', _czPointerUp);
+    stage.addEventListener('pointercancel', _czPointerUp);
+    stage.addEventListener('wheel', _czWheel, { passive: false });
+});
 
 // ─── Ranking ───────────────────────────────────────
 // 'auto' = ordenación semántica automática según filtros activos
@@ -4799,6 +5126,18 @@ function construirSitial() {
             if (yB !== yA) return yB - yA;
             return mejorRango(a) - mejorRango(b);
         });
+
+    // Asignar provincia a cada estudiante (buscando su primera fila con
+    // provincia registrada entre las olimpiadas internacionales y "otras"),
+    // para poder ofrecer el filtro "Filtrar por Provincia" en el Sitial.
+    const _todasFilasProv = Object.values(todasLasOlimpiadas).flat()
+        .concat((typeof datosOtras !== 'undefined' && Array.isArray(datosOtras)) ? datosOtras : []);
+    window._estudiantesTodos.forEach(e => {
+        const fila = _todasFilasProv.find(r => r.nombre === e.nombre && r.prov);
+        e.prov = fila ? fila.prov : null;
+    });
+    _poblarFiltroProvinciaSitial();
+
     renderizarSitial(window._estudiantesTodos);
 }
 
@@ -4894,10 +5233,46 @@ function buscarSitial(txt) {
     sitialPagina = txt ? 999 : 1;
     aplicarFiltros();
 }
+
+// ── Filtro por provincia (pequeño, opcional, junto a "Buscar estudiante") ──
+let filtroProvinciaSitial = '';
+
+// Rellena el <select> con las provincias realmente presentes entre los
+// estudiantes del Sitial, mostrando siempre su nombre completo (nunca el
+// diminutivo/código a secas), ordenadas alfabéticamente.
+function _poblarFiltroProvinciaSitial() {
+    const sel = document.getElementById('prov-filter-select');
+    if (!sel) return;
+    const lista = window._estudiantesTodos || [];
+    const codigos = [...new Set(lista.map(e => e.prov).filter(Boolean))];
+    const opciones = codigos
+        .map(cod => ({ cod, nombre: PROVINCIAS[cod] || cod }))
+        .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    const valorPrevio = sel.value;
+    sel.innerHTML = `<option value="" id="prov-filter-placeholder-opt">${T('sitial.prov.placeholder')}</option>` +
+        opciones.map(o => `<option value="${o.cod}">${o.nombre}</option>`).join('');
+    // Conservar la selección si sigue siendo válida (p.ej. al recargar datos).
+    if (valorPrevio && codigos.includes(valorPrevio)) sel.value = valorPrevio;
+}
+
+// Al elegir una provincia se filtra el Sitial de inmediato; se puede quitar
+// el filtro tocando la "✕" o volviendo a elegir la opción vacía.
+function filtrarProvinciaSitial(cod) {
+    filtroProvinciaSitial = cod || '';
+    sitialPagina = filtroProvinciaSitial ? 999 : 1;
+    const sel = document.getElementById('prov-filter-select');
+    if (sel) sel.value = filtroProvinciaSitial;
+    const clearBtn = document.getElementById('prov-filter-clear-btn');
+    if (clearBtn) clearBtn.style.display = filtroProvinciaSitial ? '' : 'none';
+    aplicarFiltros();
+}
+
 function aplicarFiltros() {
     let lista = window._estudiantesTodos || [];
     if (filtroSitial !== 'todos') lista = lista.filter(e => e.medallas.some(m => m.tipo===filtroSitial));
     if (busquedaSitial) lista = lista.filter(e => e.nombre.toLowerCase().includes(busquedaSitial));
+    if (filtroProvinciaSitial) lista = lista.filter(e => e.prov === filtroProvinciaSitial);
     renderizarSitial(lista);
 }
 
@@ -6566,10 +6941,18 @@ const _i18n = {
         'stats.ol.otras':           '🌐 Otras',
         'stats.chart1.title':       'Resultados por Provincia',
         'stats.chart1.sub':         'Cantidad total de participantes registrados y de medallas obtenidas (incluye menciones) por provincia',
+        'stats.chart1.sub.cnq':     'Cantidad de medallas obtenidas (incluye menciones) por provincia en el Concurso Nacional',
         'stats.chart.medallas.title':'Medallas por Provincia',
         'stats.chart.medallas.sub': 'Cantidad de medallas obtenidas (incluye menciones) por provincia',
         'stats.chart2.title':       'Puntuación Ponderada por Provincia',
         'stats.chart2.sub':         'Oro = 3 pts · Plata = 2 pts · Bronce = 1 pt · Mención = 0.5 pts',
+        'stats.chart3.title':       'Puntuación por Tipo de Olimpiada',
+        'stats.chart3.sub':         'Cada olimpiada pesa distinto según su nivel de exigencia — por eso una medalla en una y en otra no valen igual. La escala usada, de menor a mayor:',
+        'stats.ponderado.nombre.ocacq': 'Centroamericana',
+        'stats.ponderado.nombre.otras': 'Otras Olimpiadas',
+        'stats.ponderado.nombre.oiaq':  'Iberoamericana',
+        'stats.ponderado.nombre.imcho': 'IMChO',
+        'stats.ponderado.nombre.icho':  'IChO',
         'stats.axis.cantidad':      'Cantidad',
         'stats.axis.puntos':        'Puntos',
         'stats.axis.provincia':     'Provincia',
@@ -6580,6 +6963,7 @@ const _i18n = {
         'stats.serie.bronce':       'Bronce',
         'stats.serie.mencion':      'Mención',
         'stats.serie.puntos':       'Puntos ponderados',
+        'stats.serie.ponderado':    'Puntuación ponderada',
         'stats.th.prov':            'Provincia',
         'stats.th.total':           'Participaciones',
         'stats.th.medallas':        'Medallas',
@@ -6654,6 +7038,8 @@ const _i18n = {
         'sitial.sub':               'Estudiantes cubanos y sus logros históricos en olimpiadas de química',
         'sitial.filter.all':        'Todos',
         'sitial.search.placeholder':'🔎 Buscar estudiante…',
+        'sitial.prov.placeholder':  '📍 Filtrar por provincia…',
+        'sitial.prov.clear':        'Quitar filtro de provincia',
         'sitial.noresults':         'No se encontraron estudiantes.',
         // Tabla eventos
         'eventos.title':            'Resultados por Evento',
@@ -6789,10 +7175,18 @@ const _i18n = {
         'stats.ol.otras':           '🌐 Other',
         'stats.chart1.title':       'Results by Province',
         'stats.chart1.sub':         'Total number of recorded participants and medals earned (mentions included) by province',
+        'stats.chart1.sub.cnq':     'Number of medals earned (mentions included) by province in the National Contest',
         'stats.chart.medallas.title':'Medals by Province',
         'stats.chart.medallas.sub': 'Number of medals earned (mentions included) by province',
         'stats.chart2.title':       'Weighted Score by Province',
         'stats.chart2.sub':         'Gold = 3 pts · Silver = 2 pts · Bronze = 1 pt · Mention = 0.5 pts',
+        'stats.chart3.title':       'Score by Olympiad Type',
+        'stats.chart3.sub':         'Each olympiad carries a different weight based on its level of difficulty — a medal from one isn\'t equal to a medal from another. The scale used, from lowest to highest:',
+        'stats.ponderado.nombre.ocacq': 'Central American',
+        'stats.ponderado.nombre.otras': 'Other Olympiads',
+        'stats.ponderado.nombre.oiaq':  'Ibero-American',
+        'stats.ponderado.nombre.imcho': 'IMChO',
+        'stats.ponderado.nombre.icho':  'IChO',
         'stats.axis.cantidad':      'Count',
         'stats.axis.puntos':        'Points',
         'stats.axis.provincia':     'Province',
@@ -6803,6 +7197,7 @@ const _i18n = {
         'stats.serie.bronce':       'Bronze',
         'stats.serie.mencion':      'Mention',
         'stats.serie.puntos':       'Weighted points',
+        'stats.serie.ponderado':    'Weighted score',
         'stats.th.prov':            'Province',
         'stats.th.total':           'Participations',
         'stats.th.medallas':        'Medals',
@@ -6873,6 +7268,8 @@ const _i18n = {
         'sitial.sub':               'Cuban students and their historic achievements at chemistry olympiads',
         'sitial.filter.all':        'All',
         'sitial.search.placeholder':'🔎 Search student…',
+        'sitial.prov.placeholder':  '📍 Filter by province…',
+        'sitial.prov.clear':        'Clear province filter',
         'sitial.noresults':         'No students found.',
         'eventos.title':            'Results by Event',
         'eventos.sub':              'Complete history of participations and medals by olympiad',
@@ -6987,6 +7384,12 @@ function _refreshDynamic() {
     // Sitial search placeholder
     const searchInput = document.querySelector('.search-input');
     if (searchInput) searchInput.placeholder = T('sitial.search.placeholder');
+
+    // Sitial "Filtrar por provincia" — placeholder y tooltip del botón "✕"
+    const provPlaceholderOpt = document.getElementById('prov-filter-placeholder-opt');
+    if (provPlaceholderOpt) provPlaceholderOpt.textContent = T('sitial.prov.placeholder');
+    const provClearBtn = document.getElementById('prov-filter-clear-btn');
+    if (provClearBtn) provClearBtn.title = T('sitial.prov.clear');
 
     // Sitial "Todos" filter button
     const todosBtn = document.querySelector('.filtro-btn[data-filter="todos"]');
@@ -7218,5 +7621,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script type="module" src="Assets/UI/modern-ui.js"></script>
+<!-- ══ MODAL DE ZOOM PARA GRÁFICAS (Estadísticas por Provincias) ══
+     Reutilizable: al tocar el icono ⤢ de cualquier tarjeta de gráfica se
+     clona su SVG aquí dentro, a pantalla completa, con zoom táctil (pellizco),
+     rueda del ratón, doble toque y botones +/-, para verla cómodamente en
+     el teléfono. -->
+<div class="chart-zoom-overlay" id="chart-zoom-overlay" onclick="if(event.target===this) cerrarZoomGrafica()">
+    <div class="chart-zoom-topbar" onclick="event.stopPropagation()">
+        <span class="chart-zoom-title" id="chart-zoom-title"></span>
+        <button class="chart-zoom-close" onclick="cerrarZoomGrafica()" aria-label="Cerrar" title="Cerrar">✕</button>
+    </div>
+    <div class="chart-zoom-stage" id="chart-zoom-stage">
+        <div class="chart-zoom-inner" id="chart-zoom-inner"></div>
+    </div>
+    <div class="chart-zoom-toolbar" onclick="event.stopPropagation()">
+        <button class="chart-zoom-btn" onclick="_chartZoomStep(-0.5)" aria-label="Alejar" title="Alejar">−</button>
+        <button class="chart-zoom-btn chart-zoom-btn-reset" onclick="_chartZoomReset(true)" aria-label="Restablecer" title="Restablecer zoom">⟲</button>
+        <button class="chart-zoom-btn" onclick="_chartZoomStep(0.5)" aria-label="Acercar" title="Acercar">+</button>
+    </div>
+    <p class="chart-zoom-hint" id="chart-zoom-hint">Pellizca, usa la rueda del ratón o los botones para hacer zoom · Arrastra para mover</p>
+</div>
+
 </body>
 </html>
