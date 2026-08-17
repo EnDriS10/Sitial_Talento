@@ -23,17 +23,46 @@
         de ruta fijo: /Sitial_Talento/ (el nombre del repositorio en
         GitHub Pages). Si el sitio se moviera a la raíz de un dominio
         propio (sin ese segmento), este valor pasaría a 0.
+
+        ── Rutas bonitas de páginas "reales" (no del SPA de index.html) ──
+        Banco de Problemas, Media y Noticias son archivos .html sueltos, no
+        secciones de index.html, así que antes de caer en el truco genérico
+        de arriba, se comprueban aquí sus rutas bonitas y se redirige
+        directamente al archivo real correspondiente:
+            /Banco_Problemas               → Banco_Problemas.html
+            /media                         → media.html
+            /noticias                      → noticias.html
+            /Banco_Problemas/<id>/<tab>    → Problem_Data/visor.html?id=<id>&tab=<tab>
+        Cada uno de esos archivos reales, al cargar, oculta de nuevo su
+        propia URL "fea" con history.replaceState (ver el script al
+        inicio de cada uno), así que el usuario nunca llega a ver el
+        ".html" ni la ruta interna de verdad.
     -->
     <script>
         var pathSegmentsToKeep = 1;
         var l = window.location;
-        l.replace(
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-            l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-            (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-            l.hash
-        );
+        var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+        var resto = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).filter(Boolean);
+
+        if (resto.length === 1 && resto[0] === 'Banco_Problemas') {
+            l.replace(repoBase + '/Banco_Problemas.html' + l.search + l.hash);
+        } else if (resto.length === 1 && resto[0] === 'media') {
+            l.replace(repoBase + '/media.html' + l.search + l.hash);
+        } else if (resto.length === 1 && resto[0] === 'noticias') {
+            l.replace(repoBase + '/noticias.html' + l.search + l.hash);
+        } else if ((resto.length === 2 || resto.length === 3) && resto[0] === 'Banco_Problemas') {
+            var id  = decodeURIComponent(resto[1]);
+            var tab = resto.length === 3 ? decodeURIComponent(resto[2]) : 'enunciado';
+            l.replace(repoBase + '/Problem_Data/visor.html?id=' + encodeURIComponent(id) + '&tab=' + encodeURIComponent(tab));
+        } else {
+            l.replace(
+                l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+                repoBase + '/?/' +
+                l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+                (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+                l.hash
+            );
+        }
     </script>
     <style>
         html, body { height: 100%; margin: 0; display: flex; align-items: center; justify-content: center;
