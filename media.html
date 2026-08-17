@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Oculta el ".html" de la barra de direcciones en cuanto carga la
+     página (enlace directo a media.html o redirección de 404.html desde
+     la ruta bonita /media). No hace falta <base>: quitar la extensión no
+     cambia el nivel de carpeta desde el que se resuelven las rutas
+     relativas. -->
+<script>
+    (function (l) {
+        if (/\/media\.html$/.test(l.pathname)) {
+            history.replaceState(null, '', l.pathname.replace(/\.html$/, '') + l.search + l.hash);
+        }
+    }(window.location));
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Media — Sitial de Talentos</title>
