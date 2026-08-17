@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Oculta el ".html" de la barra de direcciones en cuanto carga la
+     página (tanto si se llegó aquí por un enlace directo a
+     Banco_Problemas.html como por la redirección de 404.html al
+     visitar/recargar la ruta bonita /Banco_Problemas). No hace falta
+     fijar <base>: quitar solo la extensión no cambia la carpeta desde la
+     que se resuelven las rutas relativas (Data/…, Problem_Data/…, etc.),
+     ya que "Banco_Problemas" y "Banco_Problemas.html" ocupan el mismo
+     nivel dentro de la URL. -->
+<script>
+    (function (l) {
+        if (/\/Banco_Problemas\.html$/.test(l.pathname)) {
+            history.replaceState(null, '', l.pathname.replace(/\.html$/, '') + l.search + l.hash);
+        }
+    }(window.location));
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Banco de Problemas — Sitial de Talentos</title>
@@ -408,11 +423,16 @@ const _BPT = {
     }
 };
 
+// Construye la URL "bonita" de un problema: Banco_Problemas/<id>/<tab>
+// (en vez de la ruta real Problem_Data/visor.html?id=..&tab=..). 404.html
+// se encarga de redirigir esa ruta bonita al archivo real si alguien la
+// visita directamente/la recarga; ver comentarios en 404.html.
+function bpUrlProblema(id, tab) {
+    return new URL('Banco_Problemas/' + encodeURIComponent(id) + '/' + tab, location.href).toString();
+}
+
 async function bpCompartir(id, titulo, btn) {
-    const url = new URL('Problem_Data/visor.html', location.href);
-    url.searchParams.set('id', id);
-    url.searchParams.set('tab', 'enunciado');
-    const href = url.toString();
+    const href = bpUrlProblema(id, 'enunciado');
     try {
         if (navigator.share) { await navigator.share({ title: titulo, url: href }); return; }
     } catch (e) { /* cancelado: probamos portapapeles */ }
@@ -622,7 +642,7 @@ function bpRenderizar() {
             card.classList.add('bp-card-clicable');
             card.setAttribute('role', 'button');
             card.setAttribute('tabindex', '0');
-            const abrir = () => window.open(p.enunciado, '_blank', 'noopener');
+            const abrir = () => window.open(bpUrlProblema(p.id, 'enunciado'), '_blank', 'noopener');
             card.addEventListener('click', abrir);
             card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); } });
         }
@@ -640,8 +660,8 @@ function bpRenderizar() {
             ${p.temaEspecifico ? `<p class="bp-tema-especifico">${p.temaEspecifico}</p>` : ''}
             <p class="bp-card-desc">${p.descripcion || ''}</p>
             <div class="bp-card-actions">
-                <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneEnunciado ? `window.open('${p.enunciado}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
-                <button class="bp-btn bp-btn-respuesta" ${tieneRespuesta ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneRespuesta ? `window.open('${p.respuesta}','_blank','noopener')` : ''}">${tieneRespuesta ? _bpT('verRespuesta') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-enunciado" ${tieneEnunciado ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneEnunciado ? `window.open('${bpUrlProblema(p.id, 'enunciado')}','_blank','noopener')` : ''}">${tieneEnunciado ? _bpT('verEnunciado') : _bpT('proximamente')}</button>
+                <button class="bp-btn bp-btn-respuesta" ${tieneRespuesta ? '' : 'aria-disabled="true"'} onclick="event.stopPropagation();${tieneRespuesta ? `window.open('${bpUrlProblema(p.id, 'respuesta')}','_blank','noopener')` : ''}">${tieneRespuesta ? _bpT('verRespuesta') : _bpT('proximamente')}</button>
                 <button class="bp-btn bp-btn-share" title="${_bpT('compartir')}" onclick="event.stopPropagation();bpCompartir('${p.id}','${(p.titulo||'').replace(/'/g,"\\'")}',this)">🔗</button>
             </div>
         `;
