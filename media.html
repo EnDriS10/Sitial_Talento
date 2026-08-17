@@ -137,13 +137,19 @@
     }
     .mp-lightbox.visible   { display: flex; }
     .mp-lightbox.mostrando { opacity: 1; }
-    .mp-lightbox img {
-        max-width: 100%; max-height: 100%; border-radius: 10px;
-        box-shadow: 0 24px 70px rgba(0,0,0,.55);
+    .mp-lb-imgwrap {
+        max-width: 100%; max-height: 100%; overflow: hidden;
+        border-radius: 10px; box-shadow: 0 24px 70px rgba(0,0,0,.55);
         transform: scale(.85); transition: transform .3s cubic-bezier(.2,.85,.3,1.2);
-        user-select: none;
+        display: flex; align-items: center; justify-content: center;
+        touch-action: none; cursor: grab;
     }
-    .mp-lightbox.mostrando img { transform: scale(1); }
+    .mp-lb-imgwrap.arrastrando { cursor: grabbing; }
+    .mp-lightbox.mostrando .mp-lb-imgwrap { transform: scale(1); }
+    .mp-lightbox img {
+        max-width: 100%; max-height: 100%; display: block;
+        user-select: none; -webkit-user-drag: none; will-change: transform;
+    }
 
     .mp-lb-close {
         position: absolute; top: 18px; right: 22px;
@@ -177,6 +183,25 @@
     @media (max-width: 560px) {
         .mp-lb-nav { width: 38px; height: 38px; font-size: 16px; }
         .mp-lb-prev { left: 8px; } .mp-lb-next { right: 8px; }
+    }
+
+    /* ── Zoom de foto en el lightbox — cómodo con pellizco, rueda, doble toque o botones ── */
+    .mp-lb-zoom-bar {
+        position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
+        display: flex; gap: 10px; z-index: 3;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .mp-lb-zoom-btn {
+        width: 42px; height: 42px; border-radius: 50%; border: none;
+        background: rgba(255,255,255,.14); color: #fff; font-size: 19px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s;
+        backdrop-filter: blur(4px);
+    }
+    .mp-lb-zoom-btn:hover { background: rgba(255,255,255,.26); transform: scale(1.06); }
+    .mp-lb-zoom-reset { font-size: 15px; }
+    @media (max-width: 560px) {
+        .mp-lb-zoom-bar { bottom: 14px; gap: 8px; }
+        .mp-lb-zoom-btn { width: 38px; height: 38px; font-size: 17px; }
     }
 
     /* ── Barra de acciones (compartir / descargar) ── */
@@ -309,8 +334,15 @@
     <button class="mp-lb-close" onclick="event.stopPropagation(); cerrarFoto()" aria-label="Cerrar">✕</button>
     <span class="mp-lb-badge" id="mp-lb-badge"></span>
     <button class="mp-lb-nav mp-lb-prev" onclick="event.stopPropagation(); irFotoAdyacente(-1)" aria-label="Anterior">‹</button>
-    <img id="mp-lb-img" src="" alt="">
+    <div class="mp-lb-imgwrap" id="mp-lb-imgwrap" onclick="event.stopPropagation()">
+        <img id="mp-lb-img" src="" alt="">
+    </div>
     <button class="mp-lb-nav mp-lb-next" onclick="event.stopPropagation(); irFotoAdyacente(1)" aria-label="Siguiente">›</button>
+    <div class="mp-lb-zoom-bar" onclick="event.stopPropagation()">
+        <button class="mp-lb-zoom-btn" onclick="fotoZoomOut()" aria-label="Disminuir" title="Disminuir tamaño">−</button>
+        <button class="mp-lb-zoom-btn mp-lb-zoom-reset" onclick="fotoZoomReset(true)" aria-label="Restablecer" title="Restablecer tamaño">⟲</button>
+        <button class="mp-lb-zoom-btn" onclick="fotoZoomIn()" aria-label="Aumentar" title="Aumentar tamaño">+</button>
+    </div>
 
     <div class="mp-share-panel" id="mp-share-panel" onclick="event.stopPropagation()">
         <p class="mp-share-panel-titulo" id="mp-share-titulo">Compartir</p>
@@ -590,6 +622,7 @@ function _renderLightbox(datos) {
     const idx = _galeria.findIndex(d => d.nombre === datos.nombre);
     document.querySelector('.mp-lb-prev').disabled = idx <= 0;
     document.querySelector('.mp-lb-next').disabled = (idx === -1) || (idx >= _galeria.length - 1);
+    fotoZoomReset(false);
 }
 
 function _mostrarLightbox() {
@@ -610,7 +643,100 @@ function _lbTeclado(e) {
     if (e.key === 'Escape') cerrarFoto();
     else if (e.key === 'ArrowLeft')  irFotoAdyacente(-1);
     else if (e.key === 'ArrowRight') irFotoAdyacente(1);
+    else if (e.key === '+' || e.key === '=') fotoZoomIn();
+    else if (e.key === '-') fotoZoomOut();
 }
+
+// ════════════════════════════════════════════════════
+// ZOOM DE FOTO EN EL LIGHTBOX — pellizco (táctil), rueda del ratón,
+// doble toque/clic, arrastre para mover cuando está ampliada, y botones
+// +/− para quien prefiera tocar en vez de gestos. Cómodo tanto en
+// escritorio como en el teléfono.
+// ════════════════════════════════════════════════════
+let _fzScale = 1, _fzX = 0, _fzY = 0;
+const _FZ_MIN = 1, _FZ_MAX = 4;
+let _fzPointers = new Map();
+let _fzPinchStartDist = 0, _fzPinchStartScale = 1;
+let _fzDragStart = null, _fzDragMoved = false;
+let _fzLastTap = 0;
+
+function _fotoZoomApply(animate) {
+    const img = document.getElementById('mp-lb-img');
+    if (!img) return;
+    img.style.transition = animate ? 'transform .25s ease' : 'none';
+    img.style.transform = `translate(${_fzX}px, ${_fzY}px) scale(${_fzScale})`;
+}
+function fotoZoomReset(animate) {
+    _fzScale = 1; _fzX = 0; _fzY = 0;
+    _fotoZoomApply(animate);
+}
+function _fotoZoomSet(newScale, animate) {
+    _fzScale = Math.max(_FZ_MIN, Math.min(_FZ_MAX, newScale));
+    if (_fzScale <= 1) { _fzScale = 1; _fzX = 0; _fzY = 0; }
+    _fotoZoomApply(animate);
+}
+function fotoZoomIn()  { _fotoZoomSet(_fzScale + 0.5, true); }
+function fotoZoomOut() { _fotoZoomSet(_fzScale - 0.5, true); }
+
+function _fzPointerDown(e) {
+    const wrap = e.currentTarget;
+    wrap.setPointerCapture(e.pointerId);
+    _fzPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_fzPointers.size === 2) {
+        const pts = [..._fzPointers.values()];
+        _fzPinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        _fzPinchStartScale = _fzScale;
+    } else if (_fzPointers.size === 1) {
+        _fzDragStart = { x: e.clientX - _fzX, y: e.clientY - _fzY };
+        _fzDragMoved = false;
+        wrap.classList.add('arrastrando');
+    }
+}
+function _fzPointerMove(e) {
+    if (!_fzPointers.has(e.pointerId)) return;
+    _fzPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_fzPointers.size === 2) {
+        const pts = [..._fzPointers.values()];
+        const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (_fzPinchStartDist > 0) _fotoZoomSet(_fzPinchStartScale * (dist / _fzPinchStartDist), false);
+    } else if (_fzPointers.size === 1 && _fzDragStart && _fzScale > 1) {
+        _fzDragMoved = true;
+        _fzX = e.clientX - _fzDragStart.x;
+        _fzY = e.clientY - _fzDragStart.y;
+        _fotoZoomApply(false);
+    }
+}
+function _fzPointerUp(e) {
+    const wrap = e.currentTarget;
+    _fzPointers.delete(e.pointerId);
+    if (_fzPointers.size < 2) _fzPinchStartDist = 0;
+    if (_fzPointers.size === 0) {
+        wrap.classList.remove('arrastrando');
+        if (_fzScale <= 1) { _fzX = 0; _fzY = 0; _fotoZoomApply(true); }
+        if (!_fzDragMoved) {
+            const now = Date.now();
+            if (now - _fzLastTap < 320) {
+                _fotoZoomSet(_fzScale > 1 ? 1 : 2, true);
+            }
+            _fzLastTap = now;
+        }
+        _fzDragStart = null;
+    }
+}
+function _fzWheel(e) {
+    e.preventDefault();
+    _fotoZoomSet(_fzScale + (e.deltaY < 0 ? 0.35 : -0.35), false);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const wrap = document.getElementById('mp-lb-imgwrap');
+    if (!wrap) return;
+    wrap.addEventListener('pointerdown', _fzPointerDown);
+    wrap.addEventListener('pointermove', _fzPointerMove);
+    wrap.addEventListener('pointerup', _fzPointerUp);
+    wrap.addEventListener('pointercancel', _fzPointerUp);
+    wrap.addEventListener('wheel', _fzWheel, { passive: false });
+});
 
 // Abre una foto por nombre de archivo. push=true crea una entrada nueva en el
 // historial (al abrir desde la cuadrícula); push=false solo se usa al cargar
