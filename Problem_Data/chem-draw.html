@@ -51,6 +51,46 @@
         if (d === undefined) d = 1;
         return { x: from.x + d * Math.cos(deg * DEG), y: from.y + d * Math.sin(deg * DEG) };
     }
+    // Cadena en zigzag "libre": igual que zz(), pero puede arrancar en
+    // cualquier punto y con cualquier dirección inicial (no solo horizontal
+    // desde el origen), manteniendo siempre el mismo ángulo de 120° entre
+    // enlaces consecutivos (alternando ±60° en cada vértice) que usa el
+    // resto del motor. Útil para anexar una cadena a partir de un vértice
+    // de anillo, o de otra cadena ya construida, sin tener que calcular los
+    // ángulos a mano (la causa más habitual de estructuras con ángulos de
+    // enlace poco realistas).
+    //   start    : {x,y} punto de partida (ya existente, no se incluye
+    //              de nuevo en el resultado)
+    //   dir0     : dirección, en grados, del primer enlace que SALE de start
+    //   n        : número de átomos NUEVOS a generar tras start
+    //   turnUp   : true = el primer giro es "hacia arriba" (+60°)
+    // Devuelve un array de n puntos (sin incluir start).
+    function chainFrom(start, dir0, n, turnUp) {
+        if (turnUp === undefined) turnUp = true;
+        const pts = [];
+        let prev = start, deg = dir0;
+        // El primer punto usa dir0 tal cual (p.ej. 30° = sale "hacia
+        // arriba" = pico). El giro para llegar al SIGUIENTE punto va en
+        // sentido contrario (-60° si el punto recién colocado es un pico,
+        // +60° si es un valle), y luego se alterna, reproduciendo la
+        // secuencia fija 30°/-30°/30°/-30°... de zz().
+        let sign = turnUp ? -1 : 1;
+        for (let i = 0; i < n; i++) {
+            const p = pt(prev, deg, 1);
+            pts.push(p);
+            prev = p;
+            deg += sign * 60;
+            sign = -sign;
+        }
+        return pts;
+    }
+    // Dirección "hacia fuera" recomendada para un sustituyente en un
+    // vértice de una cadena en zigzag: en un pico (vértice alto) el
+    // sustituyente natural sale hacia arriba (90°); en un valle, hacia
+    // abajo (-90°). Mismo convenio usado en todas las moléculas del motor
+    // (p. ej. acetona, ácido fórmico, formamida-genérica).
+    function peakDeg(isPeak) { return isPeak ? 90 : -90; }
+
     // Construye lista de átomos a partir de puntos [{x,y}] + mapa de etiquetas {idx:'O'} + cargas {idx:'+'}
     function atoms(pts, labels, charges, stars) {
         labels = labels || {}; charges = charges || {}; stars = stars || {};
@@ -266,11 +306,11 @@
     });
 
     def('alil-isocianuro', () => {
-        // CH2=CH-CH2-N≡C:
+        // CH2=CH-CH2-N⁺≡C⁻ (compuesto A)
         const c = zz(0, 0, 3);
         const n = pt(c[2], -30, 1);
         const cIso = pt(n, -90, 1);
-        const a = atoms(c.concat([n, cIso]), { 3: 'N', 4: 'C' }, { 4: '\u2212', 3:'' });
+        const a = atoms(c.concat([n, cIso]), { 3: 'N', 4: 'C' }, { 3: '+', 4: '\u2212' });
         return { atoms: a, bonds: [[0,1,2],[1,2,1],[2,3,1],[3,4,3]] };
     });
 
@@ -333,14 +373,15 @@
         return { atoms: a, bonds: [[0,1,2,{ring:c}],[1,2,1],[2,3,2,{ring:c}],[3,4,1],[4,5,2,{ring:c}],[5,0,1],[0,6,1],[2,7,1]] };
     });
 
-    def('n-metilformamida', () => {
-        const c = { x: 0, y: 0 };
-        const o = pt(c, 90, 1);
-        const n = pt(c, -30, 1);
-        const me = pt(n, -90, 1);
-        const h = pt(c, 210, 0.9);
-        const a = atoms([h, c, o, n, me], { 2: 'O', 3: 'NH' });
-        return { atoms: a, bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,1]] };
+    def('dimetilamina', () => {
+        // (CH3)2NH — H explícito enlazado hacia arriba desde el N, y los
+        // dos metilos abriéndose hacia abajo (como en la imagen original).
+        const n = { x: 0, y: 0 };
+        const h = pt(n, 90, 1);
+        const me1 = pt(n, 210, 1);
+        const me2 = pt(n, -30, 1);
+        const a = atoms([n, h, me1, me2], { 0: 'N', 1: 'H' });
+        return { atoms: a, bonds: [[0,1,1],[0,2,1],[0,3,1]] };
     });
 
     def('acetamida', () => {
@@ -378,7 +419,7 @@
             { atoms: atoms(penta), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,0,1]] },
             { atoms: atoms(hexa), bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1]] },
         ]);
-        parts.atoms.push({ x: n.x, y: n.y, label: 'N', charge: null });
+        parts.atoms.push({ x: n.x, y: n.y, label: 'N', charge: '+' });
         parts.atoms.push({ x: cIso.x, y: cIso.y, label: 'C', charge: '\u2212' });
         parts.atoms.push({ x: rGroup.x, y: rGroup.y, label: 'R', charge: null });
         parts.bonds.push([0, 11, 1]); // penta[0] - N   (penta has 5 atoms idx0-4, hexa idx5-10)
@@ -549,16 +590,44 @@
         return b;
     });
 
-    def('passerini-general', () => {
-        // R1-COOH + R2-NC + R3R4C=O  (esquema con grupos R como etiquetas)
+    // Los tres reactivos de la reacción de Passerini, como moléculas
+    // independientes (para poder montar un esquema con flecha ->
+    // producto, en vez de una única "molécula" que en realidad son tres
+    // especies separadas sin reaccionar).
+    def('passerini-acido-generico', () => {
         const c1 = { x: 0, y: 0 };
         const r1 = pt(c1, 150, 1), oh = pt(c1, 90, 1), o1 = pt(c1, -30, 1);
-        const n = { x: 2.6, y: 0 }, r2 = pt(n, 150, 1), ciso = pt(n, -30, 1);
-        const c2 = { x: 5.2, y: 0 }, r3 = pt(c2, 150, 1), r4 = pt(c2, -150, 1), o2 = pt(c2, 90, 1);
-        const a = atoms([r1, c1, oh, o1, r2, n, ciso, r3, c2, r4, o2],
-            { 0: 'R\u00b9', 2: 'OH', 3: 'O', 4: 'R\u00b2', 5: 'N', 6: 'C', 7: 'R\u00b3', 9: 'R\u2074', 10: 'O' },
-            { 6: '\u2212' });
-        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2], [4,5,1],[5,6,3], [7,8,1],[9,8,1],[8,10,2]] };
+        const a = atoms([r1, c1, oh, o1], { 0: 'R\u00b9', 2: 'OH', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,1],[1,3,2]] };
+    });
+    def('passerini-isocianuro-generico', () => {
+        const n = { x: 0, y: 0 };
+        const r2 = pt(n, 150, 1), ciso = pt(n, -30, 1);
+        const a = atoms([r2, n, ciso], { 0: 'R\u00b2', 1: 'N', 2: 'C' }, { 1: '+', 2: '\u2212' });
+        return { atoms: a, bonds: [[0,1,1],[1,2,3]] };
+    });
+    def('passerini-cetona-generica', () => {
+        const c2 = { x: 0, y: 0 };
+        const r3 = pt(c2, 150, 1), r4 = pt(c2, -150, 1), o2 = pt(c2, 90, 1);
+        const a = atoms([r3, c2, r4, o2], { 0: 'R\u00b3', 2: 'R\u2074', 3: 'O' });
+        return { atoms: a, bonds: [[0,1,1],[2,1,1],[1,3,2]] };
+    });
+    def('passerini-producto-generico', () => {
+        // igual que passerini-producto-general pero sin marcar el
+        // estereocentro (para el esquema general de la reacción; el
+        // asterisco solo tiene sentido en la parte (i), donde SÍ se pide).
+        const cCentral = { x: 0, y: 0 };
+        const r3 = pt(cCentral, 150, 1), r4 = pt(cCentral, 30, 1);
+        const oEst = pt(cCentral, -90, 1), cEst = pt(oEst, -150, 1), r1 = pt(cEst, -150, 1), oDbl = pt(cEst, -90, 1);
+        const nAmide = pt(cCentral, -30, 1), r2 = pt(nAmide, -90, 1), cAmide = pt(nAmide, 30, 1), oAmide = pt(cAmide, 90, 1);
+        const a = atoms(
+            [cCentral, r3, r4, oEst, cEst, r1, oDbl, nAmide, r2, cAmide, oAmide],
+            { 1: 'R\u00b3', 2: 'R\u2074', 3: 'O', 5: 'R\u00b9', 6: 'O', 7: 'NH', 8: 'R\u00b2', 10: 'O' }
+        );
+        return {
+            atoms: a,
+            bonds: [[0,1,1],[0,2,1],[0,3,1],[3,4,1],[4,5,1],[4,6,2],[0,7,1],[7,8,1],[0,9,1],[9,10,2]]
+        };
     });
 
     def('passerini-producto-general', () => {
@@ -957,26 +1026,44 @@
     });
 
     def('telaprevir-E', () => {
-        // Representación esquemática (simplificada) del intermedio E:
-        // ciclopropano-C(=O)-NH-CH(Et)-C(=O)-N(anillo pirrolidínico con -OAc y -R)
-        const cp = ring(-9.2, 0.2, 3, 90);
-        const c1 = pt(cp[0], -10, 1);
-        const o1 = pt(c1, 90, 1);
-        const nh = pt(c1, -55, 1);
-        const ch = pt(nh, -10, 1);
-        const et1 = pt(ch, 90, 1), et2 = pt(et1, 40, 1);
-        const c2 = pt(ch, -55, 1);
-        const o2 = pt(c2, -90, 1);
-        const ringN = pt(c2, -15, 1);
-        const pRing = ring(ringN.x + 1.05, ringN.y - 0.05, 5, 162);
-        const oac_o = pt(pRing[2], -70, 1);
-        const oac_c = pt(oac_o, -20, 1);
-        const oac_o2 = pt(oac_c, 90, 1);
-        const oac_me = pt(oac_c, -40, 1);
-        const rGroup = pt(pRing[3], -100, 1);
-        const atomsArr = atoms(cp.concat([c1, o1, nh, ch, et1, et2, c2, o2]), { 4: 'O', 5: 'NH', 10: 'O' })
+        // Intermedio E: ciclopropano-C(=O)-NH-CH(Et)-C(=O)-N(anillo
+        // pirrolidínico con -OAc y -R). Redibujado con el mismo convenio de
+        // ángulos de 120° (30°/-30° en la cadena, sustituyente a 90° en los
+        // picos y a -90° en los valles) que usa el resto del motor —en vez
+        // de los ángulos arbitrarios (-55°, -10°, 40°...) de la versión
+        // anterior, que no correspondían a una fórmula esquelética real.
+        const cp = ring(0, 0, 3, 150);           // ciclopropano; cp[0] mira hacia la cadena
+        const attach = cp[0];
+
+        // Cadena principal en zigzag estándar, construida con chainFrom():
+        // attach -> C1(=O) -> NH -> CH(Et) -> C2(=O) -> N(anillo)
+        const [c1, nh, ch, c2, ringN] = chainFrom(attach, 30, 5, true);
+        const o1 = pt(c1, peakDeg(true), 1);      // C1=O: c1 es un pico → sustituyente arriba
+        const et1 = pt(ch, peakDeg(true), 1);     // -CH2- del etilo: ch es un pico → arriba
+        const et2 = pt(et1, 30, 1);               // -CH3 del etilo, continúa el zigzag
+        const o2 = pt(c2, peakDeg(false), 1);     // C2=O: c2 es un valle → sustituyente abajo
+
+        // Anillo pirrolidínico de 5 vértices: se calcula su centro para que
+        // el vértice 0 coincida EXACTAMENTE con ringN (mismo radio que usa
+        // ring() para un pentágono regular de lado 1), en vez de aproximar
+        // la posición a mano como en la versión anterior.
+        const R5 = 1 / (2 * Math.sin(Math.PI / 5));
+        const centerDir = -18; // dirección, en grados, de ringN hacia el centro del anillo
+        const pCenter = pt(ringN, centerDir, R5);
+        const pRing = ring(pCenter.x, pCenter.y, 5, centerDir + 180); // pRing[0] === ringN
+
+        const oac_o = pt(pRing[2], 30, 1);
+        const oac_c = pt(oac_o, -30, 1);
+        const oac_o2 = pt(oac_c, -90, 1);
+        const oac_me = pt(oac_c, 30, 1);
+        const rGroup = pt(pRing[3], -60, 1);
+
+        const atomsArr = atoms(cp, {})
+            .concat(atoms([c1, o1, nh, ch, et1, et2, c2, o2], { 1: 'O', 2: 'NH', 7: 'O' }))
             .concat(atoms(pRing, { 0: 'N' }))
             .concat(atoms([oac_o, oac_c, oac_o2, oac_me, rGroup], { 0: 'O', 2: 'O', 4: 'R' }));
+        // Índices: 0-2 ciclopropano | 3 c1, 4 o1, 5 nh, 6 ch, 7 et1, 8 et2, 9 c2, 10 o2
+        //          11-15 pRing (11 = ringN = N) | 16 oac_o, 17 oac_c, 18 oac_o2, 19 oac_me, 20 rGroup
         const bonds = [
             [0,1,1],[1,2,1],[2,0,1],           // ciclopropano
             [0,3,1],                             // ciclopropano - C1
@@ -1186,6 +1273,36 @@
         return `<div class="pc-scheme-box">${inner}</div>`;
     }
 
+    // ── Esquema "en horquilla": un único compuesto de partida del que
+    // salen dos o más flechas distintas, cada una hacia su propio
+    // producto (p. ej. "bromuro de alilo" + AgCN → A, + NaCN → B). Se
+    // dibuja el compuesto de partida a la izquierda, un conector en forma
+    // de horquilla, y a la derecha una fila por cada rama (flecha +
+    // producto(s)).
+    //   start    : nodo (mismo formato que renderSchemeItem: {mol:...} o {text:...})
+    //   branches : array de { above, below, nodes: [nodo, nodo, ...] }
+    function renderForkScheme(start, branches, opts) {
+        opts = opts || {};
+        const size = opts.size || 'sm';
+        const startHtml = renderSchemeItem(start, size);
+        const n = branches.length;
+        let path = '';
+        branches.forEach((br, i) => {
+            const ty = ((i + 0.5) / n * 100).toFixed(1);
+            path += `M0,50 L16,50 L38,${ty} `;
+        });
+        const branchesHtml = branches.map(br => {
+            const arrowHtml = renderSchemeItem({ arrow: true, above: br.above, below: br.below }, size);
+            const nodesHtml = (br.nodes || []).map(nd => renderSchemeItem(nd, size)).join('');
+            return `<div class="pc-fork-branch">${arrowHtml}${nodesHtml}</div>`;
+        }).join('');
+        return `<div class="pc-scheme-box"><div class="pc-fork">
+            <div class="pc-fork-start">${startHtml}</div>
+            <div class="pc-fork-connector"><svg viewBox="0 0 40 100" preserveAspectRatio="none" class="pc-fork-connector-svg"><path d="${path}" class="pc-fork-connector-path"/></svg></div>
+            <div class="pc-fork-rows">${branchesHtml}</div>
+        </div></div>`;
+    }
+
     // ═══ Q6 — síntesis total de la acitretina ═══
 
     const SCHEMES = {};
@@ -1331,20 +1448,34 @@
 
 
 
-    SCHEMES['q2-agcn-nacn'] = () => renderScheme(null, {
-        size: 'sm',
-        rows: [
-            [ { mol: 'bromuro-alilo', label: 'bromuro de alilo' }, { arrow: true, above: 'AgCN' }, { mol: 'alil-isocianuro', label: 'A + precipitado color crema' } ],
-            [ { text: '' }, { arrow: true, above: 'NaCN' }, { text: '<span class="pc-scheme-unknown">B</span>' } ]
-        ]
-    });
-    SCHEMES['q2-c-d'] = () => renderScheme(null, {
-        size: 'sm',
-        rows: [
-            [ { text: '<span class="pc-scheme-unknown">C</span>' }, { arrow: true, above: '&minus;H\u2082O' }, { mol: 'alil-isocianuro', label: 'isocianuro R&ndash;N\u2261C' } ],
-            [ { text: '<span class="pc-scheme-unknown">C</span>' }, { arrow: true, above: '+H\u2082O' }, { mol: 'n-metilalilamina', label: 'R&ndash;NH\u2082' }, { plus: true }, { text: '<span class="pc-scheme-unknown">D</span>' } ]
-        ]
-    });
+    SCHEMES['q2-agcn-nacn'] = () => renderForkScheme(
+        { mol: 'bromuro-alilo', label: 'bromuro de alilo' },
+        [
+            { above: 'AgCN', nodes: [ { mol: 'alil-isocianuro', label: 'A' } ] },
+            { above: 'NaCN', nodes: [ { text: '<span class="pc-scheme-unknown">B</span>' } ] }
+        ],
+        { size: 'sm' }
+    );
+    SCHEMES['q2-c-d'] = () => renderForkScheme(
+        { text: '<span class="pc-scheme-unknown">C</span>' },
+        [
+            { above: '&minus;H\u2082O', nodes: [ { text: 'R&ndash;N<sup>+</sup>&equiv;C<sup>&minus;</sup>:' } ] },
+            { above: '+H\u2082O', nodes: [ { text: 'R&ndash;NH<sub>2</sub>' }, { plus: true }, { text: '<span class="pc-scheme-unknown">D</span>', label: '26.1% C' } ] }
+        ],
+        { size: 'sm' }
+    );
+    SCHEMES['q2-passerini-general'] = () => renderScheme(
+        [
+            { mol: 'passerini-acido-generico' },
+            { plus: true },
+            { mol: 'passerini-isocianuro-generico' },
+            { plus: true },
+            { mol: 'passerini-cetona-generica' },
+            { arrow: true },
+            { mol: 'passerini-producto-generico' }
+        ],
+        { size: 'lg' }
+    );
 
     SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
         size: 'sm',
@@ -1498,7 +1629,7 @@
             <foreignObject x="206" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>de signo opuesto</div></foreignObject>
         </svg>`;
 
-    window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, renderScheme, pSigns, MOLS: BUILDERS, SCHEMES, DIAGRAMS };
+    window.ChemDraw = { renderAll, renderMolById, renderSkeletal, renderOrbitalRow, renderScheme, renderForkScheme, chainFrom, pSigns, MOLS: BUILDERS, SCHEMES, DIAGRAMS };
 
 })();
 
