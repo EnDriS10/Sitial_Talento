@@ -146,7 +146,7 @@ async function renderCuadritoImage(origin, slug) {
   const nombre = cuadrito ? cuadrito.nombre : 'Sitial de Talentos Cubanos';
   const fontText = nombre + (cuadrito ? cuadrito.olimpiadas : '') + Object.values(MEDALLA_EMOJI).join('');
   const [playfair, dmsans] = await Promise.all([
-    loadGoogleFont('Playfair+Display:wght', '700', fontText),
+    loadGoogleFont('Playfair+Display', '700', fontText),
     loadGoogleFont('DM+Sans', '400', fontText),
   ]);
 
@@ -303,7 +303,7 @@ export default async function handler(request) {
 
     const fontText = titulo + subtitulo + (fuente || '') + Object.values(TEMA_LABEL).join('');
     const [playfair, dmsans] = await Promise.all([
-      loadGoogleFont('Playfair+Display:wght', '700', fontText),
+      loadGoogleFont('Playfair+Display', '700', fontText),
       loadGoogleFont('DM+Sans', '400', fontText),
     ]);
 
