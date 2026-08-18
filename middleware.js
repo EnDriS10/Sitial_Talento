@@ -192,7 +192,7 @@ function setMetaAttr(html, attr, key, content) {
   return html.replace(re, `$1${escapeHtml(content)}$2`);
 }
 
-async function injectMeta(fetchHtmlPromise, og, pageUrl) {
+async function injectMeta(fetchHtmlPromise, og, pageUrl, extraHeadScript) {
   const res = await fetchHtmlPromise;
   if (!res.ok) return null;
   let html = await res.text();
@@ -206,6 +206,17 @@ async function injectMeta(fetchHtmlPromise, og, pageUrl) {
   // og:image / twitter:image llevan una URL, no texto — sin escapar comillas HTML.
   html = html.replace(/(<meta property="og:image" content=")[^"]*(">)/, `$1${og.image}$2`);
   html = html.replace(/(<meta name="twitter:image" content=")[^"]*(">)/, `$1${og.image}$2`);
+
+  // IMPORTANTE: como esta respuesta se sirve directamente bajo la URL
+  // bonita (sin que el navegador pase nunca por la URL/​query real),
+  // los scripts propios de la página que calculan la carpeta base o
+  // leen id/tab del query string quedan mal (ven un pathname más
+  // "profundo" de lo que en verdad es, y un location.search vacío).
+  // Este script se inserta AL FINAL del <head> — así corre DESPUÉS de
+  // esos scripts originales y corrige lo que hizo falta.
+  if (extraHeadScript) {
+    html = html.replace('</head>', `<script>${extraHeadScript}</script>\n</head>`);
+  }
 
   return new Response(html, {
     status: 200,
@@ -224,7 +235,13 @@ export default async function middleware(request) {
       const slug = decodeURIComponent(cuadritoMatch[1]);
       const og = await buildCuadritoOG(origin, slug);
       if (og) {
-        const out = await injectMeta(fetch(`${origin}/index.html`), og, request.url);
+        // index.html calcula su <base id="app-base-href"> a partir de
+        // location.pathname asumiendo que termina en "index.html" o "/".
+        // Aquí el pathname visible es /Historial_Medallas/cuadrito=...,
+        // así que ese cálculo automático sale mal — lo forzamos a la
+        // raíz del sitio explícitamente.
+        const fixScript = `document.getElementById('app-base-href').href = location.origin + '/';`;
+        const out = await injectMeta(fetch(`${origin}/index.html`), og, request.url, fixScript);
         if (out) return out;
       }
     }
@@ -233,6 +250,8 @@ export default async function middleware(request) {
     if ((pathname === '/media' || pathname === '/media.html') && searchParams.get('foto')) {
       const og = await buildMediaOG(origin, searchParams.get('foto'));
       if (og) {
+        // media.html vive en la raíz igual que "/media", así que su
+        // carpeta base no cambia — no hace falta script de corrección.
         const out = await injectMeta(fetch(`${origin}/media.html`), og, request.url);
         if (out) return out;
       }
@@ -245,10 +264,22 @@ export default async function middleware(request) {
       const tab = problemaMatch[2] ? decodeURIComponent(problemaMatch[2]) : 'enunciado';
       const og = await buildProblemaOG(origin, id);
       if (og) {
+        // visor.html asume que, si llegó por la ruta bonita, en algún
+        // momento pasó por una navegación REAL a
+        // /Problem_Data/visor.html?id=..&tab=.. (vía 404.html) — de ahí
+        // saca su <base> y sus variables __pvId/__pvTab. Aquí eso nunca
+        // ocurre (servimos el HTML directo bajo la URL bonita), así que
+        // fijamos ambas cosas a mano con los valores que ya conocemos
+        // por el propio path de la petición.
+        const fixScript =
+          `document.getElementById('pv-base-href').href = location.origin + '/Problem_Data/';` +
+          `window.__pvId = ${JSON.stringify(id)};` +
+          `window.__pvTab = ${JSON.stringify(tab)};`;
         const out = await injectMeta(
-          fetch(`${origin}/Problem_Data/visor.html?id=${encodeURIComponent(id)}&tab=${encodeURIComponent(tab)}`),
+          fetch(`${origin}/Problem_Data/visor.html`),
           og,
-          request.url
+          request.url,
+          fixScript
         );
         if (out) return out;
       }
