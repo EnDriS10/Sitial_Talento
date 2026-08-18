@@ -5,7 +5,9 @@
   "rewrites": [
     { "source": "/Banco_Problemas", "destination": "/Banco_Problemas.html" },
     { "source": "/media", "destination": "/media.html" },
-    { "source": "/noticias", "destination": "/noticias.html" }
+    { "source": "/noticias", "destination": "/noticias.html" },
+    { "source": "/Banco_Problemas/:id/:tab", "destination": "/Problem_Data/visor.html?id=:id&tab=:tab" },
+    { "source": "/Banco_Problemas/:id", "destination": "/Problem_Data/visor.html?id=:id&tab=enunciado" }
   ],
 
   "headers": [
