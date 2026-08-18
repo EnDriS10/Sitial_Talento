@@ -22,6 +22,78 @@ const TEMA_LABEL = {
   analitica: 'Analítica',
 };
 
+const MEDALLA_COLOR = { oro: GOLD_LIGHT, plata: SILVER, bronce: BRONZE, mencion: TEXT_MUTED };
+const MEDALLA_EMOJI = { oro: '🥇', plata: '🥈', bronce: '🥉', mencion: '🎖' };
+
+function slugify(nombre) {
+  return (nombre || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Extrae los objetos { ... } de un array "const NOMBRE = [ ... ];" en
+// texto plano, sin evaluarlo como JS (mismo enfoque que extractProblem).
+function parseArrayObjetos(rawText, arrayName) {
+  const arrRe = new RegExp(`const\\s+${arrayName}\\s*=\\s*\\[([\\s\\S]*?)\\n\\];`);
+  const m = rawText.match(arrRe);
+  if (!m) return [];
+  const body = m[1];
+  const objetos = [];
+  const objRe = /\{([^{}]*)\}/g;
+  let om;
+  while ((om = objRe.exec(body))) {
+    const chunk = om[1];
+    const str = (key) => {
+      const mm = chunk.match(new RegExp(key + ':\\s*"([^"]*)"'));
+      return mm ? mm[1] : null;
+    };
+    const num = (key) => {
+      const mm = chunk.match(new RegExp(key + ':\\s*(\\d+)'));
+      return mm ? Number(mm[1]) : null;
+    };
+    objetos.push({
+      año: num('año'),
+      nombre: str('nombre'),
+      medalla: str('medalla'),
+      foto: str('foto'),
+    });
+  }
+  return objetos;
+}
+
+async function buildCuadrito(origin, slug) {
+  const res = await fetch(`${origin}/Data/olympiad_data.html`);
+  const text = await res.text();
+  const arrays = ['datosIChO', 'datosIMChO', 'datosOIAQ', 'datosOCACQ', 'datosOtras'];
+  const labels = ['IChO', 'IMChO', 'OIAQ', 'OCACQ', 'Otras'];
+  let filas = [];
+  arrays.forEach((arrName, i) => {
+    filas = filas.concat(parseArrayObjetos(text, arrName).map((r) => ({ ...r, olimpiada: labels[i] })));
+  });
+  const propias = filas.filter((r) => r.nombre && slugify(r.nombre) === slug);
+  if (propias.length === 0) return null;
+
+  const nombre = propias[0].nombre;
+  const foto = propias.find((r) => r.foto)?.foto || null;
+  const años = propias.map((r) => r.año).filter(Boolean);
+  const rango = años.length
+    ? Math.min(...años) === Math.max(...años)
+      ? `${Math.min(...años)}`
+      : `${Math.min(...años)}–${Math.max(...años)}`
+    : '';
+  const conteo = { oro: 0, plata: 0, bronce: 0, mencion: 0 };
+  propias.forEach((r) => {
+    if (conteo[r.medalla] !== undefined) conteo[r.medalla]++;
+  });
+  const olimpiadas = [...new Set(propias.map((r) => r.olimpiada))].join(' · ');
+
+  return { nombre, foto, rango, conteo, olimpiadas };
+}
+
 // Pequeño helper para construir el árbol de elementos que espera
 // @vercel/og (el mismo shape que React.createElement) sin necesitar
 // JSX ni un paso de build — este es un archivo .js plano.
@@ -69,10 +141,146 @@ async function loadGoogleFont(family, weight, text) {
   throw new Error(`No se pudo cargar la fuente ${family}`);
 }
 
+async function renderCuadritoImage(origin, slug) {
+  const cuadrito = await buildCuadrito(origin, slug);
+  const nombre = cuadrito ? cuadrito.nombre : 'Sitial de Talentos Cubanos';
+  const fontText = nombre + (cuadrito ? cuadrito.olimpiadas : '') + Object.values(MEDALLA_EMOJI).join('');
+  const [playfair, dmsans] = await Promise.all([
+    loadGoogleFont('Playfair+Display:wght', '700', fontText),
+    loadGoogleFont('DM+Sans', '400', fontText),
+  ]);
+
+  const medallas = cuadrito
+    ? ['oro', 'plata', 'bronce', 'mencion']
+        .filter((m) => cuadrito.conteo[m] > 0)
+        .map((m) =>
+          h(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 18px',
+                borderRadius: '999px',
+                background: 'rgba(255,255,255,0.08)',
+                border: `2px solid ${MEDALLA_COLOR[m]}`,
+                color: MEDALLA_COLOR[m],
+                fontSize: '22px',
+                fontWeight: 600,
+              },
+            },
+            `${MEDALLA_EMOJI[m]} ×${cuadrito.conteo[m]}`
+          )
+        )
+    : [];
+
+  const avatar = cuadrito && cuadrito.foto
+    ? h('img', {
+        src: cuadrito.foto,
+        width: 220,
+        height: 220,
+        style: { borderRadius: '50%', objectFit: 'cover', border: `4px solid ${GOLD_LIGHT}` },
+      })
+    : h(
+        'div',
+        {
+          style: {
+            display: 'flex',
+            width: '220px',
+            height: '220px',
+            borderRadius: '50%',
+            background: NAVY_MID,
+            border: `4px solid ${GOLD_LIGHT}`,
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '72px',
+            color: GOLD_LIGHT,
+            fontFamily: 'Playfair Display',
+          },
+        },
+        (nombre || '?').charAt(0)
+      );
+
+  const tree = h(
+    'div',
+    {
+      style: {
+        width: '1200px',
+        height: '630px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '64px',
+        background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_MID} 100%)`,
+        fontFamily: 'DM Sans',
+      },
+    },
+    h(
+      'div',
+      { style: { display: 'flex', alignItems: 'center', gap: '14px' } },
+      h('div', {
+        style: { width: '10px', height: '10px', borderRadius: '50%', background: GOLD_LIGHT },
+      }),
+      h(
+        'span',
+        { style: { color: TEXT_MUTED, fontSize: '24px', letterSpacing: '2px', display: 'flex' } },
+        'SITIAL DE TALENTOS CUBANOS · HISTORIAL POR MEDALLAS'
+      )
+    ),
+    h(
+      'div',
+      { style: { display: 'flex', alignItems: 'center', gap: '48px' } },
+      avatar,
+      h(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column', gap: '20px' } },
+        h(
+          'div',
+          {
+            style: {
+              display: 'flex',
+              fontFamily: 'Playfair Display',
+              fontWeight: 700,
+              fontSize: nombre.length > 28 ? '52px' : '64px',
+              color: GOLD_LIGHT,
+              maxWidth: '820px',
+            },
+          },
+          nombre
+        ),
+        cuadrito && cuadrito.olimpiadas
+          ? h(
+              'div',
+              { style: { display: 'flex', color: TEXT_MUTED, fontSize: '26px' } },
+              `${cuadrito.olimpiadas}${cuadrito.rango ? ' · ' + cuadrito.rango : ''}`
+            )
+          : null,
+        h('div', { style: { display: 'flex', gap: '12px' } }, ...medallas)
+      )
+    )
+  );
+
+  return new ImageResponse(tree, {
+    width: 1200,
+    height: 630,
+    fonts: [
+      { name: 'Playfair Display', data: playfair, weight: 700, style: 'normal' },
+      { name: 'DM Sans', data: dmsans, weight: 400, style: 'normal' },
+    ],
+  });
+}
+
 export default async function handler(request) {
   try {
     const { searchParams, origin } = new URL(request.url);
     const id = searchParams.get('id');
+    const tipo = searchParams.get('tipo');
+
+    if (tipo === 'cuadrito') {
+      const slug = searchParams.get('slug');
+      return await renderCuadritoImage(origin, slug || '');
+    }
 
     let titulo = 'Sitial de Talentos Cubanos';
     let subtitulo = 'Olimpiadas de Química';
