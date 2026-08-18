@@ -237,7 +237,7 @@
     [data-theme="dark"] .pc-dc-dot { fill: var(--gold-light); }
     .pc-dc-cross { font-size: 15px; font-weight: 800; fill: var(--red-soft); text-anchor: middle; }
 
-    /* ── Estructuras esqueléticas dibujadas por ChemDraw ── */
+    /* ── Estructuras químicas dibujadas por MolGraph (RDKit.js) ── */
     .pc-mol { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
     .pc-mol-rendered .pc-skel-svg { display: block; }
     .pc-skel-svg { width: 100%; height: auto; max-width: 210px; }
@@ -473,7 +473,7 @@ async function _pvCargarScript(url, globalName) {
 async function _pvCargar() {
     const contenido = await _pvCargarScript('problemas_contenido.html', 'contenidoProblemas');
     // ChemDraw e imágenes son opcionales: si faltan, seguimos sin romper la página.
-    try { await _pvCargarScript('chem-draw.html', 'ChemDraw'); } catch (e) { console.warn('ChemDraw no disponible:', e); }
+    try { await _pvCargarScript('mol-graph.html', 'MolGraph'); } catch (e) { console.warn('MolGraph no disponible:', e); }
     try { window._pvImagenes = await _pvCargarScript('imagenes.html', 'imagenesProblemas'); } catch (e) { window._pvImagenes = {}; }
     return contenido || {};
 }
@@ -533,7 +533,7 @@ function pvSetTab(tab) {
     pvRender();
 }
 
-function pvRender() {
+async function pvRender() {
     if (!_pvDatos || !_pvDatos[_pvId]) return;
     const p = _pvDatos[_pvId];
     const l = _pvLang();
@@ -563,7 +563,7 @@ function pvRender() {
     `;
 
     const articulo = document.getElementById('pv-articulo');
-    if (window.ChemDraw) window.ChemDraw.renderAll(articulo);
+    if (window.MolGraph) await window.MolGraph.renderAll(articulo);
     pvRenderGalerias(articulo);
 }
 
