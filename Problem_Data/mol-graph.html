@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body>
+<script id="mol-graph">
+
+// ════════════════════════════════════════════════════════════════════
+// MolGraph — motor de dibujo químico reutilizable (sucesor de ChemDraw)
+//
+// Diferencia clave con ChemDraw: las estructuras orgánicas/inorgánicas
+// (fórmulas esqueléticas) ya NO se definen a mano átomo por átomo.
+// Se definen con una línea de SMILES, y el layout 2D (ángulos de
+// enlace, aromaticidad, resonancia visual, disposición general) lo
+// calcula RDKit.js — el mismo motor de química computacional que usa
+// buena parte de la industria/academia — vía WebAssembly, en el propio
+// navegador del usuario (sin backend, sin coste de servidor).
+//
+// Lo que RDKit NO sabe dibujar (porque no son estructuras químicas
+// reales, sino diagramas didácticos abstractos) se queda en el motor
+// "manual" heredado de ChemDraw: diagramas de orbitales moleculares,
+// diagramas de puntos y cruces, interferencia de fases p, celdas
+// unidad/poliedros, etc. MolGraph es por tanto un motor HÍBRIDO:
+//   - RDKit.js  → cualquier molécula real (dado un SMILES)
+//   - motor manual heredado → diagramas abstractos que no son moléculas
+//
+// El montaje de ESQUEMAS DE SÍNTESIS (cajas + flechas + texto encima/
+// debajo + reparto en varias líneas tipo "serpiente") tampoco lo hace
+// RDKit (no es su trabajo) y se mantiene tal cual funcionaba en
+// ChemDraw, solo que ahora cada "nodo" molécula lleva un SMILES en vez
+// de un id apuntando a coordenadas escritas a mano.
+//
+// ── Uso desde el contenido de un problema (100% compatible con el
+//    HTML que ya tienes escrito para ChemDraw) ──
+//   <span class="pc-mol" data-mol="acetona"></span>
+//   <span class="pc-mol" data-smiles="CC(=O)C"></span>   (nuevo: SMILES directo)
+//   <div class="pc-orbitals" data-n="6" data-index="3"></div>
+//
+// Y tras inyectar el HTML:
+//   await MolGraph.renderAll(root);     // <-- ahora es ASÍNCRONO
+//                                        //     (hay que esperar a que
+//                                        //     cargue el WASM de RDKit)
+// ════════════════════════════════════════════════════════════════════
+
+(function () {
+
+    // ────────────────────────────────────────────────────────────────
+    // 1) CARGA DE RDKit.js (WebAssembly) — una sola vez, cacheada
+    // ────────────────────────────────────────────────────────────────
+    // Se sirve desde jsDelivr (CDN público, gratuito, con caché de
+    // navegador entre visitas). Si prefieres alojarlo tú mismo en el
+    // repo (p.ej. para evitar cualquier dependencia externa), basta con
+    // cambiar RDKIT_JS_URL / RDKIT_WASM_URL a rutas locales — el resto
+    // del motor no cambia.
+    const RDKIT_JS_URL = 'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2025.3.4-1.0.0/dist/RDKit_minimal.js';
+    const RDKIT_WASM_LOCATE = (file) => 'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2025.3.4-1.0.0/dist/' + file;
+
+    let _rdkitPromise = null;
+    function loadRDKit() {
+        if (_rdkitPromise) return _rdkitPromise;
+        _rdkitPromise = new Promise((resolve, reject) => {
+            if (window.RDKit) return resolve(window.RDKit);
+            if (typeof window.initRDKitModule === 'function') {
+                window.initRDKitModule({ locateFile: RDKIT_WASM_LOCATE })
+                    .then(mod => { window.RDKit = mod; resolve(mod); })
+                    .catch(reject);
+                return;
+            }
+            const s = document.createElement('script');
+            s.src = RDKIT_JS_URL;
+            s.onload = () => {
+                window.initRDKitModule({ locateFile: RDKIT_WASM_LOCATE })
+                    .then(mod => { window.RDKit = mod; resolve(mod); })
+                    .catch(reject);
+            };
+            s.onerror = () => reject(new Error('No se pudo cargar RDKit.js desde ' + RDKIT_JS_URL));
+            document.head.appendChild(s);
+        });
+        return _rdkitPromise;
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // 2) SMILES → SVG, con estilo acorde al sitio (fondo transparente,
+    //    grosor de enlace uniforme, tamaño consistente con los presets
+    //    que ya usaba ChemDraw: sm/md/lg).
+    // ────────────────────────────────────────────────────────────────
+    const SIZE_PRESETS = {
+        sm: { w: 190, h: 140, bond: 1.7 },
+        md: { w: 260, h: 190, bond: 1.9 },
+        lg: { w: 340, h: 250, bond: 2.1 }
+    };
+
+    const _molCache = {}; // smiles+size -> svg string (evita recalcular layout)
+
+    function svgForSmiles(smiles, size) {
+        if (!window.RDKit) return null;
+        const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
+        const cacheKey = smiles + '|' + size;
+        if (_molCache[cacheKey]) return _molCache[cacheKey];
+
+        const mol = window.RDKit.get_mol(smiles);
+        if (!mol) return null;
+        try {
+            const details = {
+                width: preset.w,
+                height: preset.h,
+                bondLineWidth: preset.bond,
+                addStereoAnnotation: false,
+                backgroundColour: [1, 1, 1, 0] // fondo transparente: hereda el fondo de la tarjeta (claro u oscuro)
+            };
+            let svg = mol.get_svg_with_highlights(JSON.stringify(details));
+            // Quita el rect de fondo que RDKit añade igualmente (por si
+            // algún visor ignora el canal alfa) y las etiquetas propias
+            // de RDKit; deja solo <svg>...</svg> con los trazos.
+            svg = svg.replace(/<rect[^>]*fill:#FFFFFF00[^>]*>\s*<\/rect>/i, '');
+            svg = svg.replace('<svg ', '<svg class="pc-skel-svg pc-mol-rdkit" ');
+            _molCache[cacheKey] = svg;
+            return svg;
+        } finally {
+            mol.delete();
+        }
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // 3) REGISTRO DE MOLÉCULAS — antes eran ~80 funciones de 10-40
+    //    líneas cada una (coordenadas a mano). Ahora es un diccionario
+    //    id → SMILES. Añadir una molécula nueva es escribir una línea.
+    //
+    //    Convención para "resto de la molécula" (grupos R, como en
+    //    telaprevir o en los productos genéricos de Passerini): átomo
+    //    comodín con número de mapeo, [*:1], [*:2]... RDKit lo dibuja
+    //    como "*:1" — notación estándar de punto de conexión, más
+    //    informativa que una simple "R" cuando hay varios R distintos
+    //    en la misma estructura (R¹, R², R³, R⁴ del Passerini general).
+    // ────────────────────────────────────────────────────────────────
+    const MOLS = {
+
+        // ═══ Q2 — isocianuros ═══
+        'fenilisocianuro':              '[C-]#[N+]c1ccccc1',
+        '1-isocianopropano':            'CCC[N+]#[C-]',
+        'alil-isocianuro':              'C=CC[N+]#[C-]',
+        'alil-nitrilo':                 'C=CCC#N',
+        'bromuro-alilo':                'C=CCBr',
+        'formamida-generica':           '[*:1]NC=O',
+        'acido-formico':                'OC=O',
+        'n-metilalilamina':             'C=CCNC',
+        'piridina':                     'c1ccncc1',
+        'butan-2-amina':                'CC(N)CC',
+        '3-metoxianilina':              'COc1cccc(N)c1',
+        'dimetilamina':                 'CNC',
+        'acetamida':                    'CC(N)=O',
+        'pirrolidina':                  'C1CCNC1',
+        'acetona':                      'CC(C)=O',
+        'ciclopentanona':               'O=C1CCCC1',
+        'benzofenona':                  'O=C(c1ccccc1)c1ccccc1',
+        'acido-acetico':                'CC(=O)O',
+        'acido-benzoico':               'OC(=O)c1ccccc1',
+        'acido-2-metilpropanoico':      'CC(C)C(=O)O',
+        'propanal':                     'CCC=O',
+        'benzaldehido':                 'O=Cc1ccccc1',
+        'butan-2-ona':                  'CCC(C)=O',
+        'acido-ciclopropanocarboxilico':'OC(=O)C1CC1',
+        'acetaldehido':                 'CC=O',
+        // 4-metil-1,3-diisocianobenceno: dos isocianuros en el anillo, meta
+        // entre sí, uno para y otro orto al metilo (verificado contra la
+        // figura de la p.5 del examen — la posición relativa importa
+        // porque hace que los dos grupos NC sean químicamente distintos).
+        'diisocianobenceno':            '[C-]#[N+]c1ccc(C)c([N+]#[C-])c1',
+        // OJO: pese al nombre heredado ("...propano"), la figura del
+        // examen muestra solo DOS carbonos (CN-CH2-CH2-NC): es en
+        // realidad 1,2-diisocianoetano. Mantengo el id por compatibilidad
+        // con el contenido ya escrito; el SMILES sí está corregido.
+        'diisocianopropano':            '[C-]#[N+]CC[N+]#[C-]',
+        // Carbono cuaternario con TRES isocianuros directos (equivalentes
+        // entre sí) más un cuarto brazo isocianometilo (-CH2-NC, distinto
+        // por tener un espaciador) → 2 entornos de isocianuro distintos.
+        // Confirmado contra la figura: el "armario de Galvin" contiene
+        // 2 (bencénico) + 1 (etano, simétrico) + 2 (este) = 5 isocianuros
+        // distinguibles, tal y como exige el mark scheme del apartado (k).
+        'trisisocianometano':           '[C-]#[N+]CC([N+]#[C-])([N+]#[C-])[N+]#[C-]',
+        // Corregido tras revisar la p.5 del examen a alta resolución: NO
+        // llevan hidroxilo, son ácidos poli-carboxílicos "puros". Con
+        // ácido benzoico (1 tipo) + este ácido trimelítico (3 tipos, sin
+        // simetría) + tereftálico (1 tipo, simétrico) = 5 grupos ácido
+        // distinguibles, tal y como exige el mark scheme del apartado (k).
+        'acido-2-hidroxi-dicarboxibenzoico': 'OC(=O)c1ccc(C(=O)O)c(C(=O)O)c1', // ácido trimelítico (benceno-1,2,4-tricarboxílico) — id heredado, ver nota
+        'acido-4-hidroxibenzoico':      'OC(=O)c1ccc(C(=O)O)cc1', // ácido tereftálico (benceno-1,4-dicarboxílico) — id heredado, ver nota
+        'passerini-acido-generico':     '[*:1]C(=O)O',
+        'passerini-isocianuro-generico':'[*:2][N+]#[C-]',
+        'passerini-cetona-generica':    '[*:3]C([*:4])=O',
+        'passerini-producto-generico':  '[*:1]C(=O)OC([*:3])([*:4])C(=O)N[*:2]',
+        'passerini-producto-general':   '[*:1]C(=O)OC([*:3])([*:4])C(=O)N[*:2]',
+        // Los TRES reactivos reales del Passerini que da compuesto E
+        // (verificado contra la figura de la p.4/p.5 y el mark scheme (g)):
+        //   1. ácido acético            (ya está: 'acido-acetico')
+        //   2. ciclopropil-isocianuro   (el isocianuro, R² = ciclopropilo)
+        //   3. un aldehído amino-N-acilado por el anillo bicíclico
+        // El "isocianuro bicíclico" que había definido antes NO existe:
+        // el anillo bicíclico entra como parte del ALDEHÍDO (amina ya
+        // acilada), no del isocianuro. Corregido:
+        'ciclopropil-isocianuro':       '[C-]#[N+]C1CC1',
+        'telaprevir-aldehido-biciclico':'O=CC(CCC)NC(=O)C1C2CCCC2CN1[*:1]',
+        'telaprevir-E':                 'O=C(NC1CC1)C(OC(C)=O)C(CCC)NC(=O)C1C2CCCC2CN1[*:1]',
+
+        // ═══ Q3 — henna / tautomería ═══
+        'lawsone-ceto':                 'O=C1c2ccccc2C(=O)C(=O)C1',
+        'lawsone-enol-a':               'O=C1c2ccccc2C(O)=C(O)C1=O',
+        'lawsone-enol-b':               'Oc1c(O)c(=O)c2ccccc2c1=O',
+        'ciclohexanona':                'O=C1CCCCC1',
+        'pivalona':                     'CC(C)(C)C(=O)C',
+        'pivalaldehido':                'CC(C)(C)C=O',
+        'acroleina':                    'C=CC=O',
+        'benzil':                       'O=C(c1ccccc1)C(=O)c1ccccc1',
+        'metilvinilcetona':             'C=CC(C)=O',
+        'fosforo-tautomero-a':          'COP(=S)(OC)O',
+        'fosforo-tautomero-b':          'COP(=O)(OC)S',
+        'nitro-normal':                 'CC[N+](=O)[O-]',
+        'nitro-aci':                    'CC=[N+]([O-])O',
+        'imina-inicial':                'CC(N)=O',
+        'imina-tautomero-1':            'CC(O)=N',
+        'imina-tautomero-2':            'C=C(O)N',
+        'imina-tautomero-3':            'CC(=N)O',
+        'acetamida-tautomero':          'CC(O)=N',
+        'tautomeria-ceto-ejemplo':      'CC(C)=O',
+        'tautomeria-enol-ejemplo':      'CC(O)=C',
+        'tautomeria-xyz-izq':           '[*:1]C([*:2])=O',
+        'tautomeria-xyz-der':           '[*:1]C([*:2])=C',
+        'lawsona-aducto-naranja':       'Oc1c2ccccc2c(O)c(Sc2ccccc2)c1O',
+        'lawsona-aducto-marron':        'O=C1c2ccccc2C(=O)C(Sc2ccccc2)=C1O',
+
+        // ═══ Q4 — carotenos / tartrazina ═══
+        'butadieno':                    'C=CC=C',
+        'hexatrieno':                   'C=CC=CC=C',
+        'alfa-caroteno-simplificado':   'CC1=C(C)CCCC1(C)/C=C/C=C(C)/C=C/C=C(C)/C=C/C=C(C)/C=C/C1C(C)=CCCC1(C)C',
+        'beta-caroteno-simplificado':   'CC1=C(/C=C/C=C(C)/C=C/C=C(C)/C=C/C=C(C)/C=C/C2=C(C)CCCC2(C)C)C(C)(C)CCC1',
+        'anilina':                      'Nc1ccccc1',
+        'nitrobenceno':                 'O=[N+]([O-])c1ccccc1',
+        'acido-sulfanilico':            'Nc1ccc(S(=O)(=O)O)cc1',
+        'sal-diazonio':                 'OS(=O)(=O)c1ccc([N+]#N)cc1.[Cl-]',
+        'hidrazina-sulfonica':          'O=S(=O)(O)c1ccc(NN)cc1',
+        'pirazolona-ester':             'CCOC(=O)C1=NN(c2ccc(S(=O)(=O)O)cc2)C(=O)C1',
+        'tartrazina-simplificada':      'OC1=C(N=NC2=CC=C(C=C2)S(=O)(=O)O)C(=O)N(C3=CC=C(C=C3)S(=O)(=O)O)N=C1C(=O)O',
+
+        // ═══ Q6 — síntesis total de la acitretina ═══
+        // Ar = 4-metoxi-2,3,6-trimetilfenilo (retinoide aromático clásico)
+        'acitretina-s0':    'COc1cc(C)c(C=CC(C)=O)c(C)c1C',
+        'acitretina-s1':    'COc1cc(C)c(C=CC(=O)CC=O)c(C)c1C',
+        'acitretina-s2':    'COc1cc(C)c(C=CC(=O)CC(OC)OC)c(C)c1C',
+        'acitretina-s3':    'COc1cc(C)c(C=CC(=C)CC(OC)OC)c(C)c1C',
+        'acitretina-s4':    'COc1cc(C)c(C=CC(C)=CC=O)c(C)c1C',
+        'acitretina-s5':    'COc1cc(C)c(C=CC(C)=CC=C(C(=O)OC)C(C)C(=O)O)c(C)c1C',
+        'acitretina-s6':    'COc1cc(C)c(C=CC(C)=CC=C(C(=O)O)C(C)C(=O)O)c(C)c1C',
+        'acitretina-final': 'COc1cc(C)c(C=CC(C)=CC=CC(C)=CC(=O)O)c(C)c1C'
+    };
+
+    function smilesById(id) { return MOLS[id] || null; }
+
+    // ────────────────────────────────────────────────────────────────
+    // 4) DIAGRAMAS ABSTRACTOS (heredados sin cambios de ChemDraw) —
+    //    orbitales p / interferencia de fases / MO. RDKit no interviene
+    //    aquí porque no son moléculas, son esquemas didácticos.
+    // ────────────────────────────────────────────────────────────────
+    function pSigns(N, moIndex) {
+        // Signos alternos de los lóbulos p para el MO nº moIndex (1..N)
+        // de una cadena conjugada de N orbitales p (Hückel simple).
+        const signs = [];
+        for (let k = 0; k < N; k++) {
+            const v = Math.sin((moIndex * (k + 1) * Math.PI) / (N + 1));
+            signs.push(v >= 0 ? 1 : -1);
+        }
+        return signs;
+    }
+    function renderOrbitalRow(N, moIndex, opts) {
+        opts = opts || {};
+        const blank = !!opts.blank;
+        const signs = opts.signs || pSigns(N, moIndex);
+        const spacing = 46, lobeW = 20, lobeH = 34, pad = 20;
+        const W = spacing * (N - 1) + pad * 2 + lobeW;
+        const H = lobeH * 2 + pad * 1.4;
+        const cy = H / 2;
+        let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">';
+        for (let i = 0; i < N; i++) {
+            const cx = pad + lobeW / 2 + i * spacing;
+            const topNeg = !blank && signs[i] < 0;
+            svg += `<ellipse cx="${cx}" cy="${cy - lobeH/2 + 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-neg' : 'pc-orb-pos'}"/>`;
+            svg += `<ellipse cx="${cx}" cy="${cy + lobeH/2 - 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-pos' : 'pc-orb-neg'}"/>`;
+            svg += `<line x1="${cx}" y1="${cy - lobeH + 4}" x2="${cx}" y2="${cy + lobeH - 4}" class="pc-orb-axis"/>`;
+        }
+        svg += '</svg>';
+        return svg;
+    }
+
+    const DIAGRAMS = {};
+    DIAGRAMS['p-orbital-fases'] = () => `
+        <svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <text x="80" y="20" class="pc-orb-title" text-anchor="middle">orbital p</text>
+            <line x1="80" y1="30" x2="80" y2="130" class="pc-orb-axis"/>
+            <ellipse cx="80" cy="56" rx="24" ry="28" class="pc-orb-lobe pc-orb-pos"/>
+            <ellipse cx="80" cy="104" rx="24" ry="28" class="pc-orb-lobe pc-orb-neg"/>
+            <line x1="106" y1="56" x2="170" y2="40" class="pc-orb-leader"/>
+            <text x="176" y="44" class="pc-orb-label" text-anchor="start">valor positivo</text>
+            <line x1="106" y1="104" x2="170" y2="120" class="pc-orb-leader"/>
+            <text x="176" y="124" class="pc-orb-label" text-anchor="start">valor negativo</text>
+        </svg>`;
+    DIAGRAMS['interferencia-mo'] = () => `
+        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
+            <text x="70" y="18" class="pc-orb-title" text-anchor="middle">interferencia constructiva</text>
+            <ellipse cx="52" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="52" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="86" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="86" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <foreignObject x="10" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>del mismo signo</div></foreignObject>
+            <text x="266" y="18" class="pc-orb-title" text-anchor="middle">interferencia destructiva</text>
+            <ellipse cx="248" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="248" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
+            <ellipse cx="282" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/><ellipse cx="282" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/>
+            <foreignObject x="206" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>de signo opuesto</div></foreignObject>
+        </svg>`;
+
+    // ────────────────────────────────────────────────────────────────
+    // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
+    //    [data-smiles] sueltos como dentro de un esquema de síntesis)
+    // ────────────────────────────────────────────────────────────────
+    function renderMolSmiles(smiles, size) {
+        const svg = svgForSmiles(smiles, size || 'md');
+        if (!svg) return '<span class="pc-mol-missing">[SMILES inválido: ' + smiles + ']</span>';
+        return svg;
+    }
+    function renderMolById(id, size) {
+        const smiles = smilesById(id);
+        if (!smiles) return '<span class="pc-mol-missing">[' + id + ']</span>';
+        return renderMolSmiles(smiles, size);
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // 6) snake-wrap de filas de esquema (idéntico a ChemDraw, sin
+    //    cambios — es puro layout de caja, no depende de RDKit)
+    // ────────────────────────────────────────────────────────────────
+    function snakeifySchemeRows(root) {
+        root.querySelectorAll('.pc-scheme-row').forEach(row => {
+            if (row.dataset.snaked === '1') return;
+            const children = Array.from(row.children);
+            if (children.length <= 1) return;
+            const prevAlign = row.style.alignItems;
+            row.style.alignItems = 'flex-start';
+            const lines = [];
+            let curTop = null, curLine = [];
+            children.forEach(ch => {
+                const top = ch.offsetTop;
+                if (curTop === null || Math.abs(top - curTop) < 6) {
+                    curLine.push(ch);
+                    if (curTop === null) curTop = top;
+                } else {
+                    lines.push(curLine);
+                    curLine = [ch];
+                    curTop = top;
+                }
+            });
+            if (curLine.length) lines.push(curLine);
+            row.style.alignItems = prevAlign;
+            row.dataset.snaked = '1';
+            if (lines.length <= 1) return;
+            row.classList.add('pc-scheme-row-snake');
+            const frag = document.createDocumentFragment();
+            lines.forEach((line, i) => {
+                const div = document.createElement('div');
+                const reversed = i % 2 === 1;
+                div.className = 'pc-scheme-line' + (reversed ? ' pc-scheme-line-rev' : '');
+                line.forEach(ch => div.appendChild(ch));
+                if (i < lines.length - 1) {
+                    const turn = document.createElement('div');
+                    turn.className = 'pc-scheme-turn' + (reversed ? ' pc-scheme-turn-left' : ' pc-scheme-turn-right');
+                    turn.innerHTML = '<svg viewBox="0 0 20 20" class="pc-scheme-turn-svg"><path d="M10 1 L10 13 M5 9 L10 15 L15 9" class="pc-scheme-turn-path"/></svg>';
+                    div.appendChild(turn);
+                }
+                frag.appendChild(div);
+            });
+            row.innerHTML = '';
+            row.appendChild(frag);
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // 7) ESQUEMAS DE SÍNTESIS / REACCIÓN — idéntico API a ChemDraw,
+    //    pero los nodos ahora aceptan { smiles: '...' } además del
+    //    legado { mol: 'id-del-registro' }.
+    // ────────────────────────────────────────────────────────────────
+    function renderSchemeItem(node, size) {
+        if (node.arrow) {
+            return `<div class="pc-scheme-arrow">
+                <span class="pc-scheme-arrow-above">${node.above || ''}</span>
+                <svg viewBox="0 0 68 16" class="pc-scheme-arrow-svg"><line x1="2" y1="8" x2="58" y2="8" class="pc-scheme-arrow-line"/><polygon points="58,2 68,8 58,14" class="pc-scheme-arrowhead"/></svg>
+                <span class="pc-scheme-arrow-below">${node.below || ''}</span>
+            </div>`;
+        }
+        if (node.plus) return `<div class="pc-scheme-plus">+</div>`;
+        if (node.text === '') return `<div class="pc-scheme-node"></div>`;
+        if (node.text) {
+            return `<div class="pc-scheme-node"><div class="pc-scheme-text">${node.text}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
+        }
+        const svg = node.smiles ? renderMolSmiles(node.smiles, size || 'sm') : renderMolById(node.mol, size || 'sm');
+        return `<div class="pc-scheme-node"><div class="pc-scheme-mol">${svg}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
+    }
+    function renderScheme(steps, opts) {
+        opts = opts || {};
+        const rows = opts.rows || [steps];
+        const inner = rows.map(row => `<div class="pc-scheme-row">${row.map(n => renderSchemeItem(n, opts.size)).join('')}</div>`).join('');
+        return `<div class="pc-scheme-box">${inner}</div>`;
+    }
+    function renderForkScheme(start, branches, opts) {
+        opts = opts || {};
+        const size = opts.size || 'sm';
+        const startHtml = renderSchemeItem(start, size);
+        const n = branches.length;
+        let path = '';
+        branches.forEach((br, i) => {
+            const ty = ((i + 0.5) / n * 100).toFixed(1);
+            path += `M0,50 L16,50 L38,${ty} `;
+        });
+        const branchesHtml = branches.map(br => {
+            const arrowHtml = renderSchemeItem({ arrow: true, above: br.above, below: br.below }, size);
+            const nodesHtml = (br.nodes || []).map(nd => renderSchemeItem(nd, size)).join('');
+            return `<div class="pc-fork-branch">${arrowHtml}${nodesHtml}</div>`;
+        }).join('');
+        return `<div class="pc-scheme-box"><div class="pc-fork">
+            <div class="pc-fork-start">${startHtml}</div>
+            <svg class="pc-fork-lines" viewBox="0 0 38 100" preserveAspectRatio="none"><path d="${path}" class="pc-fork-path"/></svg>
+            <div class="pc-fork-branches">${branchesHtml}</div>
+        </div></div>`;
+    }
+
+    // ── Registro de esquemas completos (Q2, Q4, Q6...) ──
+    const SCHEMES = {};
+
+    SCHEMES['q2-agcn-nacn'] = () => renderForkScheme(
+        { mol: 'bromuro-alilo', label: 'bromuro de alilo' },
+        [
+            { above: 'AgCN', nodes: [ { mol: 'alil-isocianuro', label: 'A' } ] },
+            { above: 'NaCN', nodes: [ { text: '<span class="pc-scheme-unknown">B</span>' } ] }
+        ],
+        { size: 'sm' }
+    );
+    SCHEMES['q2-c-d'] = () => renderForkScheme(
+        { text: '<span class="pc-scheme-unknown">C</span>' },
+        [
+            { above: '&minus;H\u2082O', nodes: [ { text: 'R&ndash;N<sup>+</sup>&equiv;C<sup>&minus;</sup>:' } ] },
+            { above: '+H\u2082O', nodes: [ { text: 'R&ndash;NH<sub>2</sub>' }, { plus: true }, { text: '<span class="pc-scheme-unknown">D</span>', label: '26.1% C' } ] }
+        ],
+        { size: 'sm' }
+    );
+    SCHEMES['q2-passerini-general'] = () => renderScheme(
+        [
+            { mol: 'passerini-acido-generico' },
+            { plus: true },
+            { mol: 'passerini-isocianuro-generico' },
+            { plus: true },
+            { mol: 'passerini-cetona-generica' },
+            { arrow: true },
+            { mol: 'passerini-producto-generico' }
+        ],
+        { size: 'lg' }
+    );
+
+    SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'nitrobenceno', label: 'nitrobenceno' },
+                { arrow: true, above: 'Sn / HCl' },
+                { mol: 'anilina', label: 'A &middot; C\u2086H\u2087N' },
+                { arrow: true, above: 'H\u2082SO\u2084 conc.', below: '200 &deg;C' },
+                { mol: 'acido-sulfanilico', label: 'B &middot; C\u2086H\u2087NO\u2083S' }
+            ],
+            [
+                { text: '' },
+                { arrow: true, above: 'NaNO\u2082 / HCl' },
+                { mol: 'sal-diazonio', label: 'C &middot; [C\u2086H\u2085N\u2082O\u2083S]\u207aCl\u207b' },
+                { arrow: true, above: 'i. Na\u2082SO\u2083/Na\u2082CO\u2083', below: 'ii. H\u207a/H\u2082O' },
+                { mol: 'hidrazina-sulfonica', label: 'D &middot; C\u2086H\u2088N\u2082O\u2083S' }
+            ],
+            [
+                { text: '' },
+                { arrow: true, above: 'dietil oxalacetato', below: '&minus;H\u2082O, &minus;EtOH' },
+                { mol: 'pirazolona-ester', label: 'E' },
+                { arrow: true, above: 'compuesto C' },
+                { mol: 'tartrazina-simplificada', label: 'F' },
+                { arrow: true, above: 'exceso NaOH' },
+                { mol: 'tartrazina-simplificada', label: 'tartrazina' }
+            ]
+        ]
+    });
+
+    // ═══ Q6 — síntesis total de la acitretina ═══
+    SCHEMES['q6-sintesis-respuesta'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'acitretina-s0', label: '1 &middot; cetona de partida' },
+                { arrow: true, above: 'MeONa', below: 'HCO\u2082Me &middot; acilación de Claisen' },
+                { mol: 'acitretina-s1', label: '2 &middot; &beta;-cetoaldehído' }
+            ],
+            [
+                { mol: 'acitretina-s1', label: '2' },
+                { arrow: true, above: 'MeOH / H\u2082SO\u2084', below: 'protección como acetal' },
+                { mol: 'acitretina-s2', label: '3 &middot; acetal dimetílico' }
+            ],
+            [
+                { mol: 'acitretina-s2', label: '3' },
+                { arrow: true, above: 'Ph\u2083P=CH\u2082, KO\u1d57Bu', below: 'Wittig &middot; metilenación' },
+                { mol: 'acitretina-s3', label: '4 &middot; dieno' }
+            ],
+            [
+                { mol: 'acitretina-s3', label: '4' },
+                { arrow: true, above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083 &middot; desprotección + isomerización' },
+                { mol: 'acitretina-s4', label: '5 &middot; dienal conjugado' }
+            ],
+            [
+                { mol: 'acitretina-s4', label: '5' },
+                { arrow: true, above: '2-metilsuccinato de dimetilo', below: 'Triton B &middot; condensación de Stobbe' },
+                { mol: 'acitretina-s5', label: '6 &middot; éster/ácido' }
+            ],
+            [
+                { mol: 'acitretina-s5', label: '6' },
+                { arrow: true, above: 'NaOH', below: 'hidrólisis del éster' },
+                { mol: 'acitretina-s6', label: '7 &middot; diácido' }
+            ],
+            [
+                { mol: 'acitretina-s6', label: '7' },
+                { arrow: true, above: 'piridina, &Delta;', below: 'descarboxilación (tipo malónico)' },
+                { mol: 'acitretina-final', label: 'acitretina &middot; producto final' }
+            ]
+        ]
+    });
+    // Versión "enunciado": mismos pasos pero con los productos ocultos
+    // tras un signo de interrogación, para que el estudiante los rellene.
+    SCHEMES['q6-sintesis-enunciado'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [
+            [
+                { mol: 'acitretina-s0', label: 'compuesto de partida' },
+                { arrow: true, above: 'MeONa', below: 'HCO\u2082Me' },
+                { text: '<span class="pc-scheme-unknown">1</span>' },
+                { arrow: true, above: 'MeOH', below: 'H\u2082SO\u2084' },
+                { text: '<span class="pc-scheme-unknown">2</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">2</span>' },
+                { arrow: true, above: 'Ph\u2083P=CH\u2082', below: 'KO\u1d57Bu' },
+                { text: '<span class="pc-scheme-unknown">3</span>' },
+                { arrow: true, above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083' },
+                { text: '<span class="pc-scheme-unknown">4</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">4</span>' },
+                { arrow: true, above: '2-metilsuccinato de dimetilo', below: 'Triton B' },
+                { text: '<span class="pc-scheme-unknown">5</span>' },
+                { arrow: true, above: 'NaOH' },
+                { text: '<span class="pc-scheme-unknown">6</span>' }
+            ],
+            [
+                { text: '<span class="pc-scheme-unknown">6</span>' },
+                { arrow: true, above: 'piridina, &Delta;' },
+                { mol: 'acitretina-final', label: 'acitretina (producto final)' }
+            ]
+        ]
+    });
+
+    SCHEMES['q3-keratina'] = () => renderScheme(null, {
+        size: 'sm',
+        rows: [[
+            { mol: 'lawsone-enol-b', label: 'lawsona' },
+            { plus: true },
+            { text: 'queratina&ndash;S<sup>&minus;</sup>' },
+            { arrow: true, above: 'adición', below: 'al anillo' },
+            { mol: 'lawsona-aducto-naranja', label: '<span style="color:#c9862c">aducto naranja</span>' },
+            { arrow: true, above: 'oxidación', below: '(tiempo)' },
+            { mol: 'lawsona-aducto-marron', label: '<span style="color:#7a4a1e">aducto marrón</span>' }
+        ]]
+    });
+
+    SCHEMES['q3-ceto-enol-general'] = () => renderScheme(
+        [
+            { mol: 'tautomeria-ceto-ejemplo', label: 'forma ceto' },
+            { arrow: true },
+            { mol: 'tautomeria-enol-ejemplo', label: 'forma enol' }
+        ],
+        { size: 'sm' }
+    );
+    SCHEMES['q3-tautomeria-general'] = () => renderScheme(
+        [
+            { mol: 'tautomeria-xyz-izq' },
+            { arrow: true },
+            { mol: 'tautomeria-xyz-der' }
+        ],
+        { size: 'sm' }
+    );
+
+    // ────────────────────────────────────────────────────────────────
+    // 8) renderAll — AHORA ASÍNCRONO (hay que esperar la carga del
+    //    WASM de RDKit la primera vez; las siguientes llamadas son
+    //    instantáneas porque el módulo ya está en memoria).
+    // ────────────────────────────────────────────────────────────────
+    async function renderAll(root) {
+        root = root || document;
+
+        // Los diagramas abstractos (orbitales) no dependen de RDKit:
+        // se pintan ya mismo, sin esperar nada, para que aparezcan al
+        // instante aunque la red vaya lenta.
+        root.querySelectorAll('[data-orbitals]').forEach(el => {
+            const N = parseInt(el.getAttribute('data-n') || '6', 10);
+            const idx = parseInt(el.getAttribute('data-index') || '1', 10);
+            const blank = el.getAttribute('data-blank') === 'true';
+            el.innerHTML = renderOrbitalRow(N, idx, { blank });
+            el.classList.add('pc-orb-rendered');
+        });
+        root.querySelectorAll('[data-diagram]').forEach(el => {
+            const fn = DIAGRAMS[el.getAttribute('data-diagram')];
+            el.innerHTML = fn ? fn() : '<span class="pc-mol-missing">[' + el.getAttribute('data-diagram') + ']</span>';
+            el.classList.add('pc-diagram-rendered');
+        });
+
+        const needsRDKit =
+            root.querySelector('[data-mol]') ||
+            root.querySelector('[data-smiles]') ||
+            root.querySelector('[data-scheme]');
+        if (needsRDKit) {
+            try {
+                await loadRDKit();
+            } catch (e) {
+                console.warn('MolGraph: no se pudo cargar RDKit.js, las estructuras químicas no se dibujarán.', e);
+            }
+        }
+
+        root.querySelectorAll('[data-mol]').forEach(el => {
+            const size = el.getAttribute('data-size') || 'md';
+            el.innerHTML = renderMolById(el.getAttribute('data-mol'), size);
+            el.classList.add('pc-mol-rendered', 'pc-mol-' + size);
+        });
+        root.querySelectorAll('[data-smiles]').forEach(el => {
+            const size = el.getAttribute('data-size') || 'md';
+            el.innerHTML = renderMolSmiles(el.getAttribute('data-smiles'), size);
+            el.classList.add('pc-mol-rendered', 'pc-mol-' + size);
+        });
+        root.querySelectorAll('[data-scheme]').forEach(el => {
+            const fn = SCHEMES[el.getAttribute('data-scheme')];
+            el.innerHTML = fn ? fn() : '<span class="pc-mol-missing">[' + el.getAttribute('data-scheme') + ']</span>';
+            el.classList.add('pc-scheme-rendered');
+        });
+
+        const raf = (typeof requestAnimationFrame === 'function') ? requestAnimationFrame : (fn => setTimeout(fn, 0));
+        raf(() => snakeifySchemeRows(root));
+    }
+
+    window.MolGraph = {
+        renderAll,
+        renderMolById,
+        renderMolSmiles,
+        renderOrbitalRow,
+        renderScheme,
+        renderForkScheme,
+        pSigns,
+        loadRDKit,
+        MOLS,
+        SCHEMES,
+        DIAGRAMS
+    };
+
+})();
+
+</script>
+</body>
+</html>
