@@ -48,6 +48,36 @@
     <meta name="twitter:title" content="Talentos Cubanos — Olimpiadas de Química">
     <meta name="twitter:description" content="Sitial de Talentos Cubanos: historial de medallas, competidores y resultados en las Olimpiadas de Química.">
     <meta name="twitter:image" content="https://sitialtalento.vercel.app/api/og">
+    <link rel="canonical" href="https://sitialtalento.vercel.app/">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://sitialtalento.vercel.app/#organizacion",
+                "name": "Sitial de Talentos Cubanos",
+                "url": "https://sitialtalento.vercel.app/",
+                "description": "Sitio dedicado a la historia de Cuba en la Olimpiada Internacional de Química (IChO) y en el Concurso Nacional de Química, con el historial de sus medallistas, entrenadores y resultados.",
+                "areaServed": { "@type": "Country", "name": "Cuba" }
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://sitialtalento.vercel.app/#sitio",
+                "url": "https://sitialtalento.vercel.app/",
+                "name": "Sitial de Talentos Cubanos",
+                "inLanguage": ["es", "en"],
+                "publisher": { "@id": "https://sitialtalento.vercel.app/#organizacion" },
+                "about": [
+                    "Olimpiada Internacional de Química Cuba",
+                    "IChO Cuba",
+                    "Medallistas cubanos de química",
+                    "Concurso Nacional de Química Cuba"
+                ]
+            }
+        ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -5991,6 +6021,107 @@ function _sincronizarURL() {
         if (location.pathname + location.hash !== path + h) {
             history.replaceState(null, '', path + h);
         }
+        _actualizarSEO(p, path);
+    } catch(e) {}
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SEO por sección: cada sección/subsección tiene su propia URL "bonita"
+// gracias a _sincronizarURL(); aprovechamos eso para dar a cada una su
+// propio <title>, meta description, canonical y Open Graph — en vez de
+// que TODAS compartan el título genérico de inicio. Los textos incluyen
+// a propósito los términos por los que la gente busca este contenido
+// (IChO Cuba, medallistas cubanos de química, Concurso Nacional de
+// Química, etc.), sin inventar datos que no están ya en la página.
+const _seoPorSeccion = {
+    es: {
+        inicio:  { t: 'Sitial de Talentos Cubanos — Olimpiada Internacional de Química Cuba',
+                   d: 'Historial de medallas, medallistas cubanos y resultados de Cuba en la Olimpiada Internacional de Química (IChO), el Concurso Nacional de Química y otras olimpiadas de química.' },
+        eventos: { t: 'Historial de Olimpiadas de Química — Resultados de Cuba',
+                   d: 'Resultados y medallistas cubanos en la Olimpiada Internacional de Química (IChO), Mendeleev (IMChO), Iberoamericana (OIAQ) y Centroamericana y del Caribe (OCACQ) de Química.',
+                   sub: {
+                       IChO:  { t: 'IChO Cuba — Medallistas Cubanos en la Olimpiada Internacional de Química', d: 'Historial completo de la participación y las medallas de Cuba en la Olimpiada Internacional de Química (IChO), año por año.' },
+                       IMChO: { t: 'IMChO Cuba — Olimpiada Internacional Mendeleev de Química', d: 'Resultados y medallistas cubanos en la Olimpiada Internacional Mendeleev de Química (IMChO).' },
+                       OIAQ:  { t: 'OIAQ Cuba — Olimpiada Iberoamericana de Química', d: 'Resultados y medallistas cubanos en la Olimpiada Iberoamericana de Química (OIAQ).' },
+                       OCACQ: { t: 'OCACQ Cuba — Olimpiada Centroamericana y del Caribe de Química', d: 'Resultados y medallistas cubanos en la Olimpiada Centroamericana y del Caribe de Química (OCACQ).' },
+                       Otros: { t: 'Otras Olimpiadas de Química — Cuba', d: 'Resultados de Cuba en otras olimpiadas y concursos internacionales de química.' },
+                   } },
+        sitial:  { t: 'Medallistas Cubanos de Química — Historial de Medallas',
+                   d: 'Historial de medallas por competidor: estudiantes cubanos premiados en olimpiadas internacionales, iberoamericanas y nacionales de química.' },
+        cnq:     { t: 'Concurso Nacional de Química Cuba (CNQ)',
+                   d: 'Resultados, ranking y estadísticas por provincia del Concurso Nacional de Química (CNQ) de Cuba, cantera de la Olimpiada Internacional de Química.',
+                   sub: {
+                       Ranking:       { t: 'Ranking del Concurso Nacional de Química — Cuba', d: 'Ranking histórico de resultados del Concurso Nacional de Química (CNQ) de Cuba.' },
+                       Concursos:     { t: 'Ediciones del Concurso Nacional de Química — Cuba', d: 'Ediciones y resultados del Concurso Nacional de Química (CNQ) de Cuba.' },
+                       Estadisticas:  { t: 'Estadísticas del Concurso Nacional de Química por provincia — Cuba', d: 'Estadísticas por provincia de los resultados del Concurso Nacional de Química (CNQ) de Cuba.' },
+                   } },
+        honor:   { t: 'Honor a Quien Honor Merece — Entrenadores y Científicos Cubanos de Química',
+                   d: 'Perfiles de entrenadores y próceres de la química cubana que han formado a los medallistas de las olimpiadas de química.',
+                   sub: {
+                       Entrenadores: { t: 'Entrenadores Cubanos de Química — Honor a Quien Honor Merece', d: 'Perfiles de los entrenadores cubanos detrás de los resultados de Cuba en las olimpiadas de química.' },
+                       Proceres:     { t: 'Próceres de la Química Cubana — Honor a Quien Honor Merece', d: 'Perfiles de científicos y próceres de la química en Cuba.' },
+                   } },
+        noticias:{ t: 'Noticias y Entrevistas — Olimpiada de Química Cuba',
+                   d: 'Noticias, crónicas y entrevistas sobre la Olimpiada de Química en Cuba y sus protagonistas.' },
+    },
+    en: {
+        inicio:  { t: 'Sitial de Talentos Cubanos — Cuba at the International Chemistry Olympiad',
+                   d: 'Medal history, Cuban medalists and results at the International Chemistry Olympiad (IChO), the Cuban National Chemistry Contest and other chemistry olympiads.' },
+        eventos: { t: 'Chemistry Olympiad History — Cuba\'s Results',
+                   d: 'Cuban results and medalists at the International Chemistry Olympiad (IChO), Mendeleev Olympiad (IMChO), Ibero-American Olympiad (OIAQ) and Central American & Caribbean Olympiad (OCACQ).',
+                   sub: {
+                       IChO:  { t: 'IChO Cuba — Cuban Medalists at the International Chemistry Olympiad', d: 'Full history of Cuba\'s participation and medals at the International Chemistry Olympiad (IChO), year by year.' },
+                       IMChO: { t: 'IMChO Cuba — Mendeleev International Chemistry Olympiad', d: 'Cuban results and medalists at the Mendeleev International Chemistry Olympiad (IMChO).' },
+                       OIAQ:  { t: 'OIAQ Cuba — Ibero-American Chemistry Olympiad', d: 'Cuban results and medalists at the Ibero-American Chemistry Olympiad (OIAQ).' },
+                       OCACQ: { t: 'OCACQ Cuba — Central American & Caribbean Chemistry Olympiad', d: 'Cuban results and medalists at the Central American & Caribbean Chemistry Olympiad (OCACQ).' },
+                       Otros: { t: 'Other Chemistry Olympiads — Cuba', d: 'Cuba\'s results at other international chemistry olympiads and contests.' },
+                   } },
+        sitial:  { t: 'Cuban Chemistry Medalists — Medal History',
+                   d: 'Medal history by competitor: Cuban students awarded at international, Ibero-American and national chemistry olympiads.' },
+        cnq:     { t: 'Cuban National Chemistry Contest (CNQ)',
+                   d: 'Results, ranking and province-level statistics of the Cuban National Chemistry Contest (CNQ), the feeder competition for the International Chemistry Olympiad.',
+                   sub: {
+                       Ranking:       { t: 'Cuban National Chemistry Contest Ranking', d: 'Historical ranking of results from the Cuban National Chemistry Contest (CNQ).' },
+                       Concursos:     { t: 'Cuban National Chemistry Contest — Editions', d: 'Editions and results of the Cuban National Chemistry Contest (CNQ).' },
+                       Estadisticas:  { t: 'Cuban National Chemistry Contest — Statistics by Province', d: 'Province-level statistics of the Cuban National Chemistry Contest (CNQ).' },
+                   } },
+        honor:   { t: 'Honor a Quien Honor Merece — Cuban Chemistry Trainers & Scientists',
+                   d: 'Profiles of the trainers and pioneers of Cuban chemistry behind Cuba\'s chemistry olympiad medalists.',
+                   sub: {
+                       Entrenadores: { t: 'Cuban Chemistry Trainers — Honor a Quien Honor Merece', d: 'Profiles of the Cuban trainers behind Cuba\'s chemistry olympiad results.' },
+                       Proceres:     { t: 'Pioneers of Cuban Chemistry — Honor a Quien Honor Merece', d: 'Profiles of scientists and pioneers of chemistry in Cuba.' },
+                   } },
+        noticias:{ t: 'News & Interviews — Chemistry Olympiad Cuba',
+                   d: 'News, features and exclusive interviews about the Chemistry Olympiad in Cuba and its protagonists.' },
+    },
+};
+
+function _actualizarSEO(p, path) {
+    try {
+        const dict = _seoPorSeccion[window._lang] || _seoPorSeccion.es;
+        let entry = dict[p] || dict.inicio;
+        // Si hay subsección activa (p.ej. eventos → IChO, cnq → Ranking,
+        // honor → Entrenadores), usamos su título/descr. más específicos.
+        const ultimoSegmento = path.split('/').filter(Boolean).pop();
+        if (entry.sub && ultimoSegmento && entry.sub[ultimoSegmento]) entry = entry.sub[ultimoSegmento];
+
+        document.title = entry.t;
+        const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', val); };
+        setMeta('meta[name="description"]', entry.d);
+        setMeta('meta[property="og:title"]', entry.t);
+        setMeta('meta[property="og:description"]', entry.d);
+        setMeta('meta[name="twitter:title"]', entry.t);
+        setMeta('meta[name="twitter:description"]', entry.d);
+
+        const url = location.origin + path;
+        setMeta('meta[property="og:url"]', url);
+        let canon = document.querySelector('link[rel="canonical"]');
+        if (!canon) {
+            canon = document.createElement('link');
+            canon.setAttribute('rel', 'canonical');
+            document.head.appendChild(canon);
+        }
+        canon.setAttribute('href', url);
     } catch(e) {}
 }
 
