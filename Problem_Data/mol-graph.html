@@ -35,6 +35,15 @@
 //   <span class="pc-mol" data-smiles="CC(=O)C"></span>   (nuevo: SMILES directo)
 //   <div class="pc-orbitals" data-n="6" data-index="3"></div>
 //
+// Color de los átomos: por defecto TODO el esqueleto (enlaces y
+// etiquetas de heteroátomo: O, N, S, halógenos...) se dibuja en el
+// mismo color estándar (negro/tinta), como en una fórmula esquelética
+// de libro de texto — nada de rojo para O o azul para N por defecto.
+// Si un caso concreto necesita el coloreado clásico tipo CPK (p.ej.
+// para señalar visualmente heteroátomos en un problema didáctico),
+// se especifica explícitamente con data-color-atoms="true", o con
+// { colorAtoms: true } en un nodo de esquema / llamada directa a la API.
+//
 // Y tras inyectar el HTML:
 //   await MolGraph.renderAll(root);     // <-- ahora es ASÍNCRONO
 //                                        //     (hay que esperar a que
@@ -89,12 +98,33 @@
         lg: { w: 340, h: 250, bond: 2.1 }
     };
 
-    const _molCache = {}; // smiles+size -> svg string (evita recalcular layout)
+    const _molCache = {}; // smiles+size+color -> svg string (evita recalcular layout)
 
-    function svgForSmiles(smiles, size) {
+    // Color "estándar" para heteroátomos (O, N, S, halógenos, metales...)
+    // cuando NO se pide coloreado tipo CPK: el mismo tono que usan los
+    // enlaces, para que ningún átomo destaque por color salvo que se
+    // especifique explícitamente (colorAtoms: true).
+    //
+    // OJO: no basta con `symbolColour` — esa opción SOLO tiñe el texto
+    // de la etiqueta (la "O", la "N"...); la mitad del enlace pegada al
+    // heteroátomo se sigue coloreando con la paleta CPK por defecto
+    // (rojo hacia O, azul hacia N...) a menos que además se sobrescriba
+    // `atomColourPalette` con el mismo color para esos números atómicos.
+    // Cubrimos los elementos que aparecen en problemas de química
+    // orgánica/inorgánica de olimpiada; el carbono (6) no hace falta
+    // listarlo porque su color por defecto en RDKit ya es este mismo negro.
+    const STANDARD_ATOM_COLOUR = [0.06, 0.06, 0.06];
+    const STANDARD_ATOM_NUMBERS = [
+        1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17,
+        19, 20, 24, 25, 26, 27, 28, 29, 30, 35, 47, 53, 56, 78, 79, 80
+    ]; // H,B,N,O,F,Na,Mg,Al,Si,P,S,Cl,K,Ca,Cr,Mn,Fe,Co,Ni,Cu,Zn,Br,Ag,I,Ba,Pt,Au,Hg
+    const STANDARD_ATOM_PALETTE = {};
+    STANDARD_ATOM_NUMBERS.forEach(z => { STANDARD_ATOM_PALETTE[z] = STANDARD_ATOM_COLOUR; });
+
+    function svgForSmiles(smiles, size, colorAtoms) {
         if (!window.RDKit) return null;
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
-        const cacheKey = smiles + '|' + size;
+        const cacheKey = smiles + '|' + size + '|' + (colorAtoms ? 'cpk' : 'std');
         if (_molCache[cacheKey]) return _molCache[cacheKey];
 
         const mol = window.RDKit.get_mol(smiles);
@@ -107,6 +137,14 @@
                 addStereoAnnotation: false,
                 backgroundColour: [1, 1, 1, 0] // fondo transparente: hereda el fondo de la tarjeta (claro u oscuro)
             };
+            // Por defecto, sin coloreado por elemento: O, N, S, halógenos...
+            // se dibujan en el mismo color estándar que el resto del
+            // esqueleto (etiqueta Y enlace). Solo si colorAtoms===true se
+            // deja que RDKit use su paleta CPK habitual (rojo=O, azul=N...).
+            if (!colorAtoms) {
+                details.symbolColour = STANDARD_ATOM_COLOUR;
+                details.atomColourPalette = STANDARD_ATOM_PALETTE;
+            }
             let svg = mol.get_svg_with_highlights(JSON.stringify(details));
             // Quita el rect de fondo que RDKit añade igualmente (por si
             // algún visor ignora el canal alfa) y las etiquetas propias
@@ -317,15 +355,15 @@
     // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
     //    [data-smiles] sueltos como dentro de un esquema de síntesis)
     // ────────────────────────────────────────────────────────────────
-    function renderMolSmiles(smiles, size) {
-        const svg = svgForSmiles(smiles, size || 'md');
+    function renderMolSmiles(smiles, size, colorAtoms) {
+        const svg = svgForSmiles(smiles, size || 'md', !!colorAtoms);
         if (!svg) return '<span class="pc-mol-missing">[SMILES inválido: ' + smiles + ']</span>';
         return svg;
     }
-    function renderMolById(id, size) {
+    function renderMolById(id, size, colorAtoms) {
         const smiles = smilesById(id);
         if (!smiles) return '<span class="pc-mol-missing">[' + id + ']</span>';
-        return renderMolSmiles(smiles, size);
+        return renderMolSmiles(smiles, size, colorAtoms);
     }
 
     // ────────────────────────────────────────────────────────────────
@@ -394,7 +432,9 @@
         if (node.text) {
             return `<div class="pc-scheme-node"><div class="pc-scheme-text">${node.text}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
         }
-        const svg = node.smiles ? renderMolSmiles(node.smiles, size || 'sm') : renderMolById(node.mol, size || 'sm');
+        const svg = node.smiles
+            ? renderMolSmiles(node.smiles, size || 'sm', node.colorAtoms)
+            : renderMolById(node.mol, size || 'sm', node.colorAtoms);
         return `<div class="pc-scheme-node"><div class="pc-scheme-mol">${svg}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
     }
     function renderScheme(steps, opts) {
@@ -629,12 +669,14 @@
 
         root.querySelectorAll('[data-mol]').forEach(el => {
             const size = el.getAttribute('data-size') || 'md';
-            el.innerHTML = renderMolById(el.getAttribute('data-mol'), size);
+            const colorAtoms = el.getAttribute('data-color-atoms') === 'true';
+            el.innerHTML = renderMolById(el.getAttribute('data-mol'), size, colorAtoms);
             el.classList.add('pc-mol-rendered', 'pc-mol-' + size);
         });
         root.querySelectorAll('[data-smiles]').forEach(el => {
             const size = el.getAttribute('data-size') || 'md';
-            el.innerHTML = renderMolSmiles(el.getAttribute('data-smiles'), size);
+            const colorAtoms = el.getAttribute('data-color-atoms') === 'true';
+            el.innerHTML = renderMolSmiles(el.getAttribute('data-smiles'), size, colorAtoms);
             el.classList.add('pc-mol-rendered', 'pc-mol-' + size);
         });
         root.querySelectorAll('[data-scheme]').forEach(el => {
