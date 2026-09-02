@@ -193,39 +193,58 @@
 
     function _relabelWildcardAtoms(svg, mapNumsByIdx) {
         if (!mapNumsByIdx || !Object.keys(mapNumsByIdx).length) return svg;
+        // OJO: para que getBBox() dé medidas correctas, el SVG tiene que
+        // estar realmente insertado en el documento (aunque sea oculto);
+        // un nodo "suelto" (nunca insertado en document.body) puede dar
+        // cajas en 0×0 según el navegador — ese fue el motivo de que el
+        // primer y el segundo intento de esta función no funcionaran.
+        let host = null;
         try {
-            const wrap = document.createElement('div');
-            wrap.innerHTML = svg;
-            const svgEl = wrap.querySelector('svg');
+            host = document.createElement('div');
+            host.style.cssText = 'position:absolute; left:-99999px; top:0; width:0; height:0; overflow:hidden;';
+            host.innerHTML = svg;
+            document.body.appendChild(host);
+            const svgEl = host.querySelector('svg');
             if (!svgEl) return svg;
             Object.keys(mapNumsByIdx).forEach(idxStr => {
                 const label = WILDCARD_LABELS[mapNumsByIdx[idxStr]];
                 if (!label) return;
                 const nodes = Array.prototype.slice.call(svgEl.querySelectorAll('.atom-' + idxStr));
                 if (!nodes.length) return;
-                let x = null, y = null, fontSize = null, fill = null;
+                let box = null, fontSize = null, fill = null;
                 nodes.forEach(n => {
-                    if (x === null && n.hasAttribute && n.hasAttribute('x')) {
-                        x = n.getAttribute('x'); y = n.getAttribute('y');
-                    }
+                    try {
+                        const b = n.getBBox ? n.getBBox() : null;
+                        if (b && (b.width > 0.01 || b.height > 0.01)) {
+                            if (!box) box = { x1: b.x, y1: b.y, x2: b.x + b.width, y2: b.y + b.height };
+                            else {
+                                box.x1 = Math.min(box.x1, b.x); box.y1 = Math.min(box.y1, b.y);
+                                box.x2 = Math.max(box.x2, b.x + b.width); box.y2 = Math.max(box.y2, b.y + b.height);
+                            }
+                        }
+                    } catch (e) { /* getBBox puede fallar en nodos ocultos según el navegador */ }
                     const style = (n.getAttribute && n.getAttribute('style')) || '';
                     if (!fontSize) { const fm = style.match(/font-size:\s*([\d.]+)px/); if (fm) fontSize = fm[1]; }
                     if (!fill) { const cm = style.match(/fill:\s*(#[0-9A-Fa-f]{3,8})/); if (cm) fill = cm[1]; }
                 });
                 nodes.forEach(n => { if (n.parentNode) n.parentNode.removeChild(n); });
-                if (x === null) return; // no había ningún <text> para este átomo: no arriesgamos a mal-posicionar
+                if (!box) return; // sin caja fiable: mejor no arriesgar a mal-posicionar el rótulo
+                const cx = (box.x1 + box.x2) / 2, cy = (box.y1 + box.y2) / 2;
                 const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                t.setAttribute('x', x);
-                t.setAttribute('y', y);
+                t.setAttribute('x', cx.toFixed(1));
+                t.setAttribute('y', cy.toFixed(1));
                 t.setAttribute('text-anchor', 'middle');
+                t.setAttribute('dominant-baseline', 'central');
                 t.setAttribute('class', 'atom-' + idxStr + ' pc-wildcard-label');
-                t.setAttribute('style', 'font-size:' + (fontSize || '15') + 'px;font-family:sans-serif;fill:' + (fill || '#161616') + ';font-weight:600;');
+                t.setAttribute('style', 'font-size:' + (fontSize || '15') + 'px;font-family:sans-serif;fill:' + (fill || '#161616') + ';font-weight:700;');
                 t.textContent = label;
                 svgEl.appendChild(t);
             });
-            return wrap.innerHTML;
+            return host.innerHTML;
         } catch (e) {
             return svg;
+        } finally {
+            if (host && host.parentNode) host.parentNode.removeChild(host);
         }
     }
 
@@ -476,6 +495,234 @@
         </svg>`;
 
     // ────────────────────────────────────────────────────────────────
+    // 4.b) MOLÉCULAS "A MANO" — para las estructuras con sustituyentes
+    //      con letra (R¹, R², R³, R⁴, X, Y, Z, H "postizo", NC
+    //      abreviado...) dejamos de depender de cómo RDKit organice
+    //      internamente el SVG (dos intentos distintos de "reetiquetar"
+    //      su resultado fallaron: primero porque el texto llega
+    //      troceado de forma impredecible, después porque ni siquiera
+    //      todos los navegadores/versiones etiquetan esos fragmentos
+    //      igual). Aquí construimos el SVG esquelético nosotros mismos,
+    //      con coordenadas propias — así el rótulo SIEMPRE es el que
+    //      pedimos, sin depender de ningún detalle interno de RDKit.
+    //      Convención: un átomo con label=null es un vértice de carbono
+    //      "mudo" (no se dibuja texto, como en cualquier fórmula
+    //      esquelética); order:2 dibuja doble enlace (dos líneas
+    //      paralelas).
+    // ────────────────────────────────────────────────────────────────
+    function _hexRingPts(cx, cy, r, startDeg) {
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+            const a = ((startDeg == null ? -90 : startDeg) + 60 * i) * Math.PI / 180;
+            pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+        }
+        return pts;
+    }
+    function _triRingPts(cx, cy, r, startDeg) {
+        const pts = [];
+        for (let i = 0; i < 3; i++) {
+            const a = ((startDeg == null ? -90 : startDeg) + 120 * i) * Math.PI / 180;
+            pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+        }
+        return pts;
+    }
+    function _svgSkeletal(atoms, bonds) {
+        const pad = 24;
+        const xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
+        const minX = Math.min.apply(null, xs) - pad, maxX = Math.max.apply(null, xs) + pad;
+        const minY = Math.min.apply(null, ys) - pad, maxY = Math.max.apply(null, ys) + pad;
+        const w = maxX - minX, h = maxY - minY;
+        const byId = {};
+        atoms.forEach(a => { byId[a.id] = a; });
+        let svg = `<svg viewBox="0 0 ${w.toFixed(1)} ${h.toFixed(1)}" class="pc-skel-svg pc-mol-custom" xmlns="http://www.w3.org/2000/svg">`;
+        bonds.forEach(b => {
+            const a1 = byId[b.a], a2 = byId[b.b];
+            let x1 = a1.x - minX, y1 = a1.y - minY, x2 = a2.x - minX, y2 = a2.y - minY;
+            // Si un extremo tiene rótulo, recorta un poco la línea para que
+            // no se meta debajo del texto (igual que hace cualquier
+            // graficador de química).
+            const dx0 = x2 - x1, dy0 = y2 - y1, len0 = Math.hypot(dx0, dy0) || 1;
+            const ux = dx0 / len0, uy = dy0 / len0;
+            const trim = 13;
+            if (a1.label) { x1 += ux * trim; y1 += uy * trim; }
+            if (a2.label) { x2 -= ux * trim; y2 -= uy * trim; }
+            if (b.order === 2) {
+                const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+                const ox = -dy / len * 3.4, oy = dx / len * 3.4;
+                const inset = 0.14;
+                const ix1 = x1 + dx * inset, iy1 = y1 + dy * inset;
+                const ix2 = x2 - dx * inset, iy2 = y2 - dy * inset;
+                svg += `<line x1="${(x1 - ox).toFixed(1)}" y1="${(y1 - oy).toFixed(1)}" x2="${(x2 - ox).toFixed(1)}" y2="${(y2 - oy).toFixed(1)}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${(ix1 + ox).toFixed(1)}" y1="${(iy1 + oy).toFixed(1)}" x2="${(ix2 + ox).toFixed(1)}" y2="${(iy2 + oy).toFixed(1)}" class="pc-skel-bond"/>`;
+            } else {
+                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
+            }
+        });
+        atoms.forEach(a => {
+            if (!a.label) return;
+            const x = a.x - minX, y = a.y - minY;
+            svg += `<text x="${x.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="central" class="pc-skel-label">${a.label}</text>`;
+        });
+        svg += `</svg>`;
+        return svg;
+    }
+
+    const CUSTOM_MOLS = {};
+    (function registerCustomMols() {
+        const add = (id, atoms, bonds) => { CUSTOM_MOLS[id] = _svgSkeletal(atoms, bonds); };
+
+        // ── Reactivos y producto genéricos de la reacción de Passerini ──
+        add('passerini-acido-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B9' },
+            { id: 'c', x: 42, y: 0, label: null },
+            { id: 'od', x: 42, y: -42, label: 'O' },
+            { id: 'oh', x: 80, y: 20, label: 'OH' }
+        ], [
+            { a: 'r', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'oh', order: 1 }
+        ]);
+        add('passerini-isocianuro-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B2' },
+            { id: 'nc', x: 54, y: 0, label: 'NC' }
+        ], [
+            { a: 'r', b: 'nc', order: 1 }
+        ]);
+        add('passerini-cetona-generica', [
+            { id: 'r3', x: -40, y: -22, label: 'R\u00B3' },
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'od', x: 0, y: -44, label: 'O' },
+            { id: 'r4', x: 40, y: -22, label: 'R\u2074' }
+        ], [
+            { a: 'r3', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'r4', order: 1 }
+        ]);
+        const passeriniProducto = [
+            [
+                { id: 'r1', x: 0, y: 18, label: 'R\u00B9' },
+                { id: 'c1', x: 38, y: -18, label: null },
+                { id: 'od1', x: 38, y: -58, label: 'O' },
+                { id: 'oe', x: 76, y: 18, label: 'O' },
+                { id: 'c2', x: 114, y: -18, label: null },
+                { id: 'r3', x: 94, y: -58, label: 'R\u00B3' },
+                { id: 'r4', x: 134, y: -58, label: 'R\u2074' },
+                { id: 'c3', x: 152, y: 18, label: null },
+                { id: 'od2', x: 152, y: 58, label: 'O' },
+                { id: 'n', x: 190, y: -18, label: 'N' },
+                { id: 'h', x: 190, y: -58, label: 'H' },
+                { id: 'r2', x: 228, y: 18, label: 'R\u00B2' }
+            ], [
+                { a: 'r1', b: 'c1', order: 1 }, { a: 'c1', b: 'od1', order: 2 }, { a: 'c1', b: 'oe', order: 1 },
+                { a: 'oe', b: 'c2', order: 1 }, { a: 'c2', b: 'r3', order: 1 }, { a: 'c2', b: 'r4', order: 1 },
+                { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'od2', order: 2 }, { a: 'c3', b: 'n', order: 1 },
+                { a: 'n', b: 'h', order: 1 }, { a: 'n', b: 'r2', order: 1 }
+            ]
+        ];
+        add('passerini-producto-generico', passeriniProducto[0], passeriniProducto[1]);
+        add('passerini-producto-general', passeriniProducto[0], passeriniProducto[1]);
+
+        // ── Formaldehído con los dos H explícitos (molécula demasiado
+        //    pequeña para dejarlos implícitos: sin ellos solo se vería
+        //    un trazo "=O" suelto, sin ninguna referencia del carbono) ──
+        add('formaldehido', [
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'o', x: 36, y: -24, label: 'O' },
+            { id: 'h1', x: -36, y: -24, label: 'H' },
+            { id: 'h2', x: -36, y: 24, label: 'H' }
+        ], [
+            { a: 'c', b: 'o', order: 2 }, { a: 'c', b: 'h1', order: 1 }, { a: 'c', b: 'h2', order: 1 }
+        ]);
+
+        // ── Ecuación general de tautomería X=Y–Z–H ⇌ X(H)–Y=Z, con
+        //    átomos genéricos de verdad (letras X, Y, Z), no elementos
+        //    reales ──
+        add('tautomeria-xyz-izq', [
+            { id: 'x', x: 0, y: 0, label: 'X' },
+            { id: 'y', x: 40, y: -24, label: 'Y' },
+            { id: 'z', x: 80, y: 0, label: 'Z' },
+            { id: 'h', x: 120, y: -24, label: 'H' }
+        ], [
+            { a: 'x', b: 'y', order: 2 }, { a: 'y', b: 'z', order: 1 }, { a: 'z', b: 'h', order: 1 }
+        ]);
+        add('tautomeria-xyz-der', [
+            { id: 'h', x: 0, y: -24, label: 'H' },
+            { id: 'x', x: 40, y: 0, label: 'X' },
+            { id: 'y', x: 80, y: -24, label: 'Y' },
+            { id: 'z', x: 120, y: 0, label: 'Z' }
+        ], [
+            { a: 'h', b: 'x', order: 1 }, { a: 'x', b: 'y', order: 1 }, { a: 'y', b: 'z', order: 2 }
+        ]);
+
+        // ── Isocianuros con el grupo &ndash;NC abreviado como texto, en
+        //    vez de dibujar el N&equiv;C explícito ──
+        add('1-isocianopropano', [
+            { id: 'c1', x: 0, y: 0, label: null },
+            { id: 'c2', x: 38, y: -22, label: null },
+            { id: 'c3', x: 76, y: 0, label: null },
+            { id: 'nc', x: 114, y: -22, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        add('alil-isocianuro', [
+            { id: 'c1', x: 0, y: -22, label: null },
+            { id: 'c2', x: 38, y: 0, label: null },
+            { id: 'c3', x: 76, y: -22, label: null },
+            { id: 'nc', x: 114, y: 0, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 2 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        add('diisocianopropano', [
+            { id: 'nc1', x: 0, y: 0, label: 'NC' },
+            { id: 'c1', x: 42, y: -24, label: null },
+            { id: 'c2', x: 84, y: 0, label: null },
+            { id: 'nc2', x: 126, y: -24, label: 'NC' }
+        ], [
+            { a: 'nc1', b: 'c1', order: 1 }, { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'nc2', order: 1 }
+        ]);
+        add('trisisocianometano', [
+            { id: 'cq', x: 0, y: 0, label: null },
+            { id: 'nca', x: 32, y: -32, label: 'NC' },
+            { id: 'ncb', x: -32, y: -32, label: 'NC' },
+            { id: 'ncd', x: 32, y: 32, label: 'NC' },
+            { id: 'ch2', x: -32, y: 32, label: null },
+            { id: 'ncc', x: -70, y: 60, label: 'NC' }
+        ], [
+            { a: 'cq', b: 'nca', order: 1 }, { a: 'cq', b: 'ncb', order: 1 },
+            { a: 'cq', b: 'ncd', order: 1 }, { a: 'cq', b: 'ch2', order: 1 },
+            { a: 'ch2', b: 'ncc', order: 1 }
+        ]);
+
+        // Anillos (bencénico / ciclopropílico) con el grupo &ndash;NC
+        // abreviado como sustituyente.
+        (function () {
+            const hex = _hexRingPts(0, 0, 34, -90);
+            const ringBonds = hex.map((_, i) => ({ a: 'c' + i, b: 'c' + ((i + 1) % 6), order: i % 2 === 0 ? 2 : 1 }));
+            const ringAtoms = hex.map((p, i) => ({ id: 'c' + i, x: p.x, y: p.y, label: null }));
+            // Fenilisocianuro: NC en el vértice superior (índice 0)
+            const nc0 = hex[0];
+            add('fenilisocianuro', ringAtoms.concat([{ id: 'nc', x: nc0.x, y: nc0.y - 40, label: 'NC' }]),
+                ringBonds.concat([{ a: 'c0', b: 'nc', order: 1 }]));
+            // 4-metil-1,3-diisocianobenceno: NC en el vértice 0 (arriba),
+            // metilo en el vértice 3 (abajo), segundo NC en el vértice 4
+            // (adyacente al metilo → orto a él, meta al primer NC, tal y
+            // como exige el enunciado del examen).
+            const v0 = hex[0], v3 = hex[3], v4 = hex[4];
+            const v4dir = Math.hypot(v4.x, v4.y) || 1;
+            add('diisocianobenceno', ringAtoms.concat([
+                { id: 'nca', x: v0.x, y: v0.y - 40, label: 'NC' },
+                { id: 'me', x: v3.x, y: v3.y + 40, label: null },
+                { id: 'ncb', x: v4.x + (v4.x / v4dir) * 40, y: v4.y + (v4.y / v4dir) * 40, label: 'NC' }
+            ]), ringBonds.concat([
+                { a: 'c0', b: 'nca', order: 1 }, { a: 'c3', b: 'me', order: 1 }, { a: 'c4', b: 'ncb', order: 1 }
+            ]));
+
+            const tri = _triRingPts(0, 0, 26, -90);
+            const triBonds = [{ a: 't0', b: 't1', order: 1 }, { a: 't1', b: 't2', order: 1 }, { a: 't2', b: 't0', order: 1 }];
+            const triAtoms = tri.map((p, i) => ({ id: 't' + i, x: p.x, y: p.y, label: null }));
+            const t0 = tri[0];
+            add('ciclopropil-isocianuro', triAtoms.concat([{ id: 'nc', x: t0.x, y: t0.y - 40, label: 'NC' }]),
+                triBonds.concat([{ a: 't0', b: 'nc', order: 1 }]));
+        })();
+    })();
+
+    // ────────────────────────────────────────────────────────────────
     // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
     //    [data-smiles] sueltos como dentro de un esquema de síntesis)
     // ────────────────────────────────────────────────────────────────
@@ -485,6 +732,7 @@
         return svg;
     }
     function renderMolById(id, size, colorAtoms) {
+        if (CUSTOM_MOLS[id]) return CUSTOM_MOLS[id];
         const smiles = smilesById(id);
         if (!smiles) return '<span class="pc-mol-missing">[' + id + ']</span>';
         return renderMolSmiles(smiles, size, colorAtoms);
@@ -539,50 +787,6 @@
     }
 
     // ────────────────────────────────────────────────────────────────
-    // 6.b) ALINEACIÓN EXACTA DEL CONECTOR DE UN ESQUEMA "EN HORQUILLA" —
-    //      el trazo se dibuja primero con posiciones aproximadas
-    //      (renderForkScheme, por si esta función no llegara a
-    //      ejecutarse), y AQUÍ, una vez que el navegador ya calculó el
-    //      layout real (flechas, etiquetas encima/debajo, tamaños de
-    //      molécula distintos entre ramas...), medimos en píxeles el
-    //      centro vertical exacto de la línea de cada flecha-rama y
-    //      volvemos a trazar el conector para que encaje exactamente,
-    //      como si fuera una sola flecha que se abre en dos. Mismo
-    //      patrón que snakeifySchemeRows: medir tras el layout, no
-    //      adivinar porcentajes de antemano.
-    // ────────────────────────────────────────────────────────────────
-    function alignForkConnectors(root) {
-        root.querySelectorAll('.pc-fork').forEach(fork => {
-            if (fork.dataset.aligned === '1') return;
-            const linesSvg = fork.querySelector('.pc-fork-lines');
-            const branchesBox = fork.querySelector('.pc-fork-branches');
-            const pathEl = fork.querySelector('.pc-fork-path');
-            if (!linesSvg || !branchesBox || !pathEl) return;
-            const branchLines = Array.prototype.map.call(
-                branchesBox.querySelectorAll('.pc-fork-branch'),
-                br => br.querySelector('.pc-scheme-arrow-line')
-            ).filter(Boolean);
-            if (!branchLines.length) return;
-            const boxRect = linesSvg.getBoundingClientRect();
-            const H = boxRect.height || 1;
-            if (H < 2) return; // aún no tiene layout real (p.ej. oculto); lo intentamos en el siguiente frame
-            const ys = branchLines.map(line => {
-                const r = line.getBoundingClientRect();
-                return (r.top + r.height / 2) - boxRect.top;
-            });
-            const yMin = Math.min.apply(null, ys), yMax = Math.max.apply(null, ys);
-            const yMid = (yMin + yMax) / 2;
-            const W = 38;
-            linesSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-            let path = `M0,${yMid.toFixed(1)} L16,${yMid.toFixed(1)} `;
-            if (ys.length > 1) path += `M16,${yMin.toFixed(1)} L16,${yMax.toFixed(1)} `;
-            ys.forEach(y => { path += `M16,${y.toFixed(1)} L${W},${y.toFixed(1)} `; });
-            pathEl.setAttribute('d', path);
-            fork.dataset.aligned = '1';
-        });
-    }
-
-    // ────────────────────────────────────────────────────────────────
     // 7) ESQUEMAS DE SÍNTESIS / REACCIÓN — idéntico API a ChemDraw,
     //    pero los nodos ahora aceptan { smiles: '...' } además del
     //    legado { mol: 'id-del-registro' }.
@@ -628,30 +832,38 @@
         const inner = rows.map(row => `<div class="pc-scheme-row">${row.map(n => renderSchemeItem(n, opts.size)).join('')}</div>`).join('');
         return `<div class="pc-scheme-box">${inner}</div>`;
     }
+    // Esquema "en horquilla": un compuesto de partida del que salen
+    // varias flechas distintas hacia productos distintos (p.ej. bromuro
+    // de alilo + AgCN → A, + NaCN → B). Construido ÍNTEGRAMENTE con CSS
+    // (bordes / pseudo-elementos), no con SVG medido en JavaScript: así
+    // el tramo que sale del compuesto de partida, la barra vertical y el
+    // tramo de cada rama quedan pegados por construcción — el modelo de
+    // cajas de CSS es exacto por definición, no depende de medir nada
+    // después de renderizar. Con 2 ramas (el único caso real de este
+    // banco), "justify-content: space-around" coloca los centros
+    // exactamente al 25% y 75% de la altura, que es donde anclamos la
+    // barra vertical.
     function renderForkScheme(start, branches, opts) {
         opts = opts || {};
         const size = opts.size || 'sm';
         const startHtml = renderSchemeItem(start, size);
         const n = branches.length;
-        // Trazo en "llave" [ : un tramo horizontal desde el compuesto de
-        // partida hasta una barra vertical, y desde ahí un tramo
-        // horizontal recto hacia cada rama — todo en ángulo recto, sin
-        // diagonales, para que quede minimalista y ordenado (como una
-        // llave/corchete que se abre en dos).
-        const tys = branches.map((br, i) => ((i + 0.5) / n * 100));
-        const tyMin = Math.min.apply(null, tys), tyMax = Math.max.apply(null, tys);
-        const tyMid = (tyMin + tyMax) / 2;
-        let path = `M0,${tyMid} L16,${tyMid} `;
-        if (n > 1) path += `M16,${tyMin} L16,${tyMax} `;
-        tys.forEach(ty => { path += `M16,${ty} L38,${ty} `; });
+        const barTop = (100 / (2 * n)).toFixed(2);
+        const barBottom = (100 / (2 * n)).toFixed(2);
         const branchesHtml = branches.map(br => {
-            const arrowHtml = renderSchemeItem({ arrow: true, above: br.above, below: br.below }, size);
             const nodesHtml = (br.nodes || []).map(nd => renderSchemeItem(nd, size)).join('');
-            return `<div class="pc-fork-branch">${arrowHtml}${nodesHtml}</div>`;
+            return `<div class="pc-fork-branch">
+                <div class="pc-fork-spur">
+                    <span class="pc-scheme-arrow-above">${br.above || ''}</span>
+                    <span class="pc-fork-spur-line"><i class="pc-fork-spur-head"></i></span>
+                    <span class="pc-scheme-arrow-below">${br.below || ''}</span>
+                </div>
+                ${nodesHtml}
+            </div>`;
         }).join('');
         return `<div class="pc-scheme-box"><div class="pc-fork">
             <div class="pc-fork-start">${startHtml}</div>
-            <svg class="pc-fork-lines" viewBox="0 0 38 100" preserveAspectRatio="none"><path d="${path}" class="pc-fork-path"/></svg>
+            <div class="pc-fork-spine"><span class="pc-fork-spine-bar" style="top:${barTop}%;bottom:${barBottom}%;"></span></div>
             <div class="pc-fork-branches">${branchesHtml}</div>
         </div></div>`;
     }
@@ -798,7 +1010,7 @@
             { text: 'lawsona' },
             { arrow: true, above: 'queratina&ndash;S(&minus;)' },
             { mol: 'lawsona-aducto-naranja', label: '<span style="color:#c9862c">aducto naranja</span>' },
-            { arrow: true, above: 'oxidación', below: '(tiempo)' },
+            { arrow: true },
             { mol: 'lawsona-aducto-marron', label: '<span style="color:#7a4a1e">aducto marrón</span>' }
         ]]
     });
@@ -875,7 +1087,7 @@
         });
 
         const raf = (typeof requestAnimationFrame === 'function') ? requestAnimationFrame : (fn => setTimeout(fn, 0));
-        raf(() => { snakeifySchemeRows(root); alignForkConnectors(root); raf(() => alignForkConnectors(root)); });
+        raf(() => snakeifySchemeRows(root));
     }
 
     window.MolGraph = {
