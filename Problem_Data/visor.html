@@ -254,6 +254,12 @@
     .pc-mol-sm .pc-skel-svg { max-width: 130px; }
     .pc-mol-lg .pc-skel-svg { max-width: 300px; }
 
+    /* ── Moléculas construidas a mano (sustituyentes con letra: R¹, R²,
+       R³, R⁴, X, Y, Z, H "postizo", NC abreviado...) — mismo trazo
+       visual que las de RDKit, para que no se note la diferencia. ── */
+    .pc-skel-bond { stroke: var(--text); stroke-width: 2; stroke-linecap: round; }
+    .pc-skel-label { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; fill: var(--text); }
+
     /* ── Esquemas de síntesis / reacción (flechas con reactivos) ──
        Cada .pc-scheme-row es un flujo de pasos (molécula → flecha →
        molécula → …). Se deja que el navegador reparta los pasos en varias
@@ -354,12 +360,36 @@
        varias flechas distintas, cada una hacia su propio producto (p. ej.
        bromuro de alilo + AgCN → A, + NaCN → B). Trazo limpio en ángulo
        recto (tipo "llave" [ ), no líneas diagonales. ── */
-    .pc-fork { display: flex; align-items: stretch; gap: 0; }
+    .pc-fork { display: flex; align-items: stretch; }
     .pc-fork-start { display: flex; align-items: center; flex-shrink: 0; }
-    .pc-fork-lines { width: 38px; flex-shrink: 0; align-self: stretch; min-height: 84px; display: block; }
-    .pc-fork-path { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .pc-fork-branches { display: flex; flex-direction: column; justify-content: space-around; gap: 16px; flex: 1; min-width: 0; }
-    .pc-fork-branch { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    /* Barra vertical + tramo horizontal hasta ella: puro CSS (borde /
+       elemento posicionado por porcentaje), nunca SVG medido en JS — el
+       modelo de cajas es exacto por construcción, así que el tramo del
+       compuesto de partida y la barra vertical quedan pegados siempre,
+       sin huecos ni descuadres. */
+    .pc-fork-spine { position: relative; width: 16px; flex-shrink: 0; align-self: stretch; min-height: 84px; }
+    .pc-fork-spine::before {
+        content: ''; position: absolute; left: 0; top: 50%; width: 16px; height: 2px;
+        background: var(--text); transform: translateY(-1px);
+    }
+    .pc-fork-spine-bar { position: absolute; left: 15px; width: 2px; background: var(--text); }
+    .pc-fork-branches { display: flex; flex-direction: column; justify-content: space-around; flex: 1; min-width: 0; }
+    .pc-fork-branch { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 6px 0; }
+    /* Cada rama es, en sí misma, una flecha completa (igual que
+       .pc-scheme-arrow): etiqueta arriba, línea + cabeza, etiqueta
+       abajo — pegada por construcción a la barra vertical de la
+       izquierda, como si fuera una sola flecha que se abre en dos. */
+    .pc-fork-spur { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 46px; }
+    .pc-fork-spur-line { position: relative; display: block; width: 38px; height: 12px; }
+    .pc-fork-spur-line::before {
+        content: ''; position: absolute; left: 0; top: 50%; width: 30px; height: 2px;
+        background: var(--text); transform: translateY(-1px);
+    }
+    .pc-fork-spur-head {
+        position: absolute; left: 27px; top: 50%; width: 0; height: 0;
+        border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+        border-left: 8px solid var(--text); transform: translateY(-5px);
+    }
 
     /* ── Flecha de equilibrio (doble, sentidos opuestos) ── */
     .pc-scheme-eq-svg { height: 22px; }
