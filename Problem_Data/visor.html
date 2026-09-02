@@ -352,14 +352,17 @@
 
     /* ── Esquema "en horquilla": un compuesto de partida del que salen
        varias flechas distintas, cada una hacia su propio producto (p. ej.
-       bromuro de alilo + AgCN → A, + NaCN → B). ── */
+       bromuro de alilo + AgCN → A, + NaCN → B). Trazo limpio en ángulo
+       recto (tipo "llave" [ ), no líneas diagonales. ── */
     .pc-fork { display: flex; align-items: stretch; gap: 2px; }
     .pc-fork-start { display: flex; align-items: center; flex-shrink: 0; }
-    .pc-fork-connector { width: 40px; flex-shrink: 0; align-self: stretch; min-height: 84px; }
-    .pc-fork-connector-svg { width: 100%; height: 100%; display: block; }
-    .pc-fork-connector-path { fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .6; }
-    .pc-fork-rows { display: flex; flex-direction: column; justify-content: space-around; gap: 16px; flex: 1; min-width: 0; }
+    .pc-fork-lines { width: 38px; flex-shrink: 0; align-self: stretch; min-height: 84px; display: block; }
+    .pc-fork-path { fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+    .pc-fork-branches { display: flex; flex-direction: column; justify-content: space-around; gap: 16px; flex: 1; min-width: 0; }
     .pc-fork-branch { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+    /* ── Flecha de equilibrio (doble, sentidos opuestos) ── */
+    .pc-scheme-eq-svg { height: 22px; }
 
     /* ── Ecuaciones / fórmulas destacadas (cajas de cálculo, p.ej. Q5) ── */
     .pc-eq-box {
