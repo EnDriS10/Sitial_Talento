@@ -121,6 +121,53 @@
     const STANDARD_ATOM_PALETTE = {};
     STANDARD_ATOM_NUMBERS.forEach(z => { STANDARD_ATOM_PALETTE[z] = STANDARD_ATOM_COLOUR; });
 
+    // ────────────────────────────────────────────────────────────────
+    // 2.b) REETIQUETADO DE ÁTOMOS COMODÍN — RDKit dibuja un átomo
+    //      comodín [*:N] literalmente como "*:N" (asterisco + número),
+    //      que no es la notación química habitual. Para los usos
+    //      didácticos de este banco de problemas (grupos R variables,
+    //      átomos genéricos X/Y/Z, un H explícito "postizo", el grupo
+    //      &ndash;NC de un isocianuro simplificado a su abreviatura, o el
+    //      resto de una proteína de queratina) reescribimos ese texto
+    //      DESPUÉS de que RDKit calcule el layout 2D, operando sobre el
+    //      <text> ya posicionado — así conservamos la geometría de
+    //      enlaces que RDKit calculó y solo cambiamos el rótulo visible.
+    //      Números de mapeo reservados (namespace propio de este banco,
+    //      no tiene relación con reacciones/SMARTS reales):
+    //        1-4 → R¹ R² R³ R⁴   (sustituyentes variables, p.ej. Passerini)
+    //        5-7 → X Y Z         (átomos genéricos, tautomería general)
+    //        8   → Ker           (resto de una proteína de queratina)
+    //        9   → NC            (isocianuro abreviado, sin dibujar N≡C)
+    //        10  → H             (hidrógeno explícito "postizo")
+    // ────────────────────────────────────────────────────────────────
+    const SUP_DIGITS = { '0':'\u2070','1':'\u00B9','2':'\u00B2','3':'\u00B3','4':'\u2074' };
+    const WILDCARD_LABELS = {
+        '1': 'R' + SUP_DIGITS['1'], '2': 'R' + SUP_DIGITS['2'],
+        '3': 'R' + SUP_DIGITS['3'], '4': 'R' + SUP_DIGITS['4'],
+        '5': 'X', '6': 'Y', '7': 'Z',
+        '8': 'Ker', '9': 'NC', '10': 'H'
+    };
+    function _relabelWildcardAtoms(svg) {
+        if (svg.indexOf('*') === -1) return svg;
+        try {
+            const wrap = document.createElement('div');
+            wrap.innerHTML = svg;
+            wrap.querySelectorAll('text').forEach(t => {
+                const txt = (t.textContent || '').replace(/\s+/g, '');
+                const m = txt.match(/^\*:?(\d{1,2})$/);
+                if (!m) return;
+                const label = WILDCARD_LABELS[m[1]];
+                if (!label) return;
+                while (t.firstChild) t.removeChild(t.firstChild);
+                t.textContent = label;
+                if (/^\d$/.test(m[1])) t.setAttribute('font-weight', '600'); // R¹..R⁴: algo más de peso
+            });
+            return wrap.innerHTML;
+        } catch (e) {
+            return svg;
+        }
+    }
+
     function svgForSmiles(smiles, size, colorAtoms) {
         if (!window.RDKit) return null;
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
@@ -151,6 +198,7 @@
             // de RDKit; deja solo <svg>...</svg> con los trazos.
             svg = svg.replace(/<rect[^>]*fill:#FFFFFF00[^>]*>\s*<\/rect>/i, '');
             svg = svg.replace('<svg ', '<svg class="pc-skel-svg pc-mol-rdkit" ');
+            svg = _relabelWildcardAtoms(svg);
             _molCache[cacheKey] = svg;
             return svg;
         } finally {
@@ -202,19 +250,19 @@
         // entre sí, uno para y otro orto al metilo (verificado contra la
         // figura de la p.5 del examen — la posición relativa importa
         // porque hace que los dos grupos NC sean químicamente distintos).
-        'diisocianobenceno':            '[C-]#[N+]c1ccc(C)c([N+]#[C-])c1',
+        'diisocianobenceno':            '[*:9]c1ccc(C)c([*:9])c1',
         // OJO: pese al nombre heredado ("...propano"), la figura del
         // examen muestra solo DOS carbonos (CN-CH2-CH2-NC): es en
         // realidad 1,2-diisocianoetano. Mantengo el id por compatibilidad
         // con el contenido ya escrito; el SMILES sí está corregido.
-        'diisocianopropano':            '[C-]#[N+]CC[N+]#[C-]',
+        'diisocianopropano':            '[*:9]CC[*:9]',
         // Carbono cuaternario con TRES isocianuros directos (equivalentes
         // entre sí) más un cuarto brazo isocianometilo (-CH2-NC, distinto
         // por tener un espaciador) → 2 entornos de isocianuro distintos.
         // Confirmado contra la figura: el "armario de Galvin" contiene
         // 2 (bencénico) + 1 (etano, simétrico) + 2 (este) = 5 isocianuros
         // distinguibles, tal y como exige el mark scheme del apartado (k).
-        'trisisocianometano':           '[C-]#[N+]CC([N+]#[C-])([N+]#[C-])[N+]#[C-]',
+        'trisisocianometano':           '[*:9]CC([*:9])([*:9])[*:9]',
         // Corregido tras revisar la p.5 del examen a alta resolución: NO
         // llevan hidroxilo, son ácidos poli-carboxílicos "puros". Con
         // ácido benzoico (1 tipo) + este ácido trimelítico (3 tipos, sin
@@ -244,6 +292,7 @@
         'lawsone-enol-a':               'O=C1c2ccccc2C(O)=C(O)C1=O',
         'lawsone-enol-b':               'Oc1c(O)c(=O)c2ccccc2c1=O',
         'ciclohexanona':                'O=C1CCCCC1',
+        'formaldehido':                 'C=O',
         'pivalona':                     'CC(C)(C)C(=O)C',
         'pivalaldehido':                'CC(C)(C)C=O',
         'acroleina':                    'C=CC=O',
@@ -260,10 +309,17 @@
         'acetamida-tautomero':          'CC(O)=N',
         'tautomeria-ceto-ejemplo':      'CC(C)=O',
         'tautomeria-enol-ejemplo':      'CC(O)=C',
-        'tautomeria-xyz-izq':           '[*:1]C([*:2])=O',
-        'tautomeria-xyz-der':           '[*:1]C([*:2])=C',
-        'lawsona-aducto-naranja':       'Oc1c2ccccc2c(O)c(Sc2ccccc2)c1O',
-        'lawsona-aducto-marron':        'O=C1c2ccccc2C(=O)C(Sc2ccccc2)=C1O',
+        // Ecuación general de tautomería X=Y–Z–H ⇌ X(H)–Y=Z: átomos
+        // genéricos (no elementos reales) y un H "postizo" explícito,
+        // todos como átomos comodín con número de mapeo reservado —
+        // ver _relabelWildcardAtoms (X=5, Y=6, Z=7, H=10).
+        'tautomeria-xyz-izq':           '[*:5]=[*:6][*:7][*:10]',
+        'tautomeria-xyz-der':           '[*:10][*:5][*:6]=[*:7]',
+        // El resto de la cadena lateral de queratina se abrevia como
+        // "Ker" (átomo comodín, número de mapeo 8) en vez de dibujar un
+        // anillo de fenilo que no pertenece a la estructura real.
+        'lawsona-aducto-naranja':       'Oc1c2ccccc2c(O)c(S[*:8])c1O',
+        'lawsona-aducto-marron':        'O=C1c2ccccc2C(=O)C(S[*:8])=C1O',
 
         // ═══ Q4 — carotenos / tartrazina ═══
         'butadieno':                    'C=CC=C',
@@ -420,6 +476,23 @@
     //    legado { mol: 'id-del-registro' }.
     // ────────────────────────────────────────────────────────────────
     function renderSchemeItem(node, size) {
+        const sz = node.size || size;
+        if (node.equilibrium) {
+            // Flecha doble de equilibrio (⇌): dos trazos paralelos en
+            // sentidos opuestos, minimalista, sin punta "central" — como
+            // pide el enunciado para tautomería ceto/enol y para el
+            // esquema general X=Y–Z–H ⇌ X(H)–Y=Z.
+            return `<div class="pc-scheme-arrow pc-scheme-equilibrium">
+                <span class="pc-scheme-arrow-above">${node.above || ''}</span>
+                <svg viewBox="0 0 68 22" class="pc-scheme-arrow-svg pc-scheme-eq-svg">
+                    <line x1="6" y1="7" x2="62" y2="7" class="pc-scheme-arrow-line"/>
+                    <polygon points="62,3 68,7 62,11" class="pc-scheme-arrowhead"/>
+                    <line x1="6" y1="15" x2="62" y2="15" class="pc-scheme-arrow-line"/>
+                    <polygon points="6,11 0,15 6,19" class="pc-scheme-arrowhead"/>
+                </svg>
+                <span class="pc-scheme-arrow-below">${node.below || ''}</span>
+            </div>`;
+        }
         if (node.arrow) {
             return `<div class="pc-scheme-arrow">
                 <span class="pc-scheme-arrow-above">${node.above || ''}</span>
@@ -433,8 +506,8 @@
             return `<div class="pc-scheme-node"><div class="pc-scheme-text">${node.text}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
         }
         const svg = node.smiles
-            ? renderMolSmiles(node.smiles, size || 'sm', node.colorAtoms)
-            : renderMolById(node.mol, size || 'sm', node.colorAtoms);
+            ? renderMolSmiles(node.smiles, sz || 'sm', node.colorAtoms)
+            : renderMolById(node.mol, sz || 'sm', node.colorAtoms);
         return `<div class="pc-scheme-node"><div class="pc-scheme-mol">${svg}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
     }
     function renderScheme(steps, opts) {
@@ -448,11 +521,17 @@
         const size = opts.size || 'sm';
         const startHtml = renderSchemeItem(start, size);
         const n = branches.length;
-        let path = '';
-        branches.forEach((br, i) => {
-            const ty = ((i + 0.5) / n * 100).toFixed(1);
-            path += `M0,50 L16,50 L38,${ty} `;
-        });
+        // Trazo en "llave" [ : un tramo horizontal desde el compuesto de
+        // partida hasta una barra vertical, y desde ahí un tramo
+        // horizontal recto hacia cada rama — todo en ángulo recto, sin
+        // diagonales, para que quede minimalista y ordenado (como una
+        // llave/corchete que se abre en dos).
+        const tys = branches.map((br, i) => ((i + 0.5) / n * 100));
+        const tyMin = Math.min.apply(null, tys), tyMax = Math.max.apply(null, tys);
+        const tyMid = (tyMin + tyMax) / 2;
+        let path = `M0,${tyMid} L16,${tyMid} `;
+        if (n > 1) path += `M16,${tyMin} L16,${tyMax} `;
+        tys.forEach(ty => { path += `M16,${ty} L38,${ty} `; });
         const branchesHtml = branches.map(br => {
             const arrowHtml = renderSchemeItem({ arrow: true, above: br.above, below: br.below }, size);
             const nodesHtml = (br.nodes || []).map(nd => renderSchemeItem(nd, size)).join('');
@@ -486,15 +565,15 @@
     );
     SCHEMES['q2-passerini-general'] = () => renderScheme(
         [
-            { mol: 'passerini-acido-generico' },
+            { mol: 'passerini-acido-generico', size: 'sm' },
             { plus: true },
-            { mol: 'passerini-isocianuro-generico' },
+            { mol: 'passerini-isocianuro-generico', size: 'sm' },
             { plus: true },
-            { mol: 'passerini-cetona-generica' },
+            { mol: 'passerini-cetona-generica', size: 'sm' },
             { arrow: true },
-            { mol: 'passerini-producto-generico' }
+            { mol: 'passerini-producto-generico', size: 'lg' }
         ],
-        { size: 'lg' }
+        { size: 'md' }
     );
 
     SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
@@ -617,7 +696,7 @@
     SCHEMES['q3-ceto-enol-general'] = () => renderScheme(
         [
             { mol: 'tautomeria-ceto-ejemplo', label: 'forma ceto' },
-            { arrow: true },
+            { equilibrium: true },
             { mol: 'tautomeria-enol-ejemplo', label: 'forma enol' }
         ],
         { size: 'sm' }
@@ -625,7 +704,7 @@
     SCHEMES['q3-tautomeria-general'] = () => renderScheme(
         [
             { mol: 'tautomeria-xyz-izq' },
-            { arrow: true },
+            { equilibrium: true },
             { mol: 'tautomeria-xyz-der' }
         ],
         { size: 'sm' }
