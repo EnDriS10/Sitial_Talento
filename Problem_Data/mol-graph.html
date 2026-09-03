@@ -211,7 +211,7 @@
                 if (!label) return;
                 const nodes = Array.prototype.slice.call(svgEl.querySelectorAll('.atom-' + idxStr));
                 if (!nodes.length) return;
-                let box = null, fallbackX = null, fallbackY = null, fontSize = null, fill = null;
+                let box = null, fontSize = null, fill = null;
                 nodes.forEach(n => {
                     try {
                         const b = n.getBBox ? n.getBBox() : null;
@@ -223,22 +223,13 @@
                             }
                         }
                     } catch (e) { /* getBBox puede fallar en nodos ocultos según el navegador */ }
-                    if (fallbackX === null && n.hasAttribute && n.hasAttribute('x')) {
-                        fallbackX = n.getAttribute('x'); fallbackY = n.getAttribute('y');
-                    }
                     const style = (n.getAttribute && n.getAttribute('style')) || '';
                     if (!fontSize) { const fm = style.match(/font-size:\s*([\d.]+)px/); if (fm) fontSize = fm[1]; }
                     if (!fill) { const cm = style.match(/fill:\s*(#[0-9A-Fa-f]{3,8})/); if (cm) fill = cm[1]; }
                 });
-                let cx, cy;
-                if (box) { cx = (box.x1 + box.x2) / 2; cy = (box.y1 + box.y2) / 2; }
-                else if (fallbackX !== null) { cx = parseFloat(fallbackX); cy = parseFloat(fallbackY); }
-                else return; // sin ninguna posición fiable: dejamos el átomo original tal cual, sin tocarlo
-                // Solo ahora, con la posición de reemplazo ya calculada,
-                // quitamos los trazos originales de RDKit para ese átomo —
-                // nunca antes: si algo falla arriba, el átomo original
-                // se queda intacto en vez de desaparecer.
                 nodes.forEach(n => { if (n.parentNode) n.parentNode.removeChild(n); });
+                if (!box) return; // sin caja fiable: mejor no arriesgar a mal-posicionar el rótulo
+                const cx = (box.x1 + box.x2) / 2, cy = (box.y1 + box.y2) / 2;
                 const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 t.setAttribute('x', cx.toFixed(1));
                 t.setAttribute('y', cy.toFixed(1));
@@ -535,13 +526,6 @@
         }
         return pts;
     }
-    // Mismo convenio de ángulo que _hexRingPts (0°=derecha, 90°=abajo en
-    // pantalla, -90°=arriba): así todas las coordenadas del archivo usan
-    // el mismo sistema y se pueden combinar sin contradicciones.
-    function _polar(x0, y0, angleDeg, len) {
-        const rad = angleDeg * Math.PI / 180;
-        return { x: x0 + len * Math.cos(rad), y: y0 + len * Math.sin(rad) };
-    }
     function _svgSkeletal(atoms, bonds) {
         const pad = 24;
         const xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
@@ -556,52 +540,22 @@
             let x1 = a1.x - minX, y1 = a1.y - minY, x2 = a2.x - minX, y2 = a2.y - minY;
             // Si un extremo tiene rótulo, recorta un poco la línea para que
             // no se meta debajo del texto (igual que hace cualquier
-            // graficador de química) — así el trazo llega justo hasta la
-            // letra, nunca a su mitad.
+            // graficador de química).
             const dx0 = x2 - x1, dy0 = y2 - y1, len0 = Math.hypot(dx0, dy0) || 1;
             const ux = dx0 / len0, uy = dy0 / len0;
             const trim = 13;
             if (a1.label) { x1 += ux * trim; y1 += uy * trim; }
             if (a2.label) { x2 -= ux * trim; y2 -= uy * trim; }
-            const order = b.order || 1;
-            if (order === 1) {
-                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
-                return;
-            }
-            const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
-            let px = -dy / len, py = dx / len; // perpendicular unitario
-            if (b.inside) {
-                // Para enlaces dobles DENTRO de un anillo, la segunda
-                // línea siempre va hacia el centro del anillo (convenio
-                // habitual), nunca "adivinada" por el signo del vector.
-                const midx = (x1 + x2) / 2, midy = (y1 + y2) / 2;
-                const insideX = b.inside.x - minX, insideY = b.inside.y - minY;
-                if (px * (insideX - midx) + py * (insideY - midy) < 0) { px = -px; py = -py; }
-            }
-            if (order === 3) {
-                // Triple enlace: tres líneas paralelas, lineal (los
-                // extremos ya vienen colocados a 180° por quien construye
-                // la molécula).
-                const off = 3.6;
-                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
-                svg += `<line x1="${(x1 - px * off).toFixed(1)}" y1="${(y1 - py * off).toFixed(1)}" x2="${(x2 - px * off).toFixed(1)}" y2="${(y2 - py * off).toFixed(1)}" class="pc-skel-bond"/>`;
-                svg += `<line x1="${(x1 + px * off).toFixed(1)}" y1="${(y1 + py * off).toFixed(1)}" x2="${(x2 + px * off).toFixed(1)}" y2="${(y2 + py * off).toFixed(1)}" class="pc-skel-bond"/>`;
-                return;
-            }
-            // order === 2
-            const off = 3.4;
-            if (b.inside) {
-                const inset = 0.16;
-                const ix1 = x1 + dx * inset, iy1 = y1 + dy * inset;
-                const ix2 = x2 - dx * inset, iy2 = y2 - dy * inset;
-                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
-                svg += `<line x1="${(ix1 + px * off * 2).toFixed(1)}" y1="${(iy1 + py * off * 2).toFixed(1)}" x2="${(ix2 + px * off * 2).toFixed(1)}" y2="${(iy2 + py * off * 2).toFixed(1)}" class="pc-skel-bond"/>`;
-            } else {
+            if (b.order === 2) {
+                const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+                const ox = -dy / len * 3.4, oy = dx / len * 3.4;
                 const inset = 0.14;
                 const ix1 = x1 + dx * inset, iy1 = y1 + dy * inset;
                 const ix2 = x2 - dx * inset, iy2 = y2 - dy * inset;
-                svg += `<line x1="${(x1 - px * off).toFixed(1)}" y1="${(y1 - py * off).toFixed(1)}" x2="${(x2 - px * off).toFixed(1)}" y2="${(y2 - py * off).toFixed(1)}" class="pc-skel-bond"/>`;
-                svg += `<line x1="${(ix1 + px * off).toFixed(1)}" y1="${(iy1 + py * off).toFixed(1)}" x2="${(ix2 + px * off).toFixed(1)}" y2="${(iy2 + py * off).toFixed(1)}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${(x1 - ox).toFixed(1)}" y1="${(y1 - oy).toFixed(1)}" x2="${(x2 - ox).toFixed(1)}" y2="${(y2 - oy).toFixed(1)}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${(ix1 + ox).toFixed(1)}" y1="${(iy1 + oy).toFixed(1)}" x2="${(ix2 + ox).toFixed(1)}" y2="${(iy2 + oy).toFixed(1)}" class="pc-skel-bond"/>`;
+            } else {
+                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
             }
         });
         atoms.forEach(a => {
@@ -616,249 +570,155 @@
     const CUSTOM_MOLS = {};
     (function registerCustomMols() {
         const add = (id, atoms, bonds) => { CUSTOM_MOLS[id] = _svgSkeletal(atoms, bonds); };
-        const L = 42; // longitud de enlace estándar para todas estas moléculas
-        const P = _polar;
-
-        // Añade, a partir de un átomo ya existente, el grupo &ndash;N&equiv;C de
-        // un isocianuro ABREVIADO: se dibujan los dos átomos reales, N y
-        // C, unidos por un triple enlace de verdad (tres líneas, 180°
-        // lineal — así el enlace que llega desde el resto de la molécula
-        // conecta visiblemente con el N, nunca con el centro de un rótulo
-        // "NC" combinado, y el C queda claramente más allá, en línea recta).
-        function addNC(atoms, bonds, fromId, fromX, fromY, angleDeg, prefix) {
-            const n = P(fromX, fromY, angleDeg, L * 0.85);
-            const c = P(n.x, n.y, angleDeg, L * 0.8);
-            const nId = prefix + 'N', cId = prefix + 'C';
-            atoms.push({ id: nId, x: n.x, y: n.y, label: 'N' });
-            atoms.push({ id: cId, x: c.x, y: c.y, label: 'C' });
-            bonds.push({ a: fromId, b: nId, order: 1 });
-            bonds.push({ a: nId, b: cId, order: 3 });
-        }
 
         // ── Reactivos y producto genéricos de la reacción de Passerini ──
-        // Ángulos de enlace según lo pedido: un carbono con 2 sustituyentes
-        // reales forma 60° entre ellos; con 3, también 60° (en abanico);
-        // con 4 (el carbono cuaternario del producto), 45° entre
-        // sustituyentes adyacentes; los triples enlaces son lineales (180°).
-        (function () {
-            const c = { x: 0, y: 0 };
-            const r1 = P(c.x, c.y, 180, L), od = P(c.x, c.y, 120, L), oh = P(c.x, c.y, 60, L);
-            add('passerini-acido-generico', [
-                { id: 'r', x: r1.x, y: r1.y, label: 'R\u00B9' },
-                { id: 'c', x: c.x, y: c.y, label: null },
-                { id: 'od', x: od.x, y: od.y, label: 'O' },
-                { id: 'oh', x: oh.x, y: oh.y, label: 'OH' }
+        add('passerini-acido-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B9' },
+            { id: 'c', x: 42, y: 0, label: null },
+            { id: 'od', x: 42, y: -42, label: 'O' },
+            { id: 'oh', x: 80, y: 20, label: 'OH' }
+        ], [
+            { a: 'r', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'oh', order: 1 }
+        ]);
+        add('passerini-isocianuro-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B2' },
+            { id: 'nc', x: 54, y: 0, label: 'NC' }
+        ], [
+            { a: 'r', b: 'nc', order: 1 }
+        ]);
+        add('passerini-cetona-generica', [
+            { id: 'r3', x: -40, y: -22, label: 'R\u00B3' },
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'od', x: 0, y: -44, label: 'O' },
+            { id: 'r4', x: 40, y: -22, label: 'R\u2074' }
+        ], [
+            { a: 'r3', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'r4', order: 1 }
+        ]);
+        const passeriniProducto = [
+            [
+                { id: 'r1', x: 0, y: 18, label: 'R\u00B9' },
+                { id: 'c1', x: 38, y: -18, label: null },
+                { id: 'od1', x: 38, y: -58, label: 'O' },
+                { id: 'oe', x: 76, y: 18, label: 'O' },
+                { id: 'c2', x: 114, y: -18, label: null },
+                { id: 'r3', x: 94, y: -58, label: 'R\u00B3' },
+                { id: 'r4', x: 134, y: -58, label: 'R\u2074' },
+                { id: 'c3', x: 152, y: 18, label: null },
+                { id: 'od2', x: 152, y: 58, label: 'O' },
+                { id: 'n', x: 190, y: -18, label: 'N' },
+                { id: 'h', x: 190, y: -58, label: 'H' },
+                { id: 'r2', x: 228, y: 18, label: 'R\u00B2' }
             ], [
-                { a: 'r', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'oh', order: 1 }
-            ]);
-        })();
-        (function () {
-            const atoms = [{ id: 'r', x: 0, y: 0, label: 'R\u00B2' }];
-            const bonds = [];
-            addNC(atoms, bonds, 'r', 0, 0, 0, 'ic_');
-            add('passerini-isocianuro-generico', atoms, bonds);
-        })();
-        (function () {
-            const c = { x: 0, y: 0 };
-            const r3 = P(c.x, c.y, 180, L), od = P(c.x, c.y, 120, L), r4 = P(c.x, c.y, 60, L);
-            add('passerini-cetona-generica', [
-                { id: 'r3', x: r3.x, y: r3.y, label: 'R\u00B3' },
-                { id: 'c', x: c.x, y: c.y, label: null },
-                { id: 'od', x: od.x, y: od.y, label: 'O' },
-                { id: 'r4', x: r4.x, y: r4.y, label: 'R\u2074' }
-            ], [
-                { a: 'r3', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'r4', order: 1 }
-            ]);
-        })();
-        (function () {
-            const c1 = { x: 0, y: 0 };
-            const r1 = P(c1.x, c1.y, 180, L);
-            const od1 = P(c1.x, c1.y, 120, L);
-            const oe = P(c1.x, c1.y, 60, L);           // O de éster: sale a 60° de C1 (abanico de 3, 60° entre cada par)
-            const c2 = P(oe.x, oe.y, 300, L);           // en O-éster (2 sustituyentes): 60° entre la vuelta a C1 (240°) y la salida a C2 (300°)
-            const r3 = P(c2.x, c2.y, 75, L);            // C2 es cuaternario (4 sustituyentes): 45° entre cada par consecutivo
-            const r4 = P(c2.x, c2.y, 30, L);
-            const c3 = P(c2.x, c2.y, -15, L);
-            const od2 = P(c3.x, c3.y, 105, L);          // en C3 (3 sustituyentes): 60° entre cada par, en abanico
-            const n = P(c3.x, c3.y, 45, L);
-            const h = P(n.x, n.y, 165, L);              // en N (3 sustituyentes): 60° entre cada par
-            const r2 = P(n.x, n.y, 105, L);
-            const atomsList = [
-                { id: 'r1', x: r1.x, y: r1.y, label: 'R\u00B9' },
-                { id: 'c1', x: c1.x, y: c1.y, label: null },
-                { id: 'od1', x: od1.x, y: od1.y, label: 'O' },
-                { id: 'oe', x: oe.x, y: oe.y, label: 'O' },
-                { id: 'c2', x: c2.x, y: c2.y, label: null },
-                { id: 'r3', x: r3.x, y: r3.y, label: 'R\u00B3' },
-                { id: 'r4', x: r4.x, y: r4.y, label: 'R\u2074' },
-                { id: 'c3', x: c3.x, y: c3.y, label: null },
-                { id: 'od2', x: od2.x, y: od2.y, label: 'O' },
-                { id: 'n', x: n.x, y: n.y, label: 'N' },
-                { id: 'h', x: h.x, y: h.y, label: 'H' },
-                { id: 'r2', x: r2.x, y: r2.y, label: 'R\u00B2' }
-            ];
-            const bondsList = [
                 { a: 'r1', b: 'c1', order: 1 }, { a: 'c1', b: 'od1', order: 2 }, { a: 'c1', b: 'oe', order: 1 },
                 { a: 'oe', b: 'c2', order: 1 }, { a: 'c2', b: 'r3', order: 1 }, { a: 'c2', b: 'r4', order: 1 },
                 { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'od2', order: 2 }, { a: 'c3', b: 'n', order: 1 },
                 { a: 'n', b: 'h', order: 1 }, { a: 'n', b: 'r2', order: 1 }
-            ];
-            add('passerini-producto-generico', atomsList, bondsList);
-            add('passerini-producto-general', atomsList, bondsList);
-        })();
+            ]
+        ];
+        add('passerini-producto-generico', passeriniProducto[0], passeriniProducto[1]);
+        add('passerini-producto-general', passeriniProducto[0], passeriniProducto[1]);
 
-        // ── Formaldehído con los dos H explícitos, en abanico de 60°
-        //    (3 sustituyentes: O doble + 2 H) — sin ellos solo se vería
-        //    un trazo "=O" suelto, sin ninguna referencia del carbono. ──
-        (function () {
-            const c = { x: 0, y: 0 };
-            const od = P(c.x, c.y, -90, L * 0.85);
-            const h1 = P(c.x, c.y, -90 - 60, L * 0.85);
-            const h2 = P(c.x, c.y, -90 + 60, L * 0.85);
-            add('formaldehido', [
-                { id: 'c', x: c.x, y: c.y, label: null },
-                { id: 'o', x: od.x, y: od.y, label: 'O' },
-                { id: 'h1', x: h1.x, y: h1.y, label: 'H' },
-                { id: 'h2', x: h2.x, y: h2.y, label: 'H' }
-            ], [
-                { a: 'c', b: 'o', order: 2 }, { a: 'c', b: 'h1', order: 1 }, { a: 'c', b: 'h2', order: 1 }
-            ]);
-        })();
+        // ── Formaldehído con los dos H explícitos (molécula demasiado
+        //    pequeña para dejarlos implícitos: sin ellos solo se vería
+        //    un trazo "=O" suelto, sin ninguna referencia del carbono) ──
+        add('formaldehido', [
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'o', x: 36, y: -24, label: 'O' },
+            { id: 'h1', x: -36, y: -24, label: 'H' },
+            { id: 'h2', x: -36, y: 24, label: 'H' }
+        ], [
+            { a: 'c', b: 'o', order: 2 }, { a: 'c', b: 'h1', order: 1 }, { a: 'c', b: 'h2', order: 1 }
+        ]);
 
         // ── Ecuación general de tautomería X=Y–Z–H ⇌ X(H)–Y=Z, con
         //    átomos genéricos de verdad (letras X, Y, Z), no elementos
-        //    reales — mismo abanico de 60° entre pares de sustituyentes. ──
-        (function () {
-            const x = { x: 0, y: 0 };
-            const y = P(x.x, x.y, -30, L);              // X=Y (doble enlace) a -30°
-            // en Y (2 sustituyentes: X y Z): 60° entre la vuelta a X
-            // (reverse de -30° = 150°) y la salida a Z (150±60 → 210°)
-            const z = P(y.x, y.y, 210, L);
-            // en Z (2 sustituyentes: Y y H): 60° entre la vuelta a Y
-            // (reverse de 210° = 30°) y la salida a H (30±60 → 90°)
-            const h = P(z.x, z.y, 90, L);
-            add('tautomeria-xyz-izq', [
-                { id: 'x', x: x.x, y: x.y, label: 'X' },
-                { id: 'y', x: y.x, y: y.y, label: 'Y' },
-                { id: 'z', x: z.x, y: z.y, label: 'Z' },
-                { id: 'h', x: h.x, y: h.y, label: 'H' }
-            ], [
-                { a: 'x', b: 'y', order: 2 }, { a: 'y', b: 'z', order: 1 }, { a: 'z', b: 'h', order: 1 }
-            ]);
-        })();
-        (function () {
-            const h = { x: 0, y: 0 };
-            const x = P(h.x, h.y, -30, L);
-            const y = P(x.x, x.y, 210, L);              // en X (2 sust.: H, Y): 60° respecto a la vuelta a H
-            const z = P(y.x, y.y, 90, L);                // en Y (2 sust.: X, Z=doble): 60° respecto a la vuelta a X
-            add('tautomeria-xyz-der', [
-                { id: 'h', x: h.x, y: h.y, label: 'H' },
-                { id: 'x', x: x.x, y: x.y, label: 'X' },
-                { id: 'y', x: y.x, y: y.y, label: 'Y' },
-                { id: 'z', x: z.x, y: z.y, label: 'Z' }
-            ], [
-                { a: 'h', b: 'x', order: 1 }, { a: 'x', b: 'y', order: 1 }, { a: 'y', b: 'z', order: 2 }
-            ]);
-        })();
+        //    reales ──
+        add('tautomeria-xyz-izq', [
+            { id: 'x', x: 0, y: 0, label: 'X' },
+            { id: 'y', x: 40, y: -24, label: 'Y' },
+            { id: 'z', x: 80, y: 0, label: 'Z' },
+            { id: 'h', x: 120, y: -24, label: 'H' }
+        ], [
+            { a: 'x', b: 'y', order: 2 }, { a: 'y', b: 'z', order: 1 }, { a: 'z', b: 'h', order: 1 }
+        ]);
+        add('tautomeria-xyz-der', [
+            { id: 'h', x: 0, y: -24, label: 'H' },
+            { id: 'x', x: 40, y: 0, label: 'X' },
+            { id: 'y', x: 80, y: -24, label: 'Y' },
+            { id: 'z', x: 120, y: 0, label: 'Z' }
+        ], [
+            { a: 'h', b: 'x', order: 1 }, { a: 'x', b: 'y', order: 1 }, { a: 'y', b: 'z', order: 2 }
+        ]);
 
-        // ── Isocianuros abreviados (&ndash;N&equiv;C dibujado como dos átomos
-        //    reales, lineal) sobre cadenas simples ──
-        (function () {
-            const c1 = { x: 0, y: 0 };
-            const c2 = P(c1.x, c1.y, -30, L);
-            // en C2 (2 sust.: C1 y C3): 60° entre la vuelta a C1
-            // (reverse de -30° = 150°) y la salida a C3 (150+60=210°)
-            const c3 = P(c2.x, c2.y, 210, L);
-            const atoms = [
-                { id: 'c1', x: c1.x, y: c1.y, label: null },
-                { id: 'c2', x: c2.x, y: c2.y, label: null },
-                { id: 'c3', x: c3.x, y: c3.y, label: null }
-            ];
-            const bonds = [{ a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'c3', order: 1 }];
-            // en C3 (2 sust.: C2 y N): 60° entre la vuelta a C2
-            // (reverse de 210° = 30°) y la salida al NC (30-60=-30°)
-            addNC(atoms, bonds, 'c3', c3.x, c3.y, -30, 'p_');
-            add('1-isocianopropano', atoms, bonds);
-        })();
-        (function () {
-            const c1 = { x: 0, y: 0 };
-            const c2 = P(c1.x, c1.y, -30, L);
-            const c3 = P(c2.x, c2.y, 210, L);
-            const atoms = [
-                { id: 'c1', x: c1.x, y: c1.y, label: null },
-                { id: 'c2', x: c2.x, y: c2.y, label: null },
-                { id: 'c3', x: c3.x, y: c3.y, label: null }
-            ];
-            const bonds = [{ a: 'c1', b: 'c2', order: 2 }, { a: 'c2', b: 'c3', order: 1 }];
-            addNC(atoms, bonds, 'c3', c3.x, c3.y, -30, 'a_');
-            add('alil-isocianuro', atoms, bonds);
-        })();
-        (function () {
-            const c1 = { x: 0, y: 0 };
-            const c2 = P(c1.x, c1.y, -30, L);
-            const atoms = [
-                { id: 'c1', x: c1.x, y: c1.y, label: null },
-                { id: 'c2', x: c2.x, y: c2.y, label: null }
-            ];
-            const bonds = [{ a: 'c1', b: 'c2', order: 1 }];
-            // en C1 (2 sust.: C2 y NC1): 60° entre ambas salidas (-30° y 30°)
-            addNC(atoms, bonds, 'c1', c1.x, c1.y, 30, 'd1_');
-            // en C2 (2 sust.: C1 y NC2): 60° entre la vuelta a C1
-            // (reverse de -30° = 150°) y la salida a NC2 (150+60=210°)
-            addNC(atoms, bonds, 'c2', c2.x, c2.y, 210, 'd2_');
-            add('diisocianopropano', atoms, bonds);
-        })();
-        (function () {
-            const cq = { x: 0, y: 0 };
-            // Carbono cuaternario (4 sustituyentes): 45° entre cada par
-            // consecutivo — tres isocianuros directos + un brazo -CH2-NC.
-            const atoms = [{ id: 'cq', x: 0, y: 0, label: null }];
-            const bonds = [];
-            addNC(atoms, bonds, 'cq', 0, 0, -67.5, 'ta_');
-            addNC(atoms, bonds, 'cq', 0, 0, -22.5, 'tb_');
-            addNC(atoms, bonds, 'cq', 0, 0, 22.5, 'tc_');
-            const ch2 = P(0, 0, 67.5, L);
-            atoms.push({ id: 'ch2', x: ch2.x, y: ch2.y, label: null });
-            bonds.push({ a: 'cq', b: 'ch2', order: 1 });
-            // en CH2 (2 sust.: Cq y el 4º NC): 60° entre la vuelta a Cq
-            // (67.5+180=247.5°) y la salida al NC final.
-            addNC(atoms, bonds, 'ch2', ch2.x, ch2.y, 247.5 - 60, 'td_');
-            add('trisisocianometano', atoms, bonds);
-        })();
+        // ── Isocianuros con el grupo &ndash;NC abreviado como texto, en
+        //    vez de dibujar el N&equiv;C explícito ──
+        add('1-isocianopropano', [
+            { id: 'c1', x: 0, y: 0, label: null },
+            { id: 'c2', x: 38, y: -22, label: null },
+            { id: 'c3', x: 76, y: 0, label: null },
+            { id: 'nc', x: 114, y: -22, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        add('alil-isocianuro', [
+            { id: 'c1', x: 0, y: -22, label: null },
+            { id: 'c2', x: 38, y: 0, label: null },
+            { id: 'c3', x: 76, y: -22, label: null },
+            { id: 'nc', x: 114, y: 0, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 2 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        add('diisocianopropano', [
+            { id: 'nc1', x: 0, y: 0, label: 'NC' },
+            { id: 'c1', x: 42, y: -24, label: null },
+            { id: 'c2', x: 84, y: 0, label: null },
+            { id: 'nc2', x: 126, y: -24, label: 'NC' }
+        ], [
+            { a: 'nc1', b: 'c1', order: 1 }, { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'nc2', order: 1 }
+        ]);
+        add('trisisocianometano', [
+            { id: 'cq', x: 0, y: 0, label: null },
+            { id: 'nca', x: 32, y: -32, label: 'NC' },
+            { id: 'ncb', x: -32, y: -32, label: 'NC' },
+            { id: 'ncd', x: 32, y: 32, label: 'NC' },
+            { id: 'ch2', x: -32, y: 32, label: null },
+            { id: 'ncc', x: -70, y: 60, label: 'NC' }
+        ], [
+            { a: 'cq', b: 'nca', order: 1 }, { a: 'cq', b: 'ncb', order: 1 },
+            { a: 'cq', b: 'ncd', order: 1 }, { a: 'cq', b: 'ch2', order: 1 },
+            { a: 'ch2', b: 'ncc', order: 1 }
+        ]);
 
-        // ── Anillos (bencénico / ciclopropílico) con el grupo &ndash;N&equiv;C
-        //    abreviado como sustituyente — el enlace entra en el N. ──
+        // Anillos (bencénico / ciclopropílico) con el grupo &ndash;NC
+        // abreviado como sustituyente.
         (function () {
-            const cx = 0, cy = 0, r = 34;
-            const hex = _hexRingPts(cx, cy, r, -90);
-            const ringBonds = hex.map((_, i) => ({ a: 'c' + i, b: 'c' + ((i + 1) % 6), order: i % 2 === 0 ? 2 : 1, inside: { x: cx, y: cy } }));
+            const hex = _hexRingPts(0, 0, 34, -90);
+            const ringBonds = hex.map((_, i) => ({ a: 'c' + i, b: 'c' + ((i + 1) % 6), order: i % 2 === 0 ? 2 : 1 }));
             const ringAtoms = hex.map((p, i) => ({ id: 'c' + i, x: p.x, y: p.y, label: null }));
-
-            // Fenilisocianuro: NC en el vértice superior (índice 0),
-            // saliendo radialmente hacia afuera (mismo ángulo que ese
-            // vértice desde el centro del anillo).
-            let atoms = ringAtoms.slice(); let bonds = ringBonds.slice();
-            addNC(atoms, bonds, 'c0', hex[0].x, hex[0].y, -90, 'ph_');
-            add('fenilisocianuro', atoms, bonds);
-
+            // Fenilisocianuro: NC en el vértice superior (índice 0)
+            const nc0 = hex[0];
+            add('fenilisocianuro', ringAtoms.concat([{ id: 'nc', x: nc0.x, y: nc0.y - 40, label: 'NC' }]),
+                ringBonds.concat([{ a: 'c0', b: 'nc', order: 1 }]));
             // 4-metil-1,3-diisocianobenceno: NC en el vértice 0 (arriba),
             // metilo en el vértice 3 (abajo), segundo NC en el vértice 4
-            // (adyacente al metilo → orto a él, meta al primer NC).
-            atoms = ringAtoms.slice(); bonds = ringBonds.slice();
-            addNC(atoms, bonds, 'c0', hex[0].x, hex[0].y, -90, 'db1_');
-            const v3 = hex[3], v4 = hex[4];
-            const me = P(v3.x, v3.y, 90, L);
-            atoms.push({ id: 'me', x: me.x, y: me.y, label: null });
-            bonds.push({ a: 'c3', b: 'me', order: 1 });
-            addNC(atoms, bonds, 'c4', v4.x, v4.y, 150, 'db2_');
-            add('diisocianobenceno', atoms, bonds);
+            // (adyacente al metilo → orto a él, meta al primer NC, tal y
+            // como exige el enunciado del examen).
+            const v0 = hex[0], v3 = hex[3], v4 = hex[4];
+            const v4dir = Math.hypot(v4.x, v4.y) || 1;
+            add('diisocianobenceno', ringAtoms.concat([
+                { id: 'nca', x: v0.x, y: v0.y - 40, label: 'NC' },
+                { id: 'me', x: v3.x, y: v3.y + 40, label: null },
+                { id: 'ncb', x: v4.x + (v4.x / v4dir) * 40, y: v4.y + (v4.y / v4dir) * 40, label: 'NC' }
+            ]), ringBonds.concat([
+                { a: 'c0', b: 'nca', order: 1 }, { a: 'c3', b: 'me', order: 1 }, { a: 'c4', b: 'ncb', order: 1 }
+            ]));
 
             const tri = _triRingPts(0, 0, 26, -90);
             const triBonds = [{ a: 't0', b: 't1', order: 1 }, { a: 't1', b: 't2', order: 1 }, { a: 't2', b: 't0', order: 1 }];
             const triAtoms = tri.map((p, i) => ({ id: 't' + i, x: p.x, y: p.y, label: null }));
-            atoms = triAtoms.slice(); bonds = triBonds.slice();
-            addNC(atoms, bonds, 't0', tri[0].x, tri[0].y, -90, 'cp_');
-            add('ciclopropil-isocianuro', atoms, bonds);
+            const t0 = tri[0];
+            add('ciclopropil-isocianuro', triAtoms.concat([{ id: 'nc', x: t0.x, y: t0.y - 40, label: 'NC' }]),
+                triBonds.concat([{ a: 't0', b: 'nc', order: 1 }]));
         })();
     })();
 
