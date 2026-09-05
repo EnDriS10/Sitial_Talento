@@ -121,33 +121,74 @@
     const STANDARD_ATOM_PALETTE = {};
     STANDARD_ATOM_NUMBERS.forEach(z => { STANDARD_ATOM_PALETTE[z] = STANDARD_ATOM_COLOUR; });
 
-    // Números de mapeo reservados para etiquetas de sustituyente
-    // abreviadas que no son "un R más" con su propio número (R¹, R²...),
-    // sino una notación fija: [*:90] → grupo isocianuro completo
-    // "-N≡C:" colapsado en una sola etiqueta "NC" (en vez de dibujar los
-    // dos átomos con sus cargas formales y el triple enlace explícito);
-    // y [*:95] → "el resto de la molécula no relevante para el
-    // problema", dibujado como "R'" (p. ej. la cadena lateral de la
-    // queratina en el aducto de la lawsona, Q3, que antes se dibujaba
-    // por error como un fenilo real). En ambos casos el enlace entrante
-    // siempre queda pegado, sin ambigüedad, a ese nodo.
-    const RESERVED_LABEL_MAP_NUMS = { 90: 'NC', 95: "R'", 96: 'R' };
-    // Busca, dentro del bloque V2000 ya generado por RDKit para un mol,
-    // los índices (0-based) de los átomos marcados con un número de
-    // mapeo concreto. Lo hacemos leyendo el propio molblock en vez de
-    // adivinar posiciones a mano: es válido pase lo que pase con el
-    // orden interno tras el parseo/saneado de RDKit.
-    function findMapNumAtomIndices(mol, mapNum) {
-        const molblock = mol.get_molblock();
-        const lines = molblock.split('\n');
-        const nAtoms = parseInt((lines[3] || '').slice(0, 3), 10) || 0;
-        const indices = [];
-        for (let i = 0; i < nAtoms; i++) {
-            const line = lines[4 + i] || '';
-            const mapField = line.slice(60, 63).trim();
-            if (parseInt(mapField, 10) === mapNum) indices.push(i);
+    // ────────────────────────────────────────────────────────────────
+    // 2.b) REETIQUETADO DE ÁTOMOS COMODÍN — RDKit dibuja un átomo
+    //      comodín [*:N] literalmente como texto "*" (+ el número de
+    //      mapeo), lo cual no es la notación química habitual. Para los
+    //      usos didácticos de este banco (grupos R variables, átomos
+    //      genéricos X/Y/Z, un H "postizo" explícito, el grupo &ndash;NC
+    //      de un isocianuro abreviado, o el resto "R'" de una cadena de
+    //      queratina) sustituimos ese rótulo DESPUÉS de que RDKit calcule
+    //      el layout 2D y el SVG final.
+    //
+    //      Primer intento (fallido): buscar texto tipo "*:1" dentro de
+    //      los <text> del SVG. No funcionó de forma fiable porque RDKit
+    //      reparte el símbolo del átomo y su número de mapeo en varios
+    //      fragmentos de texto internos, así que el patrón exacto nunca
+    //      terminaba de coincidir siempre.
+    //
+    //      Solución robusta: RDKit SIEMPRE marca cada trazo (texto o
+    //      trazo de enlace) de un átomo con la clase CSS "atom-<índice>"
+    //      — es el mismo mecanismo que usa para resaltar átomos — así
+    //      que en vez de adivinar el texto, calculamos nosotros mismos
+    //      (recorriendo el SMILES, igual que lo hace RDKit al parsear)
+    //      el índice de átomo de cada [*:N], localizamos TODOS los
+    //      elementos con esa clase, y los sustituimos por un único
+    //      <text> nuevo en la misma posición, con el rótulo que
+    //      queremos. Esto no depende de cómo RDKit trocee el texto
+    //      internamente.
+    //
+    //      Números de mapeo reservados (namespace propio de este banco,
+    //      no tiene relación con reacciones/SMARTS reales):
+    //        1-4 → R¹ R² R³ R⁴   (sustituyentes variables, p.ej. Passerini)
+    //        5-7 → X Y Z         (átomos genéricos, tautomería general)
+    //        8   → R'            (resto de una proteína de queratina)
+    //        9   → NC            (isocianuro abreviado, sin dibujar N≡C)
+    //        10  → H             (hidrógeno explícito "postizo")
+    // ────────────────────────────────────────────────────────────────
+    const SUP_DIGITS = { '0':'\u2070','1':'\u00B9','2':'\u00B2','3':'\u00B3','4':'\u2074' };
+    const WILDCARD_LABELS = {
+        '1': 'R' + SUP_DIGITS['1'], '2': 'R' + SUP_DIGITS['2'],
+        '3': 'R' + SUP_DIGITS['3'], '4': 'R' + SUP_DIGITS['4'],
+        '5': 'X', '6': 'Y', '7': 'Z',
+        '8': "R'", '9': 'NC', '10': 'H'
+    };
+
+    // Recorre un SMILES en el MISMO orden en que RDKit asigna índices de
+    // átomo (orden de aparición; los dígitos de cierre de anillo, signos
+    // de enlace, paréntesis de rama y puntos de desconexión NO cuentan
+    // como átomo) y devuelve {índiceDeÁtomo: nºDeMapeo} para cada átomo
+    // comodín [*:N] que encuentre.
+    function _atomIndexOfMapNums(smiles) {
+        const map = {};
+        let atomIdx = 0, i = 0;
+        while (i < smiles.length) {
+            const c = smiles[i];
+            if (c === '[') {
+                const close = smiles.indexOf(']', i);
+                const inner = smiles.slice(i + 1, close);
+                const mm = inner.match(/:(\d+)/);
+                if (mm) map[atomIdx] = mm[1];
+                atomIdx++;
+                i = close + 1;
+                continue;
+            }
+            if (c === 'C' && smiles[i + 1] === 'l') { atomIdx++; i += 2; continue; }
+            if (c === 'B' && smiles[i + 1] === 'r') { atomIdx++; i += 2; continue; }
+            if (/[A-Za-z]/.test(c)) { atomIdx++; i++; continue; }
+            i++; // dígitos de anillo, ( ) = # - / \ . + %
         }
-        return indices;
+        return map;
     }
 
     function svgForSmiles(smiles, size, colorAtoms) {
@@ -174,148 +215,32 @@
                 details.symbolColour = STANDARD_ATOM_COLOUR;
                 details.atomColourPalette = STANDARD_ATOM_PALETTE;
             }
-            // Etiquetas de sustituyente abreviadas reservadas (NC, R'...):
-            // ver RESERVED_LABEL_MAP_NUMS arriba.
-            Object.keys(RESERVED_LABEL_MAP_NUMS).forEach(mapNumStr => {
-                const idxs = findMapNumAtomIndices(mol, Number(mapNumStr));
-                if (!idxs.length) return;
-                details.atomLabels = details.atomLabels || {};
-                idxs.forEach(i => { details.atomLabels[String(i)] = RESERVED_LABEL_MAP_NUMS[mapNumStr]; });
-            });
+            // Sustituyentes genéricos ([*:1] → "R¹", etc. — ver
+            // WILDCARD_LABELS): se le pide a RDKit que dibuje directamente
+            // el texto definitivo mediante la opción "atomLabels" del
+            // propio render, en vez de dibujar el átomo comodín y luego
+            // ir a buscarlo en el SVG ya insertado en el DOM con
+            // getBBox() para recortarlo y sustituirlo. Ese segundo enfoque
+            // era frágil — getBBox() puede devolver una caja 0×0 o fallar
+            // según el navegador y el momento exacto en que se mide, y
+            // cuando eso pasaba nos quedábamos con el rótulo por defecto
+            // de RDKit ("*:1"), de ahí los dos puntos apareciendo en vez
+            // de "R". Con atomLabels el texto queda fijado en el mismo
+            // cálculo de layout, sin ningún paso posterior que pueda
+            // fallar.
+            const mapNums = _atomIndexOfMapNums(smiles);
+            const mapKeys = Object.keys(mapNums);
+            if (mapKeys.length) {
+                details.atomLabels = {};
+                mapKeys.forEach(idx => {
+                    const label = WILDCARD_LABELS[mapNums[idx]];
+                    if (label) details.atomLabels[idx] = label;
+                });
+            }
             let svg = mol.get_svg_with_highlights(JSON.stringify(details));
             // Quita el rect de fondo que RDKit añade igualmente (por si
-
             // algún visor ignora el canal alfa) y las etiquetas propias
             // de RDKit; deja solo <svg>...</svg> con los trazos.
-            svg = svg.replace(/<rect[^>]*fill:#FFFFFF00[^>]*>\s*<\/rect>/i, '');
-            svg = svg.replace('<svg ', '<svg class="pc-skel-svg pc-mol-rdkit" ');
-            _molCache[cacheKey] = svg;
-            return svg;
-        } finally {
-            mol.delete();
-        }
-    }
-
-    // ── Moléculas con coordenadas 2D fijadas a mano (molblock V2000) ──
-    // Para un puñado de estructuras concretas, la generación automática
-    // de coordenadas de RDKit no respeta los ángulos que necesitamos
-    // (p. ej. el producto general de Passerini con su carbono
-    // tetrasustituido, o el formaldehído con sus hidrógenos explícitos
-    // a 120°). En vez de depender del layout automático, construimos el
-    // molblock nosotros mismos con la geometría exacta y se lo pasamos
-    // a RDKit ya resuelto — RDKit conserva esas coordenadas tal cual.
-    const CUSTOM_MOLBLOCKS = {};
-    (function registerCustomMolblocks() {
-        function deg(d) { return d * Math.PI / 180; }
-        function pt(cx, cy, angleDeg, len) {
-            return [cx + len * Math.cos(deg(angleDeg)), cy + len * Math.sin(deg(angleDeg))];
-        }
-        function pad(str, len) { return str.length >= len ? str : ' '.repeat(len - str.length) + str; }
-        function fmtCoord(v) { return pad(v.toFixed(4), 10); }
-        function fmtCount(v) { return pad(String(v), 3); }
-        // atoms: [símbolo, x, y] · bonds: [átomo1, átomo2, orden] (1-based)
-        function buildMolblock(atoms, bonds) {
-            let mb = '\n     RDKit          2D\n\n';
-            mb += fmtCount(atoms.length) + fmtCount(bonds.length) + '  0  0  0  0  0  0  0  0999 V2000\n';
-            atoms.forEach(([sym, x, y]) => {
-                mb += fmtCoord(x) + fmtCoord(y) + fmtCoord(0) + ' ' + pad(sym, 2) + '  0  0  0  0  0  0  0  0  0  0  0  0\n';
-            });
-            bonds.forEach(([a, b, o]) => { mb += fmtCount(a) + fmtCount(b) + fmtCount(o) + '  0\n'; });
-            mb += 'M  END\n';
-            return mb;
-        }
-
-        // ── Formaldehído (O=CH2) con los dos H explícitos ──
-        // O, H y H en los vértices de un triángulo equilátero; el C se
-        // sitúa en el punto donde se cortan las tres bisectrices (el
-        // centroide) y los tres enlaces C–X son esas bisectrices, así
-        // que los tres ángulos entre enlaces salen exactos: 120°/120°/120°.
-        (function () {
-            const C = [0, 0];
-            const O = pt(C[0], C[1], 90, 1.0);
-            const H1 = pt(C[0], C[1], 210, 1.0);
-            const H2 = pt(C[0], C[1], -30, 1.0);
-            const atoms = [['C', C[0], C[1]], ['O', O[0], O[1]], ['H', H1[0], H1[1]], ['H', H2[0], H2[1]]];
-            const bonds = [[1, 2, 2], [1, 3, 1], [1, 4, 1]];
-            CUSTOM_MOLBLOCKS['formaldehido'] = { molblock: buildMolblock(atoms, bonds), atomLabels: {} };
-        })();
-
-        // ── Producto general de Passerini: R¹C(=O)–O–C(R³)(R⁴)–C(=O)NHR² ──
-        // Geometría fijada a mano según la convención pedida: el carbono
-        // central (4 sustituyentes: O-éster, R³, R⁴ y C(=O)NHR²) forma
-        // 45° entre sus dos enlaces "de cadena"; cada carbono carbonílico
-        // (enlace doble a O) forma 60° entre su sustituyente R y el
-        // siguiente átomo de la cadena, con el =O en la bisectriz opuesta.
-        (function () {
-            const Ca = [0, 0];
-            const Oester = pt(Ca[0], Ca[1], 112.5, 1.0);
-            const C2 = pt(Ca[0], Ca[1], 67.5, 1.0);
-            const R3 = pt(Ca[0], Ca[1], 225, 1.0);
-            const R4 = pt(Ca[0], Ca[1], -45, 1.0);
-
-            const dirOesterToC1 = 165;
-            const C1 = pt(Oester[0], Oester[1], dirOesterToC1, 1.0);
-            const dirC1ToOester = dirOesterToC1 + 180;
-            const dirC1ToR1 = dirC1ToOester - 60;
-            const R1 = pt(C1[0], C1[1], dirC1ToR1, 1.0);
-            const dirC1ToOdbl = (dirC1ToOester + dirC1ToR1) / 2 + 180;
-            const Ocarbonyl1 = pt(C1[0], C1[1], dirC1ToOdbl, 1.0);
-
-            const dirC2ToCalpha = 67.5 + 180;
-            const dirC2ToN = dirC2ToCalpha + 60;
-            const N = pt(C2[0], C2[1], dirC2ToN, 1.0);
-            const dirC2ToOdbl = (dirC2ToCalpha + dirC2ToN) / 2 + 180;
-            const Ocarbonyl2 = pt(C2[0], C2[1], dirC2ToOdbl, 1.0);
-            const R2 = pt(N[0], N[1], dirC2ToN + 40, 1.0);
-
-            const atoms = [
-                ['R', R1[0], R1[1]],           // 0 (1) R1
-                ['C', C1[0], C1[1]],            // 1 (2) C1 carbonilo éster
-                ['O', Ocarbonyl1[0], Ocarbonyl1[1]], // 2 (3) =O éster
-                ['O', Oester[0], Oester[1]],    // 3 (4) O éster
-                ['C', Ca[0], Ca[1]],            // 4 (5) Cα central
-                ['R', R3[0], R3[1]],            // 5 (6) R3
-                ['R', R4[0], R4[1]],            // 6 (7) R4
-                ['C', C2[0], C2[1]],            // 7 (8) C2 carbonilo amida
-                ['O', Ocarbonyl2[0], Ocarbonyl2[1]], // 8 (9) =O amida
-                ['N', N[0], N[1]],              // 9 (10) N
-                ['R', R2[0], R2[1]]             // 10 (11) R2
-            ];
-            const bonds = [
-                [1, 2, 1], [2, 3, 2], [2, 4, 1], [4, 5, 1], [5, 6, 1], [5, 7, 1],
-                [5, 8, 1], [8, 9, 2], [8, 10, 1], [10, 11, 1]
-            ];
-            const entry = {
-                molblock: buildMolblock(atoms, bonds),
-                atomLabels: { '0': '*:1', '5': '*:3', '6': '*:4', '10': '*:2' }
-            };
-            CUSTOM_MOLBLOCKS['passerini-producto-generico'] = entry;
-            CUSTOM_MOLBLOCKS['passerini-producto-general'] = entry;
-        })();
-    })();
-
-    function svgForCustomMolblock(id, size) {
-        if (!window.RDKit) return null;
-        const entry = CUSTOM_MOLBLOCKS[id];
-        if (!entry) return null;
-        const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
-        const cacheKey = 'MB:' + id + '|' + size;
-        if (_molCache[cacheKey]) return _molCache[cacheKey];
-
-        const mol = window.RDKit.get_mol(entry.molblock);
-        if (!mol) return null;
-        try {
-            const details = {
-                width: preset.w,
-                height: preset.h,
-                bondLineWidth: preset.bond,
-                addStereoAnnotation: false,
-                backgroundColour: [1, 1, 1, 0],
-                symbolColour: STANDARD_ATOM_COLOUR,
-                atomColourPalette: STANDARD_ATOM_PALETTE,
-                atomLabels: entry.atomLabels || {}
-            };
-            let svg = mol.get_svg_with_highlights(JSON.stringify(details));
             svg = svg.replace(/<rect[^>]*fill:#FFFFFF00[^>]*>\s*<\/rect>/i, '');
             svg = svg.replace('<svg ', '<svg class="pc-skel-svg pc-mol-rdkit" ');
             _molCache[cacheKey] = svg;
@@ -340,17 +265,9 @@
     const MOLS = {
 
         // ═══ Q2 — isocianuros ═══
-        // NOTA sobre el grupo -N≡C: en vez de dibujar los dos átomos con
-        // sus cargas formales y el triple enlace explícito (que a tamaño
-        // pequeño, o con varios grupos en la misma molécula, se veía
-        // apelotonado y con el enlace de entrada ambiguo entre N y C), se
-        // usa el átomo comodín reservado [*:90], que el motor de dibujo
-        // sustituye automáticamente por una única etiqueta "NC" — igual
-        // que en el enunciado original — con el enlace siempre pegado a
-        // ese nodo (ver RESERVED_LABEL_MAP_NUMS en el motor de dibujo).
-        'fenilisocianuro':              '[*:90]c1ccccc1',
-        '1-isocianopropano':            'CCC[*:90]',
-        'alil-isocianuro':              'C=CC[*:90]',
+        'fenilisocianuro':              '[*:9]c1ccccc1',
+        '1-isocianopropano':            'CCC[*:9]',
+        'alil-isocianuro':              'C=CC[*:9]',
         'alil-nitrilo':                 'C=CCC#N',
         'bromuro-alilo':                'C=CCBr',
         'formamida-generica':           '[*:1]NC=O',
@@ -377,19 +294,19 @@
         // entre sí, uno para y otro orto al metilo (verificado contra la
         // figura de la p.5 del examen — la posición relativa importa
         // porque hace que los dos grupos NC sean químicamente distintos).
-        'diisocianobenceno':            '[*:90]c1ccc(C)c([*:90])c1',
+        'diisocianobenceno':            '[*:9]c1ccc(C)c([*:9])c1',
         // OJO: pese al nombre heredado ("...propano"), la figura del
         // examen muestra solo DOS carbonos (CN-CH2-CH2-NC): es en
         // realidad 1,2-diisocianoetano. Mantengo el id por compatibilidad
         // con el contenido ya escrito; el SMILES sí está corregido.
-        'diisocianopropano':            '[*:90]CC[*:90]',
+        'diisocianopropano':            '[*:9]CC[*:9]',
         // Carbono cuaternario con TRES isocianuros directos (equivalentes
         // entre sí) más un cuarto brazo isocianometilo (-CH2-NC, distinto
         // por tener un espaciador) → 2 entornos de isocianuro distintos.
         // Confirmado contra la figura: el "armario de Galvin" contiene
         // 2 (bencénico) + 1 (etano, simétrico) + 2 (este) = 5 isocianuros
         // distinguibles, tal y como exige el mark scheme del apartado (k).
-        'trisisocianometano':           '[*:90]CC([*:90])([*:90])[*:90]',
+        'trisisocianometano':           '[*:9]CC([*:9])([*:9])[*:9]',
         // Corregido tras revisar la p.5 del examen a alta resolución: NO
         // llevan hidroxilo, son ácidos poli-carboxílicos "puros". Con
         // ácido benzoico (1 tipo) + este ácido trimelítico (3 tipos, sin
@@ -398,7 +315,7 @@
         'acido-2-hidroxi-dicarboxibenzoico': 'OC(=O)c1ccc(C(=O)O)c(C(=O)O)c1', // ácido trimelítico (benceno-1,2,4-tricarboxílico) — id heredado, ver nota
         'acido-4-hidroxibenzoico':      'OC(=O)c1ccc(C(=O)O)cc1', // ácido tereftálico (benceno-1,4-dicarboxílico) — id heredado, ver nota
         'passerini-acido-generico':     '[*:1]C(=O)O',
-        'passerini-isocianuro-generico':'[*:2][*:90]',
+        'passerini-isocianuro-generico':'[*:2][*:9]',
         'passerini-cetona-generica':    '[*:3]C([*:4])=O',
         'passerini-producto-generico':  '[*:1]C(=O)OC([*:3])([*:4])C(=O)N[*:2]',
         'passerini-producto-general':   '[*:1]C(=O)OC([*:3])([*:4])C(=O)N[*:2]',
@@ -410,15 +327,26 @@
         // El "isocianuro bicíclico" que había definido antes NO existe:
         // el anillo bicíclico entra como parte del ALDEHÍDO (amina ya
         // acilada), no del isocianuro. Corregido:
-        'ciclopropil-isocianuro':       '[*:90]C1CC1',
-        'telaprevir-aldehido-biciclico':'O=CC(CCC)NC(=O)C1C2CCCC2CN1[*:96]',
-        'telaprevir-E':                 'O=C(NC1CC1)C(OC(C)=O)C(CCC)NC(=O)C1C2CCCC2CN1[*:96]',
+        'ciclopropil-isocianuro':       '[*:9]C1CC1',
+        'telaprevir-aldehido-biciclico':'O=CC(CCC)NC(=O)C1C2CCCC2CN1[*:1]',
+        'telaprevir-E':                 'O=C(NC1CC1)C(OC(C)=O)C(CCC)NC(=O)C1C2CCCC2CN1[*:1]',
 
         // ═══ Q3 — henna / tautomería ═══
         'lawsone-ceto':                 'O=C1c2ccccc2C(=O)C(=O)C1',
         'lawsone-enol-a':               'O=C1c2ccccc2C(O)=C(O)C1=O',
         'lawsone-enol-b':               'Oc1c(O)c(=O)c2ccccc2c1=O',
         'ciclohexanona':                'O=C1CCCCC1',
+        // Con hidrógenos explícitos: al ser una molécula tan pequeña (un
+        // solo carbono), dibujarla sin H visibles dejaría solo un trazo
+        // "=O" suelto, sin ninguna referencia de dónde está el carbono.
+        // Los H se representan como átomos comodín (nº de mapeo 10, ver
+        // WILDCARD_LABELS) en vez de [H] real, porque RDKit
+        // eliminaría un [H] explícito normal al sanear la molécula.
+        // NOTA: esta entrada queda anulada por la versión con
+        // coordenadas fijas a mano en CUSTOM_MOLS (más abajo), que es
+        // la que realmente se dibuja — se deja aquí solo como referencia
+        // por si CUSTOM_MOLS no estuviera disponible.
+        'formaldehido':                 '[*:10]C(=O)[*:10]',
         'pivalona':                     'CC(C)(C)C(=O)C',
         'pivalaldehido':                'CC(C)(C)C=O',
         'acroleina':                    'C=CC=O',
@@ -435,17 +363,18 @@
         'acetamida-tautomero':          'CC(O)=N',
         'tautomeria-ceto-ejemplo':      'CC(C)=O',
         'tautomeria-enol-ejemplo':      'CC(O)=C',
-        'tautomeria-xyz-izq':           '[*:1]C([*:2])=O',
-        'tautomeria-xyz-der':           '[*:1]C([*:2])=C',
-        // El sustituyente unido al azufre representa el resto de la
-        // cadena lateral de la proteína de queratina (no un fenilo real,
-        // que era lo que había antes por error): igual que en los grupos
-        // R del Passerini general, se usa un átomo comodín — aquí [*:95],
-        // dibujado con la etiqueta "R'" — para dejar claro que el enlace
-        // C–S–R' representa "el resto de la queratina", no una molécula
-        // concreta.
-        'lawsona-aducto-naranja':       'Oc1c2ccccc2c(O)c(S[*:95])c1O',
-        'lawsona-aducto-marron':        'O=C1c2ccccc2C(=O)C(S[*:95])=C1O',
+        // Ecuación general de tautomería X=Y–Z–H ⇌ X(H)–Y=Z: átomos
+        // genéricos (no elementos reales) y un H "postizo" explícito,
+        // todos como átomos comodín con número de mapeo reservado —
+        // ver WILDCARD_LABELS (X=5, Y=6, Z=7, H=10). NOTA: anulada por
+        // la versión con coordenadas fijas a mano en CUSTOM_MOLS.
+        'tautomeria-xyz-izq':           '[*:5]=[*:6][*:7][*:10]',
+        'tautomeria-xyz-der':           '[*:10][*:5][*:6]=[*:7]',
+        // El resto de la cadena lateral de queratina se abrevia como
+        // "Ker" (átomo comodín, número de mapeo 8) en vez de dibujar un
+        // anillo de fenilo que no pertenece a la estructura real.
+        'lawsona-aducto-naranja':       'Oc1c2ccccc2c(O)c(S[*:8])c1O',
+        'lawsona-aducto-marron':        'O=C1c2ccccc2C(=O)C(S[*:8])=C1O',
 
         // ═══ Q4 — carotenos / tartrazina ═══
         'butadieno':                    'C=CC=C',
@@ -534,6 +463,256 @@
         </svg>`;
 
     // ────────────────────────────────────────────────────────────────
+    // 4.b) MOLÉCULAS "A MANO" — para las estructuras con sustituyentes
+    //      con letra (R¹, R², R³, R⁴, X, Y, Z, H "postizo", NC
+    //      abreviado...) dejamos de depender de cómo RDKit organice
+    //      internamente el SVG (dos intentos distintos de "reetiquetar"
+    //      su resultado fallaron: primero porque el texto llega
+    //      troceado de forma impredecible, después porque ni siquiera
+    //      todos los navegadores/versiones etiquetan esos fragmentos
+    //      igual). Aquí construimos el SVG esquelético nosotros mismos,
+    //      con coordenadas propias — así el rótulo SIEMPRE es el que
+    //      pedimos, sin depender de ningún detalle interno de RDKit.
+    //      Convención: un átomo con label=null es un vértice de carbono
+    //      "mudo" (no se dibuja texto, como en cualquier fórmula
+    //      esquelética); order:2 dibuja doble enlace (dos líneas
+    //      paralelas).
+    // ────────────────────────────────────────────────────────────────
+    function _hexRingPts(cx, cy, r, startDeg) {
+        const pts = [];
+        for (let i = 0; i < 6; i++) {
+            const a = ((startDeg == null ? -90 : startDeg) + 60 * i) * Math.PI / 180;
+            pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+        }
+        return pts;
+    }
+    function _triRingPts(cx, cy, r, startDeg) {
+        const pts = [];
+        for (let i = 0; i < 3; i++) {
+            const a = ((startDeg == null ? -90 : startDeg) + 120 * i) * Math.PI / 180;
+            pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+        }
+        return pts;
+    }
+    function _svgSkeletal(atoms, bonds) {
+        const pad = 24;
+        const xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
+        const minX = Math.min.apply(null, xs) - pad, maxX = Math.max.apply(null, xs) + pad;
+        const minY = Math.min.apply(null, ys) - pad, maxY = Math.max.apply(null, ys) + pad;
+        const w = maxX - minX, h = maxY - minY;
+        const byId = {};
+        atoms.forEach(a => { byId[a.id] = a; });
+        let svg = `<svg viewBox="0 0 ${w.toFixed(1)} ${h.toFixed(1)}" class="pc-skel-svg pc-mol-custom" xmlns="http://www.w3.org/2000/svg">`;
+        bonds.forEach(b => {
+            const a1 = byId[b.a], a2 = byId[b.b];
+            let x1 = a1.x - minX, y1 = a1.y - minY, x2 = a2.x - minX, y2 = a2.y - minY;
+            // Si un extremo tiene rótulo, recorta un poco la línea para que
+            // no se meta debajo del texto (igual que hace cualquier
+            // graficador de química).
+            const dx0 = x2 - x1, dy0 = y2 - y1, len0 = Math.hypot(dx0, dy0) || 1;
+            const ux = dx0 / len0, uy = dy0 / len0;
+            const trim = 13;
+            if (a1.label) { x1 += ux * trim; y1 += uy * trim; }
+            if (a2.label) { x2 -= ux * trim; y2 -= uy * trim; }
+            if (b.order === 2) {
+                const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+                const ox = -dy / len * 3.4, oy = dx / len * 3.4;
+                const inset = 0.14;
+                const ix1 = x1 + dx * inset, iy1 = y1 + dy * inset;
+                const ix2 = x2 - dx * inset, iy2 = y2 - dy * inset;
+                svg += `<line x1="${(x1 - ox).toFixed(1)}" y1="${(y1 - oy).toFixed(1)}" x2="${(x2 - ox).toFixed(1)}" y2="${(y2 - oy).toFixed(1)}" class="pc-skel-bond"/>`;
+                svg += `<line x1="${(ix1 + ox).toFixed(1)}" y1="${(iy1 + oy).toFixed(1)}" x2="${(ix2 + ox).toFixed(1)}" y2="${(iy2 + oy).toFixed(1)}" class="pc-skel-bond"/>`;
+            } else {
+                svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="pc-skel-bond"/>`;
+            }
+        });
+        atoms.forEach(a => {
+            if (!a.label) return;
+            const x = a.x - minX, y = a.y - minY;
+            svg += `<text x="${x.toFixed(1)}" y="${(y + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="central" class="pc-skel-label">${a.label}</text>`;
+        });
+        svg += `</svg>`;
+        return svg;
+    }
+
+    const CUSTOM_MOLS = {};
+    (function registerCustomMols() {
+        const add = (id, atoms, bonds) => { CUSTOM_MOLS[id] = _svgSkeletal(atoms, bonds); };
+
+        // ── Reactivos y producto genéricos de la reacción de Passerini ──
+        add('passerini-acido-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B9' },
+            { id: 'c', x: 42, y: 0, label: null },
+            { id: 'od', x: 42, y: -42, label: 'O' },
+            { id: 'oh', x: 80, y: 20, label: 'OH' }
+        ], [
+            { a: 'r', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'oh', order: 1 }
+        ]);
+        add('passerini-isocianuro-generico', [
+            { id: 'r', x: 0, y: 0, label: 'R\u00B2' },
+            { id: 'nc', x: 54, y: 0, label: 'NC' }
+        ], [
+            { a: 'r', b: 'nc', order: 1 }
+        ]);
+        add('passerini-cetona-generica', [
+            { id: 'r3', x: -40, y: -22, label: 'R\u00B3' },
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'od', x: 0, y: -44, label: 'O' },
+            { id: 'r4', x: 40, y: -22, label: 'R\u2074' }
+        ], [
+            { a: 'r3', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'r4', order: 1 }
+        ]);
+        const passeriniProducto = [
+            [
+                { id: 'r1', x: 0, y: 18, label: 'R\u00B9' },
+                { id: 'c1', x: 38, y: -18, label: null },
+                { id: 'od1', x: 38, y: -58, label: 'O' },
+                { id: 'oe', x: 76, y: 18, label: 'O' },
+                { id: 'c2', x: 114, y: -18, label: null },
+                { id: 'r3', x: 94, y: -58, label: 'R\u00B3' },
+                { id: 'r4', x: 134, y: -58, label: 'R\u2074' },
+                { id: 'c3', x: 152, y: 18, label: null },
+                { id: 'od2', x: 152, y: 58, label: 'O' },
+                { id: 'n', x: 190, y: -18, label: 'N' },
+                { id: 'h', x: 190, y: -58, label: 'H' },
+                { id: 'r2', x: 228, y: 18, label: 'R\u00B2' }
+            ], [
+                { a: 'r1', b: 'c1', order: 1 }, { a: 'c1', b: 'od1', order: 2 }, { a: 'c1', b: 'oe', order: 1 },
+                { a: 'oe', b: 'c2', order: 1 }, { a: 'c2', b: 'r3', order: 1 }, { a: 'c2', b: 'r4', order: 1 },
+                { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'od2', order: 2 }, { a: 'c3', b: 'n', order: 1 },
+                { a: 'n', b: 'h', order: 1 }, { a: 'n', b: 'r2', order: 1 }
+            ]
+        ];
+        add('passerini-producto-generico', passeriniProducto[0], passeriniProducto[1]);
+        add('passerini-producto-general', passeriniProducto[0], passeriniProducto[1]);
+
+        // ── Formaldehído con los dos H explícitos (molécula demasiado
+        //    pequeña para dejarlos implícitos: sin ellos solo se vería
+        //    un trazo "=O" suelto, sin ninguna referencia del carbono) ──
+        add('formaldehido', [
+            { id: 'c', x: 0, y: 0, label: null },
+            { id: 'o', x: 36, y: -24, label: 'O' },
+            { id: 'h1', x: -36, y: -24, label: 'H' },
+            { id: 'h2', x: -36, y: 24, label: 'H' }
+        ], [
+            { a: 'c', b: 'o', order: 2 }, { a: 'c', b: 'h1', order: 1 }, { a: 'c', b: 'h2', order: 1 }
+        ]);
+
+        // ── Ecuación general de tautomería X=Y–Z–H ⇌ X(H)–Y=Z, con
+        //    átomos genéricos de verdad (letras X, Y, Z), no elementos
+        //    reales — geometría calcada del enunciado original: a la
+        //    izquierda X=Y cae en vertical y luego Y-Z-H forma una V
+        //    abierta hacia abajo; a la derecha H-X cae en diagonal, X-Y
+        //    en vertical, y luego Y=Z abre en diagonal hacia abajo ──
+        add('tautomeria-xyz-izq', [
+            { id: 'x', x: 0, y: 0, label: 'X' },
+            { id: 'y', x: 0, y: 50, label: 'Y' },
+            { id: 'z', x: 40, y: 75, label: 'Z' },
+            { id: 'h', x: 80, y: 50, label: 'H' }
+        ], [
+            { a: 'x', b: 'y', order: 2 }, { a: 'y', b: 'z', order: 1 }, { a: 'z', b: 'h', order: 1 }
+        ]);
+        add('tautomeria-xyz-der', [
+            { id: 'h', x: 40, y: 0, label: 'H' },
+            { id: 'x', x: 0, y: 25, label: 'X' },
+            { id: 'y', x: 0, y: 75, label: 'Y' },
+            { id: 'z', x: 40, y: 100, label: 'Z' }
+        ], [
+            { a: 'h', b: 'x', order: 1 }, { a: 'x', b: 'y', order: 1 }, { a: 'y', b: 'z', order: 2 }
+        ]);
+
+        // ── Isocianuros con el grupo &ndash;NC abreviado como texto, en
+        //    vez de dibujar el N&equiv;C explícito. Convención de
+        //    lectura: el rótulo se escribe con la "N" pegada al lado por
+        //    donde entra el enlace real — así el trazo siempre parece
+        //    tocar la N (el átomo realmente enlazado), nunca la C ni el
+        //    hueco entre las dos letras. Si el resto de la molécula
+        //    queda a la IZQUIERDA del grupo, se escribe "NC" (N a la
+        //    izquierda, pegada al enlace); si queda a la DERECHA, se
+        //    escribe "CN" (N a la derecha, pegada al enlace). Para
+        //    enlaces verticales (sin sesgo horizontal claro) se deja
+        //    "NC" por defecto, que es como aparece en el enunciado.
+        add('1-isocianopropano', [
+            { id: 'c1', x: 0, y: 0, label: null },
+            { id: 'c2', x: 38, y: -22, label: null },
+            { id: 'c3', x: 76, y: 0, label: null },
+            { id: 'nc', x: 114, y: -22, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        add('alil-isocianuro', [
+            { id: 'c1', x: 0, y: -22, label: null },
+            { id: 'c2', x: 38, y: 0, label: null },
+            { id: 'c3', x: 76, y: -22, label: null },
+            { id: 'nc', x: 114, y: 0, label: 'NC' }
+        ], [
+            { a: 'c1', b: 'c2', order: 2 }, { a: 'c2', b: 'c3', order: 1 }, { a: 'c3', b: 'nc', order: 1 }
+        ]);
+        // nc1 (a la izquierda del todo) recibe el enlace desde su lado
+        // DERECHO (c1 está a la derecha de nc1) → se escribe "CN", con
+        // la N pegada a ese lado. nc2 recibe el enlace desde su lado
+        // IZQUIERDO (c2 a la izquierda) → se escribe "NC" normal.
+        add('diisocianopropano', [
+            { id: 'nc1', x: 0, y: 0, label: 'CN' },
+            { id: 'c1', x: 42, y: -24, label: null },
+            { id: 'c2', x: 84, y: 0, label: null },
+            { id: 'nc2', x: 126, y: -24, label: 'NC' }
+        ], [
+            { a: 'nc1', b: 'c1', order: 1 }, { a: 'c1', b: 'c2', order: 1 }, { a: 'c2', b: 'nc2', order: 1 }
+        ]);
+        // ncb y ncc reciben su enlace desde la DERECHA (cq y ch2 quedan
+        // más a la derecha que ellos) → "CN"; nca y ncd lo reciben desde
+        // la IZQUIERDA → "NC".
+        add('trisisocianometano', [
+            { id: 'cq', x: 0, y: 0, label: null },
+            { id: 'nca', x: 32, y: -32, label: 'NC' },
+            { id: 'ncb', x: -32, y: -32, label: 'CN' },
+            { id: 'ncd', x: 32, y: 32, label: 'NC' },
+            { id: 'ch2', x: -32, y: 32, label: null },
+            { id: 'ncc', x: -70, y: 60, label: 'CN' }
+        ], [
+            { a: 'cq', b: 'nca', order: 1 }, { a: 'cq', b: 'ncb', order: 1 },
+            { a: 'cq', b: 'ncd', order: 1 }, { a: 'cq', b: 'ch2', order: 1 },
+            { a: 'ch2', b: 'ncc', order: 1 }
+        ]);
+
+        // Anillos (bencénico / ciclopropílico) con el grupo &ndash;NC
+        // abreviado como sustituyente.
+        (function () {
+            const hex = _hexRingPts(0, 0, 34, -90);
+            const ringBonds = hex.map((_, i) => ({ a: 'c' + i, b: 'c' + ((i + 1) % 6), order: i % 2 === 0 ? 2 : 1 }));
+            const ringAtoms = hex.map((p, i) => ({ id: 'c' + i, x: p.x, y: p.y, label: null }));
+            // Fenilisocianuro: NC en el vértice superior (índice 0)
+            const nc0 = hex[0];
+            add('fenilisocianuro', ringAtoms.concat([{ id: 'nc', x: nc0.x, y: nc0.y - 40, label: 'NC' }]),
+                ringBonds.concat([{ a: 'c0', b: 'nc', order: 1 }]));
+            // 4-metil-1,3-diisocianobenceno: NC en el vértice 0 (arriba),
+            // metilo en el vértice 3 (abajo), segundo NC en el vértice 4
+            // (adyacente al metilo → orto a él, meta al primer NC, tal y
+            // como exige el enunciado del examen). El primer NC cuelga
+            // en vertical (sin sesgo horizontal → "NC" por defecto); el
+            // segundo recibe su enlace desde la DERECHA (v4 queda a la
+            // derecha de ncb) → se escribe "CN".
+            const v0 = hex[0], v3 = hex[3], v4 = hex[4];
+            const v4dir = Math.hypot(v4.x, v4.y) || 1;
+            add('diisocianobenceno', ringAtoms.concat([
+                { id: 'nca', x: v0.x, y: v0.y - 40, label: 'NC' },
+                { id: 'me', x: v3.x, y: v3.y + 40, label: null },
+                { id: 'ncb', x: v4.x + (v4.x / v4dir) * 40, y: v4.y + (v4.y / v4dir) * 40, label: 'CN' }
+            ]), ringBonds.concat([
+                { a: 'c0', b: 'nca', order: 1 }, { a: 'c3', b: 'me', order: 1 }, { a: 'c4', b: 'ncb', order: 1 }
+            ]));
+
+            const tri = _triRingPts(0, 0, 26, -90);
+            const triBonds = [{ a: 't0', b: 't1', order: 1 }, { a: 't1', b: 't2', order: 1 }, { a: 't2', b: 't0', order: 1 }];
+            const triAtoms = tri.map((p, i) => ({ id: 't' + i, x: p.x, y: p.y, label: null }));
+            const t0 = tri[0];
+            add('ciclopropil-isocianuro', triAtoms.concat([{ id: 'nc', x: t0.x, y: t0.y - 40, label: 'NC' }]),
+                triBonds.concat([{ a: 't0', b: 'nc', order: 1 }]));
+        })();
+    })();
+
+    // ────────────────────────────────────────────────────────────────
     // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
     //    [data-smiles] sueltos como dentro de un esquema de síntesis)
     // ────────────────────────────────────────────────────────────────
@@ -543,10 +722,7 @@
         return svg;
     }
     function renderMolById(id, size, colorAtoms) {
-        if (CUSTOM_MOLBLOCKS[id]) {
-            const svg = svgForCustomMolblock(id, size || 'md');
-            if (svg) return svg;
-        }
+        if (CUSTOM_MOLS[id]) return CUSTOM_MOLS[id];
         const smiles = smilesById(id);
         if (!smiles) return '<span class="pc-mol-missing">[' + id + ']</span>';
         return renderMolSmiles(smiles, size, colorAtoms);
@@ -606,10 +782,27 @@
     //    legado { mol: 'id-del-registro' }.
     // ────────────────────────────────────────────────────────────────
     function renderSchemeItem(node, size) {
+        const sz = node.size || size;
+        if (node.equilibrium) {
+            // Flecha doble de equilibrio (⇌): dos trazos paralelos en
+            // sentidos opuestos, minimalista, sin punta "central" — como
+            // pide el enunciado para tautomería ceto/enol y para el
+            // esquema general X=Y–Z–H ⇌ X(H)–Y=Z.
+            return `<div class="pc-scheme-arrow pc-scheme-equilibrium">
+                <span class="pc-scheme-arrow-above">${node.above || ''}</span>
+                <svg viewBox="0 0 68 22" class="pc-scheme-arrow-svg pc-scheme-eq-svg">
+                    <line x1="6" y1="7" x2="62" y2="7" class="pc-scheme-arrow-line"/>
+                    <polygon points="62,3 68,7 62,11" class="pc-scheme-arrowhead"/>
+                    <line x1="6" y1="15" x2="62" y2="15" class="pc-scheme-arrow-line"/>
+                    <polygon points="6,11 0,15 6,19" class="pc-scheme-arrowhead"/>
+                </svg>
+                <span class="pc-scheme-arrow-below">${node.below || ''}</span>
+            </div>`;
+        }
         if (node.arrow) {
             // node.len permite flechas rectas más largas o más cortas
-            // (por defecto 68px, igual que antes) — "las flechas deben
-            // poder ser del tamaño que quieras".
+            // (por defecto 68px) — "las flechas deben poder ser del
+            // tamaño que quieras".
             const len = Math.max(28, node.len || 68);
             const lineEnd = len - 10;
             return `<div class="pc-scheme-arrow" style="min-width:${len + 4}px">
@@ -624,8 +817,8 @@
             return `<div class="pc-scheme-node"><div class="pc-scheme-text">${node.text}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
         }
         const svg = node.smiles
-            ? renderMolSmiles(node.smiles, size || 'sm', node.colorAtoms)
-            : renderMolById(node.mol, size || 'sm', node.colorAtoms);
+            ? renderMolSmiles(node.smiles, sz || 'sm', node.colorAtoms)
+            : renderMolById(node.mol, sz || 'sm', node.colorAtoms);
         return `<div class="pc-scheme-node"><div class="pc-scheme-mol">${svg}</div>${node.label ? `<div class="pc-scheme-label">${node.label}</div>` : ''}</div>`;
     }
     function renderScheme(steps, opts) {
@@ -635,17 +828,14 @@
         return `<div class="pc-scheme-box">${inner}</div>`;
     }
     // ── Flecha "en escuadra" (codo a 90°) para esquemas en horquilla ──
-    // Antes, cada rama se dibujaba con DOS piezas sueltas: una línea
-    // diagonal (el "conector") sin cabeza de flecha, seguida de una
-    // flecha horizontal independiente. Al no compartir trazo ni estar
-    // realmente unidas, en pantalla se veía como una flecha "partida" o
-    // mal pegada a la unión. Ahora cada rama es UN solo trazo continuo
-    // (un único <path>, mismo stroke) que sube o baja y después gira
-    // 90° hacia la derecha (o izquierda) terminando en su cabeza de
-    // flecha — como cortar un rectángulo por dos de sus lados en vez de
-    // por la diagonal. Hay 4 variantes según hacia dónde se dobla:
-    // 'up-right', 'up-left', 'down-right', 'down-left'.
-    //
+    // Cada rama es UN solo trazo continuo (un único <path>, mismo
+    // stroke) que sube o baja y después gira 90° hacia la derecha (o
+    // izquierda) terminando en su cabeza de flecha — como cortar un
+    // rectángulo por dos de sus lados en vez de por la diagonal, así la
+    // unión entre el tramo vertical y el horizontal queda siempre
+    // perfectamente pegada, sin depender de que dos elementos CSS
+    // distintos coincidan en altura. Hay 4 variantes según hacia dónde
+    // se dobla: 'up-right', 'up-left', 'down-right', 'down-left'.
     // vLen (tramo vertical) y hLen (tramo horizontal) son independientes
     // y configurables en píxeles, así una rama puede ser más larga hacia
     // arriba y más corta hacia la derecha, o al revés, según se necesite.
@@ -675,14 +865,21 @@
         </svg>`;
     }
     // Envuelve la flecha en escuadra de una rama concreta, con sus
-    // etiquetas encima/debajo (br.above / br.below), y longitudes
-    // configurables por rama (br.vLen / br.hLen).
+    // etiquetas encima/debajo (br.above / br.below, escribibles con
+    // texto/HTML libre) y longitudes configurables por rama
+    // (br.vLen / br.hLen).
     function renderForkElbow(br, vDir) {
         const svg = elbowArrowSvg(vDir + '-right', br.vLen, br.hLen);
-        const above = br.above ? `<span class="pc-elbow-label">${br.above}</span>` : '';
-        const below = br.below ? `<span class="pc-elbow-label">${br.below}</span>` : '';
+        const above = br.above ? `<span class="pc-scheme-arrow-above">${br.above}</span>` : '';
+        const below = br.below ? `<span class="pc-scheme-arrow-below">${br.below}</span>` : '';
         return `<div class="pc-fork-elbow pc-fork-elbow-${vDir}">${above}${svg}${below}</div>`;
     }
+    // Esquema "en horquilla": un compuesto de partida del que salen
+    // varias flechas distintas hacia productos distintos (p.ej. bromuro
+    // de alilo + AgCN → A, + NaCN → B). La molécula de partida queda
+    // centrada verticalmente respecto al conjunto de ramas
+    // (.pc-fork{align-items:center}), y cada producto queda centrado
+    // respecto a su propia flecha (.pc-fork-branch{align-items:center}).
     function renderForkScheme(start, branches, opts) {
         opts = opts || {};
         const size = opts.size || 'sm';
@@ -690,8 +887,8 @@
         const n = branches.length;
         // Las ramas de la mitad superior doblan hacia arriba, las de la
         // mitad inferior hacia abajo; con un número impar de ramas, la
-        // rama central usa una flecha recta (no necesita doblar, ya está
-        // alineada con el compuesto de partida).
+        // rama central usa una flecha recta (ya está alineada con el
+        // compuesto de partida, no necesita doblar).
         const mid = (n - 1) / 2;
         const branchesHtml = branches.map((br, i) => {
             const arrowHtml = (n > 1 && i === mid)
@@ -727,15 +924,15 @@
     );
     SCHEMES['q2-passerini-general'] = () => renderScheme(
         [
-            { mol: 'passerini-acido-generico' },
+            { mol: 'passerini-acido-generico', size: 'sm' },
             { plus: true },
-            { mol: 'passerini-isocianuro-generico' },
+            { mol: 'passerini-isocianuro-generico', size: 'sm' },
             { plus: true },
-            { mol: 'passerini-cetona-generica' },
+            { mol: 'passerini-cetona-generica', size: 'sm' },
             { arrow: true },
-            { mol: 'passerini-producto-generico' }
+            { mol: 'passerini-producto-generico', size: 'lg' }
         ],
-        { size: 'lg' }
+        { size: 'md' }
     );
 
     SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
@@ -845,12 +1042,10 @@
     SCHEMES['q3-keratina'] = () => renderScheme(null, {
         size: 'sm',
         rows: [[
-            { mol: 'lawsone-enol-b', label: 'lawsona' },
-            { plus: true },
-            { text: 'queratina&ndash;S<sup>&minus;</sup>' },
-            { arrow: true, above: 'adición', below: 'al anillo' },
+            { text: 'lawsona' },
+            { arrow: true, above: 'queratina&ndash;S<sup>&minus;</sup>' },
             { mol: 'lawsona-aducto-naranja', label: '<span style="color:#c9862c">aducto naranja</span>' },
-            { arrow: true, above: 'oxidación', below: '(tiempo)' },
+            { arrow: true },
             { mol: 'lawsona-aducto-marron', label: '<span style="color:#7a4a1e">aducto marrón</span>' }
         ]]
     });
@@ -858,7 +1053,7 @@
     SCHEMES['q3-ceto-enol-general'] = () => renderScheme(
         [
             { mol: 'tautomeria-ceto-ejemplo', label: 'forma ceto' },
-            { arrow: true },
+            { equilibrium: true },
             { mol: 'tautomeria-enol-ejemplo', label: 'forma enol' }
         ],
         { size: 'sm' }
@@ -866,7 +1061,7 @@
     SCHEMES['q3-tautomeria-general'] = () => renderScheme(
         [
             { mol: 'tautomeria-xyz-izq' },
-            { arrow: true },
+            { equilibrium: true },
             { mol: 'tautomeria-xyz-der' }
         ],
         { size: 'sm' }
