@@ -373,9 +373,35 @@
     .pc-elbow-svg { display: block; }
     .pc-elbow-line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .pc-elbow-head { fill: var(--text); }
+    /* El nombre debajo de la molécula (p. ej. "bromuro de alilo") no debe
+       contar para centrar la flecha: si contara, el centrado se haría
+       respecto al bloque imagen+texto y la flecha quedaría pegada más
+       arriba de lo debido, no en mitad de la estructura dibujada. Se
+       saca el rótulo del flujo (position:absolute) para que la altura
+       que ve el flexbox al centrar sea SOLO la de la imagen — así el eje
+       de las flechas coincide con el centro real de cada molécula. */
+    .pc-fork-start .pc-scheme-node,
+    .pc-fork-branch .pc-scheme-node { position: relative; }
+    .pc-fork-start .pc-scheme-label,
+    .pc-fork-branch .pc-scheme-label {
+        position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+        margin-top: 4px;
+    }
 
     /* ── Flecha de equilibrio (doble, sentidos opuestos) ── */
     .pc-scheme-eq-svg { height: 22px; }
+
+    /* ── Esquema de síntesis en varias líneas con flecha "de horquilla"
+       para bajar de una a la siguiente (Q6): cada línea se lee siempre
+       de izquierda a derecha; al llegar al final, el siguiente paso de
+       reacción se dibuja como una flecha de una sola pieza que baja
+       pegada al borde derecho y gira para entrar por la izquierda de la
+       línea de abajo, con sus reactivos encima/debajo del tramo
+       horizontal — en vez de repetir el compuesto de unión y usar un
+       conector decorativo sin información, como antes. ── */
+    .pc-scheme-zigzag .pc-scheme-row { margin: 4px 0; }
+    .pc-hairpin { display: flex; flex-direction: column; align-items: center; margin: 2px 0 10px; }
+    .pc-hairpin-svg { display: block; width: 100%; }
 
     /* ── Ecuaciones / fórmulas destacadas (cajas de cálculo, p.ej. Q5) ── */
     .pc-eq-box {
