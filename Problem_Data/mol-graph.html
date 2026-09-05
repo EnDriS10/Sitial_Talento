@@ -494,12 +494,30 @@
         }
         return pts;
     }
-    function _svgSkeletal(atoms, bonds) {
+    // opts.canvas = { w, h } fuerza un lienzo de tamaño fijo (centrando
+    // la molécula dentro de él) en vez de ajustar el viewBox al tamaño
+    // natural de cada estructura. Se usa quty cuando dos moléculas deben
+    // verse exactamente al mismo tamaño una junto a otra (p. ej. los dos
+    // lados de un equilibrio de tautomería): si cada una tuviera su
+    // propio viewBox "ajustado", el CSS (que escala por ancho) las
+    // dejaría con longitudes de enlace distintas — la más alta y
+    // estrecha saldría dibujada más "grande" que la más ancha y baja.
+    function _svgSkeletal(atoms, bonds, opts) {
+        opts = opts || {};
         const pad = 24;
         const xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
-        const minX = Math.min.apply(null, xs) - pad, maxX = Math.max.apply(null, xs) + pad;
-        const minY = Math.min.apply(null, ys) - pad, maxY = Math.max.apply(null, ys) + pad;
-        const w = maxX - minX, h = maxY - minY;
+        let minX = Math.min.apply(null, xs) - pad, maxX = Math.max.apply(null, xs) + pad;
+        let minY = Math.min.apply(null, ys) - pad, maxY = Math.max.apply(null, ys) + pad;
+        let w = maxX - minX, h = maxY - minY;
+        if (opts.canvas) {
+            const cw = opts.canvas.w, ch = opts.canvas.h;
+            // Centra la caja natural dentro del lienzo fijo (si el
+            // lienzo pedido es más grande que la molécula en algún eje;
+            // si fuera más pequeño, se deja la caja natural tal cual
+            // para no recortar nada).
+            if (cw > w) { const extra = (cw - w) / 2; minX -= extra; maxX += extra; w = cw; }
+            if (ch > h) { const extra = (ch - h) / 2; minY -= extra; maxY += extra; h = ch; }
+        }
         const byId = {};
         atoms.forEach(a => { byId[a.id] = a; });
         let svg = `<svg viewBox="0 0 ${w.toFixed(1)} ${h.toFixed(1)}" class="pc-skel-svg pc-mol-custom" xmlns="http://www.w3.org/2000/svg">`;
@@ -537,7 +555,7 @@
 
     const CUSTOM_MOLS = {};
     (function registerCustomMols() {
-        const add = (id, atoms, bonds) => { CUSTOM_MOLS[id] = _svgSkeletal(atoms, bonds); };
+        const add = (id, atoms, bonds, opts) => { CUSTOM_MOLS[id] = _svgSkeletal(atoms, bonds, opts); };
 
         // ── Reactivos y producto genéricos de la reacción de Passerini ──
         add('passerini-acido-generico', [
@@ -562,20 +580,29 @@
         ], [
             { a: 'r3', b: 'c', order: 1 }, { a: 'c', b: 'od', order: 2 }, { a: 'c', b: 'r4', order: 1 }
         ]);
+        // ── Producto general de Passerini: R¹C(=O)–O–C(R³)(R⁴)–C(=O)NHR² ──
+        // Coordenadas calcadas directamente del enunciado original (se
+        // midieron los ángulos reales de la figura): en el carbono
+        // central (4 sustituyentes) el ángulo O-Cα-R⁴ y R³-Cα-C(=O) son
+        // los más abiertos (~155°/~151°, nunca 180° — antes un ajuste
+        // mal calculado los dejaba en línea recta, ~175°, y parecía que
+        // el enlace "se saltaba" el carbono). R³ y R⁴ quedan juntos
+        // arriba en una V estrecha (~63° entre ellos), igual que en la
+        // figura del examen.
         const passeriniProducto = [
             [
-                { id: 'r1', x: 0, y: 18, label: 'R\u00B9' },
-                { id: 'c1', x: 38, y: -18, label: null },
-                { id: 'od1', x: 38, y: -58, label: 'O' },
-                { id: 'oe', x: 76, y: 18, label: 'O' },
-                { id: 'c2', x: 114, y: -18, label: null },
-                { id: 'r3', x: 94, y: -58, label: 'R\u00B3' },
-                { id: 'r4', x: 134, y: -58, label: 'R\u2074' },
-                { id: 'c3', x: 152, y: 18, label: null },
-                { id: 'od2', x: 152, y: 58, label: 'O' },
-                { id: 'n', x: 190, y: -18, label: 'N' },
-                { id: 'h', x: 190, y: -58, label: 'H' },
-                { id: 'r2', x: 228, y: 18, label: 'R\u00B2' }
+                { id: 'r1', x: -115.5, y: 30.2, label: 'R\u00B9' },
+                { id: 'c1', x: -76.7, y: 14.2, label: null },
+                { id: 'od1', x: -76.7, y: -27.8, label: 'O' },
+                { id: 'oe', x: -35.5, y: 22.4, label: 'O' },
+                { id: 'c2', x: 0, y: 0, label: null },
+                { id: 'r3', x: -21.3, y: -36.2, label: 'R\u00B3' },
+                { id: 'r4', x: 22.8, y: -35.3, label: 'R\u2074' },
+                { id: 'c3', x: 36.0, y: 21.6, label: null },
+                { id: 'od2', x: 36.0, y: 63.6, label: 'O' },
+                { id: 'n', x: 72.4, y: 0.6, label: 'N' },
+                { id: 'h', x: 72.4, y: -41.4, label: 'H' },
+                { id: 'r2', x: 109.6, y: 20.1, label: 'R\u00B2' }
             ], [
                 { a: 'r1', b: 'c1', order: 1 }, { a: 'c1', b: 'od1', order: 2 }, { a: 'c1', b: 'oe', order: 1 },
                 { a: 'oe', b: 'c2', order: 1 }, { a: 'c2', b: 'r3', order: 1 }, { a: 'c2', b: 'r4', order: 1 },
@@ -588,12 +615,18 @@
 
         // ── Formaldehído con los dos H explícitos (molécula demasiado
         //    pequeña para dejarlos implícitos: sin ellos solo se vería
-        //    un trazo "=O" suelto, sin ninguna referencia del carbono) ──
+        //    un trazo "=O" suelto, sin ninguna referencia del carbono).
+        //    Geometría exacta: O, H y H en los vértices de un triángulo
+        //    equilátero, con el C en el centroide — así los tres
+        //    ángulos O-C-H1, O-C-H2 y H1-C-H2 salen exactos a 120°
+        //    (trigonal plana, como debe ser un carbono con un doble
+        //    enlace y dos sustituyentes). Antes O quedaba a 180° de uno
+        //    de los H (en línea recta) en vez de a 120° de los dos. ──
         add('formaldehido', [
             { id: 'c', x: 0, y: 0, label: null },
-            { id: 'o', x: 36, y: -24, label: 'O' },
-            { id: 'h1', x: -36, y: -24, label: 'H' },
-            { id: 'h2', x: -36, y: 24, label: 'H' }
+            { id: 'o', x: 0, y: -40, label: 'O' },
+            { id: 'h1', x: -34.6, y: 20, label: 'H' },
+            { id: 'h2', x: 34.6, y: 20, label: 'H' }
         ], [
             { a: 'c', b: 'o', order: 2 }, { a: 'c', b: 'h1', order: 1 }, { a: 'c', b: 'h2', order: 1 }
         ]);
@@ -603,7 +636,16 @@
         //    reales — geometría calcada del enunciado original: a la
         //    izquierda X=Y cae en vertical y luego Y-Z-H forma una V
         //    abierta hacia abajo; a la derecha H-X cae en diagonal, X-Y
-        //    en vertical, y luego Y=Z abre en diagonal hacia abajo ──
+        //    en vertical, y luego Y=Z abre en diagonal hacia abajo.
+        //    Las dos estructuras tienen formas muy distintas (una más
+        //    ancha y baja, la otra más alta y estrecha) — sin forzar un
+        //    lienzo común, el CSS (que escala por ancho) las dejaría con
+        //    longitudes de enlace distintas al ponerlas una junto a la
+        //    otra: la más alta y estrecha saldría "más grande" que la
+        //    ancha y baja. TAUT_CANVAS fija el mismo lienzo para ambas
+        //    (el mayor ancho y el mayor alto que hace falta entre las
+        //    dos), así se ven exactamente al mismo tamaño. ──
+        const TAUT_CANVAS = { w: 128, h: 148 };
         add('tautomeria-xyz-izq', [
             { id: 'x', x: 0, y: 0, label: 'X' },
             { id: 'y', x: 0, y: 50, label: 'Y' },
@@ -611,7 +653,7 @@
             { id: 'h', x: 80, y: 50, label: 'H' }
         ], [
             { a: 'x', b: 'y', order: 2 }, { a: 'y', b: 'z', order: 1 }, { a: 'z', b: 'h', order: 1 }
-        ]);
+        ], { canvas: TAUT_CANVAS });
         add('tautomeria-xyz-der', [
             { id: 'h', x: 40, y: 0, label: 'H' },
             { id: 'x', x: 0, y: 25, label: 'X' },
@@ -619,7 +661,7 @@
             { id: 'z', x: 40, y: 100, label: 'Z' }
         ], [
             { a: 'h', b: 'x', order: 1 }, { a: 'x', b: 'y', order: 1 }, { a: 'y', b: 'z', order: 2 }
-        ]);
+        ], { canvas: TAUT_CANVAS });
 
         // ── Isocianuros con el grupo &ndash;NC abreviado como texto, en
         //    vez de dibujar el N&equiv;C explícito. Convención de
@@ -903,6 +945,66 @@
         </div></div>`;
     }
 
+    // ── Esquema de síntesis en varias líneas, con flecha "de horquilla"
+    //    para bajar de una línea a la siguiente ──
+    // Antes, una síntesis larga se partía en filas independientes que se
+    // repetían el compuesto de unión (el último de una fila era también
+    // el primero de la siguiente) y se enlazaban con una fecha de giro
+    // meramente decorativa, sin reactivos. Aquí, en cambio, se da la
+    // secuencia COMPLETA de una sola vez — moléculas y flechas
+    // alternadas, sin repetir ninguna — y el propio paso de reacción que
+    // cae justo al final de una línea se dibuja como una flecha de
+    // horquilla que baja y gira hacia la izquierda para entrar en la
+    // siguiente línea por su extremo izquierdo, llevando ahí mismo
+    // (encima/debajo del tramo horizontal) los reactivos de ese paso —
+    // igual que las flechas en escuadra de renderForkScheme, pero
+    // pensada para conectar dos LÍNEAS enteras en vez de dos ramas.
+    function renderZigzagScheme(mols, arrows, opts) {
+        opts = opts || {};
+        const size = opts.size || 'sm';
+        const perRow = opts.perRow || 3;
+        const rows = [];
+        for (let i = 0; i < mols.length; i += perRow) rows.push(mols.slice(i, i + perRow));
+
+        let arrowIdx = 0;
+        const rowsHtml = rows.map((rowMols, rowI) => {
+            const itemsHtml = rowMols.map((m, j) => {
+                let html = renderSchemeItem(m, size);
+                if (j < rowMols.length - 1) {
+                    const ar = arrows[arrowIdx++] || {};
+                    html += renderSchemeItem({ arrow: true, above: ar.above, below: ar.below, len: ar.len }, size);
+                }
+                return html;
+            }).join('');
+            let connectorHtml = '';
+            if (rowI < rows.length - 1) {
+                const ar = arrows[arrowIdx++] || {};
+                connectorHtml = renderHairpinConnector(ar);
+            }
+            return `<div class="pc-scheme-row">${itemsHtml}</div>${connectorHtml}`;
+        }).join('');
+        return `<div class="pc-scheme-box pc-scheme-zigzag">${rowsHtml}</div>`;
+    }
+    // Flecha de horquilla que ocupa todo el ancho de la síntesis: baja
+    // pegada al borde derecho y gira 90° para cruzar hacia la izquierda,
+    // terminando en la cabeza de flecha justo donde empieza la línea
+    // siguiente — un único trazo continuo, igual que elbowArrowSvg pero
+    // a ancho completo (se escala con preserveAspectRatio="none" para
+    // ocupar el 100% del contenedor sin depender de un ancho fijo).
+    function renderHairpinConnector(ar) {
+        ar = ar || {};
+        const vLen = Math.max(18, ar.vLen || 34);
+        const pad = 9, headLen = 9, headHalf = 5;
+        const h = vLen + pad * 2;
+        const svg = `<svg viewBox="0 0 400 ${h}" preserveAspectRatio="none" class="pc-elbow-svg pc-hairpin-svg" style="height:${h}px">
+            <path d="M391,${pad} L391,${h - pad} L${pad + headLen},${h - pad}" class="pc-elbow-line" vector-effect="non-scaling-stroke"/>
+            <polygon points="${pad + headLen},${h - pad - headHalf} ${pad},${h - pad} ${pad + headLen},${h - pad + headHalf}" class="pc-elbow-head"/>
+        </svg>`;
+        const above = ar.above ? `<span class="pc-scheme-arrow-above">${ar.above}</span>` : '';
+        const below = ar.below ? `<span class="pc-scheme-arrow-below">${ar.below}</span>` : '';
+        return `<div class="pc-hairpin">${above}${svg}${below}</div>`;
+    }
+
     // ── Registro de esquemas completos (Q2, Q4, Q6...) ──
     const SCHEMES = {};
 
@@ -965,79 +1067,58 @@
     });
 
     // ═══ Q6 — síntesis total de la acitretina ═══
-    SCHEMES['q6-sintesis-respuesta'] = () => renderScheme(null, {
-        size: 'sm',
-        rows: [
-            [
-                { mol: 'acitretina-s0', label: '1 &middot; cetona de partida' },
-                { arrow: true, above: 'MeONa', below: 'HCO\u2082Me &middot; acilación de Claisen' },
-                { mol: 'acitretina-s1', label: '2 &middot; &beta;-cetoaldehído' }
-            ],
-            [
-                { mol: 'acitretina-s1', label: '2' },
-                { arrow: true, above: 'MeOH / H\u2082SO\u2084', below: 'protección como acetal' },
-                { mol: 'acitretina-s2', label: '3 &middot; acetal dimetílico' }
-            ],
-            [
-                { mol: 'acitretina-s2', label: '3' },
-                { arrow: true, above: 'Ph\u2083P=CH\u2082, KO\u1d57Bu', below: 'Wittig &middot; metilenación' },
-                { mol: 'acitretina-s3', label: '4 &middot; dieno' }
-            ],
-            [
-                { mol: 'acitretina-s3', label: '4' },
-                { arrow: true, above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083 &middot; desprotección + isomerización' },
-                { mol: 'acitretina-s4', label: '5 &middot; dienal conjugado' }
-            ],
-            [
-                { mol: 'acitretina-s4', label: '5' },
-                { arrow: true, above: '2-metilsuccinato de dimetilo', below: 'Triton B &middot; condensación de Stobbe' },
-                { mol: 'acitretina-s5', label: '6 &middot; éster/ácido' }
-            ],
-            [
-                { mol: 'acitretina-s5', label: '6' },
-                { arrow: true, above: 'NaOH', below: 'hidrólisis del éster' },
-                { mol: 'acitretina-s6', label: '7 &middot; diácido' }
-            ],
-            [
-                { mol: 'acitretina-s6', label: '7' },
-                { arrow: true, above: 'piridina, &Delta;', below: 'descarboxilación (tipo malónico)' },
-                { mol: 'acitretina-final', label: 'acitretina &middot; producto final' }
-            ]
-        ]
-    });
+    // Secuencia completa (8 moléculas, 7 pasos de reacción) dada de una
+    // sola vez, sin repetir ningún compuesto entre líneas: cada 3
+    // moléculas se pasa a la línea siguiente mediante una flecha de
+    // horquilla (baja y gira a la izquierda) que lleva los reactivos de
+    // ESE paso — en vez de repetir el compuesto de unión y usar un
+    // conector decorativo sin información, como antes.
+    SCHEMES['q6-sintesis-respuesta'] = () => renderZigzagScheme(
+        [
+            { mol: 'acitretina-s0', label: '1 &middot; cetona de partida' },
+            { mol: 'acitretina-s1', label: '2 &middot; &beta;-cetoaldehído' },
+            { mol: 'acitretina-s2', label: '3 &middot; acetal dimetílico' },
+            { mol: 'acitretina-s3', label: '4 &middot; dieno' },
+            { mol: 'acitretina-s4', label: '5 &middot; dienal conjugado' },
+            { mol: 'acitretina-s5', label: '6 &middot; éster/ácido' },
+            { mol: 'acitretina-s6', label: '7 &middot; diácido' },
+            { mol: 'acitretina-final', label: 'acitretina' }
+        ],
+        [
+            { above: 'MeONa', below: 'HCO\u2082Me &middot; acilación de Claisen' },
+            { above: 'MeOH / H\u2082SO\u2084', below: 'protección como acetal' },
+            { above: 'Ph\u2083P=CH\u2082, KO\u1d57Bu', below: 'Wittig &middot; metilenación' },
+            { above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083 &middot; desprotección + isomerización' },
+            { above: '2-metilsuccinato de dimetilo', below: 'Triton B &middot; condensación de Stobbe' },
+            { above: 'NaOH', below: 'hidrólisis del éster' },
+            { above: 'piridina, &Delta;', below: 'descarboxilación (tipo malónico)' }
+        ],
+        { size: 'sm', perRow: 3 }
+    );
     // Versión "enunciado": mismos pasos pero con los productos ocultos
     // tras un signo de interrogación, para que el estudiante los rellene.
-    SCHEMES['q6-sintesis-enunciado'] = () => renderScheme(null, {
-        size: 'sm',
-        rows: [
-            [
-                { mol: 'acitretina-s0', label: 'compuesto de partida' },
-                { arrow: true, above: 'MeONa', below: 'HCO\u2082Me' },
-                { text: '<span class="pc-scheme-unknown">1</span>' },
-                { arrow: true, above: 'MeOH', below: 'H\u2082SO\u2084' },
-                { text: '<span class="pc-scheme-unknown">2</span>' }
-            ],
-            [
-                { text: '<span class="pc-scheme-unknown">2</span>' },
-                { arrow: true, above: 'Ph\u2083P=CH\u2082', below: 'KO\u1d57Bu' },
-                { text: '<span class="pc-scheme-unknown">3</span>' },
-                { arrow: true, above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083' },
-                { text: '<span class="pc-scheme-unknown">4</span>' }
-            ],
-            [
-                { text: '<span class="pc-scheme-unknown">4</span>' },
-                { arrow: true, above: '2-metilsuccinato de dimetilo', below: 'Triton B' },
-                { text: '<span class="pc-scheme-unknown">5</span>' },
-                { arrow: true, above: 'NaOH' },
-                { text: '<span class="pc-scheme-unknown">6</span>' }
-            ],
-            [
-                { text: '<span class="pc-scheme-unknown">6</span>' },
-                { arrow: true, above: 'piridina, &Delta;' },
-                { mol: 'acitretina-final', label: 'acitretina (producto final)' }
-            ]
-        ]
-    });
+    SCHEMES['q6-sintesis-enunciado'] = () => renderZigzagScheme(
+        [
+            { mol: 'acitretina-s0' },
+            { text: '<span class="pc-scheme-unknown">1</span>' },
+            { text: '<span class="pc-scheme-unknown">2</span>' },
+            { text: '<span class="pc-scheme-unknown">3</span>' },
+            { text: '<span class="pc-scheme-unknown">4</span>' },
+            { text: '<span class="pc-scheme-unknown">5</span>' },
+            { text: '<span class="pc-scheme-unknown">6</span>' },
+            { mol: 'acitretina-final', label: 'acitretina' }
+        ],
+        [
+            { above: 'MeONa', below: 'HCO\u2082Me' },
+            { above: 'MeOH', below: 'H\u2082SO\u2084' },
+            { above: 'Ph\u2083P=CH\u2082', below: 'KO\u1d57Bu' },
+            { above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083' },
+            { above: '2-metilsuccinato de dimetilo', below: 'Triton B' },
+            { above: 'NaOH' },
+            { above: 'piridina, &Delta;' }
+        ],
+        { size: 'sm', perRow: 3 }
+    );
 
     SCHEMES['q3-keratina'] = () => renderScheme(null, {
         size: 'sm',
@@ -1132,6 +1213,7 @@
         renderOrbitalRow,
         renderScheme,
         renderForkScheme,
+        renderZigzagScheme,
         pSigns,
         loadRDKit,
         MOLS,
