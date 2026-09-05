@@ -254,6 +254,12 @@
     .pc-mol-sm .pc-skel-svg { max-width: 130px; }
     .pc-mol-lg .pc-skel-svg { max-width: 300px; }
 
+    /* ── Moléculas construidas a mano (sustituyentes con letra: R¹, R²,
+       R³, R⁴, X, Y, Z, H "postizo", NC abreviado...) — mismo trazo
+       visual que las de RDKit, para que no se note la diferencia. ── */
+    .pc-skel-bond { stroke: var(--text); stroke-width: 2; stroke-linecap: round; }
+    .pc-skel-label { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; fill: var(--text); }
+
     /* ── Esquemas de síntesis / reacción (flechas con reactivos) ──
        Cada .pc-scheme-row es un flujo de pasos (molécula → flecha →
        molécula → …). Se deja que el navegador reparta los pasos en varias
@@ -294,26 +300,82 @@
     .pc-scheme-arrow-above, .pc-scheme-arrow-below { font-size: 10.8px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
     .pc-scheme-arrow-above { margin-bottom: 1px; }
     .pc-scheme-arrow-below { margin-top: 1px; }
-    .pc-scheme-arrow-svg { width: 68px; height: 16px; display: block; }
+    .pc-scheme-arrow-svg { display: block; }
     .pc-scheme-line-rev .pc-scheme-arrow-svg { transform: scaleX(-1); }
     .pc-scheme-arrow-line { stroke: var(--text); stroke-width: 2; stroke-linecap: round; }
     .pc-scheme-arrowhead { fill: var(--text); }
+
+    /* ── Zoom: síntesis completas y moléculas individuales ampliables ──
+       .pc-scheme-box recibe un botón de "ampliar todo el esquema"; cada
+       .pc-mol / .pc-scheme-mol ya renderizada es clicable para ampliar
+       solo esa molécula. Todo se abre en el mismo visor a pantalla
+       completa (#molzoom-overlay) con zoom por rueda/pellizco y arrastre. ── */
+    .pc-scheme-box { position: relative; }
+    .pc-scheme-expand-btn {
+        position: absolute; top: 8px; right: 8px; z-index: 2;
+        display: flex; align-items: center; gap: 5px;
+        background: var(--card-bg); color: var(--text-muted);
+        border: 1px solid var(--border); border-radius: 8px;
+        padding: 5px 9px; font-size: 12px; font-weight: 600;
+        cursor: pointer; opacity: .75; transition: opacity .15s, color .15s;
+    }
+    .pc-scheme-expand-btn:hover { opacity: 1; color: var(--text); }
+    .pc-mol-rendered, .pc-scheme-mol { cursor: zoom-in; border-radius: 8px; transition: background .15s; }
+    .pc-mol-rendered:hover, .pc-scheme-mol:hover { background: rgba(201,162,39,.12); }
+    [data-theme="dark"] .pc-mol-rendered:hover, [data-theme="dark"] .pc-scheme-mol:hover { background: rgba(212,168,42,.14); }
+
+    #molzoom-overlay {
+        position: fixed; inset: 0; z-index: 9999; background: rgba(4,10,24,.82);
+        display: none; align-items: center; justify-content: center; flex-direction: column;
+        backdrop-filter: blur(2px); touch-action: none;
+    }
+    #molzoom-overlay.activo { display: flex; }
+    .molzoom-bar {
+        position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 2;
+    }
+    .molzoom-btn {
+        width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
+        background: rgba(255,255,255,.08); color: #fff; font-size: 17px; font-weight: 700;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: background .15s;
+    }
+    .molzoom-btn:hover { background: rgba(255,255,255,.18); }
+    .molzoom-stage {
+        width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        cursor: grab;
+    }
+    .molzoom-stage.arrastrando { cursor: grabbing; }
+    .molzoom-inner {
+        transform-origin: center center; transition: transform .06s linear;
+        background: var(--card-bg); border-radius: 16px; padding: 26px 30px;
+        max-width: none;
+    }
+    .molzoom-inner svg { display: block; }
+    .molzoom-hint {
+        position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+        color: rgba(255,255,255,.55); font-size: 12px; text-align: center;
+    }
 
     /* ── Esquema "en horquilla": un compuesto de partida del que salen
        varias flechas distintas, cada una hacia su propio producto (p. ej.
        bromuro de alilo + AgCN → A, + NaCN → B). Cada rama es una flecha
        "en escuadra" (codo a 90°) de una sola pieza — ver elbowArrowSvg()
-       en mol-graph.html — en vez de una línea diagonal suelta pegada a
-       una flecha horizontal aparte. ── */
+       en mol-graph.html — un único trazo continuo que sube o baja y
+       luego gira hacia la derecha, en vez de una línea diagonal suelta
+       pegada a una flecha horizontal aparte. La molécula de partida
+       queda centrada verticalmente respecto a todas las ramas, y cada
+       producto queda centrado respecto a su propia flecha. ── */
     .pc-fork { display: flex; align-items: center; gap: 2px; }
     .pc-fork-start { display: flex; align-items: center; flex-shrink: 0; }
     .pc-fork-branches { display: flex; flex-direction: column; justify-content: center; gap: 16px; flex: 1; min-width: 0; }
     .pc-fork-branch { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .pc-fork-elbow { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-    .pc-elbow-label { font-size: 10.8px; color: var(--text-muted); white-space: nowrap; font-weight: 600; }
     .pc-elbow-svg { display: block; }
     .pc-elbow-line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .pc-elbow-head { fill: var(--text); }
+
+    /* ── Flecha de equilibrio (doble, sentidos opuestos) ── */
+    .pc-scheme-eq-svg { height: 22px; }
 
     /* ── Ecuaciones / fórmulas destacadas (cajas de cálculo, p.ej. Q5) ── */
     .pc-eq-box {
@@ -422,6 +484,19 @@
     <p style="font-size:12px;opacity:.5;margin-top:10px;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
 </footer>
 
+<div id="molzoom-overlay">
+    <div class="molzoom-bar">
+        <button class="molzoom-btn" id="molzoom-out" title="Alejar (−)">−</button>
+        <button class="molzoom-btn" id="molzoom-reset" title="Restablecer">⟲</button>
+        <button class="molzoom-btn" id="molzoom-in" title="Acercar (+)">+</button>
+        <button class="molzoom-btn" id="molzoom-close" title="Cerrar (Esc)">×</button>
+    </div>
+    <div class="molzoom-stage" id="molzoom-stage">
+        <div class="molzoom-inner" id="molzoom-inner"></div>
+    </div>
+    <p class="molzoom-hint" id="molzoom-hint"></p>
+</div>
+
 <script>
 const _PVT = {
     es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta',
@@ -438,6 +513,142 @@ function _pvLang() {
     } catch(e) { return 'es'; }
 }
 function _pvT(key) { return (_PVT[_pvLang()] || _PVT.es)[key]; }
+
+// ── Zoom de esquemas de síntesis y moléculas individuales ──
+// Delegación de eventos sobre #pv-main (nunca se reemplaza el nodo en sí,
+// solo su innerHTML en cada pvRender), así que basta con un único listener
+// que sobrevive a los cambios de pestaña / re-renderizados.
+const MolZoomUI = (() => {
+    const overlay = document.getElementById('molzoom-overlay');
+    const stage = document.getElementById('molzoom-stage');
+    const inner = document.getElementById('molzoom-inner');
+    const hint = document.getElementById('molzoom-hint');
+    let scale = 1, panX = 0, panY = 0;
+    let arrastrando = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+    let pinchDist0 = null, pinchScale0 = 1;
+
+    const MIN = 0.4, MAX = 5;
+
+    function aplicar() {
+        inner.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+    function reset() { scale = 1; panX = 0; panY = 0; aplicar(); }
+    function zoomPor(factor, cx, cy) {
+        const nuevo = Math.min(MAX, Math.max(MIN, scale * factor));
+        if (nuevo === scale) return;
+        scale = nuevo;
+        aplicar();
+    }
+
+    function abrir(html, esEsquema) {
+        inner.innerHTML = html;
+        reset();
+        overlay.classList.add('activo');
+        hint.textContent = esEsquema
+            ? (_pvLang() === 'es' ? '🖱️ Rueda o pellizca para zoom · arrastra para mover · Esc para cerrar'
+                                   : '🖱️ Scroll or pinch to zoom · drag to pan · Esc to close')
+            : (_pvLang() === 'es' ? '🖱️ Rueda para zoom · arrastra para mover' : '🖱️ Scroll to zoom · drag to pan');
+    }
+    function cerrar() { overlay.classList.remove('activo'); inner.innerHTML = ''; }
+
+    document.getElementById('molzoom-in').onclick = () => zoomPor(1.25);
+    document.getElementById('molzoom-out').onclick = () => zoomPor(0.8);
+    document.getElementById('molzoom-reset').onclick = reset;
+    document.getElementById('molzoom-close').onclick = cerrar;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrar(); });
+    document.addEventListener('keydown', (e) => {
+        if (!overlay.classList.contains('activo')) return;
+        if (e.key === 'Escape') cerrar();
+        else if (e.key === '+' || e.key === '=') zoomPor(1.2);
+        else if (e.key === '-') zoomPor(0.85);
+        else if (e.key === '0') reset();
+    });
+
+    // Rueda del ratón / trackpad
+    stage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoomPor(e.deltaY < 0 ? 1.12 : 0.9);
+    }, { passive: false });
+
+    // Arrastrar para mover (ratón)
+    stage.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') return; // el táctil se maneja aparte (pellizco / 1 dedo)
+        arrastrando = true;
+        stage.classList.add('arrastrando');
+        startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+        stage.setPointerCapture(e.pointerId);
+    });
+    stage.addEventListener('pointermove', (e) => {
+        if (!arrastrando) return;
+        panX = startPanX + (e.clientX - startX);
+        panY = startPanY + (e.clientY - startY);
+        aplicar();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
+        stage.addEventListener(ev, () => { arrastrando = false; stage.classList.remove('arrastrando'); })
+    );
+    stage.addEventListener('dblclick', reset);
+
+    // Táctil: 1 dedo arrastra, 2 dedos hacen pellizco (pinch) para zoom
+    stage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            arrastrando = true;
+            startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+            startPanX = panX; startPanY = panY;
+        } else if (e.touches.length === 2) {
+            arrastrando = false;
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            pinchDist0 = Math.hypot(dx, dy);
+            pinchScale0 = scale;
+        }
+    }, { passive: true });
+    stage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1 && arrastrando) {
+            panX = startPanX + (e.touches[0].clientX - startX);
+            panY = startPanY + (e.touches[0].clientY - startY);
+            aplicar();
+        } else if (e.touches.length === 2 && pinchDist0) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.hypot(dx, dy);
+            scale = Math.min(MAX, Math.max(MIN, pinchScale0 * (dist / pinchDist0)));
+            aplicar();
+        }
+    }, { passive: true });
+    stage.addEventListener('touchend', () => { arrastrando = false; pinchDist0 = null; });
+
+    // Delegación: click en "ampliar esquema" o en una molécula individual ya renderizada.
+    document.getElementById('pv-main').addEventListener('click', (e) => {
+        const btnEsquema = e.target.closest('.pc-scheme-expand-btn');
+        if (btnEsquema) {
+            const box = btnEsquema.closest('.pc-scheme-box');
+            if (box) {
+                const clone = box.cloneNode(true);
+                clone.querySelectorAll('.pc-scheme-expand-btn').forEach(b => b.remove());
+                abrir(clone.innerHTML, true);
+            }
+            return;
+        }
+        const mol = e.target.closest('.pc-mol-rendered, .pc-scheme-mol');
+        if (mol) { abrir(mol.innerHTML, false); }
+    });
+
+    // Añade el botón "ampliar" a cada esquema de síntesis que aún no lo tenga.
+    // Se llama tras cada MolGraph.renderAll(), así que es seguro invocarla varias veces.
+    function decorate(root) {
+        (root || document).querySelectorAll('.pc-scheme-box').forEach(box => {
+            if (box.querySelector(':scope > .pc-scheme-expand-btn')) return;
+            const btn = document.createElement('button');
+            btn.className = 'pc-scheme-expand-btn';
+            btn.type = 'button';
+            btn.innerHTML = '🔍 ' + (_pvLang() === 'es' ? 'Ampliar' : 'Expand');
+            box.prepend(btn);
+        });
+    }
+
+    return { decorate };
+})();
 
 function pvAplicarTema() {
     let dark;
@@ -579,6 +790,7 @@ async function pvRender() {
 
     const articulo = document.getElementById('pv-articulo');
     if (window.MolGraph) await window.MolGraph.renderAll(articulo);
+    MolZoomUI.decorate(articulo);
     pvRenderGalerias(articulo);
 }
 
