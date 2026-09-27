@@ -251,7 +251,7 @@ const nombreOlimpiada    = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 
 const fuenteOlimpiada    = { icho: 'Fuente: icho-official.org', imcho: 'Fuente: mendeleevolympiad.org', oiaq: 'Fuente: OIAQ', ocacq: 'Fuente: OCACQ' };
 
 const fotosPorNombre = {};
-Object.values(todasLasOlimpiadas).flat().forEach(r => {
+Object.values(todasLasOlimpiadas).flat().concat(datosOtras).forEach(r => {
     if (r.foto && !fotosPorNombre[r.nombre]) fotosPorNombre[r.nombre] = r.foto;
 });
 </script>
