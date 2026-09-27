@@ -3583,6 +3583,13 @@ async function mostrarSubseccionCNQ(sub) {
 
     window._cnqSubActual = sub;
 
+    // Igual que en cambiarSeccion: si se entra a esta subsección antes de
+    // que window.datosCNQ termine de cargar, esperar aquí para no renderizar
+    // con el array todavía vacío (eso dejaba la tabla en blanco hasta que el
+    // usuario tocaba un filtro, que es lo único que volvía a llamar a
+    // renderCNQRanking() una vez los datos ya habían llegado).
+    if (window._datosSitialListos) { try { await window._datosSitialListos; } catch(e) {} }
+
     if (sub === 'ranking') {
         document.getElementById('cnq-ranking-view').style.display = 'block';
         _inicializarSelectorAñosCNQ();
@@ -4879,10 +4886,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (e) {}
 
-    await cargarDatosOlimpiadas();
-    await cargarProfesoresData();
-    await cargarHonorData();
-    await cargarCNQData();
+    // Promesa única que se resuelve cuando TODOS los datasets (olimpiadas,
+    // profesores, honor, CNQ) terminan de cargar. Se expone en window para
+    // que cualquier navegación del usuario que ocurra antes de que termine
+    // (p. ej. un clic rápido en "Ranking" o en "Historial de Eventos" nada
+    // más entrar al sitio) pueda esperarla antes de renderizar, en vez de
+    // renderizar con arrays vacíos y quedarse así hasta que se toque un
+    // filtro manualmente.
+    window._datosSitialListos = (async () => {
+        await cargarDatosOlimpiadas();
+        await cargarProfesoresData();
+        await cargarHonorData();
+        await cargarCNQData();
+    })();
+
+    await window._datosSitialListos;
     _origInit();
 });
 
@@ -6180,7 +6198,12 @@ function cambiarSeccion(p) {
         }));
     };
 
-    salir().then(() => {
+    salir().then(async () => {
+        // Si el usuario navega antes de que terminen de cargar los datos
+        // (olimpiadas/profesores/honor/CNQ), esperar aquí: si no, las tablas
+        // se renderizan vacías y no se vuelven a pintar hasta tocar un filtro.
+        if (window._datosSitialListos) { try { await window._datosSitialListos; } catch(e) {} }
+
         // Stats & data for new section
         if (p === 'sitial' || p === 'honor' || p === 'noticias' || p === 'inicio') statsParaSitial();
         else if (p === 'eventos') { statsParaEvento(); cargarTabla(); }
