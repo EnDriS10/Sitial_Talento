@@ -4893,12 +4893,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // más entrar al sitio) pueda esperarla antes de renderizar, en vez de
     // renderizar con arrays vacíos y quedarse así hasta que se toque un
     // filtro manualmente.
-    window._datosSitialListos = (async () => {
-        await cargarDatosOlimpiadas();
-        await cargarProfesoresData();
-        await cargarHonorData();
-        await cargarCNQData();
-    })();
+    //
+    // Los 4 datasets son independientes entre sí (cada uno define sus
+    // propias variables/objetos y ninguno lee datos de los otros durante su
+    // propia carga), así que se piden en PARALELO con Promise.all en vez de
+    // uno detrás de otro con await secuencial. Antes, cada fetch esperaba a
+    // que el anterior terminara del todo, así que el tiempo total era la
+    // SUMA de las 4 peticiones; ahora es solo la del más lento de los 4.
+    window._datosSitialListos = Promise.all([
+        cargarDatosOlimpiadas(),
+        cargarProfesoresData(),
+        cargarHonorData(),
+        cargarCNQData()
+    ]);
 
     await window._datosSitialListos;
     _origInit();
