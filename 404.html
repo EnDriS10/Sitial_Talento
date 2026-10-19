@@ -62,6 +62,8 @@
             l.replace(repoBase + '/media.html' + l.search + l.hash);
         } else if (resto.length === 1 && resto[0] === 'noticias') {
             l.replace(repoBase + '/noticias.html' + l.search + l.hash);
+        } else if (resto.length >= 2 && resto[0] === 'Equipo') {
+            l.replace(repoBase + '/equipo.html?ol=' + resto[1] + '&anio=' + (resto[2] || '') + (resto[3] ? '&sub=' + resto[3] : '') + (l.search ? '&' + l.search.slice(1) : '') + l.hash);
         } else if ((resto.length === 2 || resto.length === 3) && resto[0] === 'Banco_Problemas') {
             var id  = decodeURIComponent(resto[1]);
             var tab = resto.length === 3 ? decodeURIComponent(resto[2]) : 'enunciado';
