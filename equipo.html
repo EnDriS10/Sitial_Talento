@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Fija la "carpeta real" del sitio ANTES de cargar nada relativo, para que
+     la URL bonita (/Equipo/IChO/2026) no rompa las rutas Data/... y Assets/... -->
+<base id="app-base-href" href="/">
+<script>
+    (function () {
+        var segs = location.pathname.split('/');
+        var i = -1;
+        for (var k = 0; k < segs.length; k++) { if (segs[k] === 'Equipo') { i = k; break; } }
+        var p = i >= 0 ? segs.slice(0, i).join('/') + '/' : location.pathname.replace(/[^\/]*$/, '');
+        document.getElementById('app-base-href').href = location.origin + p;
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equipo — Sitial de Talentos Cubanos</title>
+<meta name="description" content="Equipo cubano en las olimpiadas de química: participantes, medallas, profesores y fotos — Sitial de Talentos Cubanos.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Equipo — Sitial de Talentos Cubanos">
+<meta property="og:description" content="Equipo cubano en las olimpiadas de química: participantes, medallas, profesores y fotos.">
+<meta property="og:image" content="https://sitialtalento.vercel.app/api/og">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" id="eq-canonical" href="https://sitialtalento.vercel.app/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #04122b; --navy-text: var(--navy); --navy-mid: #0b2150; --navy-light: #122d6b;
+        --gold: #c9a227; --gold-light: #f0c84a; --silver: #b0bec5; --bronze: #a0522d; --accent: #1a6fb5;
+        --bg: #f5f3ee; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #5a6a8a; --border: #dde3f0;
+        --cu-blue: #002a8f; --cu-red: #cc0001;
+    }
+    [data-theme="dark"] {
+        --navy: #141a2b; --navy-text: #a9c2ee; --navy-mid: #1a2840; --navy-light: #3a5a9a;
+        --gold: #d4a82a; --gold-light: #f5d060; --accent: #5ba3e8;
+        --bg: #0d1117; --card-bg: #161b22; --text: #e6edf3; --text-muted: #8b949e; --border: #30363d;
+    }
+    * { box-sizing: border-box; }
+    html { height: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; transition: background .25s, color .25s; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Topbar (igual que media.html) */
+    .mp-topbar { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; flex-shrink: 0; }
+    .mp-breadcrumb { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    .mp-crumb-home { display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; color: var(--gold-light); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; padding: 6px 8px 6px 4px; border-radius: 8px; transition: background .18s; white-space: nowrap; flex-shrink: 0; }
+    .mp-crumb-home:hover { background: rgba(255,255,255,.1); }
+    .mp-crumb-sep { color: rgba(255,255,255,.35); font-size: 14px; flex-shrink: 0; }
+    .mp-crumb-current { font-size: 14px; font-weight: 500; color: rgba(255,255,255,.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mp-topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .mp-icon-btn { background: rgba(255,255,255,.12); border: none; border-radius: 8px; color: #fff; width: 36px; height: 36px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+    .mp-icon-btn:hover { background: rgba(255,255,255,.22); }
+
+    .eq-main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; flex: 1 0 auto; width: 100%; }
+
+    /* Hero */
+    .eq-hero { background: var(--navy); color: #fff; border-radius: 20px; padding: 34px 28px 28px; position: relative; overflow: hidden; margin-bottom: 22px; }
+    .eq-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 80% at 12% 50%, rgba(0,42,143,.28), transparent 65%), radial-gradient(ellipse 45% 70% at 90% 30%, rgba(204,0,1,.2), transparent 65%); pointer-events: none; }
+    .eq-hero > * { position: relative; }
+    .eq-flag { display: flex; width: 120px; height: 4px; border-radius: 3px; overflow: hidden; margin-bottom: 18px; }
+    .eq-flag span { flex: 1; } .eq-flag span:nth-child(odd) { background: var(--cu-blue); } .eq-flag span:nth-child(even) { background: #f2f2f2; } .eq-flag span:nth-child(3) { background: var(--cu-red); }
+    .eq-eyebrow { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 600; margin: 0 0 8px; }
+    .eq-title { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(30px, 6vw, 46px); line-height: 1.05; margin: 0 0 8px; }
+    .eq-title em { font-style: normal; color: var(--gold-light); }
+    .eq-subtitle { font-size: 14px; color: rgba(255,255,255,.65); margin: 0 0 4px; }
+    .eq-sede { font-size: 15px; color: rgba(255,255,255,.9); margin: 10px 0 0; font-weight: 500; }
+    .eq-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; align-items: center; }
+    .eq-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s, background .2s; }
+    .eq-btn:hover { transform: translateY(-2px); }
+    .eq-btn-gold { background: var(--gold-light); color: #04122b; }
+    .eq-btn-ghost { background: rgba(255,255,255,.12); color: #fff; }
+    .eq-btn-ghost:hover { background: rgba(255,255,255,.22); }
+    .eq-btn svg { width: 16px; height: 16px; }
+    .eq-yearnav { display: inline-flex; align-items: center; background: rgba(255,255,255,.12); border-radius: 22px; overflow: hidden; }
+    .eq-yearnav button, .eq-yearnav select { background: none; border: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 12px; cursor: pointer; }
+    .eq-yearnav button:hover { background: rgba(255,255,255,.15); }
+    .eq-yearnav button:disabled { opacity: .3; cursor: default; }
+    .eq-yearnav select { appearance: none; -webkit-appearance: none; text-align: center; padding: 10px 6px; }
+    .eq-yearnav select option { color: #111; }
+
+    /* Stats */
+    .eq-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 30px; }
+    .eq-stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px 10px; text-align: center; }
+    .eq-stat b { display: block; font-family: 'Playfair Display', serif; font-size: 30px; line-height: 1; color: var(--navy-text); }
+    .eq-stat span { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 7px; }
+    @media (max-width: 600px) { .eq-stats { grid-template-columns: repeat(3, 1fr); } .eq-hero { padding: 26px 18px 22px; } }
+
+    .eq-section { margin-bottom: 36px; }
+    .eq-h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy-text); margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+    .eq-h2::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .eq-count { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2px 10px; }
+
+    .eq-subchips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+    .eq-subchip { padding: 6px 14px; border-radius: 18px; border: 1.5px solid var(--border); background: var(--card-bg); font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+    .eq-subchip:hover, .eq-subchip.activo { border-color: var(--accent); color: var(--accent); }
+
+    /* Cards */
+    .eq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .eq-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px; display: flex; gap: 14px; align-items: center; box-shadow: 0 2px 14px rgba(4,18,43,.06); transition: transform .2s, box-shadow .2s; }
+    .eq-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(4,18,43,.13); }
+    .eq-av { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #e8ecf5; border: 3px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .eq-card[data-m="oro"] .eq-av { border-color: var(--gold); } .eq-card[data-m="plata"] .eq-av { border-color: var(--silver); } .eq-card[data-m="bronce"] .eq-av { border-color: #c87941; } .eq-card[data-m="mencion"] .eq-av { border-color: #7aaae8; }
+    .eq-av img { width: 100%; height: 100%; object-fit: cover; }
+    .eq-ini { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; color: var(--navy-light); }
+    .eq-info { min-width: 0; flex: 1; }
+    .eq-name { font-size: 15px; font-weight: 600; color: var(--navy-text); display: block; line-height: 1.3; margin-bottom: 6px; }
+    a.eq-name:hover { color: var(--accent); text-decoration: underline; }
+    .eq-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .prov { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: rgba(201,162,39,.14); color: #7a5800; cursor: default; }
+    [data-theme="dark"] .prov { color: #d4a82a; }
+    .eq-rank { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .rol-tag { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,.13); color: var(--navy-light); }
+    [data-theme="dark"] .rol-tag { background: rgba(90,160,255,.12); color: #8fb4f0; }
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+    .badge i { width: 7px; height: 7px; border-radius: 50%; display: block; }
+    .badge-oro { background: #fff8e1; color: #9a7200; } .badge-oro i { background: var(--gold); }
+    .badge-plata { background: #f0f4f8; color: #5a6a8a; } .badge-plata i { background: var(--silver); }
+    .badge-bronce { background: #fdf0e8; color: #7a3b10; } .badge-bronce i { background: var(--bronze); }
+    .badge-mencion { background: #e8f0fb; color: #1a4a9a; } .badge-mencion i { background: var(--accent); }
+    .badge-participante { background: #f4f4f4; color: #888; } .badge-participante i { background: #ccc; }
+    [data-theme="dark"] .badge-oro { background: #2a1f00; color: #f5d060; } [data-theme="dark"] .badge-plata { background: #1e2230; color: #a0b4c8; }
+    [data-theme="dark"] .badge-bronce { background: #2a1408; color: #d09060; } [data-theme="dark"] .badge-mencion { background: #0e1a30; color: #6090d0; }
+    [data-theme="dark"] .badge-participante { background: #1e2230; color: #8b949e; }
+
+    /* Fotos */
+    .eq-gallery { columns: 4 220px; column-gap: 14px; }
+    .eq-gallery img { width: 100%; display: block; margin: 0 0 14px; border-radius: 12px; cursor: zoom-in; border: 1px solid var(--border); box-shadow: 0 2px 14px rgba(4,18,43,.08); transition: transform .22s, box-shadow .22s; break-inside: avoid; background: var(--card-bg); }
+    .eq-gallery img:hover { transform: translateY(-3px) scale(1.012); box-shadow: 0 10px 26px rgba(4,18,43,.18); }
+    .eq-links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 6px; }
+    .eq-links a { color: var(--accent); font-weight: 600; font-size: 14px; }
+    .eq-links a:hover { text-decoration: underline; }
+    .eq-estado { padding: 70px 20px; text-align: center; color: var(--text-muted); font-size: 15px; }
+    .eq-estado a { color: var(--accent); font-weight: 600; }
+
+    /* Lightbox */
+    .eq-lb { position: fixed; inset: 0; z-index: 1000; background: rgba(4,10,22,.95); display: none; align-items: center; justify-content: center; padding: 32px; }
+    .eq-lb.visible { display: flex; }
+    .eq-lb img { max-width: 100%; max-height: 100%; border-radius: 10px; box-shadow: 0 24px 70px rgba(0,0,0,.55); }
+    .eq-lb button { position: absolute; background: rgba(255,255,255,.12); color: #fff; border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .eq-lb button:hover { background: rgba(255,255,255,.24); }
+    .eq-lb button:disabled { opacity: 0; pointer-events: none; }
+    .eq-lb-close { top: 18px; right: 22px; } .eq-lb-prev { left: 16px; top: 50%; transform: translateY(-50%); } .eq-lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
+
+    /* Share sheet */
+    .eq-share-ov { position: fixed; inset: 0; z-index: 1100; background: rgba(4,10,22,.55); display: none; align-items: flex-end; justify-content: center; }
+    .eq-share-ov.abierto { display: flex; }
+    .eq-share-sheet { width: 100%; max-width: 560px; background: var(--card-bg); border-radius: 22px 22px 0 0; padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px)); position: relative; animation: eqUp .28s cubic-bezier(.32,.9,.35,1.1); }
+    @keyframes eqUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .eq-share-title { text-align: center; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); margin: 0 0 16px; }
+    .eq-share-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .eq-share-op { display: flex; flex-direction: column; align-items: center; gap: 7px; background: none; border: none; cursor: pointer; padding: 4px 2px; border-radius: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; }
+    .eq-share-op:hover { background: rgba(128,128,128,.1); }
+    .eq-share-ic { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .eq-share-ic svg { width: 22px; height: 22px; }
+    .eq-url { margin-top: 16px; display: flex; gap: 8px; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 8px 8px 14px; }
+    .eq-url input { flex: 1; min-width: 0; border: none; background: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12.5px; outline: none; }
+    .eq-url button { background: var(--navy); color: #fff; border: none; border-radius: 9px; padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .eq-toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(10px); background: rgba(20,20,20,.92); color: #fff; padding: 10px 20px; border-radius: 22px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; z-index: 1200; }
+    .eq-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 480px) { .eq-share-grid { grid-template-columns: repeat(3, 1fr); row-gap: 14px; } }
+
+    /* Footer */
+    footer { background: var(--navy); color: rgba(255,255,255,.55); text-align: center; padding: 28px 20px 22px; font-size: 13px; flex-shrink: 0; }
+    footer a { color: var(--gold-light); }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 14px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; font-weight: 500; }
+</style>
+<link rel="stylesheet" href="Assets/UI/modern-ui.css">
+</head>
+<body>
+
+<div class="mp-topbar">
+    <div class="mp-breadcrumb">
+        <button class="mp-crumb-home" onclick="location.href='index.html#inicio'" aria-label="Inicio">🏠 <span id="eq-home-label">Home</span></button>
+        <span class="mp-crumb-sep">›</span>
+        <span class="mp-crumb-current" id="eq-crumb">…</span>
+    </div>
+    <div class="mp-topbar-actions">
+        <button class="mp-icon-btn" id="mp-theme-btn" onclick="toggleTema()" title="Tema">🌙</button>
+        <button class="mp-icon-btn" id="mp-lang-btn" onclick="toggleIdioma()" title="Idioma / Language">ES</button>
+    </div>
+</div>
+
+<div class="eq-main" id="eq-root"><div class="eq-estado">⏳ …</div></div>
+
+<footer>
+    <div class="footer-links">
+        <a href="index.html#inicio">🏠 Home</a>
+        <a href="media.html">📸 Media</a>
+        <a href="index.html#contacto">📌 Enlaces y Contacto</a>
+    </div>
+    <p style="font-size:12px;opacity:.5;margin:6px 0 0;">© 2026 · Sitial de Talentos Cubanos en Olimpiadas de Química</p>
+</footer>
+
+<div class="eq-lb" id="eq-lb" onclick="cerrarFoto()">
+    <button class="eq-lb-close" onclick="event.stopPropagation();cerrarFoto()" aria-label="Cerrar">✕</button>
+    <button class="eq-lb-prev" id="eq-lb-prev" onclick="event.stopPropagation();navFoto(-1)" aria-label="Anterior">‹</button>
+    <img id="eq-lb-img" src="" alt="" onclick="event.stopPropagation()">
+    <button class="eq-lb-next" id="eq-lb-next" onclick="event.stopPropagation();navFoto(1)" aria-label="Siguiente">›</button>
+</div>
+
+<div class="eq-share-ov" id="eq-share-ov" onclick="cerrarCompartir()">
+    <div class="eq-share-sheet" onclick="event.stopPropagation()">
+        <p class="eq-share-title" id="eq-share-title">Compartir</p>
+        <div class="eq-share-grid" id="eq-share-grid">
+            <button class="eq-share-op" onclick="compartirRed('whatsapp')"><span class="eq-share-ic" style="background:#25D366"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.5 5.2L2 22l4.9-1.5c1.5.8 3.2 1.3 5.1 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.6-1.3l-.3-.2-3.2 1 1-3.1-.2-.3C3.8 15 3.2 13.5 3.2 12c0-4.8 3.9-8.8 8.8-8.8s8.8 3.9 8.8 8.8-4 8.2-8.8 8.2z"/><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.2.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.4.1-.2 0-.4 0-.5-.1-.1-.6-1.5-.8-2-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.3 0 1.4 1 2.7 1.1 2.9.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.6-.4z"/></svg></span>WhatsApp</button>
+            <button class="eq-share-op" onclick="compartirRed('facebook')"><span class="eq-share-ic" style="background:#1877F2"><svg viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></span>Facebook</button>
+            <button class="eq-share-op" onclick="compartirRed('x')"><span class="eq-share-ic" style="background:#000"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.9 2H22l-7.2 8.3L23.3 22H16.9l-5-6.5-5.7 6.5H2.9l7.7-8.8L1.9 2h6.5l4.5 6 5-6zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"/></svg></span>X</button>
+            <button class="eq-share-op" onclick="compartirRed('telegram')"><span class="eq-share-ic" style="background:#26A5E4"><svg viewBox="0 0 24 24" fill="#fff"><path d="M21.9 4.3 18.6 20c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2l-11 6.9-4.7-1.5c-1-.3-1-1 .2-1.5L20.6 3c.8-.3 1.6.2 1.3 1.3z"/></svg></span>Telegram</button>
+            <button class="eq-share-op" onclick="copiarEnlace()"><span class="eq-share-ic" style="background:#6b7280"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"/></svg></span><span id="eq-copy-label">Copiar enlace</span></button>
+        </div>
+        <div class="eq-url"><input id="eq-url-input" readonly><button onclick="copiarEnlace()" id="eq-url-btn">Copiar</button></div>
+    </div>
+</div>
+<div class="eq-toast" id="eq-toast"></div>
+
+<script>
+// ═══════════════ i18n / tema ═══════════════
+const T_ = {
+  es: { home:'Home', team:'Equipo', students:'Participantes', teachers:'Profesores y delegación', photos:'Fotos', participants:'Participantes',
+        medals:'Medallas', gold:'Oro', silver:'Plata', bronze:'Bronce', mention:'Mención', sede:'Sede', edition:'Edición', share:'Compartir', copyLink:'Copiar enlace',
+        copy:'Copiar', more:'Más', copied:'¡Enlace copiado!', copyFail:'No se pudo copiar el enlace', loading:'Cargando…', rank:'Rank',
+        nodata:'No hay datos para esta olimpiada y año.', backHome:'Volver al inicio', allPhotos:'Ver toda la galería de Media →', history:'Ver historial completo →',
+        loadErr:'No se pudieron cargar los datos del equipo.', prev:'Año anterior', next:'Año siguiente', filterBy:'Olimpiadas de ese año:',
+        m_oro:'Medalla de Oro', m_plata:'Medalla de Plata', m_bronce:'Medalla de Bronce', m_mencion:'Mención Honorífica', m_participante:'Participante',
+        shareText:'Mira el equipo cubano de', other:'Otras olimpiadas', noRole:'Delegación' },
+  en: { home:'Home', team:'Team', students:'Participants', teachers:'Teachers & delegation', photos:'Photos', participants:'Participants',
+        medals:'Medals', gold:'Gold', silver:'Silver', bronze:'Bronze', mention:'Mention', sede:'Venue', edition:'Edition', share:'Share', copyLink:'Copy link',
+        copy:'Copy', more:'More', copied:'Link copied!', copyFail:'Could not copy link', loading:'Loading…', rank:'Rank',
+        nodata:'No data for this olympiad and year.', backHome:'Back to home', allPhotos:'See the full Media gallery →', history:'See full history →',
+        loadErr:'The team data could not be loaded.', prev:'Previous year', next:'Next year', filterBy:'Olympiads that year:',
+        m_oro:'Gold Medal', m_plata:'Silver Medal', m_bronce:'Bronze Medal', m_mencion:'Honourable Mention', m_participante:'Participant',
+        shareText:'Check out the Cuban team at', other:'Other olympiads', noRole:'Delegation' }
+};
+function L() { try { const g = localStorage.getItem('lang'); if (g) return g; const n = (navigator.language || 'es').toLowerCase(); return n.startsWith('en') ? 'en' : 'es'; } catch (e) { return 'es'; } }
+function t(k) { return (T_[L()] || T_.es)[k] || T_.es[k] || k; }
+function aplicarTema() {
+    let dark = false;
+    try { const g = localStorage.getItem('theme'); dark = g ? g === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) {}
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+}
+function toggleTema() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+}
+function toggleIdioma() { try { localStorage.setItem('lang', L() === 'es' ? 'en' : 'es'); } catch (e) {} aplicarIdiomaEstatico(); if (window._listo) render(); }
+function aplicarIdiomaEstatico() {
+    document.documentElement.lang = L();
+    document.getElementById('eq-home-label').textContent = t('home');
+    document.getElementById('mp-lang-btn').textContent = L() === 'es' ? 'ES' : 'EN';
+    document.getElementById('eq-share-title').textContent = t('share');
+    document.getElementById('eq-copy-label').textContent = t('copyLink');
+    document.getElementById('eq-url-btn').textContent = t('copy');
+}
+aplicarTema(); aplicarIdiomaEstatico();
+
+// ═══════════════ Constantes ═══════════════
+const PROV = { AR:'Artemisa', CA:'Ciego de Ávila', CM:'Camagüey', CF:'Cienfuegos', GR:'Granma', GU:'Guantánamo', LH:'La Habana', HO:'Holguín', LT:'Las Tunas', MT:'Matanzas', MA:'Mayabeque', PR:'Pinar del Río', SC:'Santiago de Cuba', SS:'Sancti Spíritus', VC:'Villa Clara', IJ:'Isla de la Juventud' };
+const MED_ORDEN = { oro:1, plata:2, bronce:3, mencion:4, participante:5 };
+const OL_INFO = {
+  icho:  { short:'IChO',  es:'Olimpiada Internacional de Química', en:'International Chemistry Olympiad' },
+  imcho: { short:'IMChO', es:'Olimpiada Internacional Mendeléiev de Química', en:'Mendeleev International Chemistry Olympiad' },
+  oiaq:  { short:'OIAQ',  es:'Olimpiada Iberoamericana de Química', en:'Ibero-American Chemistry Olympiad' },
+  ocacq: { short:'OCACQ', es:'Olimpiada Centroamericana y del Caribe de Química', en:'Central American & Caribbean Chemistry Olympiad' },
+  otras: { short:'Otras', es:'Otras olimpiadas de química', en:'Other chemistry olympiads' }
+};
+const OL_PATH = { icho:'IChO', imcho:'IMChO', oiaq:'OIAQ', ocacq:'OCACQ', otras:'Otros' };
+const OL_FROM = { icho:'icho', imcho:'imcho', oiaq:'oiaq', ocacq:'ocacq', otros:'otras', otras:'otras', otra:'otras', otro:'otras' };
+
+// ═══════════════ Utilidades ═══════════════
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+function ini(n) { return String(n || '').split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase(); }
+function slug(n) { return (n || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function thumb(u) { const m = /^(https:\/\/i\.imgur\.com\/)([A-Za-z0-9]{7})(\.(?:png|jpe?g))$/i.exec(u || ''); return m ? m[1] + m[2] + 't' + m[3] : u; }
+function avFail(img) {
+    if (!img.dataset.t && img.dataset.full) { img.dataset.t = 1; img.src = img.dataset.full; return; }
+    const s = document.createElement('span'); s.className = 'eq-ini'; s.textContent = img.dataset.ini || '';
+    img.replaceWith(s);
+}
+function avatar(nombre, foto) {
+    return foto ? `<img loading="lazy" src="${esc(thumb(foto))}" data-full="${esc(foto)}" data-ini="${esc(ini(nombre))}" alt="${esc(nombre)}" onerror="avFail(this)">`
+                : `<span class="eq-ini">${esc(ini(nombre))}</span>`;
+}
+function hrefEquipo(ol, año, sub) {
+    return 'equipo.html?ol=' + ol + '&anio=' + año + (sub ? '&sub=' + encodeURIComponent(sub) : '');
+}
+function hrefSitial(n) { return new URL('Historial_Medallas/cuadrito=' + encodeURIComponent(slug(n)) + '#sitial', document.baseURI).href; }
+function toast(m) { const e = document.getElementById('eq-toast'); e.textContent = m; e.classList.add('visible'); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('visible'), 2200); }
+
+// Carga de datos (mismo mecanismo que index.html: se ejecuta el <script> embebido)
+async function cargarScript(url, id) {
+    const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + url);
+    const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+    const el = doc.getElementById(id); if (!el) throw new Error('No se encontró #' + id);
+    const s = document.createElement('script'); s.textContent = el.textContent; document.head.appendChild(s);
+}
+function quitarComentarios(src) {
+    let out = '', inStr = false, q = '', esc_ = false, i = 0;
+    while (i < src.length) {
+        const c = src[i];
+        if (esc_) { out += c; esc_ = false; i++; continue; }
+        if (c === '\\' && inStr) { out += c; esc_ = true; i++; continue; }
+        if (!inStr && (c === '"' || c === "'")) { inStr = true; q = c; out += c; i++; continue; }
+        if (inStr && c === q) { inStr = false; out += c; i++; continue; }
+        if (!inStr && c === '/' && src[i + 1] === '/') { while (i < src.length && src[i] !== '\n') i++; continue; }
+        out += c; i++;
+    }
+    return out;
+}
+function jsAJSON(src) {
+    return quitarComentarios(src).replace(/,(\s*[\]\}])/g, '$1').replace(/(^|[{,])\s*([^\s"'0-9{},\[\]:][^\s:,\]{}]*)\s*:/gm, (m, pre, key) => (key[0] === '"' || key[0] === "'") ? m : `${pre} "${key.trim()}":`);
+}
+async function cargarMedia() {
+    const r = await fetch('Data/media_data.html'); if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text(); const marker = text.indexOf('const datosMedia = [');
+    if (marker === -1) throw new Error('sin datosMedia');
+    let dep = 0, i = text.indexOf('['); i = text.indexOf('[', marker); const start = i;
+    for (; i < text.length; i++) { if (text[i] === '[') dep++; else if (text[i] === ']') { dep--; if (dep === 0) break; } }
+    return JSON.parse(jsAJSON(text.slice(start, i + 1))).map(d => ({ nombre: (d.name || '').trim(), url: (d.link || '').trim() })).filter(a => a.nombre && a.url);
+}
+
+// ═══════════════ Parámetros ═══════════════
+function parseParams() {
+    const segs = location.pathname.split('/').filter(Boolean).map(s => { try { return decodeURIComponent(s); } catch (e) { return s; } });
+    const i = segs.indexOf('Equipo');
+    let ol = i >= 0 ? segs[i + 1] : null, anio = i >= 0 ? segs[i + 2] : null, sub = i >= 0 ? segs[i + 3] : null;
+    const q = new URLSearchParams(location.search);
+    ol = q.get('ol') || ol; anio = q.get('anio') || anio; sub = q.get('sub') || sub;
+    return { ol: OL_FROM[String(ol || '').toLowerCase()] || null, año: Number(anio) || null, sub: sub || null };
+}
+const P = parseParams();
+let FOTOS = [], FOTOS_EQ = [], _fi = 0;
+
+function fechaDe(n) { const m = n.match(/^(\d{2})_(\d{2})_(\d{4})/); return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null; }
+function eventoDe(n) { const m = n.match(/^\d{2}_\d{2}_\d{4}_([a-zA-Z]+)(?:_\d+)?(?:\.\w+)?$/); return m ? m[1].toLowerCase() : null; }
+function numDe(n) { const m = n.match(/^\d{2}_\d{2}_\d{4}_[a-zA-Z]+_(\d+)/); return m ? +m[1] : 0; }
+
+// ═══════════════ Render ═══════════════
+function render() {
+    const root = document.getElementById('eq-root');
+    const lang = L();
+    if (!P.ol || !P.año) { root.innerHTML = `<div class="eq-estado">${t('nodata')}<br><br><a href="index.html#inicio">${t('backHome')}</a></div>`; return; }
+
+    const K = P.ol, toL = v => String(v || '').toLowerCase();
+    const eOl = typeof todasLasOlimpiadas !== 'undefined' ? todasLasOlimpiadas : {};
+    const eOtras = typeof datosOtras !== 'undefined' && Array.isArray(datosOtras) ? datosOtras : [];
+    const pAll = window.todasLosProfesores || {};
+    const estAll = K === 'otras' ? eOtras : (eOl[K] || []);
+    const profAll = pAll[K] || [];
+    const match = r => !P.sub || toL(r.Olimp) === toL(P.sub);
+
+    const años = [...new Set([...estAll, ...profAll].map(r => Number(r.año)).filter(Boolean))].sort((a, b) => b - a);
+    const est = estAll.filter(r => Number(r.año) === P.año && match(r)).sort((a, b) =>
+        (MED_ORDEN[a.medalla] - MED_ORDEN[b.medalla]) || ((a.rank == null ? 1e9 : a.rank) - (b.rank == null ? 1e9 : b.rank)) || (a.nombre || '').localeCompare(b.nombre || ''));
+    const prof = profAll.filter(r => Number(r.año) === P.año && match(r)).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+    const fotosEst = typeof fotosPorNombre !== 'undefined' ? fotosPorNombre : {};
+    const fotosProf = window.fotosPorNombreProfesor || {};
+
+    const olimpsEseAño = K === 'otras' ? [...new Set(estAll.filter(r => Number(r.año) === P.año).map(r => r.Olimp).filter(Boolean))] : [];
+    let corto = OL_INFO[K].short, largo = OL_INFO[K][lang];
+    if (K === 'otras') {
+        const unico = P.sub || (olimpsEseAño.length === 1 ? olimpsEseAño[0] : null);
+        if (unico) { corto = unico; const f = est[0] || estAll.find(r => toL(r.Olimp) === toL(unico)); if (f && f.Olimpiada) largo = f.Olimpiada; }
+        else corto = t('other');
+    }
+    const titulo = `${corto} ${P.año}`;
+    document.title = `${titulo} — ${t('team')} | Sitial de Talentos`;
+    document.getElementById('eq-crumb').textContent = titulo;
+
+    if (!est.length && !prof.length) {
+        root.innerHTML = `<div class="eq-estado">${t('nodata')}<br><br><a href="index.html#inicio">${t('backHome')}</a></div>`; return;
+    }
+
+    const ref = est[0] || prof[0];
+    const sedeTxt = [ref.pais, ref.sede].filter(Boolean).join(' ');
+    const cnt = m => est.filter(r => r.medalla === m).length;
+    const nMed = cnt('oro') + cnt('plata') + cnt('bronce') + cnt('mencion');
+    const desc = `${titulo}: ${est.length} ${t('participants').toLowerCase()}, ${nMed} ${t('medals').toLowerCase()}${sedeTxt ? ' · ' + sedeTxt : ''}`;
+    const setMeta = (s, v) => { const e = document.querySelector(s); if (e) e.setAttribute('content', v); };
+    setMeta('meta[name="description"]', desc); setMeta('meta[property="og:description"]', desc);
+    setMeta('meta[property="og:title"]', `${titulo} — ${t('team')} | Sitial de Talentos`);
+    document.getElementById('eq-canonical').href = location.href.split('#')[0];
+
+    // Navegación de años
+    const idx = años.indexOf(P.año);
+    const opts = años.map(a => `<option value="${a}"${a === P.año ? ' selected' : ''}>${a}</option>`).join('');
+    const prevA = idx >= 0 && idx < años.length - 1 ? años[idx + 1] : null, nextA = idx > 0 ? años[idx - 1] : null;
+
+    // Medallistas con tarjeta en el sitial
+    const conSitial = new Set();
+    [...Object.values(eOl).flat(), ...eOtras].forEach(r => { if (r.nombre && r.medalla && r.medalla !== 'participante') conSitial.add(r.nombre); });
+
+    const subChips = (K === 'otras' && olimpsEseAño.length > 1) ? `<div class="eq-subchips">
+        <a class="eq-subchip${!P.sub ? ' activo' : ''}" href="${hrefEquipo('otras', P.año)}">${t('other')}</a>
+        ${olimpsEseAño.map(o => `<a class="eq-subchip${toL(P.sub) === toL(o) ? ' activo' : ''}" href="${hrefEquipo('otras', P.año, o)}">${esc(o)}</a>`).join('')}</div>` : '';
+
+    const cardEst = r => {
+        const nm = conSitial.has(r.nombre) ? `<a class="eq-name" href="${esc(hrefSitial(r.nombre))}">${esc(r.nombre)}</a>` : `<span class="eq-name">${esc(r.nombre)}</span>`;
+        return `<div class="eq-card" data-m="${esc(r.medalla)}"><div class="eq-av">${avatar(r.nombre, fotosEst[r.nombre])}</div>
+            <div class="eq-info">${nm}<div class="eq-meta">${r.prov ? `<span class="prov" title="${esc(PROV[r.prov] || '')}">${esc(r.prov)}</span>` : ''}
+            <span class="badge badge-${esc(r.medalla)}"><i></i>${esc(t('m_' + r.medalla))}</span>${r.rank != null ? `<span class="eq-rank">${t('rank')} ${esc(r.rank)}</span>` : ''}</div></div></div>`;
+    };
+    const cardProf = r => `<div class="eq-card"><div class="eq-av">${avatar(r.nombre, fotosProf[r.nombre] || fotosEst[r.nombre])}</div>
+        <div class="eq-info"><span class="eq-name">${esc(r.nombre)}</span><div class="eq-meta"><span class="rol-tag">${esc(r.rol || t('noRole'))}</span></div></div></div>`;
+
+    root.innerHTML = `
+    <section class="eq-hero">
+        <div class="eq-flag"><span></span><span></span><span></span><span></span><span></span></div>
+        <p class="eq-eyebrow">${esc(largo)}</p>
+        <h1 class="eq-title">${esc(corto)} <em>${P.año}</em></h1>
+        <p class="eq-subtitle">${esc(t('team'))} · Cuba${ref.ed ? ' · ' + t('edition') + ' ' + esc(ref.ed) : ''}</p>
+        ${sedeTxt ? `<p class="eq-sede">${esc(sedeTxt)}</p>` : ''}
+        <div class="eq-hero-actions">
+            <button class="eq-btn eq-btn-gold" onclick="abrirCompartir()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>${t('share')}</button>
+            <div class="eq-yearnav">
+                <button ${prevA ? `onclick="location.href='${hrefEquipo(K, prevA, P.sub)}'"` : 'disabled'} title="${t('prev')}">◀</button>
+                <select onchange="location.href='${'equipo.html?ol=' + K}&anio='+this.value${P.sub ? "+'&sub=" + encodeURIComponent(P.sub) + "'" : ''}" aria-label="Año">${opts}</select>
+                <button ${nextA ? `onclick="location.href='${hrefEquipo(K, nextA, P.sub)}'"` : 'disabled'} title="${t('next')}">▶</button>
+            </div>
+        </div>
+    </section>
+    ${subChips}
+    <div class="eq-stats">
+        <div class="eq-stat"><b>${est.length}</b><span>${t('participants')}</span></div>
+        <div class="eq-stat"><b>${cnt('oro')}</b><span>🥇 ${t('gold')}</span></div>
+        <div class="eq-stat"><b>${cnt('plata')}</b><span>🥈 ${t('silver')}</span></div>
+        <div class="eq-stat"><b>${cnt('bronce')}</b><span>🥉 ${t('bronze')}</span></div>
+        <div class="eq-stat"><b>${cnt('mencion')}</b><span>🎖 ${t('mention')}</span></div>
+    </div>
+    ${est.length ? `<section class="eq-section"><h2 class="eq-h2">🎓 ${t('students')} <span class="eq-count">${est.length}</span></h2><div class="eq-grid">${est.map(cardEst).join('')}</div></section>` : ''}
+    ${prof.length ? `<section class="eq-section"><h2 class="eq-h2">👨‍🏫 ${t('teachers')} <span class="eq-count">${prof.length}</span></h2><div class="eq-grid">${prof.map(cardProf).join('')}</div></section>` : ''}
+    <section class="eq-section" id="eq-fotos-sec" style="display:none"><h2 class="eq-h2">📸 ${t('photos')} <span class="eq-count" id="eq-fotos-n"></span></h2><div class="eq-gallery" id="eq-gallery"></div></section>
+    <div class="eq-links"><a href="media.html">${t('allPhotos')}</a><a href="${esc(new URL('Historial_Eventos/' + OL_PATH[K], document.baseURI).href)}">${t('history')}</a></div>`;
+
+    // Fotos de Media del mismo evento y año
+    FOTOS_EQ = FOTOS.filter(f => f.fecha && f.fecha.getFullYear() === P.año && (OL_FROM[f.evento] === K));
+    if (FOTOS_EQ.length) {
+        document.getElementById('eq-fotos-sec').style.display = '';
+        document.getElementById('eq-fotos-n').textContent = FOTOS_EQ.length;
+        const g = document.getElementById('eq-gallery');
+        FOTOS_EQ.forEach((f, i) => { const im = document.createElement('img'); im.src = f.url; im.loading = 'lazy'; im.alt = titulo; im.onclick = () => abrirFoto(i); im.onerror = () => im.remove(); g.appendChild(im); });
+    }
+    // URL bonita para compartir
+    try {
+        const bonita = new URL('Equipo/' + OL_PATH[K] + '/' + P.año + (P.sub ? '/' + encodeURIComponent(P.sub) : ''), document.baseURI);
+        if (location.protocol.startsWith('http') && location.pathname !== bonita.pathname) history.replaceState(null, '', bonita.pathname + location.hash);
+    } catch (e) {}
+}
+
+// ═══════════════ Lightbox de fotos ═══════════════
+function abrirFoto(i) { _fi = i; mostrarFoto(); document.getElementById('eq-lb').classList.add('visible'); document.addEventListener('keydown', teclasLb); }
+function mostrarFoto() { document.getElementById('eq-lb-img').src = FOTOS_EQ[_fi].url; document.getElementById('eq-lb-prev').disabled = _fi <= 0; document.getElementById('eq-lb-next').disabled = _fi >= FOTOS_EQ.length - 1; }
+function navFoto(d) { const n = _fi + d; if (n < 0 || n >= FOTOS_EQ.length) return; _fi = n; mostrarFoto(); }
+function cerrarFoto() { document.getElementById('eq-lb').classList.remove('visible'); document.removeEventListener('keydown', teclasLb); }
+function teclasLb(e) { if (e.key === 'Escape') cerrarFoto(); else if (e.key === 'ArrowLeft') navFoto(-1); else if (e.key === 'ArrowRight') navFoto(1); }
+
+// ═══════════════ Compartir ═══════════════
+function urlActual() { return location.href.split('#')[0]; }
+function textoCompartir() { return `${t('shareText')} ${document.title.split(' — ')[0]} — Sitial de Talentos`; }
+function abrirCompartir() {
+    document.getElementById('eq-url-input').value = urlActual();
+    const grid = document.getElementById('eq-share-grid');
+    if (navigator.share && !grid.querySelector('.eq-nat')) {
+        const b = document.createElement('button'); b.className = 'eq-share-op eq-nat';
+        b.innerHTML = `<span class="eq-share-ic" style="background:#4b5563"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>${t('more')}`;
+        b.onclick = () => navigator.share({ title: document.title, text: textoCompartir(), url: urlActual() }).catch(() => {});
+        grid.insertBefore(b, grid.firstChild);
+    }
+    document.getElementById('eq-share-ov').classList.add('abierto');
+}
+function cerrarCompartir() { document.getElementById('eq-share-ov').classList.remove('abierto'); }
+function compartirRed(red) {
+    const u = encodeURIComponent(urlActual()), tx = encodeURIComponent(textoCompartir());
+    const m = { whatsapp: `https://wa.me/?text=${tx}%20${u}`, facebook: `https://www.facebook.com/sharer/sharer.php?u=${u}`, x: `https://twitter.com/intent/tweet?text=${tx}&url=${u}`, telegram: `https://t.me/share/url?url=${u}&text=${tx}` }[red];
+    if (m) window.open(m, '_blank', 'noopener,noreferrer,width=560,height=620');
+}
+function copiarEnlace() {
+    const url = urlActual(), fin = ok => toast(ok ? t('copied') : t('copyFail'));
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(() => fin(true)).catch(() => fin(false));
+    else { try { const i = document.getElementById('eq-url-input'); i.select(); document.execCommand('copy'); fin(true); } catch (e) { fin(false); } }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarCompartir(); });
+
+// ═══════════════ Arranque ═══════════════
+(async function () {
+    try {
+        const [, , media] = await Promise.all([
+            cargarScript('Data/olympiad_data.html', 'olympiad-data'),
+            cargarScript('Data/professor_data.html', 'professor-data').catch(() => {}),
+            cargarMedia().catch(() => [])
+        ]);
+        FOTOS = (media || []).map(a => ({ ...a, fecha: fechaDe(a.nombre), evento: eventoDe(a.nombre), num: numDe(a.nombre) }))
+            .sort((a, b) => (a.fecha - b.fecha) || (a.num - b.num) || a.nombre.localeCompare(b.nombre));
+        window._listo = true;
+        render();
+    } catch (err) {
+        console.error(err);
+        document.getElementById('eq-root').innerHTML = `<div class="eq-estado">⚠️ ${t('loadErr')}<br><br><a href="index.html#inicio">${t('backHome')}</a></div>`;
+    }
+})();
+</script>
+<script type="module" src="Assets/UI/modern-ui.js"></script>
+</body>
+</html>
