@@ -210,7 +210,7 @@
         color: rgba(255,255,255,.92); font-size: 12px; font-weight: 600; letter-spacing: .4px;
         padding: 6px 14px; border-radius: 999px;
         backdrop-filter: blur(6px); display: none; align-items: center; z-index: 2;
-        pointer-events: none;
+        pointer-events: auto; cursor: pointer;
     }
 
     .mp-lb-nav {
@@ -305,6 +305,9 @@
     }
     .mp-share-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
     @media (max-width: 480px) { .mp-share-grid { grid-template-columns: repeat(3, 1fr); row-gap: 16px; } .mp-share-bar { top: 14px; left: 14px; } }
+.mp-lb-badge:hover { background: rgba(255,255,255,.22) !important; }
+    .mp-tile-badge { cursor: pointer; }
+    .mp-tile-badge:hover { background: rgba(201,162,39,.95); color: #04122b; }
 </style>
 <link rel="stylesheet" href="Assets/UI/modern-ui.css">
 </head>
@@ -626,6 +629,8 @@ async function cargarGaleria() {
                 const badge = document.createElement('span');
                 badge.className = 'mp-tile-badge';
                 badge.textContent = textoBadge;
+                badge.title = _lang() === 'es' ? 'Ver equipo' : 'View team';
+                badge.onclick = (ev) => { ev.stopPropagation(); irAlEquipo(datos); };
                 tile.appendChild(badge);
             }
             tile.onclick = () => abrirFoto(datos.nombre, true);
@@ -648,11 +653,19 @@ function _fotoParamActual() {
     try { return new URLSearchParams(location.search).get('foto'); } catch(e) { return null; }
 }
 
+// Lleva a la página del equipo (olimpiada + año) de esta foto
+function irAlEquipo(datos) {
+    if (!datos || !datos.fecha || !datos.evento) return;
+    const ol = _esEventoOtras(datos.evento) ? 'otras' : datos.evento.toLowerCase();
+    location.href = 'equipo.html?ol=' + ol + '&anio=' + datos.fecha.getFullYear();
+}
 function _renderBadge(datos) {
     const badge = document.getElementById('mp-lb-badge');
     const texto = _textoBadge(datos);
     if (texto) {
         badge.textContent = texto;
+        badge.title = _lang() === 'es' ? 'Ver equipo' : 'View team';
+        badge.onclick = (ev) => { ev.stopPropagation(); irAlEquipo(datos); };
         badge.style.display = 'inline-flex';
     } else {
         badge.style.display = 'none';
