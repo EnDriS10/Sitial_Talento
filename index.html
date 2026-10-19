@@ -571,9 +571,16 @@
         .chip-tooltip-wrap { position: relative; display: inline-flex; }
         .chip-tooltip-wrap .medalla-chip { cursor: pointer; transition: transform .15s, box-shadow .15s; }
         .chip-tooltip-wrap .medalla-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(4,18,43,.15); }
-        .chip-popup { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.55; white-space: nowrap; box-shadow: 0 8px 24px rgba(4,18,43,.35); z-index: 10; pointer-events: none; animation: tooltipPop .18s cubic-bezier(.34,1.56,.64,1); }
+        .chip-popup { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.55; white-space: nowrap; box-shadow: 0 8px 24px rgba(4,18,43,.35); z-index: 10; pointer-events: auto; animation: tooltipPop .18s cubic-bezier(.34,1.56,.64,1); }
         .chip-popup::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--navy); }
         .chip-tooltip-wrap.activo .chip-popup { display: block; }
+        .chip-popup-link { display: inline-block; margin-top: 6px; color: var(--gold-light); font-weight: 700; text-decoration: none; font-size: 12px; }
+        .chip-popup-link:hover { text-decoration: underline; }
+        /* Año/delegación clicable en Historial por Eventos → página del equipo */
+        #cuerpo-tabla td:first-child strong { cursor: pointer; border-bottom: 1px dashed var(--accent); }
+        #cuerpo-tabla td:first-child strong:hover { color: var(--accent); }
+        #cuerpo-tabla td[colspan]:not(.no-results) { cursor: pointer; }
+        #cuerpo-tabla td[colspan]:not(.no-results):hover { color: var(--accent); }
         @keyframes tooltipPop { from { opacity: 0; transform: translateX(-50%) scale(.85) translateY(4px); } to { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); } }
 
         /* FILTROS */
@@ -6498,9 +6505,10 @@ function abrirTarjetaModal(nombre) {
         const popupId = `chip-popup-${i}`;
         return `<span class="chip-tooltip-wrap" id="wrap-${popupId}" onclick="toggleChipPopup('wrap-${popupId}', event)">
             <span class="medalla-chip chip-${m.tipo}" tabindex="0">${medallaEmoji[m.tipo]} ${m.olimpiada} ${m.año}</span>
-            <span class="chip-popup" id="${popupId}">
+            <span class="chip-popup" id="${popupId}" onclick="event.stopPropagation()">
                 <strong>${tituloPopup}</strong><br>
-                ${pais} ${sede}
+                ${pais} ${sede}<br>
+                <a class="chip-popup-link" href="${_hrefEquipo(m.olimpiada, m.año)}">${T('equipo.ver')}</a>
             </span>
         </span>`;
     }).join('');
@@ -6534,6 +6542,41 @@ function cerrarTarjetaModal(e, forzar) {
         try { history.replaceState(null, '', location.pathname + location.hash); } catch(err) {}
     }
 }
+
+// ════ Página del equipo (olimpiada + año) ════
+function _hrefEquipo(olim, año, sub) {
+    const k = String(olim || '').toLowerCase();
+    const principal = ['icho','imcho','oiaq','ocacq'].includes(k);
+    const ol = principal ? k : 'otras';
+    if (!principal && !sub && olim && k !== 'otras') sub = olim;
+    return 'equipo.html?ol=' + ol + '&anio=' + encodeURIComponent(año) + (sub ? '&sub=' + encodeURIComponent(sub) : '');
+}
+// Al tocar el año (o la cabecera de delegación) en Historial por Eventos
+(function () {
+    const tb = document.getElementById('cuerpo-tabla');
+    if (!tb) return;
+    tb.addEventListener('click', e => {
+        const td = e.target.closest('td'); if (!td) return;
+        const ol = document.getElementById('selector-olimpiada').value;
+        let año = null, sub = null;
+        if (td.hasAttribute('colspan')) {
+            const m = td.textContent.trim().match(/(\S+)\s+(\d{4})\b/);
+            if (!m) return;
+            año = m[2];
+            if (ol === 'otras' && /^[A-Za-z0-9._-]+$/.test(m[1])) sub = m[1];
+        } else {
+            const st = e.target.closest('strong');
+            if (!st || td !== td.parentElement.firstElementChild || !/^\d{4}$/.test(st.textContent.trim())) return;
+            año = st.textContent.trim();
+            if (ol === 'otras') {
+                const c = td.parentElement.querySelector('td[style*="font-size:12px"]');
+                const s = c && c.childNodes[0] ? c.childNodes[0].textContent.trim() : '';
+                if (s) sub = s;
+            }
+        }
+        location.href = _hrefEquipo(ol, año, sub);
+    });
+})();
 
 // Lee un parámetro de la query string actual (?tarjeta=slug, etc.)
 function _queryParam(param) {
@@ -7296,6 +7339,7 @@ const _i18n = {
         'share.title':              'Compartir',
         'share.copyLink':           'Copiar enlace',
         'share.more':               'Más',
+        'equipo.ver':               'Ver equipo →',
         // CNQ
         'nav.cnq':                  'Olimpiada Cubana de Química',
         'cnq.title':                'Olimpiada Cubana de Química',
@@ -7530,6 +7574,7 @@ const _i18n = {
         'share.title':              'Share',
         'share.copyLink':           'Copy link',
         'share.more':               'More',
+        'equipo.ver':               'View team →',
         // CNQ
         'nav.cnq':                  'Cuban Chemistry Olympiad',
         'cnq.title':                'Cuban Chemistry Olympiad',
