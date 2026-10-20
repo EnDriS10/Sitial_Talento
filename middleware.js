@@ -233,6 +233,9 @@ export default async function middleware(request) {
     const cuadritoMatch = pathname.match(/^\/Historial_Medallas\/cuadrito=(.+)$/);
     if (cuadritoMatch) {
       const slug = decodeURIComponent(cuadritoMatch[1]);
+      // El HTML base se pide en paralelo con los datos (antes iban en serie).
+      const htmlPromise = fetch(`${origin}/index.html`);
+      htmlPromise.catch(() => {});
       const og = await buildCuadritoOG(origin, slug);
       if (og) {
         // index.html calcula su <base id="app-base-href"> a partir de
@@ -241,7 +244,7 @@ export default async function middleware(request) {
         // así que ese cálculo automático sale mal — lo forzamos a la
         // raíz del sitio explícitamente.
         const fixScript = `document.getElementById('app-base-href').href = location.origin + '/';`;
-        const out = await injectMeta(fetch(`${origin}/index.html`), og, request.url, fixScript);
+        const out = await injectMeta(htmlPromise, og, request.url, fixScript);
         if (out) return out;
       }
     }
