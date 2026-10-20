@@ -12,8 +12,19 @@
     <base id="app-base-href" href="/">
     <script>
         (function () {
-            var p = location.pathname.replace(/index\.html$/, '');
-            if (!p.endsWith('/')) p += '/';
+            // Fuera de GitHub Pages (Vercel, dominio propio) el sitio vive SIEMPRE en
+            // la raíz "/": así no importa si la URL visible es una ruta bonita
+            // (/Historial_Eventos/IChO, /Historial_Medallas/cuadrito=…) o la
+            // respuesta viene del middleware; las rutas relativas (Data/…,
+            // Assets/…) siempre resuelven bien. En GitHub Pages de proyecto se
+            // conserva la carpeta del repositorio.
+            var p;
+            if (/\.github\.io$/.test(location.hostname)) {
+                p = location.pathname.replace(/index\.html$/, '');
+                if (!p.endsWith('/')) p += '/';
+            } else {
+                p = '/';
+            }
             document.getElementById('app-base-href').href = location.origin + p;
         })();
     </script>
@@ -4894,29 +4905,27 @@ document.addEventListener('error', function (e) {
 // Si el fetch falla (p.ej. en local sin servidor), la página muestra un aviso.
 // Descarga un dataset reutilizando el prefetch temprano. Si falló por un
 // problema de red o un error 5xx (típico de móvil / servidor ocupado), reintenta
-// hasta 2 veces. Un 4xx (p. ej. 404) es definitivo y NO se reintenta.
+// hasta 3 veces (la 2ª y 3ª contra la raíz del sitio).
 async function _fetchDataHtml(key, url) {
     const pre = window._prefetchData && window._prefetchData[key];
     let lastErr = null;
+    // Si el prefetch temprano falla (incluso con un 404 causado por una ruta
+    // relativa mal resuelta) NO se da por perdido el dataset: se reintenta
+    // abajo, también contra la raíz del sitio cuando no es GitHub Pages.
     if (pre) {
-        try { return await pre; } catch (e) {
-            lastErr = e;
-            if (/HTTP 4\d\d/.test(String(e && e.message))) throw e;
-        }
+        try { return await pre; } catch (e) { lastErr = e; }
     }
-    for (let i = 0; i < 2; i++) {
-        await new Promise(res => setTimeout(res, 300 * (i + 1)));
+    const urls = [url];
+    if (!/\.github\.io$/.test(location.hostname)) urls.push('/' + url);
+    for (let i = 0; i < 3; i++) {
+        if (i > 0) await new Promise(res => setTimeout(res, 300 * i));
+        const u = urls[Math.min(i, urls.length - 1)];
         try {
-            const r = await fetch(url, { cache: 'reload' });
-            if (!r.ok) {
-                const err = new Error('HTTP ' + r.status);
-                if (r.status >= 400 && r.status < 500) throw err;
-                lastErr = err; continue;
-            }
+            const r = await fetch(u, { cache: i === 0 ? 'default' : 'reload' });
+            if (!r.ok) { lastErr = new Error('HTTP ' + r.status); continue; }
             return await r.text();
         } catch (e) {
             lastErr = e;
-            if (/HTTP 4\d\d/.test(String(e && e.message))) throw e;
         }
     }
     throw lastErr;
