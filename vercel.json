@@ -1,7 +1,4 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-
   "rewrites": [
     { "source": "/Banco_Problemas", "destination": "/Banco_Problemas.html" },
     { "source": "/media", "destination": "/media.html" },
@@ -36,7 +33,7 @@
     {
       "source": "/Data/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=1800, stale-while-revalidate=3600" }
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=300, stale-while-revalidate=3600" }
       ]
     },
     {
