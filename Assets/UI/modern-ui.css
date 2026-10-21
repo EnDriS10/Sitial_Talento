@@ -172,3 +172,6 @@ h1, h2, h3, .bp-heading, .mp-heading, .np-header-titulo, #topbar-titulo-seccion 
 .mp-gallery img, .card img, .bp-card img {
     border-radius: var(--radius-sm);
 }
+
+/* Las tablas nunca se ocultan por el scroll-reveal */
+.tabla-wrapper.mu-reveal { opacity: 1 !important; transform: none !important; }
