@@ -52,9 +52,20 @@
          estas mismas promesas, así que no se descarga nada dos veces. -->
     <script>
         (function () {
+            // fetch con tiempo límite: una petición colgada (red móvil, webview de
+            // Telegram/WhatsApp) ya no deja las tablas en "Cargando…" para siempre.
+            window._fetchT = function (u, opts, ms) {
+                opts = opts || {};
+                if (typeof AbortController === 'undefined') return fetch(u, opts);
+                var ctl = new AbortController();
+                var t = setTimeout(function () { ctl.abort(); }, ms || 10000);
+                opts.signal = ctl.signal;
+                return fetch(u, opts).then(function (r) { clearTimeout(t); return r; },
+                                           function (e) { clearTimeout(t); throw e; });
+            };
             function get(u) {
                 try {
-                    return fetch(u).then(function (r) {
+                    return window._fetchT(u).then(function (r) {
                         if (!r.ok) throw new Error('HTTP ' + r.status);
                         return r.text();
                     });
@@ -3494,8 +3505,15 @@ async function cargarHonorData() {
     try {
         const lang = window._lang || 'es';
         const archivo = lang === 'en' ? 'Data/honor_merece_EN.html' : 'Data/honor_merece_ES.html';
-        const resp = await fetch(archivo);
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        let resp = null;
+        for (let i = 0; i < 3; i++) {
+            try {
+                resp = await window._fetchT(archivo, i ? { cache: 'reload' } : {}, 10000);
+                if (resp.ok) break;
+            } catch (e) { resp = null; }
+            await new Promise(res => setTimeout(res, 400 * (i + 1)));
+        }
+        if (!resp || !resp.ok) throw new Error('HTTP ' + (resp ? resp.status : 'red'));
         const html = await resp.text();
         const doc  = new DOMParser().parseFromString(html, 'text/html');
         const el   = doc.getElementById('honor-data');
@@ -4870,9 +4888,11 @@ function _instalarTablasPorTandas() {
                     if (this._tokenRender !== token || i >= filas.length) return;
                     this.insertAdjacentHTML('beforeend', filas.slice(i, i + TANDA).join(''));
                     i += TANDA;
-                    document.hidden ? setTimeout(paso, 30) : requestAnimationFrame(paso);
+                    setTimeout(paso, 16);
                 };
-                document.hidden ? setTimeout(paso, 30) : requestAnimationFrame(paso);
+                // setTimeout (no requestAnimationFrame): en webviews/pestañas en segundo
+                // plano rAF puede no dispararse y la tabla se quedaba a medias.
+                setTimeout(paso, 0);
             }
         });
         const col = id === 'cnq-tabla-body' ? 9 : 8;
@@ -4917,11 +4937,11 @@ async function _fetchDataHtml(key, url) {
     }
     const urls = [url];
     if (!/\.github\.io$/.test(location.hostname)) urls.push('/' + url);
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
         if (i > 0) await new Promise(res => setTimeout(res, 300 * i));
         const u = urls[Math.min(i, urls.length - 1)];
         try {
-            const r = await fetch(u, { cache: i === 0 ? 'default' : 'reload' });
+            const r = await window._fetchT(u, { cache: i === 0 ? 'default' : 'reload' }, 10000);
             if (!r.ok) { lastErr = new Error('HTTP ' + r.status); continue; }
             return await r.text();
         } catch (e) {
@@ -5127,8 +5147,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     // …pero la primera pantalla (sitial, tablas de eventos, estadísticas) solo
     // necesita los datasets principales: CNQ es el más pesado y solo se usa
     // dentro de su propia sección, que ya espera por sí misma.
-    await Promise.allSettled([_pOl, _pPr, _pHo]);
+    // Honor (artículos) NO bloquea la primera pantalla: solo añade enlaces a
+    // artículos, así que cuando llega se refresca lo que los usa.
+    await Promise.allSettled([_pOl, _pPr]);
     try { _origInit(); } catch (e) { console.error('Error en la inicialización:', e); }
+    _pHo.then(() => {
+        try { if (window._estudiantesTodos && window._estudiantesTodos.length) aplicarFiltros(); } catch (e) {}
+    });
+    // Red de seguridad: si la tabla de eventos sigue con el placeholder
+    // "Cargando…" aunque los datos ya estén, repintarla (antes había que tocar
+    // un filtro para que apareciera).
+    let _wd = 0;
+    const _vigia = setInterval(() => {
+        _wd++;
+        const tb = document.getElementById('cuerpo-tabla');
+        const colgada = tb && (tb.querySelector('.no-results') && /Cargando|Loading/.test(tb.textContent));
+        if (window._appReady && colgada && typeof todasLasOlimpiadas !== 'undefined') {
+            try { cargarTabla(); } catch (e) {}
+        }
+        if (_wd > 20 || (window._appReady && !colgada && _wd > 3)) clearInterval(_vigia);
+    }, 1000);
 });
 
 
