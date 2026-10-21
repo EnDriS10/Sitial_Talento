@@ -110,7 +110,10 @@ async function wireHamburger(createMorph) {
 function setupScrollReveal() {
     const selectors = [
         "h1", ".mp-heading", ".bp-heading", ".np-header", ".card",
-        ".tabla-wrapper", ".bp-card", ".np-card", ".mp-gallery > *",
+        ".bp-card", ".np-card", ".mp-gallery > *",
+        // OJO: ".tabla-wrapper" ya NO se anima. Las tablas son muy altas y, con
+        // threshold 0.12, el observador nunca llegaba al 12 % visible: la tabla
+        // quedaba con opacity:0 (invisible aunque sus filas existieran y fueran clicables).
     ].join(", ");
     const els = Array.from(document.querySelectorAll(selectors)).slice(0, 60);
     if (!els.length) return;
@@ -127,12 +130,14 @@ function setupScrollReveal() {
                 }
             });
         },
-        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+        { threshold: 0.01, rootMargin: "0px 0px -40px 0px" }
     );
     els.forEach((el) => {
         el.classList.add("mu-reveal");
         io.observe(el);
     });
+    // Red de seguridad: nada se queda oculto si el observador no dispara.
+    setTimeout(() => els.forEach((el) => el.classList.add("mu-in")), 2500);
 }
 
 (async function init() {
