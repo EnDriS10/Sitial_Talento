@@ -1,0 +1,25 @@
+{
+  "name": "Sitial de Talentos Cubanos",
+  "short_name": "Sitial",
+  "description": "Historial de medallas, equipos, fotos y problemas de las Olimpiadas de Química de Cuba. Funciona sin conexión.",
+  "id": "./",
+  "start_url": "./?utm_source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "es",
+  "background_color": "#04122b",
+  "theme_color": "#04122b",
+  "categories": ["education"],
+  "icons": [
+    { "src": "Assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "Assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "Assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Resultados por evento", "url": "./Historial_Eventos/IChO", "icons": [{ "src": "Assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Sitial de Honor", "url": "./Historial_Medallas", "icons": [{ "src": "Assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Banco de Problemas", "url": "./Banco_Problemas", "icons": [{ "src": "Assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Media", "url": "./media", "icons": [{ "src": "Assets/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

@@ -22,7 +22,7 @@ Sitio web estático que recoge la historia de la participación cubana en las **
 | **Noticias** (`noticias.html`) | Recortes de prensa. |
 | **Banco de Problemas** | Problemas de olimpiada con visor (`Problem_Data/visor.html`), enunciado/solución y moléculas dibujadas con SVG. |
 
-Extras: español/inglés, modo claro/oscuro, tablas pintadas por tandas, vistas previas (Open Graph) dinámicas al compartir enlaces.
+Extras: **funciona sin conexión (PWA instalable)**, **exportar tablas a Excel/CSV e imprimirlas**, español/inglés, modo claro/oscuro, tablas pintadas por tandas, vistas previas (Open Graph) dinámicas al compartir enlaces.
 
 ---
 
@@ -35,9 +35,12 @@ Extras: español/inglés, modo claro/oscuro, tablas pintadas por tandas, vistas 
 ├── noticias.html           Prensa
 ├── Banco_Problemas.html    Listado del banco de problemas
 ├── 404.html                Enrutador de URLs bonitas (truco SPA de rafgraph)
+├── sw.js                   Service Worker (modo offline)
+├── manifest.webmanifest    Manifiesto PWA (instalable)
+├── offline.html            Pantalla de respaldo sin conexión
 ├── Data/                   Datos del sitio (ver abajo)
 ├── Problem_Data/           Datos y visor del Banco de Problemas
-├── Assets/                 Logos, CSS/JS de UI y material del CNQ
+├── Assets/                 Logos, iconos PWA, CSS/JS de UI (pwa.js, tools.js), vendor/ y material del CNQ
 ├── api/
 │   ├── og.js               Genera imágenes Open Graph (Edge, @vercel/og)
 │   └── check-links.js      Cron diario: detecta enlaces rotos de Imgur
@@ -76,6 +79,22 @@ npx serve .        # o: python3 -m http.server
 
 ---
 
+## 📲 PWA, impresión y exportación
+
+**Modo offline / app instalable**
+- `sw.js` (raíz) + `manifest.webmanifest` + `Assets/UI/pwa.js` (registro, botón *Instalar app*, aviso de "Sin conexión" y de "Nueva versión").
+- Estrategias: páginas y `Data/` → **red primero** (siempre lo último publicado) con copia guardada si no hay red (4 s / 3 s); `Assets/`, fuentes y CDN → caché primero con actualización en segundo plano; fotos de Imgur → caché (máx. 250); `/api/` nunca se cachea.
+- Las rutas bonitas (`/Historial_Eventos/IChO`, `/Equipo/IChO/2026`, `/Banco_Problemas/<id>/<tab>`) también abren sin conexión.
+- Tras instalar, el sitio descarga la carcasa y todos los `Data/` y `Problem_Data/`. Si algún día cambias algo grande en la carcasa, sube `VERSION` en `sw.js`.
+- En Vercel: `vercel.json` sirve `sw.js` sin caché (con `Service-Worker-Allowed: /`), el manifiesto con su `Content-Type` y caché larga para iconos y `vendor/`. No requiere build.
+
+**Exportar e imprimir** (`Assets/UI/tools.js`)
+- Cada tabla (Historial por eventos, ranking CNQ, estadísticas por provincia) y la lista del Sitial muestran una barra con **⬇ Excel · ⬇ CSV · 🖨 Imprimir**.
+- Exporta lo que estás viendo (filtros y orden incluidos): año y edición en columnas separadas, provincia completa, autofiltro y anchos de columna. Excel usa SheetJS incluido en `Assets/vendor/` (funciona sin conexión).
+- Imprimir genera un documento A4 limpio con cabecera repetida en cada hoja (horizontal si la tabla es ancha).
+
+---
+
 ## 🛠️ Notas técnicas (lecciones aprendidas)
 
 - `<base id="app-base-href">` se fija a `/` fuera de GitHub Pages para que `fetch('Data/…')` y las imágenes relativas funcionen bajo cualquier URL bonita.
@@ -95,7 +114,7 @@ npx serve .        # o: python3 -m http.server
 - [ ] Sitemap generado automáticamente a partir de `Data/` (equipos, cuadritos, problemas).
 - [ ] Mirror/subida propia de imágenes (menos dependencia de Imgur) y aviso del cron por Telegram.
 - [ ] Más problemas en el Banco con filtros por tema, dificultad y año.
-- [ ] Modo offline (PWA) y versión imprimible de rankings.
+- [x] Modo offline (PWA) y versión imprimible de rankings (ver *PWA, impresión y exportación*).
 - [ ] Panel de edición de datos (formulario que genere las entradas de `Data/`).
 - [ ] Traducción completa al inglés de todas las secciones.
 

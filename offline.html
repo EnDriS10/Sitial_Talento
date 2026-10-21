@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Sin conexión — Sitial de Talentos Cubanos</title>
+<style>
+  :root{color-scheme:light dark}
+  html,body{height:100%;margin:0}
+  body{display:flex;align-items:center;justify-content:center;background:#04122b;color:#f0c84a;
+       font-family:'DM Sans',system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+  main{max-width:420px}
+  h1{font-size:26px;margin:0 0 10px}
+  p{opacity:.85;line-height:1.5;margin:0 0 18px}
+  a,button{display:inline-block;background:#f0c84a;color:#04122b;border:0;border-radius:999px;
+       padding:10px 22px;font:600 15px inherit;text-decoration:none;cursor:pointer}
+  .big{font-size:56px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<main>
+  <div class="big">📡</div>
+  <h1 id="t">Sin conexión</h1>
+  <p id="d">Esta página todavía no está guardada en tu dispositivo. Conéctate una vez para que el Sitial quede disponible sin internet.</p>
+  <a href="./" id="b">Ir al inicio</a>
+</main>
+<script>
+  try{ if(localStorage.getItem('lang')==='en'){
+    document.documentElement.lang='en';
+    t.textContent='You are offline';
+    d.textContent="This page isn't saved on your device yet. Connect once so the site becomes available offline.";
+    b.textContent='Go to home';
+  }}catch(e){}
+  addEventListener('online',function(){location.reload()});
+</script>
+</body>
+</html>
