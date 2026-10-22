@@ -130,6 +130,15 @@ navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, st
 
 ---
 
+### Cómo entiende y responde las preguntas
+1. **Entender** (`api/_lib/plan.js`): un modelo rápido reformula la pregunta (sinónimos, «última» → edición concreta, seguimientos) y decide si es del Sitial, general o de actualidad. No hay listas de preguntas; `CHAT_PLAN=0` lo desactiva.
+2. **Sitial primero**: se buscan los datos del sitio con esa consulta.
+3. **Internet después** (`api/_lib/web.js`): si es de actualidad, o si el asistente responde `[[BUSCAR: …]]` porque el Sitial no tiene el dato. Usa Tavily con `TAVILY_API_KEY` (plan gratuito) o Wikipedia sin clave.
+4. **Guidelines** en `api/_lib/prompts.js` y `Data/chatbot_guia.md`.
+
+### Banco de Problemas
+Pestañas Enunciado · ✍️ Tu respuesta (marcador del futuro corrector con DeepSeek: `Data/tutor_contrato.md`, `api/tutor.js`) · 🔑 Respuesta (pide confirmación).
+
 ## 🛠️ Notas técnicas (lecciones aprendidas)
 
 - `<base id="app-base-href">` se fija a `/` fuera de GitHub Pages para que `fetch('Data/…')` y las imágenes relativas funcionen bajo cualquier URL bonita.

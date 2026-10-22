@@ -84,7 +84,7 @@ const TIPO_TRIGGERS = [
   { tipo: 'agregado', re: /cuantas|cuantos|total|mas medallas|mejor|ranking|record|promedio|how many|total|most|best|por provincia|provincia con/, boost: 2.5 },
   { tipo: 'cnq', re: /cnq|concurso nacional|olimpiada cubana|decimo|onceno|duodecimo|noveno|preseleccion|psn|escuela|ipvce/, boost: 2.5 },
   { tipo: 'guia', re: /como|donde|que es|para que|pagina|seccion|sitio|web|funciona|exportar|imprimir|offline|instalar|contacto|correo|telegram|contactar|how|where|what is|section|site|contact/, boost: 1.2 },
-  { tipo: 'equipo', re: /equipo|delegacion|integrantes|participantes|team|members|delegation/, boost: 2 },
+  { tipo: 'equipo', re: /equipo|delegacion|integrantes|participantes|medallista|ganador|premiad|galardonad|representa|clasific|resultados|quienes (fueron|participaron|viajaron|asistieron)|team|members|delegation|medalist|winner/, boost: 2.2 },
 ];
 
 // Sinónimos inglés → español para que las preguntas en inglés encuentren los datos
@@ -96,7 +96,7 @@ const SIN = {
   mentor: 'mentor', province: 'provincia', provinces: 'provincias', results: 'resultados', ranking: 'ranking', students: 'estudiantes',
   student: 'estudiante', contact: 'contacto', email: 'correo', export: 'exportar', print: 'imprimir', install: 'instalar',
   offline: 'offline', hall: 'sitial', honor: 'honor', national: 'nacional', contest: 'concurso', competition: 'concurso', difficulty: 'dificultad',
-  total: 'total', most: 'mas', best: 'mejor', how: 'como', host: 'sede', venue: 'sede', city: 'sede', year: 'ano',
+  winners: 'medallistas', winner: 'medallista', medalists: 'medallistas', medallists: 'medallistas', latest: 'ultima', last: 'ultima', recent: 'ultima', current: 'ultima', won: 'medallas', participated: 'participantes', cuban: 'cuba', cubans: 'cuba', total: 'total', most: 'mas', best: 'mejor', how: 'como', host: 'sede', venue: 'sede', city: 'sede', year: 'ano',
 };
 function tokensConsulta(s) {
   const base = tokens(s);
@@ -119,6 +119,9 @@ class Indice {
       c._nombreNorm = c.nombres ? c.nombres.map(norm) : [];
       c._titleToks = new Set(tokens(c.title));
     });
+    // última edición registrada por olimpiada (para resolver «la última IChO»)
+    this.ultima = {};
+    chunks.forEach((c) => { if (c.tipo === 'equipo' && c.sigla && (!this.ultima[c.sigla] || c.anio > this.ultima[c.sigla].anio)) this.ultima[c.sigla] = c; });
     this.N = chunks.length;
     this.avg = chunks.reduce((a, c) => a + c._len, 0) / Math.max(1, this.N);
   }
@@ -126,6 +129,16 @@ class Indice {
     const q = tokensConsulta(consulta);
     if (!q.length) return [];
     const qn = norm(consulta);
+    // intención: «última/reciente/actual» + (olimpiada) → fijar la edición más reciente
+    const RECIENTE = /\b(ultim[oa]s?|reciente|recientes|actual|pasad[oa]|este ano|latest|last|recent|current|newest)\b/.test(qn);
+    const SIGLAS = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
+    const mencionadas = Object.keys(SIGLAS).filter((k) => new RegExp('\\b' + k + '\\b').test(qn)).map((k) => SIGLAS[k]);
+    const sinAnio = !(qn.match(ANIO_RE) || []).length;
+    const fijados = [];
+    if (RECIENTE && sinAnio) {
+      const objetivo = mencionadas.length ? mencionadas : (/internacional|olimpiada|olympiad/.test(qn) || /medallista|ganador|equipo|delegacion|team|medal/.test(qn) ? Object.keys(this.ultima) : []);
+      objetivo.forEach((sg) => { if (this.ultima[sg]) fijados.push(this.ultima[sg]); });
+    }
     const boosts = TIPO_TRIGGERS.filter((t) => t.re.test(qn)).concat(/next|upcoming|proxima|siguiente/.test(qn) ? [{ tipo: 'agregado', boost: 1.6 }] : []);
     const anios = qn.match(ANIO_RE) || [];
     const scored = [];
@@ -157,16 +170,20 @@ class Indice {
       scored.push([s, c]);
     }
     scored.sort((a, b) => b[0] - a[0]);
+    const fij = fijados.slice(0, 4);
     const corte = scored.length ? Math.max(1.5, scored[0][0] * 0.18) : 0;
-    const out = [];
-    let chars = 0;
+    const out = fij.slice();
+    let chars = fij.reduce((a, c) => a + c.text.length + c.title.length + 80, 0);
     for (const [sc, c] of scored) {
+      if (fij.includes(c)) continue;
       if (sc < corte) break;
       const len = c.text.length + c.title.length + 80;
       if (out.length >= k) break;
       if (chars + len > maxChars && out.length) continue;
       out.push(c); chars += len;
     }
+    out.fijados = fij.length;
+    out.top = scored.length ? scored[0][0] : 0;
     return out;
   }
 }
@@ -267,7 +284,7 @@ function construir() {
     add({
       id: 'e:' + key, tipo: 'equipo', title: `Equipo de Cuba en ${sigla} ${año}`, text: txt,
       extra: `${r.sede || ''} ${r.largo || ''}`, url: urlEquipo(r), etiqueta: `Equipo ${sigla} ${año}`,
-      nombres: [], prioridad: 1.1,
+      nombres: [], prioridad: 1.1, sigla, anio: Number(año),
     });
   }
 
@@ -465,6 +482,12 @@ export function obtenerKB() {
   const idx = new Indice(chunks);
   _cache = { idx, n: chunks.length, ms: Date.now() - t0 };
   return _cache;
+}
+
+// Una línea con la última edición registrada de cada olimpiada (siempre va al prompt)
+export function resumenUltimas() {
+  const u = obtenerKB().idx.ultima;
+  return Object.keys(u).map((k) => `${k} ${u[k].anio} (${u[k].url})`).join('; ');
 }
 
 // Texto del contexto que se inserta en el prompt

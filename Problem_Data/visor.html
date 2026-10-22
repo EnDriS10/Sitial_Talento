@@ -32,7 +32,7 @@
     (function (l) {
         var params = new URLSearchParams(l.search);
         window.__pvId  = params.get('id') || '';
-        window.__pvTab = params.get('tab') === 'respuesta' ? 'respuesta' : 'enunciado';
+        window.__pvTab = ['tu-respuesta', 'respuesta'].indexOf(params.get('tab')) >= 0 ? params.get('tab') : 'enunciado';
         if (/\/Problem_Data\/visor\.html$/.test(l.pathname) && window.__pvId) {
             var repoRoot = l.pathname.replace(/Problem_Data\/visor\.html$/, '');
             history.replaceState(null, '',
@@ -149,6 +149,18 @@
         color: var(--text-muted); border-bottom: 2.5px solid transparent; transition: color .18s, border-color .18s;
     }
     .pv-tab:hover { color: var(--text); }
+    .pv-tu { border: 1px dashed var(--border); border-radius: 14px; padding: 26px 22px; text-align: center; background: rgba(128,128,128,.05); }
+    .pv-tu h2 { margin: 0 0 4px; font-size: 1.25rem; }
+    .pv-tu .pv-soon { display: inline-block; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 10px; margin-bottom: 12px; }
+    .pv-tu ol { text-align: left; max-width: 420px; margin: 14px auto; padding-left: 22px; color: var(--text-muted, inherit); }
+    .pv-tu button { opacity: .5; cursor: not-allowed; padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: inherit; font: inherit; }
+    .pv-conf-bg { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .pv-conf { background: var(--bg-card, var(--bg, #fff)); color: var(--text, #111); border: 1px solid var(--border); border-radius: 16px; padding: 22px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+    .pv-conf h3 { margin: 0 0 8px; }
+    .pv-conf p { margin: 0 0 18px; line-height: 1.5; }
+    .pv-conf-btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .pv-conf-btns button { padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+    .pv-conf-btns .pv-conf-si { background: var(--gold); color: #241c02; border-color: var(--gold); font-weight: 600; }
     .pv-tab.activo { color: var(--text); border-bottom-color: var(--gold); }
 
     .pv-articulo {
@@ -529,9 +541,13 @@
 
 <script>
 const _PVT = {
-    es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta',
+    es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta', tabTu: '✍️ Tu respuesta',
+          confTitulo: '¿Ver la respuesta?', confTexto: '¿Estás seguro de que quieres ver la respuesta? Intenta resolver el problema primero: así se aprende (y se entrena) mucho más.', confSi: 'Sí, ver la respuesta', confNo: 'Seguir intentándolo',
+          tuTitulo: 'Tu respuesta', tuSoon: 'Próximamente', tuTexto: 'Aquí podrás subir fotos de tu resolución y una IA la revisará y la puntuará según los puntos de cada inciso.', tuPasos: ['Sube fotos de tu resolución', 'La IA la compara con la solución oficial', 'Recibes la puntuación por inciso y comentarios'], tuBtn: 'Subir fotos (no disponible aún)',
           error: 'No se pudo cargar este problema.', volver: '← Volver al Banco de Problemas' },
-    en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer',
+    en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer', tabTu: '✍️ Your answer',
+          confTitulo: 'View the answer?', confTexto: 'Are you sure you want to see the answer? Try solving the problem first: you learn (and train) much more that way.', confSi: 'Yes, show the answer', confNo: 'Keep trying',
+          tuTitulo: 'Your answer', tuSoon: 'Coming soon', tuTexto: 'Here you will be able to upload photos of your solution and an AI will review it and score it using the marks of each part.', tuPasos: ['Upload photos of your solution', 'The AI compares it with the official solution', 'You get a score per part plus feedback'], tuBtn: 'Upload photos (not available yet)',
           error: 'This problem could not be loaded.', volver: '← Back to Problem Bank' }
 };
 function _pvLang() {
@@ -707,7 +723,12 @@ pvAplicarTema();
 // Leídos por el script del <head> ANTES de reescribir la URL a su forma
 // bonita (Banco_Problemas/<id>/<tab>), que ya no lleva query string.
 const _pvId = window.__pvId || '';
-let _pvTab = window.__pvTab === 'respuesta' ? 'respuesta' : 'enunciado';
+let _pvTab = ['tu-respuesta', 'respuesta'].indexOf(window.__pvTab) >= 0 ? window.__pvTab : 'enunciado';
+// La solución oficial pide confirmación: una vez aceptada, no se vuelve a preguntar
+// en esta visita (ni al recargar la pestaña durante la sesión) para ese problema.
+let _pvRespOk = false;
+function _pvLeerOk() { try { return sessionStorage.getItem('pvOk:' + _pvId) === '1'; } catch (e) { return false; } }
+function _pvGuardarOk() { try { sessionStorage.setItem('pvOk:' + _pvId, '1'); } catch (e) {} }
 
 // ── Carga de contenido: mismo patrón que CNQ_data.html / professor_data.html
 //    (fetch + DOMParser + inyectar el <script> real, no un parser JSON casero).
@@ -772,7 +793,29 @@ async function pvCompartir() {
     }
 }
 
-function pvSetTab(tab) {
+function pvConfirmarRespuesta() {
+    return new Promise((ok) => {
+        const bg = document.createElement('div');
+        bg.className = 'pv-conf-bg';
+        bg.setAttribute('role', 'dialog'); bg.setAttribute('aria-modal', 'true');
+        bg.innerHTML = `<div class="pv-conf"><h3>${_pvT('confTitulo')}</h3><p>${_pvT('confTexto')}</p>
+            <div class="pv-conf-btns"><button type="button" class="pv-conf-no">${_pvT('confNo')}</button><button type="button" class="pv-conf-si">${_pvT('confSi')}</button></div></div>`;
+        const cerrar = (v) => { document.removeEventListener('keydown', tecla); bg.remove(); ok(v); };
+        const tecla = (e) => { if (e.key === 'Escape') cerrar(false); };
+        bg.addEventListener('click', (e) => { if (e.target === bg) cerrar(false); });
+        bg.querySelector('.pv-conf-no').onclick = () => cerrar(false);
+        bg.querySelector('.pv-conf-si').onclick = () => cerrar(true);
+        document.addEventListener('keydown', tecla);
+        document.body.appendChild(bg);
+        bg.querySelector('.pv-conf-no').focus();
+    });
+}
+
+async function pvSetTab(tab) {
+    if (tab === 'respuesta' && !_pvRespOk && !_pvLeerOk()) {
+        if (!(await pvConfirmarRespuesta())) return;
+        _pvRespOk = true; _pvGuardarOk();
+    }
     _pvTab = tab;
     // La URL visible ya está en su forma bonita (.../Banco_Problemas/<id>/
     // <tab>, ver script del <head>); al cambiar de pestaña solo hace falta
@@ -801,7 +844,9 @@ async function pvRender() {
     document.getElementById('pv-foot-back').innerHTML = `<a href="../Banco_Problemas.html">${_pvT('volver')}</a>`;
     document.title = titulo + ' — Sitial de Talentos';
 
-    const cuerpo = p[_pvTab] || '<p>Contenido no disponible.</p>';
+    const cuerpo = _pvTab === 'tu-respuesta'
+        ? `<div class="pv-tu"><span class="pv-soon">${_pvT('tuSoon')}</span><h2>${_pvT('tuTitulo')}</h2><p>${_pvT('tuTexto')}</p><ol>${_pvT('tuPasos').map((x) => `<li>${x}</li>`).join('')}</ol><button type="button" disabled>${_pvT('tuBtn')}</button></div>`
+        : (p[_pvTab] || '<p>Contenido no disponible.</p>');
 
     document.getElementById('pv-main').innerHTML = `
         <span class="pv-q-badge">${p.numero || ''}</span>
@@ -812,6 +857,7 @@ async function pvRender() {
         <p class="pv-fuente">${p.fuente || ''}</p>
         <div class="pv-tabs">
             <button class="pv-tab ${_pvTab === 'enunciado' ? 'activo' : ''}" onclick="pvSetTab('enunciado')">${_pvT('tabEnunciado')}</button>
+            <button class="pv-tab ${_pvTab === 'tu-respuesta' ? 'activo' : ''}" onclick="pvSetTab('tu-respuesta')">${_pvT('tabTu')}</button>
             <button class="pv-tab ${_pvTab === 'respuesta' ? 'activo' : ''}" onclick="pvSetTab('respuesta')">${_pvT('tabRespuesta')}</button>
         </div>
         <article class="pv-articulo" id="pv-articulo">${cuerpo}</article>
@@ -828,6 +874,14 @@ async function pvInicializar() {
     try {
         _pvDatos = await _pvCargar();
         if (!_pvDatos[_pvId]) throw new Error('Problema no encontrado: ' + _pvId);
+        if (_pvTab === 'respuesta' && !_pvLeerOk()) {      // enlace directo a la respuesta → confirmar
+            _pvTab = 'enunciado';
+            await pvRender();
+            const url = new URL(location.href);
+            if (/\/Banco_Problemas\/[^/]+\/[^/]+$/.test(url.pathname)) { url.pathname = url.pathname.replace(/[^/]+$/, 'enunciado'); history.replaceState(null, '', url); }
+            if (await pvConfirmarRespuesta()) { _pvRespOk = true; _pvGuardarOk(); pvSetTab('respuesta'); }
+            return;
+        }
         pvRender();
     } catch (err) {
         console.error(err);

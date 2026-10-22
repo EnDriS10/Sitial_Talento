@@ -9,7 +9,9 @@
 // Flujo   : validar → límite de uso → buscar en la base de conocimiento
 //           → prompt con contexto → proveedor de IA (con respaldo) → stream
 // ════════════════════════════════════════════════════════════════════
-import { obtenerKB, contextoDe, fuentesDe } from './_lib/kb.js';
+import { buscarWeb, contextoWeb } from './_lib/web.js';
+import { obtenerKB, contextoDe, fuentesDe, resumenUltimas } from './_lib/kb.js';
+import { planificar } from './_lib/plan.js';
 import { chatStream, proveedoresActivos, objetivos, resumenSalud } from './_lib/llm.js';
 import { MODOS } from './_lib/prompts.js';
 import { ipDe, origenPermitido, validar, limitar } from './_lib/guard.js';
@@ -55,14 +57,27 @@ export default async function handler(req, res) {
   const lim = await limitar(ipDe(req));
   if (lim) return json(res, 429, { code: lim.codigo, error: lim.mensaje, retryAfter: lim.reintentarEn }, { 'Retry-After': String(lim.reintentarEn || 60) });
 
-  // ── contexto (búsqueda en los datos del sitio) ──
+  // ── 1) entender la pregunta: un modelo reformula y clasifica (sin listas de preguntas fijas) ──
   const modo = MODOS[body.mode] ? body.mode : 'general';
+  const lang = body.lang === 'en' ? 'en' : 'es';
   const kb = obtenerKB();
+  const ultimaPregunta = v.msgs.filter((m) => m.role === 'user').slice(-1)[0].content;
   const ultimas = v.msgs.filter((m) => m.role === 'user').slice(-2).map((m) => m.content).join(' ');
-  const fragmentos = kb.idx.buscar(ultimas, { k: 8, maxChars: 7000 });
+  const plan = await planificar(v.msgs, resumenUltimas());
+
+  // ── 2) buscar en los datos del Sitial con la consulta reformulada + la pregunta original ──
+  const consulta = [plan && plan.consulta, ultimas].filter(Boolean).join(' ');
+  const fragmentos = kb.idx.buscar(consulta, { k: 8, maxChars: 7000 });
   const pagina = body.page && typeof body.page === 'object'
     ? `${String(body.page.title || '').slice(0, 120)} (${String(body.page.path || '').slice(0, 160)})` : '';
-  const system = MODOS[modo]({ contexto: contextoDe(fragmentos), pagina, lang: body.lang === 'en' ? 'en' : 'es' });
+
+  // ── 3) internet: de entrada si el planificador lo marca como actualidad; si no, solo cuando el propio
+  //       asistente dice que el Sitial no tiene el dato (marcador [[BUSCAR: …]]) ──
+  let web = [];
+  if (modo === 'general' && plan && plan.ambito === 'actualidad') web = await buscarWeb(plan.web || ultimaPregunta, lang);
+  const construir = () => MODOS[modo]({ contexto: contextoDe(fragmentos), web: contextoWeb(web), ultimas: resumenUltimas(), pagina, lang, puedeBuscar: modo === 'general' && !web.length && !webIntentada });
+  let webIntentada = web.length > 0 || (plan && plan.ambito === 'actualidad');
+  let system = construir();
 
   // ── stream hacia el navegador ──
   res.writeHead(200, {
@@ -75,14 +90,45 @@ export default async function handler(req, res) {
   const ctl = new AbortController();
   res.on('close', () => ctl.abort());
 
-  try {
-    let primero = true;
+  // Ejecuta una generación. Si empieza por [[BUSCAR: …]] devuelve {buscar} sin haber enviado nada al usuario.
+  async function generar(sys) {
+    let buf = '', decidido = false, meta = null;
     for await (const ev of chatStream({
-      messages: [{ role: 'system', content: system }, ...v.msgs],
+      messages: [{ role: 'system', content: sys }, ...v.msgs],
       maxTokens: Number(process.env.CHAT_MAX_TOKENS || 700), temperature: 0.3, signal: ctl.signal,
     })) {
-      if (ev.meta) { send({ t: 'meta', provider: ev.meta.proveedor, model: ev.meta.modelo, sources: fuentesDe(fragmentos, 3) }); primero = false; continue; }
-      send({ t: 'delta', v: ev.texto });
+      if (ev.meta) { meta = ev.meta; if (decidido) emitirMeta(meta); continue; }
+      if (decidido) { send({ t: 'delta', v: ev.texto }); continue; }
+      buf += ev.texto;
+      const t = buf.trimStart();
+      if (t.startsWith('[[')) {
+        const m = t.match(/^\[\[\s*BUSCAR\s*:?\s*([^\]]*)\]\]/i);
+        if (m) { return { buscar: (m[1] || '').trim() || ultimaPregunta }; }
+        if (t.length < 14) continue;               // aún no sabemos si es el marcador
+      } else if (t.length < 2) continue;
+      decidido = true;
+      if (meta) emitirMeta(meta);
+      send({ t: 'delta', v: buf });
+    }
+    if (!decidido) {                                // respuesta muy corta: enviarla tal cual
+      const m = buf.trim().match(/^\[\[\s*BUSCAR\s*:?\s*([^\]]*)\]\]/i);
+      if (m) return { buscar: (m[1] || '').trim() || ultimaPregunta };
+      if (meta) emitirMeta(meta);
+      if (buf) send({ t: 'delta', v: buf });
+    }
+    return {};
+  }
+  const emitirMeta = (m) => send({ t: 'meta', provider: m.proveedor, model: m.modelo,
+    sources: fuentesDe(fragmentos, 3).concat(web.slice(0, 2).map((x) => ({ title: x.title, url: x.url, web: true }))).slice(0, 4), web: web.length > 0 });
+
+  try {
+    let r = await generar(system);
+    if (r.buscar) {                                  // el Sitial no tenía el dato → internet
+      webIntentada = true;
+      web = await buscarWeb(r.buscar, lang);
+      system = construir();
+      r = await generar(system);
+      if (r.buscar) send({ t: 'delta', v: lang === 'en' ? "I couldn't find that information." : 'No he podido encontrar esa información.' });
     }
     send({ t: 'done' });
   } catch (e) {
