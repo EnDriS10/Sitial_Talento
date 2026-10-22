@@ -36,6 +36,8 @@ Extras: **funciona sin conexión (PWA instalable)**, **exportar tablas a Excel/C
 ├── Banco_Problemas.html    Listado del banco de problemas
 ├── 404.html                Enrutador de URLs bonitas (truco SPA de rafgraph)
 ├── sw.js                   Service Worker (modo offline)
+├── .env.example            Variables de entorno del chatbot (plantilla)
+├── scripts/chat-dev.mjs    Servidor local para probar sitio + chatbot
 ├── manifest.webmanifest    Manifiesto PWA (instalable)
 ├── offline.html            Pantalla de respaldo sin conexión
 ├── Data/                   Datos del sitio (ver abajo)
@@ -43,7 +45,9 @@ Extras: **funciona sin conexión (PWA instalable)**, **exportar tablas a Excel/C
 ├── Assets/                 Logos, iconos PWA, CSS/JS de UI (pwa.js, tools.js), vendor/ y material del CNQ
 ├── api/
 │   ├── og.js               Genera imágenes Open Graph (Edge, @vercel/og)
-│   └── check-links.js      Cron diario: detecta enlaces rotos de Imgur
+│   ├── chat.js             Chatbot: POST /api/chat (streaming)
+│   └── _lib/               kb.js (búsqueda en los datos), llm.js + health.js (IA con relevo), guard.js (límites), prompts.js
+│   ├── check-links.js      Cron diario: detecta enlaces rotos de Imgur
 ├── middleware.js           Edge Middleware: meta tags OG por cuadrito/foto/problema
 ├── vercel.json             Rewrites, cabeceras de caché y cron
 ├── package.json            Dependencia @vercel/og
@@ -95,6 +99,37 @@ npx serve .        # o: python3 -m http.server
 
 ---
 
+## 🤖 Chatbot (Asistente del Sitial)
+
+Botón flotante en todas las páginas que abre un chat con IA. Responde sobre el sitio —medallas, equipos, personas, profesores, CNQ, noticias, fotos, problemas, cómo usar cada sección— **dando los enlaces correspondientes**, y también contesta preguntas generales. Todo gratis.
+
+**Arquitectura**
+```
+navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, streaming SSE)
+                                              │ 1. valida + origen + límite por IP        (guard.js)
+                                              │ 2. busca fragmentos relevantes             (kb.js)
+                                              │ 3. arma el prompt con ese contexto         (prompts.js)
+                                              └ 4. llama a la IA, con relevo automático    (llm.js + health.js)
+```
+- **Conocimiento (RAG sin base de datos):** `kb.js` lee los mismos archivos que ya editas (`Data/*.html`, `Problem_Data/problemas_data.html`) y los convierte en ~800 fragmentos (personas, equipos, resúmenes y rankings, CNQ, biografías, noticias, fotos, problemas…). Busca por palabras (sin acentos, ES/EN) y manda al modelo solo lo relevante. Cada deploy lo actualiza solo.
+- **Guía del sitio:** `Data/chatbot_guia.md` es texto normal con lo que el bot debe saber de la web (secciones, contacto, preguntas frecuentes). Cada bloque empieza con `## Título` y, opcionalmente, `url: /ruta`. Edítalo cuando quieras.
+- **IA gratuita con relevo automático:** orden por defecto Mistral → Gemini → Groq → OpenRouter, con varios modelos por proveedor (cada modelo gratuito tiene su propia cuota). Si un modelo se queda sin cuota (429), falla (5xx/timeout), devuelve vacío o tiene la clave mal, **esa misma petición pasa al siguiente sin esperar** y el modelo queda "enfriado" (30 s–6 h según el error; 30 min si es cuota diaria) para que las siguientes preguntas ni lo intenten hasta que se recupere. Todos usan el protocolo OpenAI-compatible, igual que DeepSeek.
+- **Por qué Mistral primero:** su capa gratuita es la más generosa (1 petición/s y ~1.000 millones de tokens/mes, sin tope diario práctico) y responde bien en español. Groq (~1.000 peticiones y 200 K tokens/día por modelo) y Gemini son el respaldo. Los límites gratuitos cambian: compruébalos en cada consola.
+- **Anti-abuso:** solo acepta peticiones del propio sitio (mismo origen), máx. 1.000 caracteres por mensaje y 10 de historial, límite por IP (8/min y 80/día por defecto) y tope global diario. Con Upstash Redis (gratis) los contadores y el estado de salud se comparten entre instancias; sin él funcionan en memoria.
+- **Privacidad:** en las capas gratuitas los proveedores pueden usar las conversaciones para mejorar sus modelos (Mistral lo exige en su plan gratuito; Google también). El widget no pide ni guarda datos personales; la conversación solo vive en `sessionStorage` de la pestaña.
+
+**Puesta en marcha en Vercel**
+1. Consigue al menos una clave gratuita (Mistral recomendada; añade Gemini y Groq para respaldo): enlaces en `.env.example`.
+2. Vercel → tu proyecto → *Settings → Environment Variables*: añade `MISTRAL_API_KEY` (y las demás) para *Production* y *Preview*. Redespliega.
+3. Comprueba `https://sitialtalento.vercel.app/api/chat` (GET): debe mostrar `"proveedores"` ≥ 1 y `"fragmentos"` ≈ 800. Si `fragmentos` es 0, los datos no viajan con la función: revisa `functions → includeFiles` en `vercel.json`.
+4. Opcional: crea una base gratuita en Upstash y añade `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`; y `CHAT_DEBUG_TOKEN` para ver la salud de cada modelo.
+
+**Probar en local:** `cp .env.example .env`, rellena una clave y `node --env-file=.env scripts/chat-dev.mjs` → http://localhost:3000.
+
+**Siguiente paso previsto (Banco de Problemas):** el tutor paso a paso reutilizará todo esto: `prompts.js` ya admite "modos" (solo falta `problema`, con el enunciado y la solución del visor como contexto) y `llm.js` ya incluye DeepSeek (`DEEPSEEK_API_KEY` + `LLM_PROVIDERS=deepseek,...` o un modo que fuerce ese proveedor).
+
+---
+
 ## 🛠️ Notas técnicas (lecciones aprendidas)
 
 - `<base id="app-base-href">` se fija a `/` fuera de GitHub Pages para que `fetch('Data/…')` y las imágenes relativas funcionen bajo cualquier URL bonita.
@@ -110,6 +145,7 @@ npx serve .        # o: python3 -m http.server
 - [ ] Página de perfil por profesor/entrenador compartible.
 - [ ] Comparador de equipos entre años y países.
 - [ ] Más fotos/vídeos por equipo y descarga de la ficha del equipo como imagen (para redes).
+- [x] Chatbot general con IA gratuita (ver *Chatbot*). Pendiente: tutor paso a paso en el Banco de Problemas (DeepSeek).
 - [ ] Imagen Open Graph dinámica para `/Equipo/<olimpiada>/<año>`.
 - [ ] Sitemap generado automáticamente a partir de `Data/` (equipos, cuadritos, problemas).
 - [ ] Mirror/subida propia de imágenes (menos dependencia de Imgur) y aviso del cron por Telegram.

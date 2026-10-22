@@ -22,7 +22,7 @@
    Para forzar que todos los usuarios renueven la caché de la "carcasa"
    tras un cambio grande, sube VERSION.
    ══════════════════════════════════════════════════════════════ */
-const VERSION   = 'v1';
+const VERSION   = 'v2';
 const SHELL     = 'sitial-shell-' + VERSION;
 const DATA      = 'sitial-data-' + VERSION;
 const STATIC    = 'sitial-static-' + VERSION;
@@ -35,7 +35,7 @@ const PRECACHE_SHELL = [
   'equipo.html', 'offline.html', 'manifest.webmanifest',
   'Problem_Data/visor.html',
   'Assets/UI/modern-ui.css', 'Assets/UI/modern-ui.js',
-  'Assets/UI/pwa.js', 'Assets/UI/tools.js', 'Assets/vendor/xlsx.mini.min.js',
+  'Assets/UI/pwa.js', 'Assets/UI/tools.js', 'Assets/UI/chatbot.js', 'Assets/vendor/xlsx.mini.min.js',
   'Assets/icons/icon-192.png', 'Assets/icons/icon-512.png'
 ];
 const PRECACHE_DATA = [

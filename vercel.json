@@ -1,4 +1,11 @@
 {
+  "functions": {
+    "api/chat.js": {
+      "includeFiles": "{Data,Problem_Data}/**",
+      "maxDuration": 30
+    }
+  },
+
   "rewrites": [
     { "source": "/Banco_Problemas", "destination": "/Banco_Problemas.html" },
     { "source": "/media", "destination": "/media.html" },
