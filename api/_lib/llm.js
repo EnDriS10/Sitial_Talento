@@ -41,6 +41,9 @@ export const PROVEEDORES = {
     env: 'DEEPSEEK_API_KEY',
     url: 'https://api.deepseek.com/chat/completions',
     modelos: ['deepseek-flash'],      // admite imágenes; 'deepseek-v4-pro' solo texto
+    // El "thinking" viene activado por defecto y gasta max_tokens razonando (la respuesta llega vacía):
+    // se desactiva salvo que se pida (opts.thinking).
+    extra: (m, o) => ({ thinking: { type: o && o.thinking ? 'enabled' : 'disabled' } }),
   },
 };
 
@@ -82,7 +85,8 @@ class ErrorObjetivo extends Error {
   constructor(msg, extra) { super(msg); Object.assign(this, extra); }
 }
 
-async function abrir(t, { messages, maxTokens, temperature, signal, json, firstByteMs }) {
+async function abrir(t, opts) {
+  const { messages, maxTokens, temperature, signal, json, firstByteMs } = opts;
   const p = PROVEEDORES[t.prov];
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(new Error('timeout')), Number(firstByteMs || process.env.LLM_FIRST_BYTE_MS || 10000));
@@ -93,7 +97,7 @@ async function abrir(t, { messages, maxTokens, temperature, signal, json, firstB
     res = await fetch(urlDe(t.prov), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env[p.env] },
-      body: JSON.stringify({ model: t.modelo, messages, stream: true, max_tokens: maxTokens, temperature, ...(json ? { response_format: { type: 'json_object' } } : {}), ...(p.extra ? p.extra(t.modelo) : {}) }),
+      body: JSON.stringify({ model: t.modelo, messages, stream: true, max_tokens: maxTokens, temperature, ...(json ? { response_format: { type: 'json_object' } } : {}), ...(p.extra ? p.extra(t.modelo, opts) : {}) }),
       signal: ctl.signal,
     });
   } catch (e) {

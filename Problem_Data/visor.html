@@ -948,6 +948,7 @@ async function _tuPost(body) {
     try { r = await fetch(_TU_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, problemId: _pvId, lang: _pvLang() }) }); }
     catch (e) { throw new Error(_pvT('tuNoApi')); }
     let j = null; try { j = await r.json(); } catch (e) {}
+    if (j && j.detalle) console.warn('[tutor] detalle:', j.detalle);
     if (!r.ok || !j) throw new Error((j && j.error) || (r.status === 404 || r.status === 405 ? _pvT('tuNoApi') : _pvT('tuErr')));
     return j;
 }

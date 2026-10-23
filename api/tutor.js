@@ -118,7 +118,7 @@ export default async function handler(req, res) {
   if (accion === 'hint') {
     const q = String(b.question || '').trim().slice(0, 600);
     if (!q) return json(res, 400, { code: 'bad_request', error: 'Escribe tu pregunta.' });
-    system = systemPista(p, lang); maxTokens = 600;
+    system = systemPista(p, lang); maxTokens = process.env.TUTOR_THINKING === '1' ? 4000 : 900;
     const hist = (Array.isArray(b.history) ? b.history : []).slice(-5).map((h) => `Estudiante: ${String(h.q || '').slice(0, 300)}\nTutor: ${String(h.a || '').slice(0, 500)}`).join('\n\n');
     userTexto = (hist ? 'Conversación previa:\n' + hist + '\n\n' : '') + 'Pregunta del estudiante: ' + q;
   } else {
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
     if (!imgs.length && !textos.trim()) return json(res, 400, { code: 'bad_request', error: 'Sube al menos una foto o texto con tu resolución.' });
     const nivelesOk = (Array.isArray(b.hints) ? b.hints : []).map((h) => (COSTE[h && h.level] !== undefined ? h.level : null)).filter(Boolean).slice(0, 30);
     var penal = Math.min(COSTE_MAX, nivelesOk.reduce((a, n) => a + COSTE[n], 0));
-    system = systemCalificar(p, lang, penal); maxTokens = 3000;
+    system = systemCalificar(p, lang, penal); maxTokens = process.env.TUTOR_THINKING === '1' ? 9000 : 4000;
     userTexto = 'Esta es la resolución del estudiante.' + (textos.trim() ? '\n\nTexto aportado:\n' + textos : '') + (imgs.length ? `\n\nAdjunto ${imgs.length} imagen(es) con la resolución manuscrita, en orden.` : '');
   }
 
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
     const { texto, meta } = await completar({
       messages: [{ role: 'system', content: system }, { role: 'user', content: conImg ? contenido : userTexto }],
       targets: objetivos(), json: true, maxTokens, temperature: accion === 'grade' ? 0.1 : 0.4,
-      firstByteMs: 40000, totalMs: 56000,
+      firstByteMs: 40000, totalMs: 56000, thinking: process.env.TUTOR_THINKING === '1',
     });
     const j = parseJSON(texto);
     if (!j) return json(res, 502, { code: 'bad_output', error: 'No pude interpretar la respuesta de la IA. Inténtalo de nuevo.' });
@@ -165,6 +165,7 @@ export default async function handler(req, res) {
     return json(res, 200, { incisos, max, bruto, penalizacionPct: penal, penalizacion: descuento, final, resumen: String(j.resumen || '').slice(0, 800), advertencias: (Array.isArray(j.advertencias) ? j.advertencias : []).slice(0, 5).map((x) => String(x).slice(0, 200)), model: meta && meta.modelo });
   } catch (e) {
     console.error('[tutor]', e.message);
-    return json(res, e.todos ? 503 : 500, { code: 'unavailable', error: 'El tutor no está disponible ahora mismo. Inténtalo en unos minutos.' });
+    // `detalle` ayuda a diagnosticar (estado HTTP del proveedor, saldo, modelo…); no contiene claves
+    return json(res, e.todos ? 503 : 500, { code: 'unavailable', error: 'El tutor no está disponible ahora mismo. Inténtalo en unos minutos.', detalle: String(e.message).slice(0, 500) });
   }
 }
