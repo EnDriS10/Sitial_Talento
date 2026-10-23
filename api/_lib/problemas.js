@@ -50,10 +50,17 @@ export function datosProblema(id) {
   const imgs = [];
   (String(c.enunciado || '').match(/<img[^>]*src="([^"]+)"/gi) || []).forEach((t) => { const u = (t.match(/src="([^"]+)"/) || [])[1]; if (u && /^https:\/\//.test(u)) imgs.push(u); });
   (String(c.enunciado || '').match(/data-gallery="([^"]+)"/g) || []).forEach((t) => { const k = t.match(/"([^"]+)"/)[1]; (gal[k] || []).forEach((g) => g.url && imgs.push(g.url)); });
+  const solTxt = htmlATexto(resp);
+  // baremo oficial: «(c)(i) «1 punto»» → [{id:'(c)(i)', max:1}]
+  const baremo = [];
+  solTxt.split('\n').forEach((ln) => {
+    const m = ln.match(/^\s*((?:\([a-z0-9]+\))+)\s*«\s*([\d.,]+)\s*punt/i);
+    if (m) baremo.push({ id: m[1], max: parseFloat(m[2].replace(',', '.')) });
+  });
   const m = metaPor[id] || {};
   return {
     id, titulo: c.titulo, numero: c.numero, fuente: c.fuente, dificultad: m.dificultad,
-    enunciado: htmlATexto(c.enunciado), solucion: htmlATexto(resp), maxPuntos: max || null,
+    enunciado: htmlATexto(c.enunciado), solucion: solTxt, maxPuntos: max || null, baremo,
     imagenes: [...new Set(imgs)].slice(0, 4),
   };
 }

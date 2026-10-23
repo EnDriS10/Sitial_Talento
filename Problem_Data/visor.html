@@ -570,14 +570,14 @@
 const _PVT = {
     es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta', tabTu: '✍️ Tu respuesta',
           confTitulo: '¿Ver la respuesta?', confTexto: '¿Estás seguro de que quieres ver la respuesta? Intenta resolver el problema primero: así se aprende (y se entrena) mucho más.', confSi: 'Sí, ver la respuesta', confNo: 'Seguir intentándolo',
-          tuTitulo: 'Tu respuesta', tuAskH: 'Pregunta al tutor', tuAskNote: 'Puedes pedir aclaraciones o pistas. Cada ayuda resta puntos a tu nota final; las preguntas obvias o que piden la respuesta se rechazan.', tuAskPh: 'Escribe tu duda sobre el problema…', tuAsk: 'Preguntar', tuAskPhoto: '📎 Foto de tu duda',
+          tuTitulo: 'Tu respuesta', tuPartH: 'Parece que solo enviaste una parte', tuPartHas: 'Detecté respuesta a:', tuPartMiss: 'No vi respuesta a:', tuPartCut: 'Además, la última parte parece cortada o incompleta.', tuPartAsk: '¿Quieres continuar añadiendo el resto o calificamos solo lo que enviaste?', tuPartGo: 'Calificar solo lo enviado', tuPartMore: 'Voy a añadir el resto', tuEmpty: 'No encontré respuestas', tuOnlySent: 'sobre lo enviado', tuCross: 'Revisión cruzada de dos IA', tuDisc: 'Las IA discreparon; se promedió', tuAskH: 'Pregunta al tutor', tuAskNote: 'Puedes pedir aclaraciones o pistas. Cada ayuda resta puntos a tu nota final; las preguntas obvias o que piden la respuesta se rechazan.', tuAskPh: 'Escribe tu duda sobre el problema…', tuAsk: 'Preguntar', tuAskPhoto: '📎 Foto de tu duda',
           tuPen: 'Penalización por ayudas', tuReset: 'Empezar de nuevo', tuCost: { aclaracion: 'Aclaración · sin coste', pista: 'Pista · −5 %', pista_fuerte: 'Pista fuerte · −12 %', rechazada: 'Pregunta rechazada · sin coste' },
           tuGradeH: 'Sube tu resolución', tuGradeNote: 'Sube fotos de tu resolución (o un archivo de texto). La IA la compara con la solución oficial y la puntúa por inciso.', tuFiles: '📷 Añadir fotos / archivos', tuNotes: 'Notas o respuesta escrita (opcional)', tuGrade: 'Calificar mi resolución', tuGrading: 'Calificando… (puede tardar hasta un minuto)', tuAsking: 'Pensando…',
           tuRes: 'Resultado', tuRaw: 'Puntos obtenidos', tuFinal: 'Nota final', tuHow: 'Cómo se resuelve', tuWarn: 'Avisos', tuErr: 'No se pudo completar la solicitud.', tuNoApi: 'El tutor solo funciona en la versión alojada en Vercel.', tuMax: 'máx.', tuLegal: 'La corrección la hace una IA y puede equivocarse: úsala como guía de entrenamiento.', tuRemove: 'Quitar', tuTooMany: 'Máximo 4 archivos.',
           error: 'No se pudo cargar este problema.', volver: '← Volver al Banco de Problemas' },
     en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer', tabTu: '✍️ Your answer',
           confTitulo: 'View the answer?', confTexto: 'Are you sure you want to see the answer? Try solving the problem first: you learn (and train) much more that way.', confSi: 'Yes, show the answer', confNo: 'Keep trying',
-          tuTitulo: 'Your answer', tuAskH: 'Ask the tutor', tuAskNote: 'You can ask for clarifications or hints. Every help costs points from your final mark; obvious questions or requests for the answer are declined.', tuAskPh: 'Type your question about the problem…', tuAsk: 'Ask', tuAskPhoto: '📎 Photo of your question',
+          tuTitulo: 'Your answer', tuPartH: 'It looks like you only sent part of it', tuPartHas: 'I found answers to:', tuPartMiss: 'No answer seen for:', tuPartCut: 'Also, the last part looks cut off or unfinished.', tuPartAsk: 'Do you want to keep adding the rest, or should we grade only what you sent?', tuPartGo: 'Grade only what I sent', tuPartMore: 'I will add the rest', tuEmpty: 'No answers found', tuOnlySent: 'on what was sent', tuCross: 'Cross-checked by two AIs', tuDisc: 'The AIs disagreed; averaged', tuAskH: 'Ask the tutor', tuAskNote: 'You can ask for clarifications or hints. Every help costs points from your final mark; obvious questions or requests for the answer are declined.', tuAskPh: 'Type your question about the problem…', tuAsk: 'Ask', tuAskPhoto: '📎 Photo of your question',
           tuPen: 'Penalty for help', tuReset: 'Start over', tuCost: { aclaracion: 'Clarification · no cost', pista: 'Hint · −5 %', pista_fuerte: 'Strong hint · −12 %', rechazada: 'Declined · no cost' },
           tuGradeH: 'Upload your solution', tuGradeNote: 'Upload photos of your solution (or a text file). The AI compares it with the official solution and scores each part.', tuFiles: '📷 Add photos / files', tuNotes: 'Notes or written answer (optional)', tuGrade: 'Grade my solution', tuGrading: 'Grading… (can take up to a minute)', tuAsking: 'Thinking…',
           tuRes: 'Result', tuRaw: 'Points earned', tuFinal: 'Final mark', tuHow: 'How it is solved', tuWarn: 'Warnings', tuErr: 'The request could not be completed.', tuNoApi: 'The tutor only works on the Vercel-hosted version.', tuMax: 'max', tuLegal: 'The marking is done by an AI and can make mistakes: use it as a training guide.', tuRemove: 'Remove', tuTooMany: 'Maximum 4 files.',
@@ -907,7 +907,7 @@ async function pvRender() {
 
 // ══════════════ Tutor con IA (pestaña «Tu respuesta») ══════════════
 // Pistas (cuestan puntos) + calificación de fotos de tu resolución por inciso.
-// Habla con /api/tutor (DeepSeek con visión; ver api/tutor.js y Data/tutor_contrato.md).
+// Habla con /api/tutor (modelos gratuitos con visión; ver api/tutor.js y Data/tutor_contrato.md).
 const _TU_API = (location.pathname.replace(/(Banco_Problemas\/[^/]+\/[^/]+|Problem_Data\/visor\.html)$/, '')) + 'api/tutor';
 const _tuEsc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let _tuFiles = [];   // [{kind:'img', data, name} | {kind:'txt', text, name}]
@@ -1011,24 +1011,45 @@ function pvTutorInit() {
 
     const redibujaG = () => _tuThumbs(_tuFiles, $('tu-gth'), redibujaG);
     $('tu-gf').onchange = async (e) => { await _tuLeerArchivos(e.target.files, _tuFiles, 4); e.target.value = ''; redibujaG(); };
-    $('tu-go').onclick = async () => {
-        $('tu-gerr').textContent = ''; $('tu-out').innerHTML = '';
-        $('tu-go').disabled = true; const old = $('tu-go').textContent; $('tu-go').textContent = _pvT('tuGrading');
+    const fm = (n) => String(Math.round(n * 100) / 100).replace('.', _pvLang() === 'es' ? ',' : '.');
+    const pintaResultado = (r) => {
+        $('tu-out').innerHTML = `<div class="pv-score"><small>${_pvT('tuFinal')}</small><b>${fm(r.final)} / ${fm(r.max)}</b>
+            <small>${_pvT('tuRaw')}: ${fm(r.bruto)}${r.penalizacionPct ? ` · ${_pvT('tuPen')}: −${fm(r.penalizacion)} (${r.penalizacionPct} %)` : ''}${r.maxEnviado != null ? ` · ${fm(Math.max(0, r.bruto))}/${fm(r.maxEnviado)} ${_pvT('tuOnlySent')}` : ''}</small>
+            ${r.revisionCruzada ? `<br><small>🔍 ${_pvT('tuCross')}</small>` : ''}</div>
+            <p>${_tuEsc(r.resumen)}</p>
+            ${r.advertencias && r.advertencias.length ? `<p class="pv-note">⚠️ ${_pvT('tuWarn')}: ${r.advertencias.map(_tuEsc).join(' · ')}</p>` : ''}
+            ${r.incisos.map((x) => `<details class="pv-inc"><summary><strong>${_tuEsc(x.id)}</strong><span>${_tuEsc(x.comentario)}${x.discrepancia ? ` <em title="${_tuEsc(_pvT('tuDisc'))}">↔</em>` : ''}</span><span class="pv-pts">${fm(x.puntos)} / ${fm(x.max)}</span></summary><p><strong>${_pvT('tuHow')}:</strong>\n${_tuEsc(x.como_se_hace)}</p></details>`).join('')}`;
+        $('tu-out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    const pintaParcial = (r, bodyBase) => {
+        $('tu-out').innerHTML = `<div class="pv-score" style="border-color:var(--border);text-align:left">
+            <strong>${_pvT('tuPartH')}</strong>
+            <p style="margin:8px 0 0">${_pvT('tuPartHas')} <b>${r.presentes.map(_tuEsc).join(', ') || '—'}</b></p>
+            <p style="margin:4px 0 0">${_pvT('tuPartMiss')} <b>${r.faltan.map(_tuEsc).join(', ') || '—'}</b></p>
+            ${r.cortada ? `<p style="margin:4px 0 0">${_pvT('tuPartCut')}</p>` : ''}
+            <p style="margin:10px 0 0">${_pvT('tuPartAsk')}</p>
+            <div class="pv-row"><button type="button" class="pv-b pv-main" id="tu-pgo">${_pvT('tuPartGo')}</button><button type="button" class="pv-b" id="tu-pmore">${_pvT('tuPartMore')}</button></div></div>`;
+        $('tu-pmore').onclick = () => { $('tu-out').innerHTML = ''; $('tu-gf').closest('label').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+        $('tu-pgo').onclick = () => enviarCalificar({ ...bodyBase, transcripcion: r.transcripcion, presentes: r.presentes, faltan: r.faltan, cortada: r.cortada, confirmarParcial: true, images: [], texts: [] });
+    };
+    const enviarCalificar = async (cuerpo) => {
+        $('tu-gerr').textContent = ''; $('tu-go').disabled = true; if ($('tu-pgo')) $('tu-pgo').disabled = true;
+        const old = _pvT('tuGrade'); $('tu-go').textContent = _pvT('tuGrading');
         try {
-            const r = await _tuPost({
-                action: 'grade', images: _tuFiles.filter((f) => f.kind === 'img').map((f) => f.data),
-                texts: _tuFiles.filter((f) => f.kind === 'txt').map((f) => f.text).concat($('tu-notes').value.trim() ? [$('tu-notes').value.trim()] : []),
-                hints: st.hints.map((h) => ({ level: h.level })),
-            });
-            const fm = (n) => String(Math.round(n * 100) / 100).replace('.', _pvLang() === 'es' ? ',' : '.');
-            $('tu-out').innerHTML = `<div class="pv-score"><small>${_pvT('tuFinal')}</small><b>${fm(r.final)} / ${fm(r.max)}</b>
-                <small>${_pvT('tuRaw')}: ${fm(r.bruto)}${r.penalizacionPct ? ` · ${_pvT('tuPen')}: −${fm(r.penalizacion)} (${r.penalizacionPct} %)` : ''}</small></div>
-                <p>${_tuEsc(r.resumen)}</p>
-                ${r.advertencias && r.advertencias.length ? `<p class="pv-note">⚠️ ${_pvT('tuWarn')}: ${r.advertencias.map(_tuEsc).join(' · ')}</p>` : ''}
-                ${r.incisos.map((x) => `<details class="pv-inc"><summary><strong>${_tuEsc(x.id)}</strong><span>${_tuEsc(x.comentario)}</span><span class="pv-pts">${fm(x.puntos)} / ${fm(x.max)}</span></summary><p><strong>${_pvT('tuHow')}:</strong>\n${_tuEsc(x.como_se_hace)}</p></details>`).join('')}`;
-            $('tu-out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const r = await _tuPost(cuerpo);
+            if (r.vacio) { $('tu-out').innerHTML = `<p class="pv-note">⚠️ ${_tuEsc(r.mensaje || _pvT('tuEmpty'))}</p>`; }
+            else if (r.parcial) pintaParcial(r, { action: 'grade', hints: cuerpo.hints });
+            else pintaResultado(r);
         } catch (e) { $('tu-gerr').textContent = e.message; }
         $('tu-go').disabled = false; $('tu-go').textContent = old;
+    };
+    $('tu-go').onclick = () => {
+        $('tu-out').innerHTML = '';
+        enviarCalificar({
+            action: 'grade', images: _tuFiles.filter((f) => f.kind === 'img').map((f) => f.data),
+            texts: _tuFiles.filter((f) => f.kind === 'txt').map((f) => f.text).concat($('tu-notes').value.trim() ? [$('tu-notes').value.trim()] : []),
+            hints: st.hints.map((h) => ({ level: h.level })),
+        });
     };
 }
 

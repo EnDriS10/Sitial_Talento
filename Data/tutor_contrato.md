@@ -1,25 +1,14 @@
-# Corrector de problemas con IA (DeepSeek) — contrato y bases
+# Tutor de problemas con IA — contrato
 
-Estado: **implementado** en `api/tutor.js` (acciones `hint` y `grade`) y en la pestaña «✍️ Tu respuesta» de `Problem_Data/visor.html`. Este documento describe el contrato.
+Implementado en `api/tutor.js` y en la pestaña «✍️ Tu respuesta» de `Problem_Data/visor.html`. Todo con modelos gratuitos (Gemini, Mistral, Groq, OpenRouter).
 
-## Flujo previsto
-1. El estudiante abre un problema y pestaña «Tu respuesta», sube 1–4 fotos de su resolución.
-2. El navegador reduce las fotos (máx. ~1600 px, JPEG ~0.8) y las envía a `POST /api/tutor`.
-3. El servidor construye el prompt con enunciado + solución oficial + **baremo** (puntos por inciso)
-   y llama a DeepSeek (variable `DEEPSEEK_API_KEY`, `LLM_PROVIDERS=deepseek` para este modo).
-4. Respuesta JSON (no streaming): ver abajo. La pestaña muestra puntuación por inciso y comentarios.
+## Acciones
+**hint** `{action:'hint', problemId, question, history?, images?, lang}` → `{answer, level, cost}` (nivel: aclaracion 0 %, pista 5 %, pista_fuerte 12 %, rechazada 0 %).
 
-## Petición
-```json
-{ "problemId": "cinetica-alimentos", "lang": "es", "images": ["data:image/jpeg;base64,…"] }
-```
-## Respuesta
-```json
-{ "total": 7.5, "max": 10,
-  "incisos": [ { "id": "1a", "puntos": 2, "max": 2, "comentario": "…" } ] }
-```
-## Datos que faltan en `Problem_Data/problemas_data.html`
-- `baremo: [{ id: "1a", max: 2 }, …]` por problema (puntos/marcas de cada inciso).
-- Comprobar si el modelo elegido admite imágenes; si no, OCR previo.
-## Límites a añadir
-Cuota por IP más estricta que el chat (p. ej. 5/día), tamaño máximo de imagen y moderación básica.
+**grade** `{action:'grade', problemId, images?, texts?, hints:[{level}], lang}`:
+1. Lector con visión → transcripción + incisos presentes/faltantes + `cortada`.
+2. Si es parcial: responde `{parcial:true, presentes, faltan, cortada, transcripcion}`. El cliente pregunta al estudiante y, si decide calificar lo enviado, reenvía `{transcripcion, presentes, faltan, confirmarParcial:true}`.
+3. Dos calificadores en paralelo → `{incisos:[{id,max,puntos,comentario,como_se_hace,discrepancia?}], bruto, max, penalizacionPct, penalizacion, final, maxEnviado, resumen, advertencias, revisionCruzada}`.
+
+## Datos
+`api/_lib/problemas.js` lee `Problem_Data/*` y extrae el baremo de las líneas `(a) «2 puntos»` de la solución. Si un problema no tiene esas etiquetas (p. ej. q6), el modelo decide los máximos.

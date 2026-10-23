@@ -126,7 +126,6 @@ navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, st
 
 **Probar en local:** `cp .env.example .env`, rellena una clave y `node --env-file=.env scripts/chat-dev.mjs` → http://localhost:3000.
 
-**Siguiente paso previsto (Banco de Problemas):** el tutor paso a paso reutilizará todo esto: `prompts.js` ya admite "modos" (solo falta `problema`, con el enunciado y la solución del visor como contexto) y `llm.js` ya incluye DeepSeek (`DEEPSEEK_API_KEY` + `LLM_PROVIDERS=deepseek,...` o un modo que fuerce ese proveedor).
 
 ---
 
@@ -139,12 +138,12 @@ navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, st
 ### Conocimiento precargado
 Al arrancar, `kb.js` construye una **ficha base** del Sitial (olimpiadas y alias —«ibero» = OIAQ—, última edición de cada una con su delegación, otras olimpiadas, fecha de hoy) que acompaña SIEMPRE al asistente, además de los fragmentos que recupera por pregunta. Para añadir conocimiento permanente edita `Data/chatbot_guia.md`.
 
-### Banco de Problemas — tutor con IA (DeepSeek)
+### Banco de Problemas — tutor con IA (gratuito, con visión)
 Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmación).
-- **Preguntar al tutor** (`api/tutor.js`, acción `hint`): aclaraciones (0 %), pistas (−5 %) y pistas fuertes (−12 %) restan puntos; las preguntas obvias o que piden la respuesta se rechazan.
-- **Calificar** (acción `grade`): subes fotos (se reducen en el navegador) o texto; DeepSeek (`deepseek-flash`, con visión) compara con la solución oficial y el esquema de puntos de `Problem_Data/problemas_contenido.html` y devuelve la puntuación por inciso, comentarios y cómo se resuelve. Penalización máx. 40 %.
-- Modelos: `TUTOR_TARGETS` (por defecto `deepseek:deepseek-flash,gemini:gemini-flash-latest,mistral:mistral-small-latest`). Límites: `TUTOR_HINT_DAY`, `TUTOR_GRADE_DAY`, `TUTOR_GLOBAL_DAY`.
-- Los problemas se cargan en memoria una vez (`api/_lib/problemas.js`); el máximo de puntos sale de las etiquetas «N puntos» de la solución.
+- **Preguntar al tutor** (`api/tutor.js`, acción `hint`): aclaraciones (0 %), pistas (−5 %) y pistas fuertes (−12 %) restan puntos; las preguntas obvias o que piden la respuesta se rechazan. Acepta texto o una foto de la duda.
+- **Calificar** (acción `grade`), 3 pasos rápidos: 1) un modelo con **visión** (Gemini / Mistral / Groq) transcribe las fotos o el texto y detecta qué incisos hay, cuáles faltan y si quedó cortada; 2) si solo enviaste una parte, el tutor pregunta si continúas o calificas solo lo enviado; 3) **dos modelos distintos califican en paralelo** (revisión cruzada) comparando con la solución oficial; los puntos se promedian y se acotan al baremo.
+- Sin DeepSeek ni modelos de pago: `TUTOR_VISION`, `TUTOR_GRADERS`, `TUTOR_FAST` fijan los modelos; `TUTOR_DUAL=0` desactiva la revisión cruzada. Límites: `TUTOR_HINT_DAY`, `TUTOR_GRADE_DAY`, `TUTOR_GLOBAL_DAY`.
+- Los problemas se cargan en memoria una vez (`api/_lib/problemas.js`), incluido el baremo por inciso (de las etiquetas «N puntos» de la solución).
 
 ### Menú hamburguesa
 `Assets/UI/menu.js` añade el menú a media, noticias, Banco de Problemas, equipos y visor; en todas las páginas no muestra la sección donde ya estás.
@@ -164,7 +163,7 @@ Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmació
 - [ ] Página de perfil por profesor/entrenador compartible.
 - [ ] Comparador de equipos entre años y países.
 - [ ] Más fotos/vídeos por equipo y descarga de la ficha del equipo como imagen (para redes).
-- [x] Chatbot general con IA gratuita (ver *Chatbot*). Pendiente: tutor paso a paso en el Banco de Problemas (DeepSeek).
+- [x] Chatbot general con IA gratuita (ver *Chatbot*). Tutor del Banco de Problemas: hecho (ver *Banco de Problemas*).
 - [ ] Imagen Open Graph dinámica para `/Equipo/<olimpiada>/<año>`.
 - [ ] Sitemap generado automáticamente a partir de `Data/` (equipos, cuadritos, problemas).
 - [ ] Mirror/subida propia de imágenes (menos dependencia de Imgur) y aviso del cron por Telegram.

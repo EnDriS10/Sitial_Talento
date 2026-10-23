@@ -2,7 +2,7 @@
 // Cliente LLM: varios proveedores y modelos gratuitos con relevo automático
 // ════════════════════════════════════════════════════════════════════
 // Todos hablan el protocolo "OpenAI-compatible" (/chat/completions + stream),
-// incluido DeepSeek: el tutor del Banco de Problemas reutilizará este código.
+// incluido DeepSeek (opcional): el tutor del Banco de Problemas reutiliza este código.
 //
 // · Un "objetivo" = proveedor + modelo. Cada modelo gratuito tiene su propia
 //   cuota, así que se encadenan varios (p. ej. mistral-small → gemini-flash
