@@ -32,8 +32,13 @@ async function leerBody(req) {
   for await (const c of req) { total += c.length; if (total > MAX_BODY) throw new Error('grande'); partes.push(c); }
   return JSON.parse(Buffer.concat(partes).toString('utf8') || '{}');
 }
-function objetivos() {
-  const def = 'deepseek:deepseek-flash,gemini:gemini-flash-latest,mistral:mistral-small-latest';
+// Orden de modelos. Con imágenes solo sirven los que ven (DeepSeek-flash, Gemini, Mistral Small);
+// con solo texto se añaden Groq y OpenRouter como respaldo. Los que no tienen clave o están
+// enfriados (p. ej. sin saldo) se saltan solos. TUTOR_TARGETS lo fija a mano.
+function objetivos(conImagenes) {
+  const def = conImagenes
+    ? 'deepseek:deepseek-flash,gemini:gemini-flash-latest,mistral:mistral-small-latest,gemini:gemini-flash-lite-latest'
+    : 'deepseek:deepseek-flash,mistral:mistral-small-latest,gemini:gemini-flash-latest,groq:openai/gpt-oss-120b,gemini:gemini-flash-lite-latest,groq:openai/gpt-oss-20b,openrouter:meta-llama/llama-3.3-70b-instruct:free';
   return (process.env.TUTOR_TARGETS || def).split(',').map((s) => s.trim()).filter(Boolean)
     .map((s) => { const i = s.indexOf(':'); return { prov: s.slice(0, i).toLowerCase(), modelo: s.slice(i + 1) }; });
 }
@@ -97,7 +102,7 @@ const num = (x, d = 0) => (Number.isFinite(+x) ? +x : d);
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
-    const t = objetivos().filter((x) => process.env[({ deepseek: 'DEEPSEEK_API_KEY', gemini: 'GEMINI_API_KEY', mistral: 'MISTRAL_API_KEY', groq: 'GROQ_API_KEY', openrouter: 'OPENROUTER_API_KEY' })[x.prov]]);
+    const t = objetivos(false).filter((x) => process.env[({ deepseek: 'DEEPSEEK_API_KEY', gemini: 'GEMINI_API_KEY', mistral: 'MISTRAL_API_KEY', groq: 'GROQ_API_KEY', openrouter: 'OPENROUTER_API_KEY' })[x.prov]]);
     return json(res, 200, { ok: true, disponible: t.length > 0, modelos: t.map((x) => x.prov + ':' + x.modelo) });
   }
   if (req.method !== 'POST') return json(res, 405, { error: 'Método no permitido' }, { Allow: 'GET, POST' });
@@ -144,8 +149,8 @@ export default async function handler(req, res) {
   try {
     const { texto, meta } = await completar({
       messages: [{ role: 'system', content: system }, { role: 'user', content: conImg ? contenido : userTexto }],
-      targets: objetivos(), json: true, maxTokens, temperature: accion === 'grade' ? 0.1 : 0.4,
-      firstByteMs: 40000, totalMs: 56000, thinking: process.env.TUTOR_THINKING === '1',
+      targets: objetivos(conImg), json: true, maxTokens, temperature: accion === 'grade' ? 0.1 : 0.4,
+      firstByteMs: conImg ? 30000 : 20000, totalMs: 56000, thinking: process.env.TUTOR_THINKING === '1',
     });
     const j = parseJSON(texto);
     if (!j) return json(res, 502, { code: 'bad_output', error: 'No pude interpretar la respuesta de la IA. Inténtalo de nuevo.' });

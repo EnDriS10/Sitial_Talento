@@ -25,6 +25,8 @@ export const PROVEEDORES = {
     env: 'GEMINI_API_KEY',
     url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
     modelos: ['gemini-flash-latest', 'gemini-flash-lite-latest'],
+    // Los modelos Flash «piensan» por defecto y tardan en dar el primer byte: razonamiento mínimo
+    extra: () => ({ reasoning_effort: 'low' }),
   },
   groq: {
     env: 'GROQ_API_KEY',

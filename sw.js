@@ -22,7 +22,7 @@
    Para forzar que todos los usuarios renueven la caché de la "carcasa"
    tras un cambio grande, sube VERSION.
    ══════════════════════════════════════════════════════════════ */
-const VERSION   = 'v3';
+const VERSION   = 'v4';
 const SHELL     = 'sitial-shell-' + VERSION;
 const DATA      = 'sitial-data-' + VERSION;
 const STATIC    = 'sitial-static-' + VERSION;
@@ -194,7 +194,7 @@ self.addEventListener('fetch', (event) => {
   // Cross-origin
   if (url.origin !== location.origin) {
     if (url.hostname === 'i.imgur.com') { event.respondWith(imagenImgur(req)); return; }
-    if (/(^|\.)(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com|esm\.sh|cdn\.jsdelivr\.net|unpkg\.com)$/.test(url.hostname)) {
+    if (/(^|\.)(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\.com)$/.test(url.hostname)) {
       event.respondWith(cachePrimero(req, STATIC, true).catch(() => Response.error()));
     }
     return;
