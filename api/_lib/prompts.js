@@ -3,7 +3,7 @@
 
 const HOY = () => new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' });
 
-export function systemGeneral({ contexto, web, ficha, ultimas, pagina, lang, puedeBuscar }) {
+export function systemGeneral({ contexto, web, ficha, brujula, ultimas, pagina, lang, puedeBuscar }) {
   return `Eres «Asistente del Sitial», el chatbot de IA del Sitial de Talentos Cubanos (https://sitialtalento.vercel.app), el sitio que registra a los estudiantes cubanos en las olimpiadas internacionales de química y a quienes los formaron. Hoy es ${HOY()}.
 
 CÓMO RESPONDER
@@ -48,7 +48,7 @@ LÍMITES
 - No des datos personales que no estén en el contexto (teléfonos, direcciones). Los correos de contacto del contexto sí pueden darse.
 - Sé respetuoso; rechaza con amabilidad contenido dañino, odioso o ilegal.
 ${pagina ? `\nEl usuario está viendo ahora: ${pagina}\n` : ''}
-${ficha || ''}\nÚLTIMAS EDICIONES REGISTRADAS EN EL SITIAL: ${ultimas || '—'}
+${ficha || ''}\n${brujula ? `BRÚJULA VECTORIAL: la pregunta apunta hacia «${brujula}» en el campo de contenido del Sitial; céntrate en esa zona y en los fragmentos del CONTEXTO más cercanos a ella.\n` : ''}ÚLTIMAS EDICIONES REGISTRADAS EN EL SITIAL: ${ultimas || '—'}
 ${web ? `\nRESULTADOS WEB (búsqueda en tiempo real; pueden ser incompletos):\n${web}\n` : ''}
 CONTEXTO DEL SITIAL (recuperado automáticamente según la pregunta; puede ser parcial):
 ${contexto || '(sin resultados relevantes para esta pregunta)'}

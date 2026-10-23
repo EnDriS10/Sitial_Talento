@@ -1,6 +1,7 @@
 // Conocimiento del Banco de Problemas para el tutor: se construye UNA vez al arrancar la función
 // (enunciado, solución con esquema de puntuación, imágenes y puntos máximos) y queda en memoria.
 import { leer, evalDatos } from './kb.js';
+import { Espacio, coseno } from './vectores.js';
 
 const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ', '&hellip;': '…', '&rarr;': '→', '&larr;': '←', '&harr;': '↔', '&rlarr;': '⇄', '&minus;': '−', '&times;': '×', '&middot;': '·', '&deg;': '°', '&plusmn;': '±', '&le;': '≤', '&ge;': '≥', '&ne;': '≠', '&asymp;': '≈', '&Delta;': 'Δ', '&delta;': 'δ', '&alpha;': 'α', '&beta;': 'β', '&gamma;': 'γ', '&lambda;': 'λ', '&mu;': 'μ', '&nu;': 'ν', '&pi;': 'π', '&sigma;': 'σ', '&omega;': 'ω', '&theta;': 'θ', '&epsilon;': 'ε', '&rArr;': '⇒', '&lArr;': '⇐', '&ndash;': '–', '&mdash;': '—', '&lsquo;': '‘', '&rsquo;': '’', '&ldquo;': '“', '&rdquo;': '”', '&laquo;': '«', '&raquo;': '»', '&Aring;': 'Å', '&sup2;': '²', '&sup3;': '³' };
 const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉', '+': '₊', '-': '₋' };
@@ -62,5 +63,46 @@ export function datosProblema(id) {
     id, titulo: c.titulo, numero: c.numero, fuente: c.fuente, dificultad: m.dificultad,
     enunciado: htmlATexto(c.enunciado), solucion: solTxt, maxPuntos: max || null, baremo,
     imagenes: [...new Set(imgs)].slice(0, 4),
+    temas: [m.temas, m.temaEspecifico].flat().filter(Boolean).join(', '),
   };
+}
+
+// ── Campo vectorial del problema ─────────────────────────────────────
+// Cada problema se trocea por incisos (enunciado y solución). Una pregunta (o un texto seleccionado)
+// se proyecta sobre esos trozos para saber a QUÉ inciso apunta y qué parte de la solución importa.
+let _esp = null;
+const _trozos = new Map();
+function trocear(texto, fuente) {
+  const out = []; let id = 'general', buf = [];
+  const cierra = () => { const t = buf.join('\n').trim(); if (t) out.push({ fuente, id, texto: t.slice(0, 1800) }); buf = []; };
+  String(texto).split('\n').forEach((ln) => {
+    const m = ln.match(/^\s*((?:\([a-z0-9]+\))+)\s*(?:«[^»]*»)?\s*$/i) || ln.match(/^\s*((?:\([a-z0-9]+\))+)\s*«/i);
+    if (m) { cierra(); id = m[1]; buf.push(ln); } else buf.push(ln);
+  });
+  cierra();
+  return out;
+}
+function trozosDe(id) {
+  if (_trozos.has(id)) return _trozos.get(id);
+  const d = datosProblema(id);
+  const t = d ? [...trocear(d.enunciado, 'enunciado'), ...trocear(d.solucion, 'solucion')] : [];
+  if (!_esp) {
+    const todos = listaProblemas().flatMap((k) => { const x = datosProblema(k); return x ? [x.enunciado, x.solucion] : []; });
+    _esp = new Espacio(todos.flatMap((tx) => tx.split(/\n{2,}/)));
+  }
+  t.forEach((x) => { x.v = _esp.vec(x.id + ' ' + x.texto); });
+  _trozos.set(id, t);
+  return t;
+}
+// → { incisos:[{id, peso}], trozos:[{fuente,id,texto,sim}] } ordenado por cercanía a la pregunta
+export function enfoqueProblema(id, consulta, k = 3) {
+  const t = trozosDe(id);
+  if (!t.length || !String(consulta || '').trim()) return { incisos: [], trozos: [] };
+  const qv = _esp.vec(consulta);
+  const sc = t.map((x) => ({ ...x, sim: coseno(qv, x.v) })).sort((a, b) => b.sim - a.sim);
+  const max = sc[0].sim || 1;
+  const por = new Map();
+  sc.slice(0, 6).forEach((x) => { if (x.id !== 'general') por.set(x.id, (por.get(x.id) || 0) + Math.max(0, x.sim) / max); });
+  const tot = [...por.values()].reduce((a, b) => a + b, 0) || 1;
+  return { incisos: [...por].map(([i, w]) => ({ id: i, peso: w / tot })).sort((a, b) => b.peso - a.peso).slice(0, 2), trozos: sc.slice(0, k).map(({ v, ...r }) => r) };
 }

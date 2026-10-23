@@ -138,11 +138,20 @@ navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, st
 ### Conocimiento precargado
 Al arrancar, `kb.js` construye una **ficha base** del Sitial (olimpiadas y alias —«ibero» = OIAQ—, última edición de cada una con su delegación, otras olimpiadas, fecha de hoy) que acompaña SIEMPRE al asistente, además de los fragmentos que recupera por pregunta. Para añadir conocimiento permanente edita `Data/chatbot_guia.md`.
 
+### Campo vectorial (chatbot y tutor)
+Cada fragmento de contenido del Sitial es un **vector** y cada pregunta también; así se sabe *hacia dónde apunta* aunque no repita las palabras del contenido (`api/_lib/vectores.js`).
+- **Capa local** (siempre activa, sin API ni cuota): vectores de palabras, bigramas y trigramas de letras con pesos idf; tolera erratas y alias («ibero» ≈ OIAQ).
+- **Capa semántica** (opcional): embeddings de Gemini (`gemini-embedding-001`, 256 dim.) o Mistral. Se generan **una vez** en tu ordenador con `GEMINI_API_KEY=… node scripts/build-vectores.mjs`, que crea `Data/vectores.json` (≈1 MB); súbelo al repo. Después, cada pregunta solo calcula su propio vector. Si cambias mucho los datos, vuelve a ejecutarlo (los fragmentos cambiados se detectan por hash y usan solo la capa local hasta entonces). `CHAT_VECTORS=0` la desactiva.
+- **Dirección («brújula»)**: cada grupo (equipo·IChO, equipo·OIAQ, noticia, honor, problema…) tiene un centroide; la pregunta se proyecta sobre ellos y la dirección resultante refuerza esos fragmentos y se pasa al modelo (`BRÚJULA VECTORIAL`).
+- Puntuación final = BM25 + similitud local + similitud semántica, × refuerzo por dirección.
+- **Tutor**: cada problema se trocea por incisos (enunciado y solución) y la pregunta, o el texto seleccionado, se proyecta sobre esos trozos para saber a qué inciso apunta (`enfoqueProblema` en `api/_lib/problemas.js`).
+
 ### Banco de Problemas — tutor con IA (gratuito, con visión)
 Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmación).
 - **Preguntar al tutor** (`api/tutor.js`, acción `hint`): aclaraciones (0 %), pistas (−5 %) y pistas fuertes (−12 %) restan puntos; las preguntas obvias o que piden la respuesta se rechazan. Acepta texto o una foto de la duda.
 - **Calificar** (acción `grade`), 3 pasos rápidos: 1) un modelo con **visión** (Gemini / Mistral / Groq) transcribe las fotos o el texto y detecta qué incisos hay, cuáles faltan y si quedó cortada; 2) si solo enviaste una parte, el tutor pregunta si continúas o calificas solo lo enviado; 3) **dos modelos distintos califican en paralelo** (revisión cruzada) comparando con la solución oficial; los puntos se promedian y se acotan al baremo.
 - Sin DeepSeek ni modelos de pago: `TUTOR_VISION`, `TUTOR_GRADERS`, `TUTOR_FAST` fijan los modelos; `TUTOR_DUAL=0` desactiva la revisión cruzada. Límites: `TUTOR_HINT_DAY`, `TUTOR_GRADE_DAY`, `TUTOR_GLOBAL_DAY`.
+- **Conversar sobre la solución** (acción `discuss`, sin penalización): tras calificar aparece un chat para preguntar *cómo* y *por qué* (botones «¿Cómo se hace?» / «¿Por qué?» en cada inciso), y se puede **seleccionar cualquier texto** de la solución, de la corrección o del enunciado y pulsar «Preguntar al tutor» (en el enunciado cuenta como pista y resta puntos). La corrección y la conversación se guardan en el navegador.
 - Los problemas se cargan en memoria una vez (`api/_lib/problemas.js`), incluido el baremo por inciso (de las etiquetas «N puntos» de la solución).
 
 ### Menú hamburguesa

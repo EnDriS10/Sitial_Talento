@@ -10,7 +10,7 @@
 //           → prompt con contexto → proveedor de IA (con respaldo) → stream
 // ════════════════════════════════════════════════════════════════════
 import { buscarWeb, contextoWeb } from './_lib/web.js';
-import { obtenerKB, contextoDe, fuentesDe, resumenUltimas, fichaSitial } from './_lib/kb.js';
+import { obtenerKB, contextoDe, fuentesDe, resumenUltimas, fichaSitial, vectorPregunta, brujula } from './_lib/kb.js';
 import { planificar } from './_lib/plan.js';
 import { chatStream, proveedoresActivos, objetivos, resumenSalud } from './_lib/llm.js';
 import { MODOS } from './_lib/prompts.js';
@@ -63,11 +63,14 @@ export default async function handler(req, res) {
   const kb = obtenerKB();
   const ultimaPregunta = v.msgs.filter((m) => m.role === 'user').slice(-1)[0].content;
   const ultimas = v.msgs.filter((m) => m.role === 'user').slice(-2).map((m) => m.content).join(' ');
-  const plan = await planificar(v.msgs, resumenUltimas(), fichaSitial());
+  // «brújula» local de la pregunta (campo vectorial) para orientar al planificador
+  const dirRapida = brujula(kb.idx.direccionDe(ultimas));
+  const plan = await planificar(v.msgs, resumenUltimas(), fichaSitial(), dirRapida);
 
   // ── 2) buscar en los datos del Sitial con la consulta reformulada + la pregunta original ──
   const consulta = [plan && plan.consulta, ultimas].filter(Boolean).join(' ');
-  const fragmentos = kb.idx.buscar(consulta, { k: 8, maxChars: 7000 });
+  const vq = await vectorPregunta(consulta);            // vector semántico (si hay Data/vectores.json), si no null
+  const fragmentos = kb.idx.buscar(consulta, { k: 8, maxChars: 7000, vq });
   const pagina = body.page && typeof body.page === 'object'
     ? `${String(body.page.title || '').slice(0, 120)} (${String(body.page.path || '').slice(0, 160)})` : '';
 
@@ -75,7 +78,7 @@ export default async function handler(req, res) {
   //       asistente dice que el Sitial no tiene el dato (marcador [[BUSCAR: …]]) ──
   let web = [];
   if (modo === 'general' && plan && plan.ambito === 'actualidad' && !fragmentos.fijados && !(fragmentos.top >= 18)) web = await buscarWeb(plan.web || ultimaPregunta, lang);
-  const construir = () => MODOS[modo]({ contexto: contextoDe(fragmentos), web: contextoWeb(web), ultimas: resumenUltimas(), ficha: fichaSitial(), pagina, lang, puedeBuscar: modo === 'general' && !web.length && !webIntentada });
+  const construir = () => MODOS[modo]({ contexto: contextoDe(fragmentos), web: contextoWeb(web), ultimas: resumenUltimas(), ficha: fichaSitial(), brujula: brujula(fragmentos.direccion), pagina, lang, puedeBuscar: modo === 'general' && !web.length && !webIntentada });
   let webIntentada = web.length > 0 || (plan && plan.ambito === 'actualidad');
   let system = construir();
 

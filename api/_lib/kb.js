@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { Espacio, coseno, centroide, direccion as dirVec, cargarVectores, hashTexto, vectorConsulta, proveedorEmb } from './vectores.js';
 import { fileURLToPath } from 'node:url';
 
 // Carpeta raíz del proyecto: en Vercel los archivos listados en "includeFiles" (vercel.json)
@@ -106,8 +107,11 @@ function tokensConsulta(s) {
 }
 const ANIO_RE = /\b(19|20)\d{2}\b/g;
 
+const grupoDe = (c) => c.tipo === 'equipo' ? 'equipo·' + c.sigla
+  : (c.tipo === 'agregado' && /^a:[A-Za-z]+$/.test(c.id) && !['a:global', 'a:top', 'a:provincias', 'a:otras'].includes(c.id)) ? 'olimpiada·' + c.id.slice(2) : c.tipo;
+
 class Indice {
-  constructor(chunks) {
+  constructor(chunks, opts) {
     this.chunks = chunks;
     this.df = new Map();
     chunks.forEach((c) => {
@@ -119,13 +123,49 @@ class Indice {
       c._nombreNorm = c.nombres ? c.nombres.map(norm) : [];
       c._titleToks = new Set(tokens(c.title));
     });
+    // ── CAMPO VECTORIAL: cada fragmento = vector; cada grupo = centroide (dirección) ──
+    const textoVec = (c) => c.title + '\n' + c.text + (c.extra ? '\n' + c.extra : '');
+    this.espacio = new Espacio(chunks.map(textoVec));
+    this.centLocal = new Map(); this.centAPI = new Map();
+    const porGrupo = new Map();
+    chunks.forEach((c) => {
+      c.grupo = grupoDe(c);
+      c._v = this.espacio.vec(textoVec(c));
+      c._t = textoVec(c).slice(0, 1500);
+      c._h = hashTexto(c._t);
+      if (!porGrupo.has(c.grupo)) porGrupo.set(c.grupo, []);
+      porGrupo.get(c.grupo).push(c);
+    });
+    for (const [g, cs] of porGrupo) this.centLocal.set(g, centroide(cs.map((c) => c._v)));
+    // vectores semánticos precalculados (Data/vectores.json), solo los que siguen coincidiendo con el texto
+    this.api = null;
+    const vj = opts && opts.vectores;
+    if (vj) {
+      let ok = 0;
+      chunks.forEach((c) => { const x = vj.items.get(c.id); if (x && x.h === c._h) { c._va = x.v; ok++; } });
+      if (ok > chunks.length * 0.5) {
+        this.api = { proveedor: vj.proveedor, modelo: vj.modelo, dim: vj.dim, cubiertos: ok };
+        for (const [g, cs] of porGrupo) { const vs = cs.filter((c) => c._va).map((c) => c._va); if (vs.length) this.centAPI.set(g, centroide(vs)); }
+      }
+    }
     // última edición registrada por olimpiada (para resolver «la última IChO»)
     this.ultima = {};
     chunks.forEach((c) => { if (c.tipo === 'equipo' && c.sigla && (!this.ultima[c.sigla] || c.anio > this.ultima[c.sigla].anio)) this.ultima[c.sigla] = c; });
     this.N = chunks.length;
     this.avg = chunks.reduce((a, c) => a + c._len, 0) / Math.max(1, this.N);
   }
-  buscar(consulta, { k = 8, maxChars = 7000 } = {}) {
+  // Dirección de una pregunta en el campo vectorial: [{grupo, peso}]
+  direccionDe(consulta, vq) {
+    const qv = this.espacio.vec(consulta);
+    const dl = dirVec(qv, this.centLocal);
+    if (!(vq && this.centAPI.size)) return dl;
+    const da = dirVec(vq, this.centAPI);
+    const m = new Map();
+    dl.forEach((x) => m.set(x.grupo, (m.get(x.grupo) || 0) + 0.4 * x.peso));
+    da.forEach((x) => m.set(x.grupo, (m.get(x.grupo) || 0) + 0.6 * x.peso));
+    return [...m].map(([grupo, peso]) => ({ grupo, peso })).sort((a, b) => b.peso - a.peso).slice(0, 3);
+  }
+  buscar(consulta, { k = 8, maxChars = 7000, vq = null } = {}) {
     const q = tokensConsulta(consulta);
     if (!q.length) return [];
     let qn = norm(consulta);
@@ -136,13 +176,16 @@ class Indice {
     const mencionadas = Object.keys(SIGLAS).filter((k) => new RegExp('\\b' + k + '\\b').test(qn)).map((k) => SIGLAS[k]);
     const sinAnio = !(qn.match(ANIO_RE) || []).length;
     const fijados = [];
-    if (RECIENTE && sinAnio) {
+    if (RECIENTE && sinAnio && !/noticia|news|foto|photo|media|entrevista|interview/.test(qn)) {
       const objetivo = mencionadas.length ? mencionadas : (/internacional|olimpiada|olympiad/.test(qn) || /medallista|ganador|equipo|delegacion|team|medal/.test(qn) ? Object.keys(this.ultima) : []);
       objetivo.forEach((sg) => { if (this.ultima[sg]) fijados.push(this.ultima[sg]); });
     }
     const boosts = TIPO_TRIGGERS.filter((t) => t.re.test(qn)).concat(/next|upcoming|proxima|siguiente/.test(qn) ? [{ tipo: 'agregado', boost: 1.6 }] : []);
     const anios = qn.match(ANIO_RE) || [];
-    const scored = [];
+    const rows = [];
+    const qv = this.espacio.vec(consulta);
+    const usaAPI = !!(vq && this.api && vq.length === this.api.dim);
+    let maxS = 0;
     for (const c of this.chunks) {
       let s = 0;
       for (const t of q) {
@@ -153,7 +196,6 @@ class Indice {
         s += idf * ((tf * 2.2) / (tf + 1.2 * (0.25 + 0.75 * (c._len / this.avg))));
         if (c._titleToks.has(t)) s += idf * 1.5;
       }
-      if (!s) continue;
       // nombre completo (o casi) mencionado en la pregunta → muy relevante
       for (const n of c._nombreNorm) {
         if (qn.includes(n)) { s += 25; break; }
@@ -161,18 +203,35 @@ class Indice {
         const hit = nt.filter((x) => qn.includes(x)).length;
         if (nt.length >= 2 && hit >= 2) s += 6 * hit;
       }
-      for (const b of boosts) if (c.tipo === b.tipo) s *= b.boost;
-      // si la pregunta menciona un año, favorecer fragmentos de ese año y penalizar los de otros años
-      if (anios.length && (c.tipo === 'equipo' || c.tipo === 'cnq' || c.tipo === 'media')) {
-        const ya = (c.title.match(ANIO_RE) || []).length ? c.title.match(/\b(19|20)\d{2}\b/g) : [];
-        if (ya.length) s *= ya.some((y) => anios.includes(y)) ? 2 : 0.35;
+      if (s) {
+        for (const b of boosts) if (c.tipo === b.tipo) s *= b.boost;
+        // si la pregunta menciona un año, favorecer fragmentos de ese año y penalizar los de otros años
+        if (anios.length && (c.tipo === 'equipo' || c.tipo === 'cnq' || c.tipo === 'media')) {
+          const ya = (c.title.match(ANIO_RE) || []).length ? c.title.match(/\b(19|20)\d{2}\b/g) : [];
+          if (ya.length) s *= ya.some((y) => anios.includes(y)) ? 2 : 0.35;
+        }
+        if (c.prioridad) s *= c.prioridad;
       }
-      if (c.prioridad) s *= c.prioridad;
-      scored.push([s, c]);
+      if (s > maxS) maxS = s;
+      rows.push({ c, s, l: coseno(qv, c._v), a: usaAPI && c._va ? coseno(vq, c._va) : null });
+    }
+    // ── mezcla léxica (BM25) + vectorial (local y semántica) + dirección del campo ──
+    const ref = (arr) => { const o = arr.filter((x) => x != null).sort((x, y) => y - x); return { max: o[0] || 0, ref: o[Math.min(o.length - 1, 30)] || 0 }; };
+    const nz = (x, r) => (x != null && r.max - r.ref > 1e-9 ? Math.min(1, Math.max(0, (x - r.ref) / (r.max - r.ref))) : 0);
+    const rl = ref(rows.map((r) => r.l)), ra = usaAPI ? ref(rows.map((r) => r.a)) : null;
+    const dir = this.direccionDe(consulta, usaAPI ? vq : null);
+    const pesoGrupo = (g) => dir.reduce((a, d) => a + (d.grupo === g ? d.peso : d.grupo.split('·')[0] === g.split('·')[0] ? d.peso * 0.4 : 0), 0);
+    const W = usaAPI ? { bm: 0.45, l: 0.2, a: 0.35 } : { bm: 0.6, l: 0.4, a: 0 };
+    const scored = [];
+    for (const r of rows) {
+      const sN = maxS ? r.s / maxS : 0, lN = nz(r.l, rl), aN = usaAPI ? nz(r.a, ra) : 0;
+      if (!r.s && Math.max(lN, aN) < 0.75) continue;                  // sin pista léxica: solo si el vector la señala con fuerza
+      const f = (W.bm * sN + W.l * lN + W.a * aN) * (1 + 0.7 * pesoGrupo(r.c.grupo));
+      scored.push([f, r.c, r.s]);
     }
     scored.sort((a, b) => b[0] - a[0]);
     const fij = fijados.slice(0, 4);
-    const corte = scored.length ? Math.max(1.5, scored[0][0] * 0.18) : 0;
+    const corte = scored.length ? Math.max(0.06, scored[0][0] * 0.3) : 0;
     const out = fij.slice();
     let chars = fij.reduce((a, c) => a + c.text.length + c.title.length + 80, 0);
     for (const [sc, c] of scored) {
@@ -184,7 +243,9 @@ class Indice {
       out.push(c); chars += len;
     }
     out.fijados = fij.length;
-    out.top = scored.length ? scored[0][0] : 0;
+    out.top = maxS;
+    out.direccion = dir;
+    out.vectorial = usaAPI ? 'local+semántica' : 'local';
     return out;
   }
 }
@@ -527,8 +588,8 @@ export function obtenerKB() {
   if (_cache) return _cache;
   const t0 = Date.now();
   const chunks = construir();
-  const idx = new Indice(chunks);
-  _cache = { idx, n: chunks.length, ms: Date.now() - t0, ficha: FICHA };
+  const idx = new Indice(chunks, { vectores: process.env.CHAT_VECTORS === '0' ? null : cargarVectores(ROOT) });
+  _cache = { idx, n: chunks.length, ms: Date.now() - t0, ficha: FICHA, api: idx.api };
   return _cache;
 }
 
@@ -552,4 +613,18 @@ export function fuentesDe(chunks, max = 3) {
     if (out.length >= max) break;
   }
   return out;
+}
+
+// Vector semántico de la pregunta (si hay Data/vectores.json y clave); null si no
+export async function vectorPregunta(texto) {
+  const kb = obtenerKB();
+  if (!kb.api) return null;
+  const prov = proveedorEmb(kb.api.proveedor);
+  if (prov !== kb.api.proveedor) return null;          // hay que usar el mismo modelo que los vectores guardados
+  return vectorConsulta(prov, String(texto).slice(0, 600));
+}
+// Texto de la «brújula» que se añade al prompt
+export function brujula(dir) {
+  if (!dir || !dir.length) return '';
+  return dir.map((d) => `${d.grupo} (${Math.round(d.peso * 100)} %)`).join(', ');
 }

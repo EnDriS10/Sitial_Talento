@@ -18,7 +18,7 @@
 // Modelos configurables: TUTOR_VISION, TUTOR_GRADERS, TUTOR_FAST.
 // ════════════════════════════════════════════════════════════════════
 import { completar } from './_lib/llm.js';
-import { datosProblema } from './_lib/problemas.js';
+import { datosProblema, enfoqueProblema } from './_lib/problemas.js';
 import { ipDe, origenPermitido, limitarTutor } from './_lib/guard.js';
 
 export const config = { runtime: 'nodejs' };
@@ -114,6 +114,21 @@ ${penal ? `Nota: el estudiante usó ayudas (penalización ${penal}% que aplica e
 Responde SOLO con JSON: {"incisos":[{"id":"(a)","puntos":1,"comentario":"…","como_se_hace":"…"}],"resumen":"…","advertencias":["…"]}`;
 }
 
+function systemDiscutir(p, lang, resultado, foco) {
+  const res = resultado && Array.isArray(resultado.incisos) ? `
+════ RESOLUCIÓN DEL ESTUDIANTE Y SU CALIFICACIÓN (ya entregada) ════
+${resultado.transcripcion ? 'Transcripción:\n' + String(resultado.transcripcion).slice(0, 4000) + '\n' : ''}${resultado.incisos.slice(0, 30).map((x) => `${x.id}: ${x.puntos}/${x.max} — ${String(x.comentario || '').slice(0, 220)} | Cómo se hace: ${String(x.como_se_hace || '').slice(0, 300)}`).join('\n')}
+════ FIN ════` : '';
+  return `${REGLAS_COMUNES(p, lang)}${res}
+
+MODO CONVERSACIÓN SOBRE LA SOLUCIÓN. El estudiante YA ve la solución y/o su calificación y quiere ENTENDERLAS. No hay penalización: ayuda a fondo.
+- Explica CÓMO se hace y, sobre todo, POR QUÉ se hace así (el concepto, la ley, la razón de cada paso), con ejemplos o analogías cuando ayuden. Si cita un texto seleccionado, explícalo parte por parte.
+- Si pregunta por qué perdió puntos, compara su resolución con el esquema de puntuación con honestidad; si crees que la calificación fue demasiado dura o se leyó mal su letra, dilo (no puedes cambiar la nota, pero recomiéndale revisarlo).
+- Sé claro y didáctico, sin rodeos: normalmente 80–200 palabras; más solo si lo pide. Usa notación química clara y, si hay cálculo, muéstralo paso a paso con unidades.
+- Termina, cuando tenga sentido, con una pregunta corta para comprobar que lo entendió o proponiendo un ejercicio similar.
+${foco ? `Foco vectorial: la pregunta apunta a ${foco}.\n` : ''}Responde SOLO con JSON: {"respuesta":"…"}`;
+}
+
 function parseJSON(t) {
   const m = String(t || '').match(/\{[\s\S]*\}/);
   if (!m) return null;
@@ -144,7 +159,7 @@ export default async function handler(req, res) {
 
   let b;
   try { b = await leerBody(req); } catch (e) { return json(res, 413, { code: 'too_large', error: 'Las imágenes pesan demasiado. Envía menos fotos o más pequeñas.' }); }
-  const accion = b.action === 'grade' ? 'grade' : 'hint';
+  const accion = b.action === 'grade' ? 'grade' : b.action === 'discuss' ? 'discuss' : 'hint';
   const lang = b.lang === 'en' ? 'en' : 'es';
   const p = datosProblema(String(b.problemId || ''));
   if (!p) return json(res, 404, { code: 'no_problem', error: 'Problema no encontrado.' });
@@ -160,7 +175,10 @@ export default async function handler(req, res) {
       const lim = await limitarTutor(ipDe(req), 'hint');
       if (lim) return json(res, 429, { code: lim.codigo, error: lim.mensaje, retryAfter: lim.reintentarEn }, { 'Retry-After': String(lim.reintentarEn || 60) });
       const hist = (Array.isArray(b.history) ? b.history : []).slice(-5).map((h) => `Estudiante: ${String(h.q || '').slice(0, 300)}\nTutor: ${String(h.a || '').slice(0, 500)}`).join('\n\n');
-      const texto = (hist ? 'Conversación previa:\n' + hist + '\n\n' : '') + 'Pregunta del estudiante: ' + q;
+      const quote = String(b.quote || '').trim().slice(0, 600);
+      const foco = enfoqueProblema(p.id, q + ' ' + quote);
+      const focoTxt = foco.incisos.length ? `\n[Brújula vectorial: la pregunta apunta al inciso ${foco.incisos.map((x) => `${x.id} (${Math.round(x.peso * 100)} %)`).join(' / ')}. El coste de la pista se mide respecto a ese inciso.]` : '';
+      const texto = (hist ? 'Conversación previa:\n' + hist + '\n\n' : '') + (quote ? `Texto que seleccionó el estudiante: «${quote}»\n` : '') + 'Pregunta del estudiante: ' + q + focoTxt;
       let contenido = texto;
       if (imgs.length) {
         contenido = [{ type: 'text', text: texto }, { type: 'text', text: '[Imágenes del estudiante:]' }, ...imgs.map((u) => ({ type: 'image_url', image_url: { url: u } }))];
@@ -169,6 +187,23 @@ export default async function handler(req, res) {
       if (!j) return json(res, 502, { code: 'bad_output', error: 'No pude interpretar la respuesta de la IA. Inténtalo de nuevo.' });
       const nivel = COSTE[j.nivel] !== undefined ? j.nivel : 'pista';
       return json(res, 200, { answer: String(j.respuesta || '').slice(0, 1500), level: nivel, cost: COSTE[nivel], model: meta && meta.modelo });
+    }
+
+    // ═══════════ CONVERSAR SOBRE LA SOLUCIÓN / LA CALIFICACIÓN (sin penalización) ═══════════
+    if (accion === 'discuss') {
+      const q = String(b.question || '').trim().slice(0, 800);
+      if (!q) return json(res, 400, { code: 'bad_request', error: 'Escribe tu pregunta.' });
+      const lim = await limitarTutor(ipDe(req), 'chat');
+      if (lim) return json(res, 429, { code: lim.codigo, error: lim.mensaje, retryAfter: lim.reintentarEn }, { 'Retry-After': String(lim.reintentarEn || 60) });
+      const quote = String(b.quote || '').trim().slice(0, 1200);
+      const foco = enfoqueProblema(p.id, q + ' ' + quote);
+      const focoTxt = foco.incisos.map((x) => `${x.id} (${Math.round(x.peso * 100)} %)`).join(' / ');
+      const hist = (Array.isArray(b.history) ? b.history : []).slice(-6).map((h) => `Estudiante: ${String(h.q || '').slice(0, 400)}\nTutor: ${String(h.a || '').slice(0, 700)}`).join('\n\n');
+      const user = (hist ? 'Conversación previa:\n' + hist + '\n\n' : '') + (quote ? `Texto seleccionado por el estudiante (de ${b.fuente === 'respuesta' ? 'la solución oficial' : b.fuente === 'resultado' ? 'la corrección' : 'el enunciado'}): «${quote}»\n` : '') + 'Pregunta del estudiante: ' + q +
+        (foco.trozos.length && quote === '' ? '\n\nFragmentos más cercanos de la solución:\n' + foco.trozos.filter((t) => t.fuente === 'solucion').map((t) => t.texto.slice(0, 700)).join('\n---\n') : '');
+      const { j, meta } = await pedirJSON(GRADERS(), systemDiscutir(p, lang, b.resultado, focoTxt), user, { maxTokens: 1500, temperature: 0.3, firstByteMs: 20000 });
+      if (!j || !String(j.respuesta || '').trim()) return json(res, 502, { code: 'bad_output', error: 'No pude interpretar la respuesta de la IA. Inténtalo de nuevo.' });
+      return json(res, 200, { answer: String(j.respuesta).slice(0, 3000), model: meta && meta.modelo, foco: foco.incisos });
     }
 
     // ═══════════ CALIFICAR ═══════════
@@ -255,7 +290,7 @@ export default async function handler(req, res) {
     const adv = [...new Set(buenas.flatMap((x) => (Array.isArray(x.j.advertencias) ? x.j.advertencias : [])).map((x) => String(x).slice(0, 200)))].slice(0, 5);
     return json(res, 200, {
       incisos, max, bruto, penalizacionPct: penal, penalizacion: descuento, final,
-      maxEnviado, resumen: String(primero.resumen || '').slice(0, 800), advertencias: adv,
+      maxEnviado, transcripcion: transcripcion.slice(0, 5000), resumen: String(primero.resumen || '').slice(0, 800), advertencias: adv,
       revisionCruzada: buenas.length > 1, model: modelos,
     });
   } catch (e) {

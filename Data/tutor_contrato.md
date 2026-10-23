@@ -12,3 +12,6 @@ Implementado en `api/tutor.js` y en la pestaña «✍️ Tu respuesta» de `Prob
 
 ## Datos
 `api/_lib/problemas.js` lee `Problem_Data/*` y extrae el baremo de las líneas `(a) «2 puntos»` de la solución. Si un problema no tiene esas etiquetas (p. ej. q6), el modelo decide los máximos.
+
+## Conversar sobre la solución (sin penalización)
+`{action:'discuss', problemId, question, quote?, fuente:'respuesta'|'resultado', history, resultado?}` → `{answer, foco}`. El servidor proyecta la pregunta/selección sobre los trozos del problema (campo vectorial por incisos) y responde explicando cómo y por qué. Si la selección viene del enunciado, el cliente usa `hint` (cuesta puntos) con `quote`.
