@@ -1,7 +1,6 @@
 # Corrector de problemas con IA (DeepSeek) — contrato y bases
 
-Estado: **sin programar**. La pestaña «✍️ Tu respuesta» de `Problem_Data/visor.html` es solo un marcador.
-`api/tutor.js` devuelve 501 y `prompts.js` ya trae `systemProblema()` (sin activar en `MODOS`).
+Estado: **implementado** en `api/tutor.js` (acciones `hint` y `grade`) y en la pestaña «✍️ Tu respuesta» de `Problem_Data/visor.html`. Este documento describe el contrato.
 
 ## Flujo previsto
 1. El estudiante abre un problema y pestaña «Tu respuesta», sube 1–4 fotos de su resolución.

@@ -1,11 +1,9 @@
 // Prompts del asistente. Cada "modo" construye su propio mensaje de sistema.
-// Hoy solo existe "general" (chatbot del Sitial). Para el futuro tutor del
-// Banco de Problemas basta con añadir aquí el modo "problema" (con el
-// enunciado y la solución como contexto) y elegir el proveedor DeepSeek.
+// Chatbot general del Sitial. El tutor del Banco de Problemas tiene sus prompts en api/tutor.js.
 
 const HOY = () => new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' });
 
-export function systemGeneral({ contexto, web, ultimas, pagina, lang, puedeBuscar }) {
+export function systemGeneral({ contexto, web, ficha, ultimas, pagina, lang, puedeBuscar }) {
   return `Eres «Asistente del Sitial», el chatbot de IA del Sitial de Talentos Cubanos (https://sitialtalento.vercel.app), el sitio que registra a los estudiantes cubanos en las olimpiadas internacionales de química y a quienes los formaron. Hoy es ${HOY()}.
 
 CÓMO RESPONDER
@@ -33,7 +31,13 @@ Ya se consultó internet. Usa los RESULTADOS WEB si ayudan (cita la fuente) y NO
 ` : `
 No uses el marcador [[BUSCAR]]; si no tienes el dato, dilo con honestidad.
 `}
+FORMATO DE ENLACES (obligatorio)
+- Todo enlace va en Markdown con texto descriptivo: [Equipo de Cuba en IChO 2026](https://…). Nunca pegues la URL suelta ni entre < >, y no inventes enlaces: solo los de «Enlace:», «Fuente:» o la FICHA BASE.
+- Si respondes con datos de una página del Sitial, termina con el enlace a esa página.
+
 GUÍAS DE CALIDAD
+- El Sitial es la fuente de verdad sobre las olimpiadas de química de Cuba y está al día: úsalo con confianza y completa con la FICHA BASE (alias, últimas ediciones, delegaciones). No dudes de datos que figuran en el Sitial ni digas que «aún no ocurrió» algo que figura registrado.
+- Si buscas en internet, relaciona siempre con el tema del Sitial: olimpiadas de química, Cuba y sus resultados. Ignora resultados web que no tengan que ver (IA, informática, noticias genéricas) y no los cites.
 - Copia las URL exactamente como aparecen tras «Enlace:» o «Fuente:»; nunca las modifiques ni inventes otras. Para noticias da el titular y su enlace.
 - Cifras y rankings: usa los resúmenes del contexto; si sumas o comparas, muestra el resultado claro.
 - No inventes. Si dos datos se contradicen, indica ambos y cuál parece más fiable.
@@ -44,23 +48,13 @@ LÍMITES
 - No des datos personales que no estén en el contexto (teléfonos, direcciones). Los correos de contacto del contexto sí pueden darse.
 - Sé respetuoso; rechaza con amabilidad contenido dañino, odioso o ilegal.
 ${pagina ? `\nEl usuario está viendo ahora: ${pagina}\n` : ''}
-ÚLTIMAS EDICIONES REGISTRADAS EN EL SITIAL: ${ultimas || '—'}
+${ficha || ''}\nÚLTIMAS EDICIONES REGISTRADAS EN EL SITIAL: ${ultimas || '—'}
 ${web ? `\nRESULTADOS WEB (búsqueda en tiempo real; pueden ser incompletos):\n${web}\n` : ''}
 CONTEXTO DEL SITIAL (recuperado automáticamente según la pregunta; puede ser parcial):
 ${contexto || '(sin resultados relevantes para esta pregunta)'}
 `;
 }
 
-// ── Tutor del Banco de Problemas (BASE, aún sin conectar) ───────────────
-// Futuro: el usuario sube fotos de su resolución; DeepSeek compara con la solución
-// oficial y puntúa según los puntos (marcas) de cada inciso. Ver Data/tutor_contrato.md
-export function systemProblema({ enunciado, solucion, baremo, lang }) {
-  return `Eres el tutor de química del Sitial. Corrige la resolución del estudiante comparándola con la solución oficial y puntúa cada inciso según su baremo. Sé exigente pero constructivo; indica errores concretos y cómo corregirlos. No reveles la solución completa si el estudiante aún está intentando.
-Idioma: ${lang === 'en' ? 'English' : 'español'}.
-ENUNCIADO:\n${enunciado || ''}\n\nSOLUCIÓN OFICIAL:\n${solucion || ''}\n\nBAREMO (puntos por inciso):\n${baremo || 'no disponible'}`;
-}
-
 export const MODOS = {
   general: systemGeneral,
-  // problema: systemProblema,   ← se activará con api/tutor.js (DeepSeek); ver Data/tutor_contrato.md
 };

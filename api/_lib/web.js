@@ -28,7 +28,7 @@ async function tavily(q) {
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
     body: JSON.stringify({ query: q, max_results: 4, search_depth: 'basic', include_answer: false, topic: /noticia|news|hoy|today|ultim|latest|recent/i.test(q) ? 'news' : 'general' }),
   });
-  return (d.results || []).map((x) => ({ title: limpia(x.title, 120), url: x.url, snippet: limpia(x.content, 600) }));
+  return (d.results || []).filter((x) => x.score == null || x.score >= 0.45).map((x) => ({ title: limpia(x.title, 120), url: x.url, snippet: limpia(x.content, 600) }));
 }
 
 async function wikipedia(q, lang) {

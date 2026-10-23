@@ -10,7 +10,7 @@
 //           → prompt con contexto → proveedor de IA (con respaldo) → stream
 // ════════════════════════════════════════════════════════════════════
 import { buscarWeb, contextoWeb } from './_lib/web.js';
-import { obtenerKB, contextoDe, fuentesDe, resumenUltimas } from './_lib/kb.js';
+import { obtenerKB, contextoDe, fuentesDe, resumenUltimas, fichaSitial } from './_lib/kb.js';
 import { planificar } from './_lib/plan.js';
 import { chatStream, proveedoresActivos, objetivos, resumenSalud } from './_lib/llm.js';
 import { MODOS } from './_lib/prompts.js';
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
   const kb = obtenerKB();
   const ultimaPregunta = v.msgs.filter((m) => m.role === 'user').slice(-1)[0].content;
   const ultimas = v.msgs.filter((m) => m.role === 'user').slice(-2).map((m) => m.content).join(' ');
-  const plan = await planificar(v.msgs, resumenUltimas());
+  const plan = await planificar(v.msgs, resumenUltimas(), fichaSitial());
 
   // ── 2) buscar en los datos del Sitial con la consulta reformulada + la pregunta original ──
   const consulta = [plan && plan.consulta, ultimas].filter(Boolean).join(' ');
@@ -74,8 +74,8 @@ export default async function handler(req, res) {
   // ── 3) internet: de entrada si el planificador lo marca como actualidad; si no, solo cuando el propio
   //       asistente dice que el Sitial no tiene el dato (marcador [[BUSCAR: …]]) ──
   let web = [];
-  if (modo === 'general' && plan && plan.ambito === 'actualidad') web = await buscarWeb(plan.web || ultimaPregunta, lang);
-  const construir = () => MODOS[modo]({ contexto: contextoDe(fragmentos), web: contextoWeb(web), ultimas: resumenUltimas(), pagina, lang, puedeBuscar: modo === 'general' && !web.length && !webIntentada });
+  if (modo === 'general' && plan && plan.ambito === 'actualidad' && !fragmentos.fijados && !(fragmentos.top >= 18)) web = await buscarWeb(plan.web || ultimaPregunta, lang);
+  const construir = () => MODOS[modo]({ contexto: contextoDe(fragmentos), web: contextoWeb(web), ultimas: resumenUltimas(), ficha: fichaSitial(), pagina, lang, puedeBuscar: modo === 'general' && !web.length && !webIntentada });
   let webIntentada = web.length > 0 || (plan && plan.ambito === 'actualidad');
   let system = construir();
 
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     return {};
   }
   const emitirMeta = (m) => send({ t: 'meta', provider: m.proveedor, model: m.modelo,
-    sources: fuentesDe(fragmentos, 3).concat(web.slice(0, 2).map((x) => ({ title: x.title, url: x.url, web: true }))).slice(0, 4), web: web.length > 0 });
+    sources: fuentesDe(fragmentos, 3), web: web.length > 0 });
 
   try {
     let r = await generar(system);

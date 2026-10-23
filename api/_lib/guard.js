@@ -98,3 +98,17 @@ export async function limitar(ip) {
   }
   return null;
 }
+
+// Límites propios del tutor del Banco de Problemas (más estrictos: cada llamada es más cara)
+export async function limitarTutor(ip, tipo) {
+  const dia = new Date().toISOString().slice(0, 10);
+  const maxDia = tipo === 'grade' ? Number(process.env.TUTOR_GRADE_DAY || 8) : Number(process.env.TUTOR_HINT_DAY || 40);
+  const [m, d] = await Promise.all([incr(`tutor:m:${ip}`, 60), incr(`tutor:${tipo}:${dia}:${ip}`, 86400)]);
+  if (m.n > 6) return { codigo: 'rate_minute', mensaje: 'Vas demasiado rápido. Espera un momento.', reintentarEn: m.ttl };
+  if (d.n > maxDia) return { codigo: 'rate_day', mensaje: tipo === 'grade' ? 'Has llegado al límite diario de calificaciones. Vuelve mañana.' : 'Has llegado al límite diario de preguntas al tutor. Vuelve mañana.', reintentarEn: d.ttl };
+  if (process.env.UPSTASH_REDIS_REST_URL) {
+    const g = await incr(`tutor:g:${dia}`, 86400);
+    if (g.n > Number(process.env.TUTOR_GLOBAL_DAY || 300)) return { codigo: 'global_day', mensaje: 'El tutor alcanzó su límite diario. Vuelve mañana.', reintentarEn: g.ttl };
+  }
+  return null;
+}

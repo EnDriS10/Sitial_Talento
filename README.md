@@ -136,8 +136,18 @@ navegador (Assets/UI/chatbot.js) ──POST──► /api/chat (Vercel, Node, st
 3. **Internet después** (`api/_lib/web.js`): si es de actualidad, o si el asistente responde `[[BUSCAR: …]]` porque el Sitial no tiene el dato. Usa Tavily con `TAVILY_API_KEY` (plan gratuito) o Wikipedia sin clave.
 4. **Guidelines** en `api/_lib/prompts.js` y `Data/chatbot_guia.md`.
 
-### Banco de Problemas
-Pestañas Enunciado · ✍️ Tu respuesta (marcador del futuro corrector con DeepSeek: `Data/tutor_contrato.md`, `api/tutor.js`) · 🔑 Respuesta (pide confirmación).
+### Conocimiento precargado
+Al arrancar, `kb.js` construye una **ficha base** del Sitial (olimpiadas y alias —«ibero» = OIAQ—, última edición de cada una con su delegación, otras olimpiadas, fecha de hoy) que acompaña SIEMPRE al asistente, además de los fragmentos que recupera por pregunta. Para añadir conocimiento permanente edita `Data/chatbot_guia.md`.
+
+### Banco de Problemas — tutor con IA (DeepSeek)
+Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmación).
+- **Preguntar al tutor** (`api/tutor.js`, acción `hint`): aclaraciones (0 %), pistas (−5 %) y pistas fuertes (−12 %) restan puntos; las preguntas obvias o que piden la respuesta se rechazan.
+- **Calificar** (acción `grade`): subes fotos (se reducen en el navegador) o texto; DeepSeek (`deepseek-flash`, con visión) compara con la solución oficial y el esquema de puntos de `Problem_Data/problemas_contenido.html` y devuelve la puntuación por inciso, comentarios y cómo se resuelve. Penalización máx. 40 %.
+- Modelos: `TUTOR_TARGETS` (por defecto `deepseek:deepseek-flash,gemini:gemini-flash-latest,mistral:mistral-small-latest`). Límites: `TUTOR_HINT_DAY`, `TUTOR_GRADE_DAY`, `TUTOR_GLOBAL_DAY`.
+- Los problemas se cargan en memoria una vez (`api/_lib/problemas.js`); el máximo de puntos sale de las etiquetas «N puntos» de la solución.
+
+### Menú hamburguesa
+`Assets/UI/menu.js` añade el menú a media, noticias, Banco de Problemas, equipos y visor; en todas las páginas no muestra la sección donde ya estás.
 
 ## 🛠️ Notas técnicas (lecciones aprendidas)
 

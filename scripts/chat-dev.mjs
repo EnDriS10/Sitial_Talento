@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chat from '../api/chat.js';
+import tutor from '../api/tutor.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT || 3000);
@@ -16,12 +17,12 @@ const REWRITES = { '/media': '/media.html', '/noticias': '/noticias.html', '/Ban
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
-  if (url.pathname === '/api/chat') {
+  if (url.pathname === '/api/chat' || url.pathname === '/api/tutor') {
     if (req.method === 'POST') {
       const partes = []; for await (const c of req) partes.push(c);
       try { req.body = JSON.parse(Buffer.concat(partes).toString('utf8') || '{}'); } catch (e) { req.body = {}; }
     }
-    return chat(req, res);
+    return (url.pathname === '/api/tutor' ? tutor : chat)(req, res);
   }
   let p = REWRITES[url.pathname] || decodeURIComponent(url.pathname);
   if (p.endsWith('/')) p += 'index.html';

@@ -37,7 +37,7 @@ const OL_LONG = {
   OCACQ: 'Olimpiada Centroamericana y del Caribe de Química (OCACQ)',
 };
 
-function leer(rel) {
+export function leer(rel) {
   try { return fs.readFileSync(path.join(ROOT, rel), 'utf8'); } catch (e) { return null; }
 }
 function scripts(html) {
@@ -48,7 +48,7 @@ function scripts(html) {
   return out;
 }
 // Ejecuta el JS de un archivo de datos en un sandbox y devuelve las variables pedidas.
-function evalDatos(html, nombres) {
+export function evalDatos(html, nombres) {
   const code = scripts(html).filter((s) => !/application\/json/.test(s.attrs)).map((s) => s.body).join('\n');
   if (!code.trim()) return {};
   const sandbox = { window: {}, console: { log() {}, warn() {}, error() {} } };
@@ -96,7 +96,7 @@ const SIN = {
   mentor: 'mentor', province: 'provincia', provinces: 'provincias', results: 'resultados', ranking: 'ranking', students: 'estudiantes',
   student: 'estudiante', contact: 'contacto', email: 'correo', export: 'exportar', print: 'imprimir', install: 'instalar',
   offline: 'offline', hall: 'sitial', honor: 'honor', national: 'nacional', contest: 'concurso', competition: 'concurso', difficulty: 'dificultad',
-  winners: 'medallistas', winner: 'medallista', medalists: 'medallistas', medallists: 'medallistas', latest: 'ultima', last: 'ultima', recent: 'ultima', current: 'ultima', won: 'medallas', participated: 'participantes', cuban: 'cuba', cubans: 'cuba', total: 'total', most: 'mas', best: 'mejor', how: 'como', host: 'sede', venue: 'sede', city: 'sede', year: 'ano',
+  ibero: 'oiaq', iberoamericana: 'oiaq', iberoamericano: 'oiaq', iberoamerica: 'oiaq', centroamericana: 'ocacq', caribe: 'ocacq', mendeleev: 'imcho', mendeleiev: 'imcho', mendeleyev: 'imcho', otras: 'otras olimpiadas', winners: 'medallistas', winner: 'medallista', medalists: 'medallistas', medallists: 'medallistas', latest: 'ultima', last: 'ultima', recent: 'ultima', current: 'ultima', won: 'medallas', participated: 'participantes', cuban: 'cuba', cubans: 'cuba', total: 'total', most: 'mas', best: 'mejor', how: 'como', host: 'sede', venue: 'sede', city: 'sede', year: 'ano',
 };
 function tokensConsulta(s) {
   const base = tokens(s);
@@ -128,7 +128,8 @@ class Indice {
   buscar(consulta, { k = 8, maxChars = 7000 } = {}) {
     const q = tokensConsulta(consulta);
     if (!q.length) return [];
-    const qn = norm(consulta);
+    let qn = norm(consulta);
+    if (/\b(este ano|this year|ano actual|actual(mente)?)\b/.test(qn) && !(qn.match(ANIO_RE) || []).length) { const y = String(new Date().getFullYear()); qn += ' ' + y; q.push(y); }
     // intención: «última/reciente/actual» + (olimpiada) → fijar la edición más reciente
     const RECIENTE = /\b(ultim[oa]s?|reciente|recientes|actual|pasad[oa]|este ano|latest|last|recent|current|newest)\b/.test(qn);
     const SIGLAS = { icho: 'IChO', imcho: 'IMChO', oiaq: 'OIAQ', ocacq: 'OCACQ' };
@@ -285,6 +286,52 @@ function construir() {
       id: 'e:' + key, tipo: 'equipo', title: `Equipo de Cuba en ${sigla} ${año}`, text: txt,
       extra: `${r.sede || ''} ${r.largo || ''}`, url: urlEquipo(r), etiqueta: `Equipo ${sigla} ${año}`,
       nombres: [], prioridad: 1.1, sigla, anio: Number(año),
+    });
+  }
+
+
+  // ── 2b) FICHA BASE: conocimiento precargado que acompaña SIEMPRE al asistente ──
+  {
+    const hoy = new Date();
+    const ALIAS = {
+      IChO: 'Olimpiada Internacional de Química (alias: «internacional», «la IChO»)',
+      IMChO: 'Olimpiada Internacional Mendeléiev de Química (alias: Mendeléiev, Mendeleev)',
+      OIAQ: 'Olimpiada Iberoamericana de Química (alias: «ibero», Iberoamericana)',
+      OCACQ: 'Olimpiada Centroamericana y del Caribe de Química (alias: «centro», «caribe», Centroamericana)',
+    };
+    const lineas = [];
+    for (const sg of ['IChO', 'IMChO', 'OIAQ', 'OCACQ']) {
+      const ks = [...eq.keys()].filter((k) => k.startsWith(sg + '|')).map((k) => Number(k.split('|')[1])).sort((a, b) => a - b);
+      if (!ks.length) continue;
+      const ult = eq.get(sg + '|' + ks[ks.length - 1]);
+      const miembros = ult.est.slice().sort((a, b) => (orden[a.medalla] ?? 9) - (orden[b.medalla] ?? 9)).map((x) => `${x.nombre} (${(MEDAL[x.medalla] || x.medalla).toLowerCase()})`).join(', ');
+      lineas.push(`- ${sg} = ${ALIAS[sg]}. Cuba ha participado en ${ks.length} ediciones (${ks[0]}–${ks[ks.length - 1]}). ÚLTIMA registrada: ${ks[ks.length - 1]}, sede ${ult.r.sede || '?'} ${ult.r.pais || ''}. Delegación cubana: ${miembros}. Página: ${urlEquipo(ult.r)}`);
+    }
+    const otrasPor = new Map();
+    otras.forEach((r) => { const k = (r.Olimp || 'Otras') + '|' + (r.Olimpiada || ''); if (!otrasPor.has(k)) otrasPor.set(k, new Set()); otrasPor.get(k).add(r.año); });
+    const otrasTxt = [...otrasPor].map(([k, ys]) => { const [sg, nm] = k.split('|'); return `${sg}${nm ? ' (' + nm + ')' : ''}: ${[...ys].sort().join(', ')}`; }).join('; ');
+    FICHA = `FICHA BASE DEL SITIAL (conocimiento permanente; el Sitial está siempre actualizado a la fecha de hoy)
+Hoy es ${hoy.toISOString().slice(0, 10)}; el año en curso es ${hoy.getFullYear()}. «Este año» = ${hoy.getFullYear()}. Si el Sitial ya registra una edición de este año, esa edición YA ocurrió y sus datos son oficiales: respóndelos con seguridad; nunca digas que «aún no ha tenido lugar» algo que figura aquí.
+Olimpiadas con delegación de Cuba registradas:
+${lineas.join('\n')}
+- Otras olimpiadas con participación cubana (sección «Otras», se ven en /Equipo/Otros/<año>/<sigla>): ${otrasTxt || '—'}.
+- CNQ = Concurso/Olimpiada Nacional Cubana de Química (décimo, onceno y duodécimo grado; ranking, exámenes y estadísticas por provincia).
+Todo lo anterior es de Cuba. Cuando busques en internet, el tema es siempre las olimpiadas de química, sus resultados y Cuba (nunca IA, informática ni otras materias), salvo que la pregunta sea claramente de otro asunto.`;
+  }
+
+
+  // Otras olimpiadas (no IChO/IMChO/OIAQ/OCACQ): todos los participantes en un solo fragmento
+  {
+    const sg = [...new Set(otras.map((r) => r.Olimp || 'Otras'))];
+    const partes = [];
+    for (const [key, e] of eq) {
+      const [sigla, año] = key.split('|');
+      if (!sg.includes(sigla) || !e.est.length) continue;
+      partes.push(`${sigla} ${año} (${e.r.largo || ''}, sede ${e.r.sede || '?'}): ` + e.est.map((x) => `${x.nombre} (${(MEDAL[x.medalla] || x.medalla).toLowerCase()})`).join(', ') + ` — ${urlEquipo(e.r)}`);
+    }
+    if (partes.length) add({
+      id: 'a:otras', tipo: 'agregado', title: 'Otras olimpiadas internacionales (distintas de IChO, IMChO, OIAQ y OCACQ): estudiantes cubanos participantes',
+      text: partes.join('\n'), url: abs('/Historial_Eventos'), etiqueta: 'Otras olimpiadas', prioridad: 1.4,
     });
   }
 
@@ -474,17 +521,19 @@ function construir() {
   return chunks;
 }
 
+let FICHA = '';
 let _cache = null;
 export function obtenerKB() {
   if (_cache) return _cache;
   const t0 = Date.now();
   const chunks = construir();
   const idx = new Indice(chunks);
-  _cache = { idx, n: chunks.length, ms: Date.now() - t0 };
+  _cache = { idx, n: chunks.length, ms: Date.now() - t0, ficha: FICHA };
   return _cache;
 }
 
 // Una línea con la última edición registrada de cada olimpiada (siempre va al prompt)
+export function fichaSitial() { return obtenerKB().ficha; }
 export function resumenUltimas() {
   const u = obtenerKB().idx.ultima;
   return Object.keys(u).map((k) => `${k} ${u[k].anio} (${u[k].url})`).join('; ');

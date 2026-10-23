@@ -149,6 +149,33 @@
         color: var(--text-muted); border-bottom: 2.5px solid transparent; transition: color .18s, border-color .18s;
     }
     .pv-tab:hover { color: var(--text); }
+    .pv-tu2 section { border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; background: rgba(128,128,128,.04); }
+    .pv-tu2 h2 { margin: 0 0 4px; font-size: 1.15rem; }
+    .pv-tu2 .pv-note { font-size: .88rem; color: var(--text-muted, inherit); margin: 0 0 12px; line-height: 1.45; }
+    .pv-tu2 textarea { width: 100%; box-sizing: border-box; min-height: 70px; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: inherit; font: inherit; resize: vertical; }
+    .pv-tu2 .pv-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+    .pv-tu2 .pv-b { padding: 9px 16px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: inherit; font: inherit; cursor: pointer;  display: inline-flex; align-items: center; }
+    .pv-tu2 .pv-b.pv-main { background: var(--gold); color: #241c02; border-color: var(--gold); font-weight: 600; }
+    .pv-tu2 .pv-b:disabled { opacity: .5; cursor: wait; }
+    .pv-tu2 .pv-pen { font-size: .85rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); margin-left: auto; }
+    .pv-tu2 .pv-pen.alta { border-color: #c0392b; color: #c0392b; }
+    .pv-tu2 .pv-msg { margin: 12px 0 0; }
+    .pv-tu2 .pv-q { background: rgba(128,128,128,.12); border-radius: 10px 10px 2px 10px; padding: 8px 12px; margin-left: 12%; white-space: pre-wrap; }
+    .pv-tu2 .pv-a { border: 1px solid var(--border); border-radius: 10px 10px 10px 2px; padding: 8px 12px; margin-right: 8%; margin-top: 6px; white-space: pre-wrap; line-height: 1.5; }
+    .pv-tu2 .pv-chip { display: inline-block; font-size: .72rem; margin-top: 6px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-muted, inherit); }
+    .pv-tu2 .pv-chip.c { border-color: var(--gold); color: var(--gold); }
+    .pv-tu2 .pv-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .pv-tu2 .pv-thumb { position: relative; width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: .7rem; text-align: center; padding: 4px; box-sizing: border-box; }
+    .pv-tu2 .pv-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .pv-tu2 .pv-thumb button { position: absolute; top: 2px; right: 2px; z-index: 2; border: 0; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; background: rgba(0,0,0,.65); color: #fff; line-height: 1; }
+    .pv-tu2 .pv-score { text-align: center; padding: 14px; border-radius: 12px; border: 1px solid var(--gold); margin: 12px 0; }
+    .pv-tu2 .pv-score b { font-size: 2rem; display: block; color: var(--gold); }
+    .pv-tu2 .pv-inc { border-top: 1px solid var(--border); padding: 10px 0; }
+    .pv-tu2 .pv-inc summary { cursor: pointer; display: flex; gap: 10px; align-items: baseline; }
+    .pv-tu2 .pv-inc .pv-pts { margin-left: auto; font-weight: 700; white-space: nowrap; }
+    .pv-tu2 .pv-inc p { margin: 8px 0 0; line-height: 1.5; white-space: pre-wrap; }
+    .pv-tu2 .pv-err { color: #c0392b; margin-top: 10px; }
+    .pv-tu2 .pv-legal { font-size: .78rem; color: var(--text-muted, inherit); text-align: center; }
     .pv-tu { border: 1px dashed var(--border); border-radius: 14px; padding: 26px 22px; text-align: center; background: rgba(128,128,128,.05); }
     .pv-tu h2 { margin: 0 0 4px; font-size: 1.25rem; }
     .pv-tu .pv-soon { display: inline-block; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 10px; margin-bottom: 12px; }
@@ -543,11 +570,17 @@
 const _PVT = {
     es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta', tabTu: '✍️ Tu respuesta',
           confTitulo: '¿Ver la respuesta?', confTexto: '¿Estás seguro de que quieres ver la respuesta? Intenta resolver el problema primero: así se aprende (y se entrena) mucho más.', confSi: 'Sí, ver la respuesta', confNo: 'Seguir intentándolo',
-          tuTitulo: 'Tu respuesta', tuSoon: 'Próximamente', tuTexto: 'Aquí podrás subir fotos de tu resolución y una IA la revisará y la puntuará según los puntos de cada inciso.', tuPasos: ['Sube fotos de tu resolución', 'La IA la compara con la solución oficial', 'Recibes la puntuación por inciso y comentarios'], tuBtn: 'Subir fotos (no disponible aún)',
+          tuTitulo: 'Tu respuesta', tuAskH: 'Pregunta al tutor', tuAskNote: 'Puedes pedir aclaraciones o pistas. Cada ayuda resta puntos a tu nota final; las preguntas obvias o que piden la respuesta se rechazan.', tuAskPh: 'Escribe tu duda sobre el problema…', tuAsk: 'Preguntar', tuAskPhoto: '📎 Foto de tu duda',
+          tuPen: 'Penalización por ayudas', tuReset: 'Empezar de nuevo', tuCost: { aclaracion: 'Aclaración · sin coste', pista: 'Pista · −5 %', pista_fuerte: 'Pista fuerte · −12 %', rechazada: 'Pregunta rechazada · sin coste' },
+          tuGradeH: 'Sube tu resolución', tuGradeNote: 'Sube fotos de tu resolución (o un archivo de texto). La IA la compara con la solución oficial y la puntúa por inciso.', tuFiles: '📷 Añadir fotos / archivos', tuNotes: 'Notas o respuesta escrita (opcional)', tuGrade: 'Calificar mi resolución', tuGrading: 'Calificando… (puede tardar hasta un minuto)', tuAsking: 'Pensando…',
+          tuRes: 'Resultado', tuRaw: 'Puntos obtenidos', tuFinal: 'Nota final', tuHow: 'Cómo se resuelve', tuWarn: 'Avisos', tuErr: 'No se pudo completar la solicitud.', tuNoApi: 'El tutor solo funciona en la versión alojada en Vercel.', tuMax: 'máx.', tuLegal: 'La corrección la hace una IA y puede equivocarse: úsala como guía de entrenamiento.', tuRemove: 'Quitar', tuTooMany: 'Máximo 4 archivos.',
           error: 'No se pudo cargar este problema.', volver: '← Volver al Banco de Problemas' },
     en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer', tabTu: '✍️ Your answer',
           confTitulo: 'View the answer?', confTexto: 'Are you sure you want to see the answer? Try solving the problem first: you learn (and train) much more that way.', confSi: 'Yes, show the answer', confNo: 'Keep trying',
-          tuTitulo: 'Your answer', tuSoon: 'Coming soon', tuTexto: 'Here you will be able to upload photos of your solution and an AI will review it and score it using the marks of each part.', tuPasos: ['Upload photos of your solution', 'The AI compares it with the official solution', 'You get a score per part plus feedback'], tuBtn: 'Upload photos (not available yet)',
+          tuTitulo: 'Your answer', tuAskH: 'Ask the tutor', tuAskNote: 'You can ask for clarifications or hints. Every help costs points from your final mark; obvious questions or requests for the answer are declined.', tuAskPh: 'Type your question about the problem…', tuAsk: 'Ask', tuAskPhoto: '📎 Photo of your question',
+          tuPen: 'Penalty for help', tuReset: 'Start over', tuCost: { aclaracion: 'Clarification · no cost', pista: 'Hint · −5 %', pista_fuerte: 'Strong hint · −12 %', rechazada: 'Declined · no cost' },
+          tuGradeH: 'Upload your solution', tuGradeNote: 'Upload photos of your solution (or a text file). The AI compares it with the official solution and scores each part.', tuFiles: '📷 Add photos / files', tuNotes: 'Notes or written answer (optional)', tuGrade: 'Grade my solution', tuGrading: 'Grading… (can take up to a minute)', tuAsking: 'Thinking…',
+          tuRes: 'Result', tuRaw: 'Points earned', tuFinal: 'Final mark', tuHow: 'How it is solved', tuWarn: 'Warnings', tuErr: 'The request could not be completed.', tuNoApi: 'The tutor only works on the Vercel-hosted version.', tuMax: 'max', tuLegal: 'The marking is done by an AI and can make mistakes: use it as a training guide.', tuRemove: 'Remove', tuTooMany: 'Maximum 4 files.',
           error: 'This problem could not be loaded.', volver: '← Back to Problem Bank' }
 };
 function _pvLang() {
@@ -845,7 +878,7 @@ async function pvRender() {
     document.title = titulo + ' — Sitial de Talentos';
 
     const cuerpo = _pvTab === 'tu-respuesta'
-        ? `<div class="pv-tu"><span class="pv-soon">${_pvT('tuSoon')}</span><h2>${_pvT('tuTitulo')}</h2><p>${_pvT('tuTexto')}</p><ol>${_pvT('tuPasos').map((x) => `<li>${x}</li>`).join('')}</ol><button type="button" disabled>${_pvT('tuBtn')}</button></div>`
+        ? '<div class="pv-tu2" id="pv-tu-root"></div>'
         : (p[_pvTab] || '<p>Contenido no disponible.</p>');
 
     document.getElementById('pv-main').innerHTML = `
@@ -868,6 +901,134 @@ async function pvRender() {
     if (window.MolGraph) await window.MolGraph.renderAll(articulo);
     MolZoomUI.decorate(articulo);
     pvRenderGalerias(articulo);
+    if (_pvTab === 'tu-respuesta') pvTutorInit();
+}
+
+
+// ══════════════ Tutor con IA (pestaña «Tu respuesta») ══════════════
+// Pistas (cuestan puntos) + calificación de fotos de tu resolución por inciso.
+// Habla con /api/tutor (DeepSeek con visión; ver api/tutor.js y Data/tutor_contrato.md).
+const _TU_API = (location.pathname.replace(/(Banco_Problemas\/[^/]+\/[^/]+|Problem_Data\/visor\.html)$/, '')) + 'api/tutor';
+const _tuEsc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let _tuFiles = [];   // [{kind:'img', data, name} | {kind:'txt', text, name}]
+function _tuLoad() { try { return JSON.parse(localStorage.getItem('pvTutor:' + _pvId)) || { hints: [] }; } catch (e) { return { hints: [] }; } }
+function _tuSave(st) { try { localStorage.setItem('pvTutor:' + _pvId, JSON.stringify(st)); } catch (e) {} }
+function _tuPct(st) { return Math.min(40, st.hints.reduce((a, h) => a + (h.cost || 0), 0)); }
+
+// Reduce la foto (lado máx. 1400 px, JPEG) para que quepa en la petición
+function _tuComprimir(file) {
+    return new Promise((ok, fail) => {
+        const fr = new FileReader();
+        fr.onerror = () => fail(new Error('read'));
+        fr.onload = () => {
+            const im = new Image();
+            im.onerror = () => fail(new Error('img'));
+            im.onload = () => {
+                const k = Math.min(1, 1400 / Math.max(im.width, im.height));
+                const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+                const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+                ok(c.toDataURL('image/jpeg', 0.8));
+            };
+            im.src = fr.result;
+        };
+        fr.readAsDataURL(file);
+    });
+}
+async function _tuLeerArchivos(files, destino, max) {
+    for (const f of files) {
+        if (destino.length >= max) { alert(_pvT('tuTooMany')); break; }
+        try {
+            if (/^image\//.test(f.type)) destino.push({ kind: 'img', data: await _tuComprimir(f), name: f.name });
+            else if (/^text\/|\.(txt|md|tex)$/i.test(f.name)) destino.push({ kind: 'txt', text: (await f.text()).slice(0, 6000), name: f.name });
+        } catch (e) { /* archivo no legible: se ignora */ }
+    }
+}
+async function _tuPost(body) {
+    let r;
+    try { r = await fetch(_TU_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, problemId: _pvId, lang: _pvLang() }) }); }
+    catch (e) { throw new Error(_pvT('tuNoApi')); }
+    let j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j) throw new Error((j && j.error) || (r.status === 404 || r.status === 405 ? _pvT('tuNoApi') : _pvT('tuErr')));
+    return j;
+}
+function _tuThumbs(arr, cont, onChange) {
+    cont.innerHTML = arr.map((f, i) => `<div class="pv-thumb">${f.kind === 'img' ? `<img src="${f.data}" alt="">` : _tuEsc(f.name)}<button type="button" data-i="${i}" title="${_pvT('tuRemove')}">×</button></div>`).join('');
+    cont.querySelectorAll('button').forEach((b) => { b.onclick = () => { arr.splice(+b.dataset.i, 1); onChange(); }; });
+}
+
+function pvTutorInit() {
+    const root = document.getElementById('pv-tu-root'); if (!root) return;
+    const st = _tuLoad();
+    let fotoDuda = [];
+    _tuFiles = [];
+    root.innerHTML = `
+      <section id="tu-ask">
+        <h2>💡 ${_pvT('tuAskH')} <span class="pv-pen" id="tu-pen"></span></h2>
+        <p class="pv-note">${_pvT('tuAskNote')}</p>
+        <div id="tu-log"></div>
+        <textarea id="tu-q" maxlength="600" placeholder="${_tuEsc(_pvT('tuAskPh'))}"></textarea>
+        <div class="pv-thumbs" id="tu-qth"></div>
+        <div class="pv-row">
+          <button type="button" class="pv-b pv-main" id="tu-send">${_pvT('tuAsk')}</button>
+          <label class="pv-b" style="cursor:pointer">${_pvT('tuAskPhoto')}<input type="file" accept="image/*" id="tu-qf" hidden></label>
+          <button type="button" class="pv-b" id="tu-reset">${_pvT('tuReset')}</button>
+        </div>
+        <div class="pv-err" id="tu-qerr"></div>
+      </section>
+      <section id="tu-grade">
+        <h2>📷 ${_pvT('tuGradeH')}</h2>
+        <p class="pv-note">${_pvT('tuGradeNote')}</p>
+        <div class="pv-row"><label class="pv-b" style="cursor:pointer">${_pvT('tuFiles')}<input type="file" accept="image/*,.txt,.md,text/plain" multiple id="tu-gf" hidden></label></div>
+        <div class="pv-thumbs" id="tu-gth"></div>
+        <p class="pv-note" style="margin-top:12px">${_pvT('tuNotes')}</p>
+        <textarea id="tu-notes" maxlength="6000"></textarea>
+        <div class="pv-row"><button type="button" class="pv-b pv-main" id="tu-go">${_pvT('tuGrade')}</button></div>
+        <div class="pv-err" id="tu-gerr"></div>
+        <div id="tu-out"></div>
+        <p class="pv-legal">${_pvT('tuLegal')}</p>
+      </section>`;
+    const $ = (id) => document.getElementById(id);
+    const pintaPen = () => { const x = _tuPct(st); $('tu-pen').textContent = _pvT('tuPen') + ': −' + x + ' %'; $('tu-pen').classList.toggle('alta', x >= 20); };
+    const pintaLog = () => {
+        $('tu-log').innerHTML = st.hints.map((h) => `<div class="pv-msg"><div class="pv-q">${_tuEsc(h.q)}</div><div class="pv-a">${_tuEsc(h.a)}<br><span class="pv-chip ${h.cost ? 'c' : ''}">${_tuEsc((_pvT('tuCost') || {})[h.level] || h.level)}</span></div></div>`).join('');
+    };
+    pintaPen(); pintaLog();
+
+    const redibujaQ = () => _tuThumbs(fotoDuda, $('tu-qth'), redibujaQ);
+    $('tu-qf').onchange = async (e) => { fotoDuda = []; await _tuLeerArchivos(e.target.files, fotoDuda, 1); e.target.value = ''; redibujaQ(); };
+    $('tu-send').onclick = async () => {
+        const q = $('tu-q').value.trim(); if (!q) return;
+        $('tu-qerr').textContent = ''; $('tu-send').disabled = true; const old = $('tu-send').textContent; $('tu-send').textContent = _pvT('tuAsking');
+        try {
+            const r = await _tuPost({ action: 'hint', question: q, history: st.hints.slice(-5).map((h) => ({ q: h.q, a: h.a })), images: fotoDuda.filter((f) => f.kind === 'img').map((f) => f.data) });
+            st.hints.push({ q, a: r.answer, level: r.level, cost: r.cost }); _tuSave(st);
+            $('tu-q').value = ''; fotoDuda = []; $('tu-qth').innerHTML = ''; pintaPen(); pintaLog();
+        } catch (e) { $('tu-qerr').textContent = e.message; }
+        $('tu-send').disabled = false; $('tu-send').textContent = old;
+    };
+    $('tu-reset').onclick = () => { st.hints = []; _tuSave(st); _tuFiles = []; $('tu-out').innerHTML = ''; _tuThumbs(_tuFiles, $('tu-gth'), () => {}); pintaPen(); pintaLog(); };
+
+    const redibujaG = () => _tuThumbs(_tuFiles, $('tu-gth'), redibujaG);
+    $('tu-gf').onchange = async (e) => { await _tuLeerArchivos(e.target.files, _tuFiles, 4); e.target.value = ''; redibujaG(); };
+    $('tu-go').onclick = async () => {
+        $('tu-gerr').textContent = ''; $('tu-out').innerHTML = '';
+        $('tu-go').disabled = true; const old = $('tu-go').textContent; $('tu-go').textContent = _pvT('tuGrading');
+        try {
+            const r = await _tuPost({
+                action: 'grade', images: _tuFiles.filter((f) => f.kind === 'img').map((f) => f.data),
+                texts: _tuFiles.filter((f) => f.kind === 'txt').map((f) => f.text).concat($('tu-notes').value.trim() ? [$('tu-notes').value.trim()] : []),
+                hints: st.hints.map((h) => ({ level: h.level })),
+            });
+            const fm = (n) => String(Math.round(n * 100) / 100).replace('.', _pvLang() === 'es' ? ',' : '.');
+            $('tu-out').innerHTML = `<div class="pv-score"><small>${_pvT('tuFinal')}</small><b>${fm(r.final)} / ${fm(r.max)}</b>
+                <small>${_pvT('tuRaw')}: ${fm(r.bruto)}${r.penalizacionPct ? ` · ${_pvT('tuPen')}: −${fm(r.penalizacion)} (${r.penalizacionPct} %)` : ''}</small></div>
+                <p>${_tuEsc(r.resumen)}</p>
+                ${r.advertencias && r.advertencias.length ? `<p class="pv-note">⚠️ ${_pvT('tuWarn')}: ${r.advertencias.map(_tuEsc).join(' · ')}</p>` : ''}
+                ${r.incisos.map((x) => `<details class="pv-inc"><summary><strong>${_tuEsc(x.id)}</strong><span>${_tuEsc(x.comentario)}</span><span class="pv-pts">${fm(x.puntos)} / ${fm(x.max)}</span></summary><p><strong>${_pvT('tuHow')}:</strong>\n${_tuEsc(x.como_se_hace)}</p></details>`).join('')}`;
+            $('tu-out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (e) { $('tu-gerr').textContent = e.message; }
+        $('tu-go').disabled = false; $('tu-go').textContent = old;
+    };
 }
 
 async function pvInicializar() {
@@ -891,6 +1052,7 @@ async function pvInicializar() {
 pvInicializar();
 </script>
 <script src="../Assets/UI/pwa.js" defer></script>
+<script src="../Assets/UI/menu.js" defer></script>
 <script src="../Assets/UI/chatbot.js" defer></script>
 <script type="module" src="../Assets/UI/modern-ui.js"></script>
 </body>

@@ -154,6 +154,10 @@
             var ext = /^https?:/.test(u) && u.indexOf(location.origin) !== 0;
             return '<a href="' + esc(u) + '"' + (ext ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + tx + '</a>';
         });
+        s = s.replace(/&lt;(https?:\/\/[^\s&]+)&gt;/g, function (_, u) {
+            var h = href(u.replace(/&amp;/g, '&')); var ext = h.indexOf(location.origin) !== 0;
+            return '<a href="' + esc(h) + '"' + (ext ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + u + '</a>';
+        });
         s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+[^\s<).,;:!?])/g, function (_, p, u) {
             var h = href(u.replace(/&amp;/g, '&')); var ext = h.indexOf(location.origin) !== 0;
             return p + '<a href="' + esc(h) + '"' + (ext ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + u + '</a>';

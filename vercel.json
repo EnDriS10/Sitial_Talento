@@ -1,5 +1,9 @@
 {
   "functions": {
+    "api/tutor.js": {
+      "includeFiles": "{Data,Problem_Data}/**",
+      "maxDuration": 60
+    },
     "api/chat.js": {
       "includeFiles": "{Data,Problem_Data}/**",
       "maxDuration": 30

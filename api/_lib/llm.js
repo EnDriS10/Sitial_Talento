@@ -40,7 +40,7 @@ export const PROVEEDORES = {
   deepseek: {                      // de pago: solo entra si lo pones en LLM_PROVIDERS
     env: 'DEEPSEEK_API_KEY',
     url: 'https://api.deepseek.com/chat/completions',
-    modelos: ['deepseek-chat'],
+    modelos: ['deepseek-flash'],      // admite imágenes; 'deepseek-v4-pro' solo texto
   },
 };
 
@@ -82,10 +82,10 @@ class ErrorObjetivo extends Error {
   constructor(msg, extra) { super(msg); Object.assign(this, extra); }
 }
 
-async function abrir(t, { messages, maxTokens, temperature, signal }) {
+async function abrir(t, { messages, maxTokens, temperature, signal, json, firstByteMs }) {
   const p = PROVEEDORES[t.prov];
   const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(new Error('timeout')), Number(process.env.LLM_FIRST_BYTE_MS || 10000));
+  const timer = setTimeout(() => ctl.abort(new Error('timeout')), Number(firstByteMs || process.env.LLM_FIRST_BYTE_MS || 10000));
   const onAbort = () => ctl.abort(signal.reason);
   if (signal) signal.addEventListener('abort', onAbort, { once: true });
   let res;
@@ -93,7 +93,7 @@ async function abrir(t, { messages, maxTokens, temperature, signal }) {
     res = await fetch(urlDe(t.prov), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env[p.env] },
-      body: JSON.stringify({ model: t.modelo, messages, stream: true, max_tokens: maxTokens, temperature, ...(p.extra ? p.extra(t.modelo) : {}) }),
+      body: JSON.stringify({ model: t.modelo, messages, stream: true, max_tokens: maxTokens, temperature, ...(json ? { response_format: { type: 'json_object' } } : {}), ...(p.extra ? p.extra(t.modelo) : {}) }),
       signal: ctl.signal,
     });
   } catch (e) {
@@ -112,7 +112,8 @@ async function abrir(t, { messages, maxTokens, temperature, signal }) {
 
 // Emite { meta:{proveedor,modelo,intentos} } y luego { texto } …
 export async function* chatStream(opts) {
-  const todos = objetivos(opts.orden);
+  // opts.targets = [{prov, modelo}] fija proveedores/modelos concretos (p. ej. el tutor)
+  const todos = opts.targets ? opts.targets.filter((t) => PROVEEDORES[t.prov] && process.env[PROVEEDORES[t.prov].env]).map((t) => ({ ...t, clave: t.prov + ':' + t.modelo })) : objetivos(opts.orden);
   if (!todos.length) {
     const e = new Error('Ningún proveedor de IA configurado (faltan las claves API).'); e.status = 503; e.todos = true; throw e;
   }
@@ -122,7 +123,7 @@ export async function* chatStream(opts) {
   const enfriados = todos.filter((t) => sal.get(t.clave)).sort((a, b) => sal.get(a.clave) - sal.get(b.clave));
   const cola = [...sanos, ...enfriados.slice(0, 1)];
   const maxIntentos = Number(process.env.LLM_MAX_ATTEMPTS || 5);
-  const limite = Date.now() + Number(process.env.LLM_TOTAL_MS || 24000);
+  const limite = Date.now() + Number(opts.totalMs || process.env.LLM_TOTAL_MS || 24000);
   const errores = [];
   let intentos = 0;
 
@@ -191,4 +192,11 @@ export async function resumenSalud() {
   const ts = objetivos();
   const sal = await estado(ts.map((t) => t.clave));
   return ts.map((t) => ({ objetivo: t.clave, enfriamientoSeg: Math.ceil((sal.get(t.clave) || 0) / 1000) }));
+}
+
+// Respuesta completa (sin streaming): para el tutor y el planificador
+export async function completar(opts) {
+  let texto = '', meta = null;
+  for await (const ev of chatStream(opts)) { if (ev.meta) meta = ev.meta; else texto += ev.texto; }
+  return { texto, meta };
 }
