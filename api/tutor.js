@@ -18,6 +18,7 @@
 // Modelos configurables: TUTOR_VISION, TUTOR_GRADERS, TUTOR_FAST.
 // ════════════════════════════════════════════════════════════════════
 import { completar } from './_lib/llm.js';
+import { GUIA_DIBUJO } from './_lib/dibujo.js';
 import { datosProblema, enfoqueProblema } from './_lib/problemas.js';
 import { ipDe, origenPermitido, limitarTutor } from './_lib/guard.js';
 
@@ -126,7 +127,10 @@ MODO CONVERSACIÓN SOBRE LA SOLUCIÓN. El estudiante YA ve la solución y/o su c
 - Si pregunta por qué perdió puntos, compara su resolución con el esquema de puntuación con honestidad; si crees que la calificación fue demasiado dura o se leyó mal su letra, dilo (no puedes cambiar la nota, pero recomiéndale revisarlo).
 - Sé claro y didáctico, sin rodeos: normalmente 80–200 palabras; más solo si lo pide. Usa notación química clara y, si hay cálculo, muéstralo paso a paso con unidades.
 - Termina, cuando tenga sentido, con una pregunta corta para comprobar que lo entendió o proponiendo un ejercicio similar.
-${foco ? `Foco vectorial: la pregunta apunta a ${foco}.\n` : ''}Responde SOLO con JSON: {"respuesta":"…"}`;
+- Si la pregunta es de química orgánica (o una estructura, síntesis o mecanismo lo aclara), DIBUJA con la sintaxis de abajo: moléculas, la síntesis completa o el mecanismo paso a paso, y explica cada paso. Si el estudiante pide «dibújalo», «hazme el mecanismo» o similar, hazlo siempre.
+- Evita listas largas y tablas; el estudiante puede seguir preguntando, no cierres la conversación.
+${GUIA_DIBUJO}
+${foco ? `Foco vectorial: la pregunta apunta a ${foco}.\n` : ''}Responde SOLO con JSON (dentro de la cadena usa \n para los saltos de línea): {"respuesta":"…"}`;
 }
 
 function parseJSON(t) {
@@ -201,9 +205,9 @@ export default async function handler(req, res) {
       const hist = (Array.isArray(b.history) ? b.history : []).slice(-6).map((h) => `Estudiante: ${String(h.q || '').slice(0, 400)}\nTutor: ${String(h.a || '').slice(0, 700)}`).join('\n\n');
       const user = (hist ? 'Conversación previa:\n' + hist + '\n\n' : '') + (quote ? `Texto seleccionado por el estudiante (de ${b.fuente === 'respuesta' ? 'la solución oficial' : b.fuente === 'resultado' ? 'la corrección' : 'el enunciado'}): «${quote}»\n` : '') + 'Pregunta del estudiante: ' + q +
         (foco.trozos.length && quote === '' ? '\n\nFragmentos más cercanos de la solución:\n' + foco.trozos.filter((t) => t.fuente === 'solucion').map((t) => t.texto.slice(0, 700)).join('\n---\n') : '');
-      const { j, meta } = await pedirJSON(GRADERS(), systemDiscutir(p, lang, b.resultado, focoTxt), user, { maxTokens: 1500, temperature: 0.3, firstByteMs: 20000 });
+      const { j, meta } = await pedirJSON(GRADERS(), systemDiscutir(p, lang, b.resultado, focoTxt), user, { maxTokens: 2600, temperature: 0.3, firstByteMs: 20000 });
       if (!j || !String(j.respuesta || '').trim()) return json(res, 502, { code: 'bad_output', error: 'No pude interpretar la respuesta de la IA. Inténtalo de nuevo.' });
-      return json(res, 200, { answer: String(j.respuesta).slice(0, 3000), model: meta && meta.modelo, foco: foco.incisos });
+      return json(res, 200, { answer: String(j.respuesta).slice(0, 6000), model: meta && meta.modelo, foco: foco.incisos });
     }
 
     // ═══════════ CALIFICAR ═══════════

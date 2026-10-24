@@ -157,6 +157,10 @@ Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmació
 ### Menú hamburguesa
 `Assets/UI/menu.js` añade el menú a media, noticias, Banco de Problemas, equipos y visor; en todas las páginas no muestra la sección donde ya estás.
 
+## ⚗️ Esquemas libres y dibujo por IA (MolGraph)
+
+`Problem_Data/mol-graph.html` incluye un motor de **esquemas libres**: nodos en rejilla `@columna,fila`, flechas en cualquier dirección (→ ← ↓ ↑, en escuadra `ruta=hv`, equilibrio `<=>`, resonancia `<->`, punteada `-->`), reactivos arriba (azul) y abajo (rojo), nota gris entre corchetes, cajas de resalte (`caja amarillo: a, b | Stobbe`), átomos resaltados (`resaltar=3,4`) y flechas curvas de mecanismo (`curva: a:3 -> a:5`). La sintaxis completa está en `api/_lib/dibujo.js`; es la misma que se le da al tutor, que puede responder con `[[MOL: SMILES | nombre]]` o con bloques ```esquema``` y el visor los dibuja (todo se escapa; la IA nunca inyecta HTML). El cajón del tutor se puede mover (arrastrando la cabecera), redimensionar, maximizar (⤢ o doble clic) y siempre hay un botón flotante «Habla con el tutor».
+
 ## 🛠️ Notas técnicas (lecciones aprendidas)
 
 - `<base id="app-base-href">` se fija a `/` fuera de GitHub Pages para que `fetch('Data/…')` y las imágenes relativas funcionen bajo cualquier URL bonita.

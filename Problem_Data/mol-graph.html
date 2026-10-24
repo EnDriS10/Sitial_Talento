@@ -191,10 +191,11 @@
         return map;
     }
 
-    function svgForSmiles(smiles, size, colorAtoms) {
+    function svgForSmiles(smiles, size, colorAtoms, hl, hlColor) {
         if (!window.RDKit) return null;
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
-        const cacheKey = smiles + '|' + size + '|' + (colorAtoms ? 'cpk' : 'std');
+        const hlKey = hl && hl.length ? hl.join(',') + (hlColor || '') : '';
+        const cacheKey = smiles + '|' + size + '|' + (colorAtoms ? 'cpk' : 'std') + '|' + hlKey;
         if (_molCache[cacheKey]) return _molCache[cacheKey];
 
         const mol = window.RDKit.get_mol(smiles);
@@ -236,6 +237,12 @@
                     const label = WILDCARD_LABELS[mapNums[idx]];
                     if (label) details.atomLabels[idx] = label;
                 });
+            }
+            if (hl && hl.length) {
+                details.atoms = hl.filter(i => i >= 0 && i < mol.get_num_atoms());
+                const hx = /^#([0-9a-f]{6})/i.exec(hlColor || '') || /^#([0-9a-f]{6})/i.exec('#e0b400');
+                const v = parseInt(hx[1], 16);
+                details.highlightColour = [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255, 0.45];
             }
             let svg = mol.get_svg_with_highlights(JSON.stringify(details));
             // Quita el rect de fondo que RDKit añade igualmente (por si
@@ -758,9 +765,9 @@
     // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
     //    [data-smiles] sueltos como dentro de un esquema de síntesis)
     // ────────────────────────────────────────────────────────────────
-    function renderMolSmiles(smiles, size, colorAtoms) {
-        const svg = svgForSmiles(smiles, size || 'md', !!colorAtoms);
-        if (!svg) return '<span class="pc-mol-missing">[SMILES inválido: ' + smiles + ']</span>';
+    function renderMolSmiles(smiles, size, colorAtoms, hl, hlColor) {
+        const svg = svgForSmiles(smiles, size || 'md', !!colorAtoms, hl, hlColor);
+        if (!svg) return '<span class="pc-mol-missing">[SMILES inválido: ' + _fesc(smiles) + ']</span>';
         return svg;
     }
     function renderMolById(id, size, colorAtoms) {
@@ -1073,52 +1080,43 @@
     // horquilla (baja y gira a la izquierda) que lleva los reactivos de
     // ESE paso — en vez de repetir el compuesto de unión y usar un
     // conector decorativo sin información, como antes.
-    SCHEMES['q6-sintesis-respuesta'] = () => renderZigzagScheme(
-        [
-            { mol: 'acitretina-s0', label: '1 &middot; cetona de partida' },
-            { mol: 'acitretina-s1', label: '2 &middot; &beta;-cetoaldehído' },
-            { mol: 'acitretina-s2', label: '3 &middot; acetal dimetílico' },
-            { mol: 'acitretina-s3', label: '4 &middot; dieno' },
-            { mol: 'acitretina-s4', label: '5 &middot; dienal conjugado' },
-            { mol: 'acitretina-s5', label: '6 &middot; éster/ácido' },
-            { mol: 'acitretina-s6', label: '7 &middot; diácido' },
-            { mol: 'acitretina-final', label: 'acitretina' }
-        ],
-        [
-            { above: 'MeONa', below: 'HCO\u2082Me &middot; acilación de Claisen' },
-            { above: 'MeOH / H\u2082SO\u2084', below: 'protección como acetal' },
-            { above: 'Ph\u2083P=CH\u2082, KO\u1d57Bu', below: 'Wittig &middot; metilenación' },
-            { above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083 &middot; desprotección + isomerización' },
-            { above: '2-metilsuccinato de dimetilo', below: 'Triton B &middot; condensación de Stobbe' },
-            { above: 'NaOH', below: 'hidrólisis del éster' },
-            { above: 'piridina, &Delta;', below: 'descarboxilación (tipo malónico)' }
-        ],
-        { size: 'sm', perRow: 3 }
-    );
-    // Versión "enunciado": mismos pasos pero con los productos ocultos
-    // tras un signo de interrogación, para que el estudiante los rellene.
-    SCHEMES['q6-sintesis-enunciado'] = () => renderZigzagScheme(
-        [
-            { mol: 'acitretina-s0' },
-            { text: '<span class="pc-scheme-unknown">1</span>' },
-            { text: '<span class="pc-scheme-unknown">2</span>' },
-            { text: '<span class="pc-scheme-unknown">3</span>' },
-            { text: '<span class="pc-scheme-unknown">4</span>' },
-            { text: '<span class="pc-scheme-unknown">5</span>' },
-            { text: '<span class="pc-scheme-unknown">6</span>' },
-            { mol: 'acitretina-final', label: 'acitretina' }
-        ],
-        [
-            { above: 'MeONa', below: 'HCO\u2082Me' },
-            { above: 'MeOH', below: 'H\u2082SO\u2084' },
-            { above: 'Ph\u2083P=CH\u2082', below: 'KO\u1d57Bu' },
-            { above: '1. HCO\u2082H, H\u2082SO\u2084', below: '2. NEt\u2083' },
-            { above: '2-metilsuccinato de dimetilo', below: 'Triton B' },
-            { above: 'NaOH' },
-            { above: 'piridina, &Delta;' }
-        ],
-        { size: 'sm', perRow: 3 }
-    );
+    SCHEMES['q6-sintesis-respuesta'] = () => freeHost(`
+size=sm escala=0.8 gapx=130 gapy=95
+s0 @0,0: m:acitretina-s0 | 1 · cetona de partida
+s1 @1,0: m:acitretina-s1 | 2 · β-cetoaldehído
+s2 @2,0: m:acitretina-s2 | 3 · acetal dimetílico
+s3 @2,1: m:acitretina-s3 | 4 · dieno
+s4 @1,1: m:acitretina-s4 | 5 · dienal conjugado
+s5 @0,1: m:acitretina-s5 | 6 · éster/ácido
+s6 @0,2: m:acitretina-s6 | 7 · diácido
+fin @1,2: m:acitretina-final | acitretina | caja=verde
+s0 -> s1 | MeONa | HCO2Me | acilación de Claisen, formiato
+s1 -> s2 | MeOH, H2SO4 | | protección como acetal
+s2 -> s3 | Ph3P=CH2, KOtBu | | Wittig, metilenación
+s3 -> s4 | 1. HCO2H, H2SO4 | 2. NEt3 | desprotección + isomerización
+s4 -> s5 | 2-metilsuccinato de dimetilo | Triton B | condensación de Stobbe
+s5 -> s6 | NaOH | | hidrólisis del éster
+s6 -> fin | piridina, Δ | | descarboxilación
+caja amarillo: s4, s5 | Stobbe
+`);
+    SCHEMES['q6-sintesis-enunciado'] = () => freeHost(`
+size=sm escala=0.8 gapx=130 gapy=95
+s0 @0,0: m:acitretina-s0
+u1 @1,0: t:?1
+u2 @2,0: t:?2
+u3 @2,1: t:?3
+u4 @1,1: t:?4
+u5 @0,1: t:?5
+u6 @0,2: t:?6
+fin @1,2: m:acitretina-final | acitretina
+s0 -> u1 | MeONa | HCO2Me
+u1 -> u2 | MeOH | H2SO4
+u2 -> u3 | Ph3P=CH2 | KOtBu
+u3 -> u4 | 1. HCO2H, H2SO4 | 2. NEt3
+u4 -> u5 | 2-metilsuccinato de dimetilo | Triton B
+u5 -> u6 | NaOH
+u6 -> fin | piridina, Δ
+`);
 
     SCHEMES['q3-keratina'] = () => renderScheme(null, {
         size: 'sm',
@@ -1149,6 +1147,309 @@
     );
 
     // ────────────────────────────────────────────────────────────────
+    // 9) ESQUEMAS LIBRES (nuevo) — disposición 2D libre en rejilla,
+    //    flechas en cualquier dirección (→ ← ↓ ↑, en escuadra, equilibrio,
+    //    resonancia, punteadas), reactivos arriba/abajo, nota gris entre
+    //    corchetes, cajas de resalte (amarilla/verde…) y flechas curvas
+    //    de mecanismo (de átomo/enlace a átomo/enlace).
+    //
+    //    Se describen con un texto corto, fácil de escribir a mano o por
+    //    una IA (se escapa todo: nunca se interpreta HTML):
+    //
+    //      size=sm  escala=0.85  gapx=100  gapy=90
+    //      a @0,0: COc1ccccc1C=O | benzaldehído | caja=verde
+    //      b @1,0: t:H₂O
+    //      a -> b | MeONa | HCO2Me | acilación de Claisen
+    //      a ->  c | arriba | abajo | nota | estilo=eq | ruta=hv
+    //      curva: a:3 -> a:5 | giro=-1        (átomo nº3 → átomo nº5)
+    //      curva: a:3-4 -> a:6                (enlace 3-4 → átomo 6)
+    //      caja amarillo: a, b | Stobbe
+    // ────────────────────────────────────────────────────────────────
+    const FREE_COLORS = { amarillo: '#e0b400', verde: '#2e9e4f', azul: '#2f6fdc', rojo: '#d6403a', gris: '#8a8f98', naranja: '#e07b1a', morado: '#8a4fd0' };
+    const FREE_NODE_KEYS = ['caja', 'color', 'resaltar', 'tam', 'etiqueta', 'incognita'];
+    const FREE_ARROW_KEYS = ['arriba', 'abajo', 'nota', 'estilo', 'ruta', 'largo', 'color'];
+    const FREE_CURVE_KEYS = ['giro', 'color', 'curvatura'];
+    function _fesc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+    // Texto químico seguro: escapa, //→salto, ^2+ → superíndice, H2SO4 → subíndices
+    function _fquim(t) {
+        let s = _fesc(t).trim();
+        s = s.replace(/\s*\/\/\s*/g, '<br>');
+        s = s.replace(/\^\{?([+\-\u2212\u22120-9]+)\}?/g, '<sup>$1</sup>');
+        s = s.replace(/([A-Za-z\)\]])(\d+)(?![\d.]*[a-z]{3})/g, '$1<sub>$2</sub>');
+        return s;
+    }
+    function _fcolor(c) { return FREE_COLORS[String(c || '').toLowerCase()] || (/^#[0-9a-f]{3,8}$/i.test(c || '') ? c : null); }
+    function _fields(rest, keys) {
+        const pos = [], kv = {};
+        String(rest || '').split('|').forEach(p => {
+            const m = p.match(/^\s*([a-zñ_]+)\s*=\s*(.*)$/i);
+            if (m && keys.includes(m[1].toLowerCase())) kv[m[1].toLowerCase()] = m[2].trim();
+            else pos.push(p.trim());
+        });
+        return { pos, kv };
+    }
+    function parseEsquema(src) {
+        const spec = { opts: {}, nodes: [], arrows: [], curves: [], boxes: [] };
+        const seen = new Set();
+        String(src || '').split(/\r?\n/).slice(0, 120).forEach(raw => {
+            const line = raw.trim();
+            if (!line || line[0] === '#') return;
+            let m;
+            if ((m = line.match(/^caja\s*([a-zñ#0-9]*)\s*:\s*([\w\s,]+?)\s*(?:\|(.*))?$/i))) {
+                spec.boxes.push({ color: m[1] || 'amarillo', ids: m[2].split(/[\s,]+/).filter(Boolean), label: (m[3] || '').trim() });
+            } else if ((m = line.match(/^curva\s*:\s*(\w+):(\d+(?:-\d+)?)\s*->\s*(\w+):(\d+(?:-\d+)?)\s*(?:\|(.*))?$/i))) {
+                const f = _fields(m[5], FREE_CURVE_KEYS);
+                spec.curves.push({ a: { id: m[1], ref: m[2] }, b: { id: m[3], ref: m[4] }, giro: +f.kv.giro || 1, color: f.kv.color, curv: +f.kv.curvatura || 0 });
+            } else if ((m = line.match(/^(\w+)\s*(<=>|<->|-->|->)\s*(\w+)\s*(?:\|(.*))?$/))) {
+                const f = _fields(m[4], FREE_ARROW_KEYS);
+                const k = f.kv;
+                let estilo = (k.estilo || '').toLowerCase();
+                if (m[2] === '<=>') estilo = estilo || 'eq'; else if (m[2] === '<->') estilo = estilo || 'resonancia'; else if (m[2] === '-->') estilo = estilo || 'punteada';
+                spec.arrows.push({ from: m[1], to: m[3], above: k.arriba != null ? k.arriba : f.pos[0], below: k.abajo != null ? k.abajo : f.pos[1], note: k.nota != null ? k.nota : f.pos[2], estilo, ruta: (k.ruta || '').toLowerCase(), largo: +k.largo || 0, color: k.color });
+            } else if ((m = line.match(/^(\w+)\s*@\s*(-?\d+)\s*,\s*(-?\d+)\s*:\s*(.*)$/))) {
+                if (seen.has(m[1]) || spec.nodes.length >= 24) return;
+                seen.add(m[1]);
+                const f = _fields(m[4], FREE_NODE_KEYS);
+                const body = (f.pos[0] || '').trim();
+                const n = { id: m[1], c: Math.max(-20, Math.min(20, +m[2])), r: Math.max(-20, Math.min(20, +m[3])), label: f.kv.etiqueta != null ? f.kv.etiqueta : f.pos[1], kv: f.kv };
+                if (/^t:/i.test(body)) n.text = body.slice(2).trim();
+                else if (/^m:/i.test(body)) n.mol = body.slice(2).trim();
+                else n.smiles = body.slice(0, 300);
+                spec.nodes.push(n);
+            } else if ((m = line.match(/^(size|tam|escala|gapx|gapy)\s*=\s*(.+)$/i))) {
+                m[2].trim(); line.split(/\s+/).forEach(tok => { const mm = tok.match(/^(size|tam|escala|gapx|gapy)=(.+)$/i); if (mm) spec.opts[mm[1].toLowerCase()] = mm[2]; });
+            }
+        });
+        spec.arrows = spec.arrows.slice(0, 40); spec.curves = spec.curves.slice(0, 20);
+        return spec;
+    }
+
+    // Coordenadas (px del SVG de RDKit) de cada átomo: se pide el SVG
+    // resaltando todos los átomos con alfa 0 → RDKit emite una <ellipse>
+    // por átomo con su centro exacto.
+    const _ptsCache = {};
+    function atomCoords(smiles, size) {
+        if (!window.RDKit) return null;
+        const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
+        const key = smiles + '|' + size;
+        if (_ptsCache[key]) return _ptsCache[key];
+        const mol = window.RDKit.get_mol(smiles);
+        if (!mol) return null;
+        try {
+            const n = mol.get_num_atoms();
+            const all = []; for (let i = 0; i < n; i++) all.push(i);
+            const svg = mol.get_svg_with_highlights(JSON.stringify({ width: preset.w, height: preset.h, bondLineWidth: preset.bond, atoms: all, highlightColour: [0, 0, 0, 0], addStereoAnnotation: false }));
+            const pts = {};
+            const re = /<ellipse cx='([\d.\-]+)' cy='([\d.\-]+)'[^>]*class='atom-(\d+)'/g; let m;
+            while ((m = re.exec(svg))) pts[+m[3]] = [parseFloat(m[1]), parseFloat(m[2])];
+            return (_ptsCache[key] = { pts, w: preset.w, h: preset.h });
+        } finally { mol.delete(); }
+    }
+
+    function buildFree(spec) {
+        const o = spec.opts;
+        const nodes = spec.nodes;
+        const sizeKey = ['sm', 'md', 'lg'].includes(o.size || o.tam) ? (o.size || o.tam) : 'sm';
+        const esc = Math.max(0.5, Math.min(1.4, parseFloat(o.escala) || 0.85));
+        const preset = SIZE_PRESETS[sizeKey];
+        const minC = Math.min(0, ...nodes.map(n => n.c)), minR = Math.min(0, ...nodes.map(n => n.r));
+        const host = document.createElement('div');
+        host.className = 'pc-scheme-box pc-free';
+        const inner = document.createElement('div'); inner.className = 'pc-free-inner';
+        const bl = document.createElement('div'); bl.className = 'pc-free-boxes';
+        const grid = document.createElement('div'); grid.className = 'pc-free-grid';
+        const NS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pc-free-svg');
+        const labs = document.createElement('div'); labs.className = 'pc-free-labs';
+        inner.append(bl, grid, svg, labs); host.appendChild(inner);
+        const need = new Set(spec.curves.map(c => c.a.id).concat(spec.curves.map(c => c.b.id)));
+        const els = {};
+        nodes.forEach(n => {
+            const sz = ['sm', 'md', 'lg'].includes(n.kv.tam) ? n.kv.tam : sizeKey;
+            const p = SIZE_PRESETS[sz];
+            const w = Math.round(p.w * esc), h = Math.round(preset.h * esc);
+            const el = document.createElement('div'); el.className = 'pc-free-node'; el.dataset.id = n.id;
+            el.style.gridColumn = String(2 * (n.c - minC) + 1); el.style.gridRow = String(2 * (n.r - minR) + 1);
+            const mb = document.createElement('div'); mb.className = 'pc-free-mol pc-scheme-mol'; mb.style.height = h + 'px'; mb.style.minWidth = Math.round(40) + 'px';
+            if (n.text != null) {
+                mb.innerHTML = `<div class="pc-scheme-text${n.kv.incognita || /^\?/.test(n.text) ? ' pc-scheme-unknown' : ''}">${_fquim(n.text.replace(/^\?/, ''))}</div>`;
+                mb.classList.remove('pc-scheme-mol');
+            } else {
+                const hl = (n.kv.resaltar || '').split(/[,\s]+/).filter(x => /^\d+$/.test(x)).map(Number);
+                const html = n.smiles ? renderMolSmiles(n.smiles, sz, /cpk|si|true/i.test(n.kv.color || ''), hl, _fcolor(n.kv.caja) ) : renderMolById(n.mol, sz, /cpk|si|true/i.test(n.kv.color || ''));
+                mb.innerHTML = html;
+                const sv = mb.querySelector('svg');
+                if (sv) { sv.style.width = w + 'px'; sv.style.height = Math.round(p.h * esc) + 'px'; sv.style.maxWidth = 'none'; }
+                if (need.has(n.id) && n.smiles) n.pts = atomCoords(n.smiles, sz);
+            }
+            el.appendChild(mb);
+            if (n.label) { const lb = document.createElement('div'); lb.className = 'pc-scheme-label'; lb.innerHTML = _fquim(n.label); el.appendChild(lb); }
+            grid.appendChild(el); els[n.id] = el;
+        });
+        host._free = { spec, inner, bl, grid, svg, labs, els, minC, minR, esc, uid: 'f' + Math.random().toString(36).slice(2, 8) };
+        return host;
+    }
+
+    function layoutFree(host) {
+        const st = host._free; if (!st) return;
+        const { spec, inner, bl, grid, svg, labs, els } = st;
+        const nodes = spec.nodes;
+        const NS = 'http://www.w3.org/2000/svg';
+        svg.innerHTML = ''; labs.innerHTML = ''; bl.innerHTML = '';
+        const gapX = Math.max(40, parseFloat(spec.opts.gapx) || 96), gapY = Math.max(40, parseFloat(spec.opts.gapy) || 84);
+        const byId = {}; nodes.forEach(n => byId[n.id] = n);
+        const cols = Math.max(...nodes.map(n => n.c)) - st.minC + 1, rows = Math.max(...nodes.map(n => n.r)) - st.minR + 1;
+        const colGap = new Array(Math.max(0, cols - 1)).fill(gapX), rowGap = new Array(Math.max(0, rows - 1)).fill(gapY);
+
+        // 1) rótulos de flecha (para medirlos y ensanchar los huecos)
+        const items = [];
+        spec.arrows.forEach(a => {
+            const A = byId[a.from], B = byId[a.to]; if (!A || !B) return;
+            const col = _fcolor(a.color);
+            const mk = (cls, html) => { if (!html) return null; const d = document.createElement('div'); d.className = 'pc-free-lab ' + cls; d.innerHTML = _fquim(html); if (col && cls !== 'note') d.style.color = col; labs.appendChild(d); return d; };
+            const it = { a, A, B, above: mk('above', a.above), below: mk('below', a.below), note: a.note ? mk('note', '[' + a.note.replace(/^\[|\]$/g, '') + ']') : null };
+            items.push(it);
+            const dc = B.c - A.c, dr = B.r - A.r;
+            const wMax = Math.max(0, ...['above', 'below', 'note'].map(k => it[k] ? it[k].offsetWidth : 0));
+            const hSum = ['above', 'below', 'note'].reduce((s, k) => s + (it[k] ? it[k].offsetHeight : 0), 0);
+            if (dr === 0 && Math.abs(dc) === 1) { const i = Math.min(A.c, B.c) - st.minC; colGap[i] = Math.max(colGap[i], wMax + 34 + (a.largo ? 0 : 0)); }
+            if (dc === 0 && Math.abs(dr) === 1) { const i = Math.min(A.r, B.r) - st.minR; rowGap[i] = Math.max(rowGap[i], hSum + 34); }
+        });
+        grid.style.gridTemplateColumns = Array.from({ length: cols }, (_, i) => 'auto' + (i < cols - 1 ? ' ' + Math.round(colGap[i]) + 'px' : '')).join(' ');
+        grid.style.gridTemplateRows = Array.from({ length: rows }, (_, i) => 'auto' + (i < rows - 1 ? ' ' + Math.round(rowGap[i]) + 'px' : '')).join(' ');
+
+        // 2) geometría
+        const hr = inner.getBoundingClientRect();
+        const sc = inner.offsetWidth ? hr.width / inner.offsetWidth : 1;
+        const rel = el => { const r = el.getBoundingClientRect(); return { l: (r.left - hr.left) / sc, t: (r.top - hr.top) / sc, r: (r.right - hr.left) / sc, b: (r.bottom - hr.top) / sc }; };
+        const W = Math.ceil(inner.scrollWidth), H = Math.ceil(inner.scrollHeight);
+        svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        const defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs);
+        const marks = {};
+        const marker = color => {
+            const k = color || 'cur'; if (marks[k]) return marks[k];
+            const id = st.uid + 'm' + Object.keys(marks).length; marks[k] = id;
+            const m = document.createElementNS(NS, 'marker');
+            m.setAttribute('id', id); m.setAttribute('viewBox', '0 0 10 10'); m.setAttribute('refX', '8.5'); m.setAttribute('refY', '5'); m.setAttribute('markerWidth', '8'); m.setAttribute('markerHeight', '8'); m.setAttribute('orient', 'auto-start-reverse'); m.setAttribute('markerUnits', 'userSpaceOnUse');
+            m.innerHTML = `<path d="M0,0.5 L10,5 L0,9.5 z" fill="${color || 'var(--text)'}"/>`;
+            defs.appendChild(m); return id;
+        };
+        const mkPath = (d, color, opt) => {
+            const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); p.setAttribute('fill', 'none');
+            p.setAttribute('stroke', color || 'var(--text)'); p.setAttribute('stroke-width', (opt && opt.w) || 2); p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
+            if (opt && opt.dash) p.setAttribute('stroke-dasharray', '6 5');
+            if (opt && opt.end) p.setAttribute('marker-end', `url(#${marker(color)})`);
+            if (opt && opt.start) p.setAttribute('marker-start', `url(#${marker(color)})`);
+            svg.appendChild(p); return p;
+        };
+        const place = (d, x, y, ax, ay) => { if (!d) return; d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.transform = `translate(${ax}%,${ay}%)`; };
+        items.forEach(({ a, A, B, above, below, note }) => {
+            const na = rel(els[A.id]), nb = rel(els[B.id]);
+            const ma = rel(els[A.id].querySelector('.pc-free-mol')), mb = rel(els[B.id].querySelector('.pc-free-mol'));
+            const ca = { x: (ma.l + ma.r) / 2, y: (ma.t + ma.b) / 2 }, cb = { x: (mb.l + mb.r) / 2, y: (mb.t + mb.b) / 2 };
+            const dx = cb.x - ca.x, dy = cb.y - ca.y, PAD = 7;
+            const col = _fcolor(a.color);
+            const eq = a.estilo === 'eq' || a.estilo === 'equilibrio', res = a.estilo === 'resonancia', dash = a.estilo === 'punteada';
+            let pts, seg; // seg: segmento principal para rótulos {x1,y1,x2,y2}
+            if (Math.abs(dy) < 10 && !a.ruta || a.ruta === 'recta' && Math.abs(dy) < 10) {
+                const dir = dx >= 0 ? 1 : -1;
+                const x1 = dir > 0 ? ma.r + PAD : ma.l - PAD, x2 = dir > 0 ? mb.l - PAD : mb.r + PAD, y = ca.y;
+                pts = [[x1, y], [x2, y]]; seg = { x1, y1: y, x2, y2: y };
+            } else if (Math.abs(dx) < 10 && !a.ruta) {
+                const dir = dy >= 0 ? 1 : -1;
+                const y1 = dir > 0 ? na.b + PAD : na.t - PAD, y2 = dir > 0 ? nb.t - PAD : nb.b + PAD, x = ca.x;
+                pts = [[x, y1], [x, y2]]; seg = { x1: x, y1, x2: x, y2 };
+            } else if (a.ruta === 'hv') {
+                const x1 = dx >= 0 ? ma.r + PAD : ma.l - PAD, y2 = dy >= 0 ? nb.t - PAD : nb.b + PAD;
+                pts = [[x1, ca.y], [cb.x, ca.y], [cb.x, y2]]; seg = Math.abs(cb.x - x1) >= Math.abs(y2 - ca.y) ? { x1, y1: ca.y, x2: cb.x, y2: ca.y } : { x1: cb.x, y1: ca.y, x2: cb.x, y2 };
+            } else if (a.ruta === 'recta') {
+                pts = [[ca.x + Math.sign(dx) * 20, ca.y + Math.sign(dy) * 20], [cb.x - Math.sign(dx) * 20, cb.y - Math.sign(dy) * 20]]; seg = { x1: pts[0][0], y1: pts[0][1], x2: pts[1][0], y2: pts[1][1] };
+            } else { // vh (por defecto): baja/sube y luego gira hacia el destino
+                const y1 = dy >= 0 ? na.b + PAD : na.t - PAD, x2 = dx >= 0 ? mb.l - PAD : mb.r + PAD;
+                pts = [[ca.x, y1], [ca.x, cb.y], [x2, cb.y]]; seg = Math.abs(x2 - ca.x) >= Math.abs(cb.y - y1) ? { x1: ca.x, y1: cb.y, x2, y2: cb.y } : { x1: ca.x, y1, x2: ca.x, y2: cb.y };
+            }
+            if (a.largo && pts.length === 2) { // acorta la flecha recta a `largo` px, centrada
+                const [p, q] = pts, L = Math.hypot(q[0] - p[0], q[1] - p[1]); if (L > a.largo) { const ux = (q[0] - p[0]) / L, uy = (q[1] - p[1]) / L, mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; pts = [[mx - ux * a.largo / 2, my - uy * a.largo / 2], [mx + ux * a.largo / 2, my + uy * a.largo / 2]]; seg = { x1: pts[0][0], y1: pts[0][1], x2: pts[1][0], y2: pts[1][1] }; }
+            }
+            if (eq && pts.length === 2) {
+                const [p, q] = pts, L = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1, ux = (q[0] - p[0]) / L, uy = (q[1] - p[1]) / L, nx = -uy, ny = ux, o = 3.2, hd = 9;
+                const c = col || 'var(--text)';
+                mkPath(`M${p[0] + nx * o},${p[1] + ny * o} L${q[0] + nx * o},${q[1] + ny * o} M${q[0] + nx * o},${q[1] + ny * o} L${q[0] + nx * o - ux * hd + nx * 4.5},${q[1] + ny * o - uy * hd + ny * 4.5}`, col);
+                mkPath(`M${q[0] - nx * o},${q[1] - ny * o} L${p[0] - nx * o},${p[1] - ny * o} M${p[0] - nx * o},${p[1] - ny * o} L${p[0] - nx * o + ux * hd - nx * 4.5},${p[1] - ny * o + uy * hd - ny * 4.5}`, col);
+            } else {
+                mkPath('M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L'), col, { end: true, start: res, dash });
+            }
+            // rótulos
+            const horiz = Math.abs(seg.y2 - seg.y1) <= Math.abs(seg.x2 - seg.x1);
+            const mx = (seg.x1 + seg.x2) / 2, my = (seg.y1 + seg.y2) / 2;
+            if (horiz) {
+                const off = eq ? 9 : 6;
+                place(above, mx, my - off, -50, -100);
+                place(below, mx, my + off, -50, 0);
+                if (note) place(note, mx, my + off + (below ? below.offsetHeight : 0) + 1, -50, 0);
+            } else {
+                const x = Math.max(seg.x1, seg.x2) + 10;
+                const hs = [above, below, note].filter(Boolean), tot = hs.reduce((s, d) => s + d.offsetHeight, 0);
+                let y = my - tot / 2;
+                hs.forEach(d => { place(d, x, y, 0, 0); d.style.textAlign = 'left'; y += d.offsetHeight; });
+            }
+        });
+
+        // 3) flechas curvas de mecanismo
+        spec.curves.forEach(cv => {
+            const pt = (ref) => {
+                const n = byId[ref.id]; if (!n || !n.pts) return null;
+                const sv = els[n.id].querySelector('.pc-free-mol svg'); if (!sv) return null;
+                const r = rel(sv), k = r.r - r.l, kh = r.b - r.t;
+                const ids = ref.ref.split('-').map(Number);
+                const ps = ids.map(i => n.pts.pts[i]).filter(Boolean); if (!ps.length) return null;
+                const x = ps.reduce((s, p) => s + p[0], 0) / ps.length, y = ps.reduce((s, p) => s + p[1], 0) / ps.length;
+                const all = Object.values(n.pts.pts), cx = all.reduce((s, p) => s + p[0], 0) / all.length, cy = all.reduce((s, p) => s + p[1], 0) / all.length;
+                return { x: r.l + x / n.pts.w * k, y: r.t + y / n.pts.h * kh, cx: r.l + cx / n.pts.w * k, cy: r.t + cy / n.pts.h * kh };
+            };
+            const P = pt(cv.a), Q = pt(cv.b); if (!P || !Q) return;
+            const mx = (P.x + Q.x) / 2, my = (P.y + Q.y) / 2, dx = Q.x - P.x, dy = Q.y - P.y, L = Math.hypot(dx, dy) || 1;
+            let nx = -dy / L, ny = dx / L;
+            if ((mx - P.cx) * nx + (my - P.cy) * ny < 0) { nx = -nx; ny = -ny; }
+            const k = (cv.curv || 0.45) * L * (cv.giro < 0 ? -1 : 1) + (L < 30 ? 14 : 0) * (cv.giro < 0 ? -1 : 1);
+            const c1 = [P.x + dx * 0.25 + nx * k, P.y + dy * 0.25 + ny * k], c2 = [P.x + dx * 0.75 + nx * k, P.y + dy * 0.75 + ny * k];
+            mkPath(`M${P.x.toFixed(1)},${P.y.toFixed(1)} C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${Q.x.toFixed(1)},${Q.y.toFixed(1)}`, _fcolor(cv.color) || '#d6403a', { end: true, w: 1.8 });
+        });
+
+        // 4) cajas de resalte
+        const boxes = spec.boxes.slice();
+        nodes.forEach(n => { const c = _fcolor(n.kv.caja); if (c && n.kv.caja) boxes.push({ color: n.kv.caja, ids: [n.id], label: '' }); });
+        boxes.forEach(b => {
+            const rs = b.ids.map(i => els[i]).filter(Boolean).map(rel); if (!rs.length) return;
+            const col = _fcolor(b.color) || FREE_COLORS.amarillo, P2 = 12;
+            const l = Math.min(...rs.map(r => r.l)) - P2, t = Math.min(...rs.map(r => r.t)) - P2, r = Math.max(...rs.map(r => r.r)) + P2, bt = Math.max(...rs.map(r => r.b)) + P2;
+            const d = document.createElement('div'); d.className = 'pc-free-box';
+            d.style.cssText = `left:${l}px;top:${t}px;width:${r - l}px;height:${bt - t}px;border-color:${col};background:${col}22`;
+            if (b.label) { const s = document.createElement('span'); s.textContent = b.label; s.style.background = col; d.appendChild(s); }
+            bl.appendChild(d);
+        });
+    }
+
+    // Construye, inserta y mantiene el esquema (re-maqueta si el contenedor
+    // cambia de ancho o estaba oculto al crearse)
+    function mountFree(el, src) {
+        el.innerHTML = '';
+        let host;
+        try { host = buildFree(typeof src === 'string' ? parseEsquema(src) : src); } catch (e) { el.textContent = '[esquema no válido]'; return null; }
+        if (!host._free.spec.nodes.length) { el.textContent = '[esquema vacío]'; return null; }
+        el.appendChild(host);
+        const go = () => { try { layoutFree(host); } catch (e) { console.warn('MolGraph esquema:', e); } };
+        go();
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+        if (typeof ResizeObserver === 'function') {
+            let w0 = host.clientWidth, pend = false;
+            new ResizeObserver(() => { if (pend || host.clientWidth === w0 && w0 > 0) return; pend = true; requestAnimationFrame(() => { pend = false; w0 = host.clientWidth; if (w0 > 0) go(); }); }).observe(host);
+        }
+        return host;
+    }
+    function freeHost(dsl) { return `<div class="pc-free-host" data-esquema="${_fesc(dsl)}"></div>`; }
+
+    // ────────────────────────────────────────────────────────────────
     // 8) renderAll — AHORA ASÍNCRONO (hay que esperar la carga del
     //    WASM de RDKit la primera vez; las siguientes llamadas son
     //    instantáneas porque el módulo ya está en memoria).
@@ -1175,7 +1476,8 @@
         const needsRDKit =
             root.querySelector('[data-mol]') ||
             root.querySelector('[data-smiles]') ||
-            root.querySelector('[data-scheme]');
+            root.querySelector('[data-scheme]') ||
+            root.querySelector('[data-esquema]');
         if (needsRDKit) {
             try {
                 await loadRDKit();
@@ -1202,6 +1504,12 @@
             el.classList.add('pc-scheme-rendered');
         });
 
+        root.querySelectorAll('[data-esquema]').forEach(el => {
+            if (el.dataset.freeDone) return;
+            el.dataset.freeDone = '1';
+            mountFree(el, el.getAttribute('data-esquema'));
+        });
+
         const raf = (typeof requestAnimationFrame === 'function') ? requestAnimationFrame : (fn => setTimeout(fn, 0));
         raf(() => snakeifySchemeRows(root));
     }
@@ -1214,6 +1522,9 @@
         renderScheme,
         renderForkScheme,
         renderZigzagScheme,
+        parseEsquema,
+        mountFree,
+        freeHost,
         pSigns,
         loadRDKit,
         MOLS,

@@ -150,15 +150,47 @@
     }
     .pv-tab:hover { color: var(--text); }
     #pv-selbtn { position: absolute; z-index: 9998; display: none; padding: 7px 12px; border-radius: 999px; border: 0; background: var(--gold); color: #241c02; font: 600 .85rem system-ui, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.35); cursor: pointer; white-space: nowrap; }
-    #pv-drawer { position: fixed; right: 16px; bottom: 16px; z-index: 9997; width: min(430px, calc(100vw - 32px)); max-height: min(78vh, 640px); display: none; flex-direction: column; background: var(--bg-card, var(--bg, #fff)); color: var(--text, #111); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.4); overflow: hidden; }
+    #pv-drawer { position: fixed; left: 16px; top: 16px; z-index: 9997; width: 430px; height: 540px; min-width: 300px; min-height: 280px; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); display: none; flex-direction: column; background: var(--bg-card, var(--bg, #fff)); color: var(--text, #111); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.4); overflow: hidden; resize: both; }
     #pv-drawer.on { display: flex; }
-    #pv-drawer header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--navy, #04122b); color: #fff; font-weight: 600; }
-    #pv-drawer header button { margin-left: auto; border: 0; background: transparent; color: #fff; font-size: 1.3rem; cursor: pointer; line-height: 1; }
-    #pv-drawer .pv-chat { padding: 12px; overflow: auto; flex: 1; }
+    #pv-drawer.max { left: 12px !important; top: 12px !important; width: calc(100vw - 24px) !important; height: calc(100vh - 24px) !important; resize: none; }
+    #pv-drawer header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--navy, #04122b); color: #fff; font-weight: 600; cursor: move; user-select: none; touch-action: none; flex-shrink: 0; }
+    #pv-drawer.max header { cursor: default; }
+    #pv-drawer header .pv-hspace { flex: 1; }
+    #pv-drawer header button { border: 0; background: transparent; color: #fff; font-size: 1.15rem; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    #pv-drawer header button:hover { background: rgba(255,255,255,.15); }
+    #pv-drawer-chat { flex: 1; min-height: 0; display: flex; }
+    #pv-drawer .pv-chat { padding: 12px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    #pv-drawer .pv-chat .pv-chat-log { flex: 1; min-height: 60px; max-height: none; overflow: auto; }
+    #pv-drawer .pv-chat textarea { flex-shrink: 0; min-height: 52px; max-height: 30%; }
+    #pv-drawer .pv-chat .pv-row, #pv-drawer .pv-chat .pv-quote { flex-shrink: 0; }
+    #pv-fab { position: fixed; left: 16px; bottom: 16px; z-index: 9996; padding: 10px 16px; border-radius: 999px; border: 0; background: var(--gold); color: #241c02; font: 600 .9rem system-ui, sans-serif; box-shadow: 0 6px 20px rgba(0,0,0,.35); cursor: pointer; }
+    #pv-fab.hide { display: none; }
     .pv-chat .pv-chat-log { max-height: 46vh; overflow: auto; }
-    #pv-drawer .pv-chat .pv-chat-log { max-height: 36vh; }
+    .pv-chat .pv-a b { font-weight: 700; }
+    .pv-chat .pv-a code, .pv-tu2 .pv-a code { background: rgba(128,128,128,.18); padding: 0 4px; border-radius: 4px; }
+    .pv-chat .pv-a { white-space: pre-wrap; }
+    .pv-chat .pv-a .pc-free-host { white-space: normal; }
+    .pv-chat .pv-a .pc-scheme-box { margin: 8px 0; padding: 8px 10px; }
+    /* esquemas libres (flechas en cualquier dirección, cajas, mecanismos) */
+    .pc-free-inner { position: relative; display: inline-block; min-width: 100%; }
+    .pc-free-boxes { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .pc-free-grid { display: grid; justify-items: center; align-items: start; position: relative; z-index: 1; padding: 14px 10px; width: max-content; }
+    .pc-free-node { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .pc-free-mol { display: flex; align-items: center; justify-content: center; }
+    .pc-free-svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 2; }
+    .pc-free-labs { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; }
+    .pc-free-lab { position: absolute; white-space: nowrap; font-size: 11.5px; font-weight: 600; line-height: 1.3; text-align: center; }
+    .pc-free-lab.above { color: #2456b8; }
+    .pc-free-lab.below { color: #c0362f; }
+    .pc-free-lab.note { color: var(--text-muted, #777); font-weight: 500; font-size: 10.5px; }
+    [data-theme="dark"] .pc-free-lab.above { color: #7fb0ff; }
+    [data-theme="dark"] .pc-free-lab.below { color: #ff8f86; }
+    .pc-free-box { position: absolute; border: 2px solid; border-radius: 12px; }
+    .pc-free-box span { position: absolute; top: -10px; left: 12px; font-size: 10.5px; font-weight: 700; padding: 1px 9px; border-radius: 999px; color: #fff; }
+    .pc-free-lab sub, .pc-free-lab sup, .pc-scheme-label sub, .pc-scheme-label sup { font-size: .75em; line-height: 0; }
     .pv-chat textarea { width: 100%; box-sizing: border-box; min-height: 56px; padding: 9px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: inherit; font: inherit; resize: vertical; margin-top: 8px; }
     .pv-chat .pv-quote { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; padding: 6px 10px; border-left: 3px solid var(--gold); background: rgba(128,128,128,.1); border-radius: 6px; font-size: .85rem; }
+    .pv-chat .pv-quote[hidden] { display: none; }
     .pv-chat .pv-quote span { flex: 1; white-space: pre-wrap; max-height: 5.5em; overflow: auto; }
     .pv-chat .pv-quote button { border: 0; background: transparent; color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1; }
     .pv-chat .pv-msg .pv-q small { display: block; opacity: .7; border-left: 2px solid var(--gold); padding-left: 6px; margin-bottom: 4px; white-space: pre-wrap; }
@@ -592,14 +624,14 @@
 const _PVT = {
     es: { back: 'Banco de Problemas', tabEnunciado: '📄 Enunciado', tabRespuesta: '🔑 Respuesta', tabTu: '✍️ Tu respuesta',
           confTitulo: '¿Ver la respuesta?', confTexto: '¿Estás seguro de que quieres ver la respuesta? Intenta resolver el problema primero: así se aprende (y se entrena) mucho más.', confSi: 'Sí, ver la respuesta', confNo: 'Seguir intentándolo',
-          tuTitulo: 'Tu respuesta', tuPartH: 'Parece que solo enviaste una parte', tuPartHas: 'Detecté respuesta a:', tuPartMiss: 'No vi respuesta a:', tuPartCut: 'Además, la última parte parece cortada o incompleta.', tuPartAsk: '¿Quieres continuar añadiendo el resto o calificamos solo lo que enviaste?', tuPartGo: 'Calificar solo lo enviado', tuPartMore: 'Voy a añadir el resto', tuEmpty: 'No encontré respuestas', tuOnlySent: 'sobre lo enviado', tuCross: 'Revisión cruzada de dos IA', tuDisc: 'Las IA discreparon; se promedió', selBtn: '💬 Preguntar al tutor', chatH: 'Pregunta sobre tu resolución', chatNote: 'Pregunta cómo se hace cualquier paso y por qué se hace así. También puedes seleccionar con el ratón cualquier parte del texto y pulsar «Preguntar al tutor». Sin coste.', chatPh: 'Escribe tu pregunta (p. ej. «¿por qué el estado de oxidación es +1?»)…', chatSend: 'Preguntar', chatThink: 'Pensando…', chatAbout: 'Sobre:', chatFree: 'Sin coste', chatHow: '¿Cómo se hace?', chatWhy: '¿Por qué?', drawerT: 'Tutor · sobre la solución', hintCostNote: 'Esto cuenta como pista y puede restar puntos.', chatQHow: 'Explícame paso a paso cómo se resuelve el inciso {id}.', chatQWhy: '¿Por qué se hace así en el inciso {id}? Explícame el razonamiento detrás de cada paso.', chatQSel: 'Explícame esto: ¿cómo se hace y por qué?', chatClear: 'Borrar conversación', tuAskH: 'Pregunta al tutor', tuAskNote: 'Puedes pedir aclaraciones o pistas. Cada ayuda resta puntos a tu nota final; las preguntas obvias o que piden la respuesta se rechazan.', tuAskPh: 'Escribe tu duda sobre el problema…', tuAsk: 'Preguntar', tuAskPhoto: '📎 Foto de tu duda',
+          tuTitulo: 'Tu respuesta', tuPartH: 'Parece que solo enviaste una parte', tuPartHas: 'Detecté respuesta a:', tuPartMiss: 'No vi respuesta a:', tuPartCut: 'Además, la última parte parece cortada o incompleta.', tuPartAsk: '¿Quieres continuar añadiendo el resto o calificamos solo lo que enviaste?', tuPartGo: 'Calificar solo lo enviado', tuPartMore: 'Voy a añadir el resto', tuEmpty: 'No encontré respuestas', tuOnlySent: 'sobre lo enviado', tuCross: 'Revisión cruzada de dos IA', tuDisc: 'Las IA discreparon; se promedió', selBtn: '💬 Preguntar al tutor', chatH: 'Pregunta sobre tu resolución', chatNote: 'Pregunta cómo se hace cualquier paso y por qué se hace así. También puedes seleccionar con el ratón cualquier parte del texto y pulsar «Preguntar al tutor». ', chatPh: 'Escribe tu pregunta (p. ej. «¿por qué el estado de oxidación es +1?»)…', chatSend: 'Preguntar', chatThink: 'Pensando…', chatAbout: 'Sobre:', chatFree: 'Sin coste', chatHow: '¿Cómo se hace?', chatWhy: '¿Por qué?', drawerT: 'Tutor · sobre la solución', fabT: '💬 Habla con el tutor', maxT: 'Ampliar / restaurar', clearShort: 'Borrar', hintCostNote: 'Esto cuenta como pista y puede restar puntos.', chatQHow: 'Explícame paso a paso cómo se resuelve el inciso {id}.', chatQWhy: '¿Por qué se hace así en el inciso {id}? Explícame el razonamiento detrás de cada paso.', chatQSel: 'Explícame esto: ¿cómo se hace y por qué?', chatClear: 'Borrar conversación', tuAskH: 'Pregunta al tutor', tuAskNote: 'Puedes pedir aclaraciones o pistas. Cada ayuda resta puntos a tu nota final; las preguntas obvias o que piden la respuesta se rechazan.', tuAskPh: 'Escribe tu duda sobre el problema…', tuAsk: 'Preguntar', tuAskPhoto: '📎 Foto de tu duda',
           tuPen: 'Penalización por ayudas', tuReset: 'Empezar de nuevo', tuCost: { aclaracion: 'Aclaración · sin coste', pista: 'Pista · −5 %', pista_fuerte: 'Pista fuerte · −12 %', rechazada: 'Pregunta rechazada · sin coste' },
           tuGradeH: 'Sube tu resolución', tuGradeNote: 'Sube fotos de tu resolución (o un archivo de texto). La IA la compara con la solución oficial y la puntúa por inciso.', tuFiles: '📷 Añadir fotos / archivos', tuNotes: 'Notas o respuesta escrita (opcional)', tuGrade: 'Calificar mi resolución', tuGrading: 'Calificando… (puede tardar hasta un minuto)', tuAsking: 'Pensando…',
           tuRes: 'Resultado', tuRaw: 'Puntos obtenidos', tuFinal: 'Nota final', tuHow: 'Cómo se resuelve', tuWarn: 'Avisos', tuErr: 'No se pudo completar la solicitud.', tuNoApi: 'El tutor solo funciona en la versión alojada en Vercel.', tuMax: 'máx.', tuLegal: 'La corrección la hace una IA y puede equivocarse: úsala como guía de entrenamiento.', tuRemove: 'Quitar', tuTooMany: 'Máximo 4 archivos.',
           error: 'No se pudo cargar este problema.', volver: '← Volver al Banco de Problemas' },
     en: { back: 'Problem Bank', tabEnunciado: '📄 Problem', tabRespuesta: '🔑 Answer', tabTu: '✍️ Your answer',
           confTitulo: 'View the answer?', confTexto: 'Are you sure you want to see the answer? Try solving the problem first: you learn (and train) much more that way.', confSi: 'Yes, show the answer', confNo: 'Keep trying',
-          tuTitulo: 'Your answer', tuPartH: 'It looks like you only sent part of it', tuPartHas: 'I found answers to:', tuPartMiss: 'No answer seen for:', tuPartCut: 'Also, the last part looks cut off or unfinished.', tuPartAsk: 'Do you want to keep adding the rest, or should we grade only what you sent?', tuPartGo: 'Grade only what I sent', tuPartMore: 'I will add the rest', tuEmpty: 'No answers found', tuOnlySent: 'on what was sent', tuCross: 'Cross-checked by two AIs', tuDisc: 'The AIs disagreed; averaged', selBtn: '💬 Ask the tutor', chatH: 'Ask about your solution', chatNote: 'Ask how any step is done and why it is done that way. You can also select any part of the text with the mouse and press “Ask the tutor”. No cost.', chatPh: 'Type your question (e.g. “why is the oxidation state +1?”)…', chatSend: 'Ask', chatThink: 'Thinking…', chatAbout: 'About:', chatFree: 'No cost', chatHow: 'How is it done?', chatWhy: 'Why?', drawerT: 'Tutor · about the solution', hintCostNote: 'This counts as a hint and may cost points.', chatQHow: 'Explain step by step how part {id} is solved.', chatQWhy: 'Why is it done this way in part {id}? Explain the reasoning behind each step.', chatQSel: 'Explain this to me: how is it done and why?', chatClear: 'Clear conversation', tuAskH: 'Ask the tutor', tuAskNote: 'You can ask for clarifications or hints. Every help costs points from your final mark; obvious questions or requests for the answer are declined.', tuAskPh: 'Type your question about the problem…', tuAsk: 'Ask', tuAskPhoto: '📎 Photo of your question',
+          tuTitulo: 'Your answer', tuPartH: 'It looks like you only sent part of it', tuPartHas: 'I found answers to:', tuPartMiss: 'No answer seen for:', tuPartCut: 'Also, the last part looks cut off or unfinished.', tuPartAsk: 'Do you want to keep adding the rest, or should we grade only what you sent?', tuPartGo: 'Grade only what I sent', tuPartMore: 'I will add the rest', tuEmpty: 'No answers found', tuOnlySent: 'on what was sent', tuCross: 'Cross-checked by two AIs', tuDisc: 'The AIs disagreed; averaged', selBtn: '💬 Ask the tutor', chatH: 'Ask about your solution', chatNote: 'Ask how any step is done and why it is done that way. You can also select any part of the text with the mouse and press “Ask the tutor”. ', chatPh: 'Type your question (e.g. “why is the oxidation state +1?”)…', chatSend: 'Ask', chatThink: 'Thinking…', chatAbout: 'About:', chatFree: 'No cost', chatHow: 'How is it done?', chatWhy: 'Why?', drawerT: 'Tutor · about the solution', fabT: '💬 Talk to the tutor', maxT: 'Maximize / restore', clearShort: 'Clear', hintCostNote: 'This counts as a hint and may cost points.', chatQHow: 'Explain step by step how part {id} is solved.', chatQWhy: 'Why is it done this way in part {id}? Explain the reasoning behind each step.', chatQSel: 'Explain this to me: how is it done and why?', chatClear: 'Clear conversation', tuAskH: 'Ask the tutor', tuAskNote: 'You can ask for clarifications or hints. Every help costs points from your final mark; obvious questions or requests for the answer are declined.', tuAskPh: 'Type your question about the problem…', tuAsk: 'Ask', tuAskPhoto: '📎 Photo of your question',
           tuPen: 'Penalty for help', tuReset: 'Start over', tuCost: { aclaracion: 'Clarification · no cost', pista: 'Hint · −5 %', pista_fuerte: 'Strong hint · −12 %', rechazada: 'Declined · no cost' },
           tuGradeH: 'Upload your solution', tuGradeNote: 'Upload photos of your solution (or a text file). The AI compares it with the official solution and scores each part.', tuFiles: '📷 Add photos / files', tuNotes: 'Notes or written answer (optional)', tuGrade: 'Grade my solution', tuGrading: 'Grading… (can take up to a minute)', tuAsking: 'Thinking…',
           tuRes: 'Result', tuRaw: 'Points earned', tuFinal: 'Final mark', tuHow: 'How it is solved', tuWarn: 'Warnings', tuErr: 'The request could not be completed.', tuNoApi: 'The tutor only works on the Vercel-hosted version.', tuMax: 'max', tuLegal: 'The marking is done by an AI and can make mistakes: use it as a training guide.', tuRemove: 'Remove', tuTooMany: 'Maximum 4 files.',
@@ -924,6 +956,7 @@ async function pvRender() {
     MolZoomUI.decorate(articulo);
     pvRenderGalerias(articulo);
     if (_pvTab === 'tu-respuesta') pvTutorInit();
+    pvFab();
 }
 
 
@@ -936,18 +969,37 @@ function _resLoad() { try { return JSON.parse(localStorage.getItem('pvRes:' + _p
 function _resSave(r) { try { localStorage.setItem('pvRes:' + _pvId, JSON.stringify(r)); } catch (e) {} }
 const _chInst = [];   // instancias montadas (cajón e inline) para repintarlas a la vez
 
+// Respuesta de la IA → HTML seguro: negritas, `código`, y dibujos químicos.
+// Dibujos admitidos (todo se escapa; la IA nunca inyecta HTML):
+//   [[MOL: SMILES | etiqueta]]            → una molécula
+//   ```esquema … ```                      → esquema libre (ver MolGraph.parseEsquema)
+function _chFmt(txt) {
+    const t = String(txt == null ? '' : txt);
+    const re = /```(?:esquema|mol|mecanismo)[^\n]*\n([\s\S]*?)```|\[\[\s*MOL\s*:\s*([^\]|]+?)\s*(?:\|\s*([^\]]*?))?\s*\]\]/gi;
+    const inline = (x) => _tuEsc(x).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    let out = '', last = 0, m;
+    while ((m = re.exec(t))) {
+        out += inline(t.slice(last, m.index));
+        const dsl = m[1] != null ? m[1].trim() : 'm1 @0,0: ' + m[2].trim() + (m[3] ? ' | ' + m[3].trim() : '');
+        out += `<div class="pc-free-host" data-esquema="${_tuEsc(dsl)}"></div>`;
+        last = re.lastIndex;
+    }
+    return out + inline(t.slice(last));
+}
 function pvChatMontar(root, fuente) {
     for (let i = _chInst.length - 1; i >= 0; i--) if (!_chInst[i].root.isConnected) _chInst.splice(i, 1);
     const inst = { root, fuente, quote: '', busy: false };
     root.classList.add('pv-chat');
     root.innerHTML = `<div class="pv-chat-log"></div><div class="pv-quote" hidden><span></span><button type="button" title="×">×</button></div>
         <textarea maxlength="800" placeholder="${_tuEsc(_pvT('chatPh'))}"></textarea>
-        <div class="pv-row"><button type="button" class="pv-b pv-main">${_pvT('chatSend')}</button><span class="pv-chip">${_pvT('chatFree')}</span><button type="button" class="pv-b pv-clear" style="margin-left:auto">${_pvT('chatClear')}</button></div>
+        <div class="pv-row"><button type="button" class="pv-b pv-main">${_pvT('chatSend')}</button><button type="button" class="pv-b pv-clear" style="margin-left:auto">${_pvT('chatClear')}</button></div>
         <div class="pv-err"></div>`;
     const q = (sel) => root.querySelector(sel);
     inst.pintar = () => {
-        q('.pv-chat-log').innerHTML = _chLoad().map((m) => `<div class="pv-msg"><div class="pv-q">${m.quote ? `<small>${_tuEsc(_pvT('chatAbout'))} «${_tuEsc(m.quote.slice(0, 240))}»</small>` : ''}${_tuEsc(m.q)}</div><div class="pv-a">${_tuEsc(m.a)}</div></div>`).join('');
-        const lg = q('.pv-chat-log'); lg.scrollTop = lg.scrollHeight;
+        q('.pv-chat-log').innerHTML = _chLoad().map((m) => `<div class="pv-msg"><div class="pv-q">${m.quote ? `<small>${_tuEsc(_pvT('chatAbout'))} «${_tuEsc(m.quote.slice(0, 240))}»</small>` : ''}${_tuEsc(m.q)}</div><div class="pv-a">${_chFmt(m.a)}</div></div>`).join('');
+        const lg = q('.pv-chat-log');
+        if (window.MolGraph) window.MolGraph.renderAll(lg).then(() => { lg.scrollTop = lg.scrollHeight; }).catch(() => {});
+        lg.scrollTop = lg.scrollHeight;
     };
     inst.setQuote = (t) => { inst.quote = String(t || '').slice(0, 1200); const b = q('.pv-quote'); b.hidden = !inst.quote; q('.pv-quote span').textContent = inst.quote; };
     inst.preguntar = async (texto, quote) => {
@@ -980,14 +1032,54 @@ function pvAbrirDrawer(quote, fuente) {
     let d = document.getElementById('pv-drawer');
     if (!d) {
         d = document.createElement('aside'); d.id = 'pv-drawer';
-        d.innerHTML = `<header><span>🎓 ${_pvT('drawerT')}</span><button type="button" aria-label="×">×</button></header><div id="pv-drawer-chat"></div>`;
+        d.innerHTML = `<header><span>🎓 ${_pvT('drawerT')}</span><span class="pv-hspace"></span><button type="button" class="pv-hmax" title="${_tuEsc(_pvT('maxT'))}" aria-label="max">⤢</button><button type="button" class="pv-hx" aria-label="×">×</button></header><div id="pv-drawer-chat"></div>`;
         document.body.appendChild(d);
-        d.querySelector('header button').onclick = () => d.classList.remove('on');
+        // posición y tamaño recordados
+        let g = null; try { g = JSON.parse(localStorage.getItem('pvDrawerGeo')); } catch (e) {}
+        const W = window.innerWidth, H = window.innerHeight;
+        const w = Math.min(g && g.w || 430, W - 8), h = Math.min(g && g.h || 540, H - 8);
+        d.style.width = w + 'px'; d.style.height = h + 'px';
+        d.style.left = Math.max(4, Math.min(W - w - 4, g ? g.x : W - w - 16)) + 'px';
+        d.style.top = Math.max(4, Math.min(H - 60, g ? g.y : H - h - 16)) + 'px';
+        const guardar = () => { if (d.classList.contains('max')) return; const r = d.getBoundingClientRect(); try { localStorage.setItem('pvDrawerGeo', JSON.stringify({ x: r.left, y: r.top, w: r.width, h: r.height })); } catch (e) {} };
+        d.querySelector('.pv-hx').onclick = () => { d.classList.remove('on'); pvFab(); };
+        d.querySelector('.pv-hmax').onclick = () => { d.classList.toggle('max'); guardar(); };
+        d.querySelector('header').addEventListener('dblclick', (e) => { if (!e.target.closest('button')) d.classList.toggle('max'); });
+        // arrastrar desde la cabecera (ratón / táctil)
+        const hd = d.querySelector('header'); let dr = null;
+        hd.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('button') || d.classList.contains('max')) return;
+            const r = d.getBoundingClientRect(); dr = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+            hd.setPointerCapture(e.pointerId);
+        });
+        hd.addEventListener('pointermove', (e) => {
+            if (!dr) return;
+            d.style.left = Math.max(-d.offsetWidth + 80, Math.min(window.innerWidth - 80, e.clientX - dr.dx)) + 'px';
+            d.style.top = Math.max(0, Math.min(window.innerHeight - 40, e.clientY - dr.dy)) + 'px';
+        });
+        const fin = () => { if (dr) { dr = null; guardar(); } };
+        hd.addEventListener('pointerup', fin); hd.addEventListener('pointercancel', fin);
+        if (typeof ResizeObserver === 'function') new ResizeObserver(() => guardar()).observe(d);
         _drawerInst = pvChatMontar(d.querySelector('#pv-drawer-chat'), fuente);
     }
-    _drawerInst.fuente = fuente;
+    _drawerInst.fuente = fuente || _drawerInst.fuente || 'respuesta';
     d.classList.add('on');
-    if (quote) { _drawerInst.setQuote(quote); const t = d.querySelector('textarea'); if (!t.value) t.value = _pvT('chatQSel'); t.focus(); t.select(); }
+    const fab = document.getElementById('pv-fab'); if (fab) fab.classList.add('hide');
+    const t = d.querySelector('textarea');
+    if (quote) { _drawerInst.setQuote(quote); if (!t.value) t.value = _pvT('chatQSel'); t.focus(); t.select(); }
+    else t.focus();
+}
+// Botón flotante: siempre se puede seguir hablando con el tutor
+function pvFab() {
+    let f = document.getElementById('pv-fab');
+    if (!f) {
+        f = document.createElement('button'); f.id = 'pv-fab'; f.type = 'button';
+        f.onclick = () => pvAbrirDrawer('', _pvTab === 'enunciado' ? 'respuesta' : (_pvTab === 'respuesta' ? 'respuesta' : 'resultado'));
+        document.body.appendChild(f);
+    }
+    f.textContent = _pvT('fabT');
+    const d = document.getElementById('pv-drawer');
+    f.classList.toggle('hide', !!(d && d.classList.contains('on')));
 }
 // Pista (cuesta puntos): se lleva la selección a «Tu respuesta → Pregunta al tutor»
 async function pvPrefillPista(texto) {
@@ -1031,7 +1123,7 @@ async function pvPrefillPista(texto) {
             document.body.appendChild(btn);
         }
         btn.textContent = _pvT('selBtn') + (fuente === 'enunciado' || fuente === 'pista' ? ' (−)' : '');
-        btn.title = fuente === 'enunciado' || fuente === 'pista' ? _pvT('hintCostNote') : _pvT('chatFree');
+        btn.title = fuente === 'enunciado' || fuente === 'pista' ? _pvT('hintCostNote') : '';
         const r = sel.getRangeAt(0).getBoundingClientRect();
         btn.style.display = 'block';
         btn.style.top = Math.max(8, window.scrollY + r.top - btn.offsetHeight - 8) + 'px';
@@ -1164,9 +1256,10 @@ function pvTutorInit() {
             ${r.revisionCruzada ? `<br><small>🔍 ${_pvT('tuCross')}</small>` : ''}</div>
             <p>${_tuEsc(r.resumen)}</p>
             ${r.advertencias && r.advertencias.length ? `<p class="pv-note">⚠️ ${_pvT('tuWarn')}: ${r.advertencias.map(_tuEsc).join(' · ')}</p>` : ''}
-            ${r.incisos.map((x) => `<details class="pv-inc"><summary><strong>${_tuEsc(x.id)}</strong><span>${_tuEsc(x.comentario)}${x.discrepancia ? ` <em title="${_tuEsc(_pvT('tuDisc'))}">↔</em>` : ''}</span><span class="pv-pts">${fm(x.puntos)} / ${fm(x.max)}</span></summary><p><strong>${_pvT('tuHow')}:</strong>\n${_tuEsc(x.como_se_hace)}</p><div class="pv-whyrow"><button type="button" data-k="how" data-id="${_tuEsc(x.id)}">${_pvT('chatHow')}</button><button type="button" data-k="why" data-id="${_tuEsc(x.id)}">${_pvT('chatWhy')}</button></div></details>`).join('')}
+            ${r.incisos.map((x) => `<details class="pv-inc"><summary><strong>${_tuEsc(x.id)}</strong><span>${_tuEsc(x.comentario)}${x.discrepancia ? ` <em title="${_tuEsc(_pvT('tuDisc'))}">↔</em>` : ''}</span><span class="pv-pts">${fm(x.puntos)} / ${fm(x.max)}</span></summary><div class="pv-how pv-a" style="margin:8px 0"><strong>${_pvT('tuHow')}:</strong>\n${_chFmt(x.como_se_hace)}</div><div class="pv-whyrow"><button type="button" data-k="how" data-id="${_tuEsc(x.id)}">${_pvT('chatHow')}</button><button type="button" data-k="why" data-id="${_tuEsc(x.id)}">${_pvT('chatWhy')}</button></div></details>`).join('')}
             <section id="tu-chat" style="margin-top:18px"><h2>💬 ${_pvT('chatH')}</h2><p class="pv-note">${_pvT('chatNote')}</p><div id="tu-chat-mount"></div></section>`;
         const inst = pvChatMontar($('tu-chat-mount'), 'resultado');
+        if (window.MolGraph) window.MolGraph.renderAll($('tu-out'));
         $('tu-out').querySelectorAll('.pv-whyrow button').forEach((bt) => {
             bt.onclick = () => {
                 const x = r.incisos.find((i) => i.id === bt.dataset.id) || {};
