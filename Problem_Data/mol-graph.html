@@ -425,49 +425,87 @@
         }
         return signs;
     }
+    // Orbital p dibujado como en los libros: dos lóbulos en forma de gota que
+    // se tocan en el núcleo; el lóbulo de función de onda negativa va relleno
+    // de negro, el positivo en blanco. sign>0 → arriba blanco / abajo negro.
+    function pOrb(cx, cy, sign, o) {
+        o = o || {};
+        const L = o.L || 24, w = o.w || 8.5, dash = !!o.dash;
+        const lobe = (dir, black) => {
+            const y1 = cy + dir * L;
+            return `<path d="M${cx},${cy} C${cx + w * 1.5},${cy + dir * L * 0.18} ${cx + w * 1.1},${y1} ${cx},${y1} C${cx - w * 1.1},${y1} ${cx - w * 1.5},${cy + dir * L * 0.18} ${cx},${cy}Z" class="pc-orb-lobe ${black ? 'pc-orb-neg' : 'pc-orb-pos'}${dash ? ' pc-orb-dash' : ''}"/>`;
+        };
+        return lobe(-1, sign < 0) + lobe(1, sign > 0);
+    }
     function renderOrbitalRow(N, moIndex, opts) {
         opts = opts || {};
         const blank = !!opts.blank;
+        const hint = opts.hint || [];
         const signs = opts.signs || pSigns(N, moIndex);
-        const spacing = 46, lobeW = 20, lobeH = 34, pad = 20;
-        const W = spacing * (N - 1) + pad * 2 + lobeW;
-        const H = lobeH * 2 + pad * 1.4;
-        const cy = H / 2;
+        const spacing = 29, L = 24, pad = 14;
+        const W = spacing * (N - 1) + pad * 2 + 4;
+        const H = L * 2 + 6;
         let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">';
         for (let i = 0; i < N; i++) {
-            const cx = pad + lobeW / 2 + i * spacing;
-            const topNeg = !blank && signs[i] < 0;
-            svg += `<ellipse cx="${cx}" cy="${cy - lobeH/2 + 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-neg' : 'pc-orb-pos'}"/>`;
-            svg += `<ellipse cx="${cx}" cy="${cy + lobeH/2 - 2}" rx="${lobeW/2}" ry="${lobeH/2}" class="pc-orb-lobe ${topNeg ? 'pc-orb-pos' : 'pc-orb-neg'}"/>`;
-            svg += `<line x1="${cx}" y1="${cy - lobeH + 4}" x2="${cx}" y2="${cy + lobeH - 4}" class="pc-orb-axis"/>`;
+            const cx = pad + 2 + i * spacing;
+            svg += pOrb(cx, H / 2, signs[i], { L, dash: blank && !hint.includes(i) });
         }
-        svg += '</svg>';
-        return svg;
+        return svg + '</svg>';
     }
+    let _mkUid = 0;
+    function _arcArrows(x1, x2, yTop, yBot, h) {
+        const id = 'ob' + (++_mkUid);
+        return `<defs><marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9z" fill="currentColor"/></marker></defs>` +
+            `<path d="M${x1},${yTop} Q${(x1 + x2) / 2},${yTop - h} ${x2},${yTop}" class="pc-orb-arc" marker-start="url(#${id})" marker-end="url(#${id})"/>` +
+            `<path d="M${x1},${yBot} Q${(x1 + x2) / 2},${yBot + h} ${x2},${yBot}" class="pc-orb-arc" marker-start="url(#${id})" marker-end="url(#${id})"/>`;
+    }
+    const _orbGroups = (items) => '<div class="pc-orb-groups">' + items.map(it =>
+        `<figure><div class="pc-orbitals">${renderOrbitalRow(it.N, it.idx)}</div><figcaption>${it.label}</figcaption></figure>`).join('') + '</div>';
+    // Matriz del diagrama del hexatrieno (fila 0 = más energía). 0 = orbital discontinuo,
+    // 1 = negro arriba / blanco abajo, -1 = blanco arriba / negro abajo.
+    const HEX_MATRIZ = [[0, 0, 0, 0, 0, 1], [1, -1, 0, 0, -1, 1], [1, -1, -1, 0, 0, -1], [0, 1, -1, -1, 1, 0], [0, 1, 1, -1, -1, 0], [1, 0, 0, 0, 0, 0]];
+    const _orbStack = (filled) => {
+        let rows = '';
+        HEX_MATRIZ.forEach((fila, i) => {
+            const k = 6 - i;
+            const cell = v => (v === 1 ? -1 : 1);   // → convención interna de pOrb (sign<0 = negro arriba)
+            let signs;
+            if (filled) {
+                // solución completa, con la misma fase global que muestra la matriz
+                const calc = pSigns(6, k), j = fila.findIndex(v => v !== 0);
+                const f = (calc[j] < 0) === (fila[j] === 1) ? 1 : -1;
+                signs = calc.map(x => x * f);
+            } else signs = fila.map(cell);
+            const hint = fila.map((v, c) => (v !== 0 ? c : -1)).filter(c => c >= 0);
+            rows += `<div class="pc-orbitals">${renderOrbitalRow(6, k, { blank: !filled, hint, signs })}</div>`;
+        });
+        return `<div class="pc-orb-stack"><div class="pc-orb-rows">${rows}</div>
+            <div class="pc-orb-eax"><div class="pc-orb-line"></div><div class="pc-orb-etx"><span>alta<br>energía</span><span>baja<br>energía</span></div></div></div>`;
+    };
 
     const DIAGRAMS = {};
-    DIAGRAMS['p-orbital-fases'] = () => `
-        <svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
-            <text x="80" y="20" class="pc-orb-title" text-anchor="middle">orbital p</text>
-            <line x1="80" y1="30" x2="80" y2="130" class="pc-orb-axis"/>
-            <ellipse cx="80" cy="56" rx="24" ry="28" class="pc-orb-lobe pc-orb-pos"/>
-            <ellipse cx="80" cy="104" rx="24" ry="28" class="pc-orb-lobe pc-orb-neg"/>
-            <line x1="106" y1="56" x2="170" y2="40" class="pc-orb-leader"/>
-            <text x="176" y="44" class="pc-orb-label" text-anchor="start">valor positivo</text>
-            <line x1="106" y1="104" x2="170" y2="120" class="pc-orb-leader"/>
-            <text x="176" y="124" class="pc-orb-label" text-anchor="start">valor negativo</text>
-        </svg>`;
-    DIAGRAMS['interferencia-mo'] = () => `
-        <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" class="pc-orb-svg">
-            <text x="70" y="18" class="pc-orb-title" text-anchor="middle">interferencia constructiva</text>
-            <ellipse cx="52" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="52" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
-            <ellipse cx="86" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="86" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
-            <foreignObject x="10" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>del mismo signo</div></foreignObject>
-            <text x="266" y="18" class="pc-orb-title" text-anchor="middle">interferencia destructiva</text>
-            <ellipse cx="248" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/><ellipse cx="248" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/>
-            <ellipse cx="282" cy="50" rx="16" ry="26" class="pc-orb-lobe pc-orb-neg"/><ellipse cx="282" cy="92" rx="16" ry="26" class="pc-orb-lobe pc-orb-pos"/>
-            <foreignObject x="206" y="128" width="120" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="pc-orb-caption">lóbulos adyacentes<br>de signo opuesto</div></foreignObject>
-        </svg>`;
+    DIAGRAMS['p-orbital-fases'] = () => {
+        const id = 'ob' + (++_mkUid);
+        return `<div class="pc-orb-pfig"><div class="pc-orb-ptitle">orbital p</div>
+        <svg viewBox="0 0 250 100" class="pc-orb-svg pc-orb-pwide" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="${id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9z" fill="currentColor"/></marker></defs>
+            ${pOrb(34, 50, 1, { L: 38, w: 13 })}
+            <line x1="92" y1="26" x2="54" y2="26" class="pc-orb-arc" marker-end="url(#${id})"/>
+            <text x="98" y="30" class="pc-orb-label">valor positivo</text>
+            <line x1="92" y1="74" x2="54" y2="74" class="pc-orb-arc" marker-end="url(#${id})"/>
+            <text x="98" y="78" class="pc-orb-label">valor negativo</text>
+        </svg></div>`;
+    };
+    DIAGRAMS['interferencia-mo'] = () => {
+        const fila = (same, l, r) => `<div class="pc-orb-int"><span class="pc-orb-int-l">${l}</span>
+            <svg viewBox="0 0 80 100" class="pc-orb-svg pc-orb-intsvg" xmlns="http://www.w3.org/2000/svg">${pOrb(24, 50, 1, { L: 28, w: 10 })}${pOrb(56, 50, same ? 1 : -1, { L: 28, w: 10 })}${_arcArrows(24, 56, 18, 82, 14)}</svg>
+            <span class="pc-orb-int-r">${r}</span></div>`;
+        return fila(true, 'interferencia<br>constructiva', 'lóbulos adyacentes<br>del mismo signo') + fila(false, 'interferencia<br>destructiva', 'lóbulos adyacentes<br>de signo opuesto');
+    };
+    DIAGRAMS['q4-butadieno-mos'] = () => _orbGroups([{ N: 4, idx: 2, label: 'A' }, { N: 4, idx: 1, label: 'B' }, { N: 4, idx: 4, label: 'C' }, { N: 4, idx: 3, label: 'D' }]);
+    DIAGRAMS['q4-butadieno-orden'] = () => _orbGroups([{ N: 4, idx: 1, label: 'B<br><small>menor energía</small>' }, { N: 4, idx: 2, label: 'A' }, { N: 4, idx: 3, label: 'D' }, { N: 4, idx: 4, label: 'C<br><small>mayor energía</small>' }]);
+    DIAGRAMS['q4-hexatrieno-vacio'] = () => _orbStack(false);
+    DIAGRAMS['q4-hexatrieno-mos'] = () => _orbStack(true);
 
     // ────────────────────────────────────────────────────────────────
     // 4.b) MOLÉCULAS "A MANO" — para las estructuras con sustituyentes

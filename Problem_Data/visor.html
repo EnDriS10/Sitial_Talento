@@ -539,18 +539,40 @@
     .pc-orbitals-row-label { flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--text-muted); width: 74px; }
     .pc-orbitals { display: inline-block; }
     .pc-orb-svg { display: block; height: 58px; width: auto; }
-    .pc-orb-lobe { stroke: var(--text); stroke-width: 1.3; }
-    .pc-orb-pos { fill: var(--card-bg); }
-    .pc-orb-neg { fill: var(--navy-text); }
-    [data-theme="dark"] .pc-orb-neg { fill: var(--gold); }
+    .pc-orb-lobe { stroke: var(--text); stroke-width: 1.3; stroke-linejoin: round; }
+    .pc-orb-pos { fill: var(--card-bg, #fff); }
+    .pc-orb-neg { fill: var(--text); }
+    .pc-orb-lobe.pc-orb-dash { fill: none; stroke-dasharray: 2.5 2.5; opacity: .6; stroke-width: 1.1; }
     .pc-orb-axis { stroke: var(--text); stroke-width: 1; opacity: .55; }
     .pc-diagram-rendered { display: block; margin: 14px 0; }
     .pc-diagram-rendered .pc-orb-svg { height: auto; width: 100%; max-width: 420px; }
     .pc-orb-title { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; fill: var(--text); }
-    .pc-orb-label { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; fill: var(--text); }
+    .pc-orb-label { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 13px; fill: var(--text); }
     .pc-orb-leader { stroke: var(--text); stroke-width: 1; opacity: .6; }
+    .pc-orb-arc { fill: none; stroke: var(--text); stroke-width: 1.2; color: var(--text); }
     .pc-orb-caption { font-family: 'Inter', sans-serif; font-size: 11.5px; line-height: 1.35; color: var(--text); text-align: center; }
-
+    .pc-figrow { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; margin: 14px 0; }
+    .pc-figrow > p, .pc-figrow > .pc-figtext { flex: 1 1 300px; margin: 0; }
+    .pc-figrow > .pc-figside { flex: 0 0 auto; }
+    .pc-figrow > .pc-figside .pc-diagram-rendered { margin: 0; }
+    .pc-orb-pfig { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+    .pc-orb-ptitle { font-size: 13px; font-weight: 500; padding-left: 4px; }
+    .pc-diagram-rendered .pc-orb-pwide { width: 250px; height: auto; }
+    .pc-orb-int { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 6px 0; font-size: 13px; line-height: 1.25; }
+    .pc-orb-int-l { text-align: right; width: 120px; }
+    .pc-orb-int-r { text-align: left; width: 140px; }
+    .pc-diagram-rendered .pc-orb-intsvg { width: 84px; height: auto; }
+    .pc-orb-groups { display: flex; gap: 26px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+    .pc-orb-groups figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .pc-orb-groups figcaption { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; }
+    .pc-orb-groups figcaption small { font-weight: 500; color: var(--text-muted); font-size: 11px; }
+    .pc-orb-groups .pc-orb-svg, .pc-orb-stack .pc-orb-svg { height: 54px; width: auto; max-width: none; }
+    .pc-orb-stack { display: flex; gap: 14px; align-items: stretch; }
+    .pc-orb-rows { display: flex; flex-direction: column; gap: 12px; }
+    .pc-orb-eax { display: flex; gap: 8px; align-items: stretch; }
+    .pc-orb-line { width: 3px; background: var(--text); position: relative; margin: 10px 8px 0 8px; }
+    .pc-orb-line::before { content: ''; position: absolute; top: -9px; left: -6px; border: 7.5px solid transparent; border-bottom: 11px solid var(--text); border-top: 0; }
+    .pc-orb-etx { display: flex; flex-direction: column; justify-content: space-between; font-size: 12.5px; line-height: 1.2; }
     .pc-orb-energy-diagram { display: flex; align-items: stretch; gap: 14px; margin: 14px 0; padding: 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; }
     .pc-orb-energy-rows { display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .pc-orb-energy-rows .pc-orbitals-row { margin: 0; }
