@@ -1113,34 +1113,25 @@
         { size: 'md' }
     );
 
-    SCHEMES['q4-tartrazina-sintesis'] = () => renderScheme(null, {
-        size: 'sm',
-        rows: [
-            [
-                { mol: 'nitrobenceno', label: 'nitrobenceno' },
-                { arrow: true, above: 'Sn / HCl' },
-                { mol: 'anilina', label: 'A &middot; C\u2086H\u2087N' },
-                { arrow: true, above: 'H\u2082SO\u2084 conc.', below: '200 &deg;C' },
-                { mol: 'acido-sulfanilico', label: 'B &middot; C\u2086H\u2087NO\u2083S' }
-            ],
-            [
-                { text: '' },
-                { arrow: true, above: 'NaNO\u2082 / HCl' },
-                { mol: 'sal-diazonio', label: 'C &middot; [C\u2086H\u2085N\u2082O\u2083S]\u207aCl\u207b' },
-                { arrow: true, above: 'i. Na\u2082SO\u2083/Na\u2082CO\u2083', below: 'ii. H\u207a/H\u2082O' },
-                { mol: 'hidrazina-sulfonica', label: 'D &middot; C\u2086H\u2088N\u2082O\u2083S' }
-            ],
-            [
-                { text: '' },
-                { arrow: true, above: 'dietil oxalacetato', below: '&minus;H\u2082O, &minus;EtOH' },
-                { mol: 'pirazolona-ester', label: 'E' },
-                { arrow: true, above: 'compuesto C' },
-                { mol: 'tartrazina-simplificada', label: 'F' },
-                { arrow: true, above: 'exceso NaOH' },
-                { mol: 'tartrazina-simplificada', label: 'tartrazina' }
-            ]
-        ]
-    });
+    SCHEMES['q4-tartrazina-sintesis'] = () => freeHost(`
+size=sm escala=0.42 gapx=24 gapy=40
+n @0,0: O=[N+]([O-])c1ccccc1 | nitrobenceno | tam=sm
+a @1,0: Nc1ccccc1 | A · C6H7N | tam=sm
+b @2,0: Nc1ccc(S(=O)(=O)O)cc1 | B · C6H7NO3S | tam=sm
+c @3,0: N#[N+]c1ccc(S(=O)(=O)O)cc1 | C · [C6H5N2O3S]⁺ Cl⁻ | tam=sm
+d @3,2: NNc1ccc(S(=O)(=O)O)cc1 | D · C6H8N2O3S | tam=sm
+ox @2,1: CCOC(=O)CC(=O)C(=O)OCC | oxalacetato de dietilo
+e @1,2: CCOC(=O)C1=NN(c2ccc(S(=O)(=O)O)cc2)C(=O)C1 | E
+f @0,2: CCOC(=O)c1nn(-c2ccc(S(=O)(=O)O)cc2)c(O)c1N=Nc1ccc(S(=O)(=O)O)cc1 | F
+t @0,3: [Na+].[Na+].[Na+].[O-]C(=O)c1nn(-c2ccc(S(=O)(=O)[O-])cc2)c(O)c1N=Nc1ccc(S(=O)(=O)[O-])cc1 | tartrazina | caja=amarillo
+n -> a | Sn | HCl(aq)
+a -> b | H2SO4 conc. | 200 °C
+b -> c | NaNO2 | HCl
+c -> d | (i) Na2SO3/Na2CO3 | (ii) H+/H2O
+d -> e | − H2O | − CH3CH2OH
+e -> f | compuesto C
+f -> t | NaOH en exceso
+`);
 
     // ═══ Q6 — síntesis total de la acitretina ═══
     // Secuencia completa (8 moléculas, 7 pasos de reacción) dada de una
@@ -1233,6 +1224,7 @@ u6 -> fin | piridina, Δ
     //      curva: a:3 -> a:5 | giro=-1        (átomo nº3 → átomo nº5)
     //      curva: a:3-4 -> a:6                (enlace 3-4 → átomo 6)
     //      caja amarillo: a, b | Stobbe
+    //      corchete: a, b | ‡                 ([ ] alrededor de uno o varios nodos)
     // ────────────────────────────────────────────────────────────────
     const FREE_COLORS = { amarillo: '#e0b400', verde: '#2e9e4f', azul: '#2f6fdc', rojo: '#d6403a', gris: '#8a8f98', naranja: '#e07b1a', morado: '#8a4fd0' };
     const FREE_NODE_KEYS = ['caja', 'color', 'resaltar', 'tam', 'etiqueta', 'incognita'];
@@ -1258,13 +1250,15 @@ u6 -> fin | piridina, Δ
         return { pos, kv };
     }
     function parseEsquema(src) {
-        const spec = { opts: {}, nodes: [], arrows: [], curves: [], boxes: [] };
+        const spec = { opts: {}, nodes: [], arrows: [], curves: [], boxes: [], brackets: [] };
         const seen = new Set();
         String(src || '').split(/\r?\n/).slice(0, 120).forEach(raw => {
             const line = raw.trim();
             if (!line || line[0] === '#') return;
             let m;
-            if ((m = line.match(/^caja\s*([a-zñ#0-9]*)\s*:\s*([\w\s,]+?)\s*(?:\|(.*))?$/i))) {
+            if ((m = line.match(/^corchete\s*:\s*([\w\s,]+?)\s*(?:\|(.*))?$/i))) {
+                spec.brackets.push({ ids: m[1].split(/[\s,]+/).filter(Boolean), label: (m[2] || '').trim() });
+            } else if ((m = line.match(/^caja\s*([a-zñ#0-9]*)\s*:\s*([\w\s,]+?)\s*(?:\|(.*))?$/i))) {
                 spec.boxes.push({ color: m[1] || 'amarillo', ids: m[2].split(/[\s,]+/).filter(Boolean), label: (m[3] || '').trim() });
             } else if ((m = line.match(/^curva\s*:\s*(\w+):(\d+(?:-\d+)?)\s*->\s*(\w+):(\d+(?:-\d+)?)\s*(?:\|(.*))?$/i))) {
                 const f = _fields(m[5], FREE_CURVE_KEYS);
@@ -1319,7 +1313,7 @@ u6 -> fin | piridina, Δ
         const o = spec.opts;
         const nodes = spec.nodes;
         const sizeKey = ['sm', 'md', 'lg'].includes(o.size || o.tam) ? (o.size || o.tam) : 'sm';
-        const esc = Math.max(0.5, Math.min(1.4, parseFloat(o.escala) || 0.85));
+        const esc = Math.max(0.35, Math.min(1.4, parseFloat(o.escala) || 0.85));
         const preset = SIZE_PRESETS[sizeKey];
         const minC = Math.min(0, ...nodes.map(n => n.c)), minR = Math.min(0, ...nodes.map(n => n.r));
         const host = document.createElement('div');
@@ -1336,7 +1330,7 @@ u6 -> fin | piridina, Δ
         nodes.forEach(n => {
             const sz = ['sm', 'md', 'lg'].includes(n.kv.tam) ? n.kv.tam : sizeKey;
             const p = SIZE_PRESETS[sz];
-            const w = Math.round(p.w * esc), h = Math.round(preset.h * esc);
+            const w = Math.round(p.w * esc), h = nodes.every(q => q.text != null) ? 36 : Math.round(preset.h * esc);
             const el = document.createElement('div'); el.className = 'pc-free-node'; el.dataset.id = n.id;
             el.style.gridColumn = String(2 * (n.c - minC) + 1); el.style.gridRow = String(2 * (n.r - minR) + 1);
             const mb = document.createElement('div'); mb.className = 'pc-free-mol pc-scheme-mol'; mb.style.height = h + 'px'; mb.style.minWidth = Math.round(40) + 'px';
@@ -1365,7 +1359,7 @@ u6 -> fin | piridina, Δ
         const nodes = spec.nodes;
         const NS = 'http://www.w3.org/2000/svg';
         svg.innerHTML = ''; labs.innerHTML = ''; bl.innerHTML = '';
-        const gapX = Math.max(40, parseFloat(spec.opts.gapx) || 96), gapY = Math.max(40, parseFloat(spec.opts.gapy) || 84);
+        const gapX = Math.max(40, parseFloat(spec.opts.gapx) || 96), gapY = Math.max(6, parseFloat(spec.opts.gapy) || 84);
         const byId = {}; nodes.forEach(n => byId[n.id] = n);
         const cols = Math.max(...nodes.map(n => n.c)) - st.minC + 1, rows = Math.max(...nodes.map(n => n.r)) - st.minR + 1;
         const colGap = new Array(Math.max(0, cols - 1)).fill(gapX), rowGap = new Array(Math.max(0, rows - 1)).fill(gapY);
@@ -1416,25 +1410,25 @@ u6 -> fin | piridina, Δ
             const na = rel(els[A.id]), nb = rel(els[B.id]);
             const ma = rel(els[A.id].querySelector('.pc-free-mol')), mb = rel(els[B.id].querySelector('.pc-free-mol'));
             const ca = { x: (ma.l + ma.r) / 2, y: (ma.t + ma.b) / 2 }, cb = { x: (mb.l + mb.r) / 2, y: (mb.t + mb.b) / 2 };
-            const dx = cb.x - ca.x, dy = cb.y - ca.y, PAD = 7;
+            const dx = cb.x - ca.x, dy = cb.y - ca.y, PA = 7 + ((spec.brackets || []).some(q => q.ids.includes(A.id)) ? 9 : 0), PB = 7 + ((spec.brackets || []).some(q => q.ids.includes(B.id)) ? 9 : 0);
             const col = _fcolor(a.color);
             const eq = a.estilo === 'eq' || a.estilo === 'equilibrio', res = a.estilo === 'resonancia', dash = a.estilo === 'punteada';
             let pts, seg; // seg: segmento principal para rótulos {x1,y1,x2,y2}
             if (Math.abs(dy) < 10) {
                 const dir = dx >= 0 ? 1 : -1;
-                const x1 = dir > 0 ? ma.r + PAD : ma.l - PAD, x2 = dir > 0 ? mb.l - PAD : mb.r + PAD, y = ca.y;
+                const x1 = dir > 0 ? ma.r + PA : ma.l - PA, x2 = dir > 0 ? mb.l - PB : mb.r + PB, y = ca.y;
                 pts = [[x1, y], [x2, y]]; seg = { x1, y1: y, x2, y2: y };
             } else if (Math.abs(dx) < 10) {
                 const dir = dy >= 0 ? 1 : -1;
-                const y1 = dir > 0 ? na.b + PAD : na.t - PAD, y2 = dir > 0 ? nb.t - PAD : nb.b + PAD, x = ca.x;
+                const y1 = dir > 0 ? na.b + PA : na.t - PA, y2 = dir > 0 ? nb.t - PB : nb.b + PB, x = ca.x;
                 pts = [[x, y1], [x, y2]]; seg = { x1: x, y1, x2: x, y2 };
             } else if (a.ruta === 'hv') {
-                const x1 = dx >= 0 ? ma.r + PAD : ma.l - PAD, y2 = dy >= 0 ? nb.t - PAD : nb.b + PAD;
+                const x1 = dx >= 0 ? ma.r + PA : ma.l - PA, y2 = dy >= 0 ? nb.t - PB : nb.b + PB;
                 pts = [[x1, ca.y], [cb.x, ca.y], [cb.x, y2]]; seg = Math.abs(cb.x - x1) >= Math.abs(y2 - ca.y) ? { x1, y1: ca.y, x2: cb.x, y2: ca.y } : { x1: cb.x, y1: ca.y, x2: cb.x, y2 };
             } else if (a.ruta === 'recta') {
                 pts = [[ca.x + Math.sign(dx) * 20, ca.y + Math.sign(dy) * 20], [cb.x - Math.sign(dx) * 20, cb.y - Math.sign(dy) * 20]]; seg = { x1: pts[0][0], y1: pts[0][1], x2: pts[1][0], y2: pts[1][1] };
             } else { // vh (por defecto): baja/sube y luego gira hacia el destino
-                const y1 = dy >= 0 ? na.b + PAD : na.t - PAD, x2 = dx >= 0 ? mb.l - PAD : mb.r + PAD;
+                const y1 = dy >= 0 ? na.b + PA : na.t - PA, x2 = dx >= 0 ? mb.l - PB : mb.r + PB;
                 pts = [[ca.x, y1], [ca.x, cb.y], [x2, cb.y]]; seg = Math.abs(x2 - ca.x) >= Math.abs(cb.y - y1) ? { x1: ca.x, y1: cb.y, x2, y2: cb.y } : { x1: ca.x, y1, x2: ca.x, y2: cb.y };
             }
             if (a.largo && pts.length === 2) { // acorta la flecha recta a `largo` px, centrada
@@ -1460,7 +1454,10 @@ u6 -> fin | piridina, Δ
                 const x = Math.max(seg.x1, seg.x2) + 10;
                 const hs = [above, below, note].filter(Boolean), tot = hs.reduce((s, d) => s + d.offsetHeight, 0);
                 let y = my - tot / 2;
-                hs.forEach(d => { place(d, x, y, 0, 0); d.style.textAlign = 'left'; y += d.offsetHeight; });
+                const wmax = Math.max(0, ...hs.map(d => d.offsetWidth));
+                const izq = x + wmax > (inner.clientWidth || 1e9) - 4;   // sin sitio a la derecha → rótulos a la izquierda de la flecha
+                const xl = Math.min(seg.x1, seg.x2) - 10;
+                hs.forEach(d => { if (izq) { place(d, xl, y, -100, 0); d.style.textAlign = 'right'; } else { place(d, x, y, 0, 0); d.style.textAlign = 'left'; } y += d.offsetHeight; });
             }
         });
 
@@ -1496,6 +1493,15 @@ u6 -> fin | piridina, Δ
             d.style.cssText = `left:${l}px;top:${t}px;width:${r - l}px;height:${bt - t}px;border-color:${col};background:${col}22`;
             if (b.label) { const s = document.createElement('span'); s.textContent = b.label; s.style.background = col; d.appendChild(s); }
             bl.appendChild(d);
+        });
+
+        // 5) corchetes [ ] de intermedios / estados de transición
+        (spec.brackets || []).forEach(b => {
+            const rs = b.ids.map(i => els[i]).filter(Boolean).map(e => rel(e.querySelector('.pc-free-mol') || e)); if (!rs.length) return;
+            const P3 = 10, w = 9;
+            const l = Math.min(...rs.map(r => r.l)) - P3, t = Math.min(...rs.map(r => r.t)) - P3, r = Math.max(...rs.map(r => r.r)) + P3, bt = Math.max(...rs.map(r => r.b)) + P3;
+            mkPath(`M${l + w},${t} L${l},${t} L${l},${bt} L${l + w},${bt} M${r - w},${t} L${r},${t} L${r},${bt} L${r - w},${bt}`, null);
+            if (b.label) { const d = document.createElement('div'); d.className = 'pc-free-lab note'; d.innerHTML = _fquim(b.label); labs.appendChild(d); place(d, r + 3, t - 4, 0, -10); }
         });
     }
 

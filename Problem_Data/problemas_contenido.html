@@ -824,7 +824,8 @@ const contenidoProblemas = {
                     <div class="pc-compound"><span class="pc-mol" data-size="sm" data-mol="sal-diazonio"></span><span class="pc-compound-name">C &mdash; sal de diazonio</span></div>
                     <div class="pc-compound"><span class="pc-mol" data-size="sm" data-mol="hidrazina-sulfonica"></span><span class="pc-compound-name">D &mdash; hidracina (reducción con Na<sub>2</sub>SO<sub>3</sub>)</span></div>
                     <div class="pc-compound"><span class="pc-mol" data-size="sm" data-mol="pirazolona-ester"></span><span class="pc-compound-name">E &mdash; hidrazona ciclada (pirazolona-éster)</span></div>
-                    <div class="pc-compound"><span class="pc-mol" data-size="md" data-mol="tartrazina-simplificada"></span><span class="pc-compound-name">F/tartrazina &mdash; tras acoplamiento azoico con C e hidrólisis del éster</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-size="md" data-smiles="CCOC(=O)c1nn(-c2ccc(S(=O)(=O)O)cc2)c(O)c1N=Nc1ccc(S(=O)(=O)O)cc1"></span><span class="pc-compound-name">F &mdash; acoplamiento azoico de E con la sal de diazonio C (éster etílico)</span></div>
+                    <div class="pc-compound"><span class="pc-mol" data-size="md" data-mol="tartrazina-simplificada"></span><span class="pc-compound-name">tartrazina &mdash; hidrólisis del éster con exceso de NaOH (sal trisódica)</span></div>
                 </div>
                 <p class="pc-note">1 punto por A, 1 por B, 1 por C, 2 por D, 2 por E, 1 por F (arrastre de error permitido en cada paso si la estructura previa es consistente con la fórmula molecular dada).</p>
             </div>
@@ -1043,7 +1044,7 @@ const contenidoProblemas = {
     // ────────────────────────────────────────────────────────────────
     // 57ª IChO · UK Round One 2025 (Q7–Q12)
     // ────────────────────────────────────────────────────────────────
-    "q1-tiro-plato-2025": {
+    "q7-tiro-plato-2025": {
         titulo: "Tiro al plato: nitrocelulosa",
         numero: "Q7",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
@@ -1096,7 +1097,7 @@ const contenidoProblemas = {
         `
     },
 
-    "q2-brat-2025": {
+    "q8-brat-2025": {
         titulo: "BrAt: el verano de Paddington",
         numero: "Q8",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
@@ -1137,7 +1138,7 @@ const contenidoProblemas = {
         `
     },
 
-    "q3-epoxidos-2025": {
+    "q9-epoxidos-2025": {
         titulo: "Epóxidos y resinas epoxi",
         numero: "Q9",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
@@ -1153,15 +1154,22 @@ const contenidoProblemas = {
             <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>Indica la fórmula general de un epóxido que contiene n átomos de carbono.</p></div></div>
             <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>En el cuadernillo, marca el ángulo C&ndash;C&ndash;O aproximado para las moléculas siguientes.</p><table class="pc-table"><thead><tr><th></th><th>60°</th><th>90°</th><th>104.5°</th><th>107°</th><th>109.5°</th><th>120°</th><th>180°</th></tr></thead><tbody><tr><td>C<sub>2</sub>H<sub>5</sub>OC<sub>2</sub>H<sub>5</sub></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td><span class="pc-mol" data-size="sm" data-smiles="C1CO1"></span></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div>
             <p>Un método habitual de formar epóxidos es la reacción de alquenos con peroxiácidos orgánicos. El mecanismo de esta reacción se muestra con el estado de transición entre corchetes (la reacción es concertada):</p>
-            <div class="pc-free-host" data-esquema="size=md escala=0.95 gapx=150
-r @0,0: [*:8]C(=O)OO.[*:1]C([*:3])=C([*:2])[*:4] | peroxiácido + alqueno
-p @1,0: [*:1]C1([*:3])OC1([*:2])[*:4] | epóxido
-pl @2,0: t:+
-a @3,0: t:A | compuesto A
-r -&gt; p | | | estado de transición concertado
-curva: r:2 -&gt; r:4
-curva: r:6-8 -&gt; r:4 | giro=-1
-curva: r:3-4 -&gt; r:3"></div>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.62 gapx=50 gapy=14
+pr @0,0: [*:8]C(=O)OO[*:10] | peroxiácido
+pl1 @1,0: t:+
+ak @2,0: [*:1]C([*:3])=C([*:2])[*:4] | alqueno
+pa @3,0: [*:8]C(=O)OO[*:10]
+al @3,1: [*:1]C([*:3])=C([*:2])[*:4]
+ep @3,2: [*:1]C1([*:3])OC1([*:2])[*:4] | epóxido
+pl2 @2,2: t:+
+ac @1,2: [*:8]C(=O)O | A
+ak -&gt; pa
+al -&gt; ep
+curva: pa:1-2 -&gt; pa:5
+curva: pa:4-5 -&gt; al:3 | giro=1 | curvatura=0.5
+curva: al:1-3 -&gt; pa:4 | giro=-1 | curvatura=0.5
+curva: pa:3-4 -&gt; pa:3 | giro=-1
+corchete: pa, al | ‡"></div>
             <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>Dibuja la estructura del compuesto <strong>A</strong>.</p></div></div>
             <p>Estos peroxiácidos pueden añadir el átomo de oxígeno a la cara superior o inferior del doble enlace, según se aproximen desde arriba o desde abajo. Esto puede dar lugar a estereoisómeros.</p>
             <div class="pc-free-host" data-esquema="size=sm
@@ -1267,7 +1275,7 @@ i -&gt; bd | (i) base | (ii) epiclorhidrina | ruta=vh"></div><div class="pc-comp
         `
     },
 
-    "q4-nanotubos-raman-2025": {
+    "q10-nanotubos-raman-2025": {
         titulo: "Nanotubos de carbono y espectroscopía Raman",
         numero: "Q10",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
@@ -1280,7 +1288,7 @@ i -&gt; bd | (i) base | (ii) epiclorhidrina | ruta=vh"></div><div class="pc-comp
                 <p>Los nanotubos de carbono tienen aplicaciones prometedoras en nanotecnología por su alta resistencia a la tracción y su conductividad eléctrica variable. Pueden tener diámetros distintos, que se determinan mediante espectroscopía Raman. Esta técnica fue desarrollada por el físico indio C. V. Raman, el primer asiático en ganar un Premio Nobel de ciencias.</p>
             </div>
             <div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=140 gapy=80
-c2 @1,1: C#C | etino (C2H2)
+c2 @1,1: t:C₂H₂ | etino
 a @0,1: t:A
 cn @2,0: t:Cₙ | nanotubos
 b @2,2: t:B
@@ -1296,6 +1304,7 @@ c2 -&gt; b | polimerización | | ruta=vh"></div>
             <p>Alternativamente, el etino puede polimerizar y dar el polímero <strong>B</strong>.</p>
             <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Dibuja la unidad repetitiva del polímero <strong>B</strong>.</p></div></div>
             <p>Los nanotubos pueden estudiarse por espectroscopía Raman, que explora vibraciones moleculares. Las vibraciones pueden estudiarse con espectroscopía infrarroja (IR), pero la Raman también detecta vibraciones que no son observables en IR. Funciona haciendo incidir luz de frecuencia precisa sobre la muestra y midiendo la frecuencia de la luz dispersada: la desviación entre la luz incidente y la dispersada informa sobre los enlaces implicados en la vibración.</p>
+            <figure class="pc-figure"><img src="https://i.imgur.com/i6GfSWT.png" alt="Espectroscopía Raman" loading="lazy"><figcaption>Espectroscopía Raman</figcaption></figure>
             <p>C. V. Raman publicó en 1928 el primer espectro de este tipo, midiendo una muestra del compuesto <strong>A</strong>. Se observaron dos líneas significativas, de longitudes de onda 5028.8 &Aring; (línea 1) y 4683.9 &Aring; (línea 2). La luz incidente tenía una longitud de onda de 4358.3 &Aring; (línea X).</p>
             <p>En espectroscopía es habitual caracterizar la luz por el número de onda, <span class="pc-eq-inline">&nu;&#771; = 1/&lambda;</span>, con &lambda; en cm (unidad: cm<sup>&minus;1</sup>).</p>
             <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><p>Calcula la diferencia entre:</p><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>la frecuencia de la línea 1 y la de la línea incidente X (en Hz).</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>el número de onda de la línea 2 y el de la línea incidente X (en cm<sup>&minus;1</sup>).</p></div></div></div>
@@ -1313,7 +1322,7 @@ c2 -&gt; b | polimerización | | ruta=vh"></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">n(C<sub>2</sub>H<sub>2</sub>) = pV/RT = (101325 &times; 40.00&times;10<sup>&minus;3</sup>) / (8.314 &times; 298) = 1.636 mol &nbsp;&rArr;&nbsp; n(C) = 3.272 mol</p><p class="pc-eq">n(C en nanotubos) = 242&times;10<sup>&minus;3</sup> g / 12.01 g mol<sup>&minus;1</sup> = 0.0201 mol</p><p class="pc-eq">rendimiento = 0.0201 / 3.272 &times; 100 = <strong>0.616 %</strong></p><p class="pc-note">Se admite usar un volumen molar de 24 dm<sup>3</sup> mol<sup>&minus;1</sup>: n = 1.667 mol, rendimiento = 0.603 %.</p></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div><div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="c1ccccc1"></span><span class="pc-compound-name">A: benceno</span></div></div><p class="pc-note">Se acepta un círculo para los electrones deslocalizados.</p></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="md" data-smiles="[*:11]C=CC=C[*:11]"></span><span class="pc-compound-name">B: poliacetileno (unidad repetitiva –CH=CH–)</span></div></div><div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=140 gapy=80
-c2 @1,1: C#C | etino (C2H2)
+c2 @1,1: t:C₂H₂ | etino
 a @0,1: c1ccccc1 | A: benceno | caja=verde
 cn @2,0: t:Cₙ | nanotubos
 b @2,2: [*:11]C=CC=C[*:11] | B: poliacetileno | caja=verde
@@ -1337,7 +1346,7 @@ c2 -&gt; b | polimerización | | ruta=vh"></div><p class="pc-note">Deben dibujar
         `
     },
 
-    "q5-agarospirol-2025": {
+    "q11-agarospirol-2025": {
         titulo: "Agarwood: síntesis del agarospirol",
         numero: "Q11",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
@@ -1352,26 +1361,33 @@ c2 -&gt; b | polimerización | | ruta=vh"></div><p class="pc-note">Deben dibujar
             <div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="md" data-smiles="CC(C)(O)C1CCC2(C1)C(C)CCC=C2C"></span><span class="pc-compound-name">agarospirol</span></div></div>
             <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>En el cuadernillo, rodea los estereocentros del agarospirol.</p></div></div>
             <p>Primera parte de la síntesis. Con una base, el compuesto <strong>B</strong> se desprotona dando un anión que cicla como se indica para formar el compuesto <strong>C</strong>.</p>
-            <div class="pc-free-host" data-esquema="size=sm escala=0.64 gapx=90 gapy=70
+            <div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=36 gapy=40
 sm @0,0: O=C1CCCC(C)C1(CCC#N)CCC#N
+an @3,0: O=C1CCCC(C)C1(CCC(=O)OC)C[CH-]C(=O)OC | | tam=md
+te @3,1: O=C1CCCC(C)C12CCC([O-])(OC)C(C(=O)OC)C2 | | tam=md
+dk @0,1: O=C1CCCC(C)C12CCC(=O)CC2
+wi @0,2: O=C1CCCC(C)C12CCC(=C)CC2
+ke @1,2: CC1=CCC2(CC1)C(C)CCCC23OCCO3
 a @1,0: t:A | C13H20O5
-b @2,0: t:B | 
-an @2,1: O=C1CCCC(C)C1(CCC(=O)OC)C[CH-]C(=O)OC | anión (se da)
-te @1,1: O=C1CCCC(C)C12CCC([O-])(OC)C(C(=O)OC)C2 | intermedio tetraédrico (se da)
-c @0,1: t:C | 
-d @0,2: t:[D] | intermedio
-dk @1,2: O=C1CCCC(C)C12CCC(=O)CC2 | diceto (se da)
-wi @2,2: O=C1CCCC(C)C12CCC(=C)CC2 | metileno (se da)
-ke @2,3: CC1=CCC2(CC1)C(C)CCCC23OCCO3 | cetal + alqueno endocíclico (se da)
+b @2,0: t:B
+c @2,1: t:C
+d @1,1: t:D
 sm -&gt; a | NaOH | calor
 a -&gt; b | CH3OH | H⁺
 b -&gt; an | base
-an -&gt; te | | | ciclación
-te -&gt; c | | | −CH3O⁻
+an -&gt; te
+te -&gt; c
 c -&gt; d | LiI | −CH3I
 d -&gt; dk | −CO2
-dk -&gt; wi | Ph3P=CH2 (1 equiv.) | −Ph3P=O
-wi -&gt; ke | HOCH2CH2OH | TsOH, reflujo"></div>
+dk -&gt; wi | (C6H5)3P⁺–CH2⁻ (1 equiv.) | −(C6H5)3P=O
+wi -&gt; ke | HOCH2CH2OH | TsOH, reflujo
+curva: an:15 -&gt; an:10 | giro=-1
+curva: an:10-11 -&gt; an:11 | curvatura=1.1
+curva: te:11 -&gt; te:10 | curvatura=1.1
+curva: te:10-12 -&gt; te:12 | giro=-1 | curvatura=1.1
+corchete: an
+corchete: te
+corchete: d"></div>
             <p>En el resto de la pregunta no hay que mostrar estereoquímica.</p>
             <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>Dibuja las estructuras de los compuestos <strong>A</strong>, <strong>B</strong> y <strong>C</strong> y del intermedio <strong>D</strong>.</p></div></div>
             <p>Siguiente parte de la síntesis. El compuesto <strong>E</strong> se forma por ozonólisis. Con una base, <strong>E</strong> forma el anión intermedio <strong>F<sup>&minus;</sup></strong>, que cicla y luego se deshidrata para formar <strong>G</strong>.</p>
@@ -1411,26 +1427,33 @@ m -&gt; ag | (i) CH3Li (2 equiv.) | (ii) H2O"></div>
             <p class="pc-q-title">Q11 — Esta pregunta trata sobre el agarwood <span class="pc-total-chip">Total: 19 puntos</span></p>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div><div class="pc-free-host" data-esquema="size=md
 a @0,0: CC(C)(O)C1CCC2(C1)C(C)CCC=C2C | agarospirol | resaltar=4,7,9"></div><p class="pc-note">Los tres estereocentros: el C–CH<sub>3</sub> del anillo de seis, el carbono espiro y el carbono del ciclopentano que lleva el grupo C(OH)Me<sub>2</sub>. Deben ser los tres, sin errores ni círculos extra.</p></div>
-<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">4 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.64 gapx=90 gapy=70
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">4 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=36 gapy=40
 sm @0,0: O=C1CCCC(C)C1(CCC#N)CCC#N
-a @1,0: O=C1CCCC(C)C1(CCC(=O)O)CCC(=O)O | A (C13H20O5)
+an @3,0: O=C1CCCC(C)C1(CCC(=O)OC)C[CH-]C(=O)OC | | tam=md
+te @3,1: O=C1CCCC(C)C12CCC([O-])(OC)C(C(=O)OC)C2 | | tam=md
+dk @0,1: O=C1CCCC(C)C12CCC(=O)CC2
+wi @0,2: O=C1CCCC(C)C12CCC(=C)CC2
+ke @1,2: CC1=CCC2(CC1)C(C)CCCC23OCCO3
+a @1,0: O=C1CCCC(C)C1(CCC(=O)O)CCC(=O)O | A · C13H20O5
 b @2,0: O=C1CCCC(C)C1(CCC(=O)OC)CCC(=O)OC | B
-an @2,1: O=C1CCCC(C)C1(CCC(=O)OC)C[CH-]C(=O)OC | anión (se da)
-te @1,1: O=C1CCCC(C)C12CCC([O-])(OC)C(C(=O)OC)C2 | intermedio tetraédrico (se da)
-c @0,1: O=C1CCCC(C)C12CCC(=O)C(C(=O)OC)C2 | C
-d @0,2: O=C1CCCC(C)C12CCC(=O)C(C(=O)O)C2 | [D]
-dk @1,2: O=C1CCCC(C)C12CCC(=O)CC2 | diceto (se da)
-wi @2,2: O=C1CCCC(C)C12CCC(=C)CC2 | metileno (se da)
-ke @2,3: CC1=CCC2(CC1)C(C)CCCC23OCCO3 | cetal + alqueno endocíclico (se da)
+c @2,1: O=C1CCCC(C)C12CCC(=O)C(C(=O)OC)C2 | C
+d @1,1: O=C1CCCC(C)C12CCC(=O)C(C(=O)O)C2 | D
 sm -&gt; a | NaOH | calor
 a -&gt; b | CH3OH | H⁺
 b -&gt; an | base
-an -&gt; te | | | ciclación
-te -&gt; c | | | −CH3O⁻
+an -&gt; te
+te -&gt; c
 c -&gt; d | LiI | −CH3I
 d -&gt; dk | −CO2
-dk -&gt; wi | Ph3P=CH2 (1 equiv.) | −Ph3P=O
-wi -&gt; ke | HOCH2CH2OH | TsOH, reflujo"></div><p><strong>A</strong>: hidrólisis de los dos nitrilos a ácidos; <strong>B</strong>: diéster metílico; <strong>C</strong>: condensación de Dieckmann (el carbono &alpha; de un éster ataca al otro éster; se pierde CH<sub>3</sub>O<sup>&minus;</sup>) que forma el cetoéster espiro; <strong>D</strong>: el LiI desmetila el éster (SN2 sobre CH<sub>3</sub>) y el &beta;-cetoácido pierde CO<sub>2</sub>.</p><p class="pc-note">1 punto por A, 1 por B, 1 por C y 1 por D. No hay arrastre de B a C ni de C a D (se dan los intermedios). La sal carboxilato del D también se acepta; no se aceptan sales en A.</p></div>
+dk -&gt; wi | (C6H5)3P⁺–CH2⁻ (1 equiv.) | −(C6H5)3P=O
+wi -&gt; ke | HOCH2CH2OH | TsOH, reflujo
+curva: an:15 -&gt; an:10 | giro=-1
+curva: an:10-11 -&gt; an:11 | curvatura=1.1
+curva: te:11 -&gt; te:10 | curvatura=1.1
+curva: te:10-12 -&gt; te:12 | giro=-1 | curvatura=1.1
+corchete: an
+corchete: te
+corchete: d"></div><p><strong>A</strong>: hidrólisis de los dos nitrilos a ácidos; <strong>B</strong>: diéster metílico; <strong>C</strong>: condensación de Dieckmann (el carbono &alpha; de un éster ataca al otro éster; se pierde CH<sub>3</sub>O<sup>&minus;</sup>) que forma el cetoéster espiro; <strong>D</strong>: el LiI desmetila el éster (SN2 sobre CH<sub>3</sub>) y el &beta;-cetoácido pierde CO<sub>2</sub>.</p><p class="pc-note">1 punto por A, 1 por B, 1 por C y 1 por D. No hay arrastre de B a C ni de C a D (se dan los intermedios). La sal carboxilato del D también se acepta; no se aceptan sales en A.</p></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">5 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.85 gapx=110 gapy=75
 k @0,0: CC1=CCC2(CC1)C(C)CCCC23OCCO3 | (se da)
 e @1,0: CC(=O)CCC1(CC=O)C(C)CCCC12OCCO2 | E (C15H24O4)
@@ -1460,7 +1483,7 @@ m -&gt; ag | (i) CH3Li (2 equiv.) | (ii) H2O"></div><div class="pc-compounds"><d
         `
     },
 
-    "q6-yodacion-cetonas-2025": {
+    "q12-yodacion-cetonas-2025": {
         titulo: "Yodación de cetonas",
         numero: "Q12",
         fuente: "57ª Olimpiada Internacional de Química (IChO) · UK Round One 2025",
