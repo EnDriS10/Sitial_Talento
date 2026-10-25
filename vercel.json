@@ -13,7 +13,14 @@
   "rewrites": [
     { "source": "/Banco_Problemas", "destination": "/Banco_Problemas.html" },
     { "source": "/media", "destination": "/media.html" },
-    { "source": "/noticias", "destination": "/noticias.html" }
+    { "source": "/noticias", "destination": "/noticias.html" },
+
+    { "source": "/Historial_Eventos/:path*", "destination": "/index.html" },
+    { "source": "/Historial_Medallas/:path*", "destination": "/index.html" },
+    { "source": "/Olimpiada_Cubana/:path*", "destination": "/index.html" },
+    { "source": "/Honor_Merece/:path*", "destination": "/index.html" },
+    { "source": "/Contacto", "destination": "/index.html" },
+    { "source": "/Equipo/:ol/:anio", "destination": "/equipo.html" }
   ],
 
   "headers": [
