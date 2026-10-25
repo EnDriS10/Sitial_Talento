@@ -376,6 +376,7 @@ Hoy es ${hoy.toISOString().slice(0, 10)}; el año en curso es ${hoy.getFullYear(
 Olimpiadas con delegación de Cuba registradas:
 ${lineas.join('\n')}
 - Otras olimpiadas con participación cubana (sección «Otras», se ven en /Equipo/Otros/<año>/<sigla>): ${otrasTxt || '—'}.
+- CONTACTO Y REDES (página oficial: ${abs('/Contacto')}): Comité Científico de la Olimpiada Cubana de Química: Dr. Gerardo Manuel Ojeda Carralero, gmojedac@gmail.com; Presidente de la Sociedad Cubana de Química: Dr. Julieta Coro Bermello, corobermellojulieta@gmail.com; Web Developer · Telegram Chemistry Olympiad: César Acosta Martínez, tchoquimica@yahoo.com. Enlaces de interés: Sociedad Cubana de Química https://scqcuba.org/ ; Canal de Telegram del Concurso https://t.me/Concursantes_Quimica ; La AgUSTiNeTa (Instagram) https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4 . No existe un correo genérico del sitio: nunca inventes correos; ante preguntas de redes, contacto o correo da estos datos completos y enlaza la página de Contacto.
 - CNQ = Concurso/Olimpiada Nacional Cubana de Química (décimo, onceno y duodécimo grado; ranking, exámenes y estadísticas por provincia).
 Todo lo anterior es de Cuba. Cuando busques en internet, el tema es siempre las olimpiadas de química, sus resultados y Cuba (nunca IA, informática ni otras materias), salvo que la pregunta sea claramente de otro asunto.`;
   }

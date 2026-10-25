@@ -14,6 +14,8 @@ export function htmlATexto(h) {
     .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, '[imagen: $1]')
     .replace(/<[^>]*data-mol="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, '[estructura: $1]')
     .replace(/<[^>]*data-scheme="([^"]+)"[^>]*>/gi, '[esquema de síntesis: $1]')
+    .replace(/<[^>]*data-smiles="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => '[estructura SMILES: ' + x + ']')
+    .replace(/<div class="pc-free-host" data-esquema="([^"]*)"[^>]*>\s*<\/div>/gi, (_, x) => '\n[esquema: ' + x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\n+/g, ' ; ') + ']\n')
     .replace(/<[^>]*data-diagram="([^"]+)"[^>]*>/gi, '[diagrama: $1]')
     .replace(/<sub>([\s\S]*?)<\/sub>/gi, (_, x) => conv(x.replace(/<[^>]+>/g, ''), SUB))
     .replace(/<sup>([\s\S]*?)<\/sup>/gi, (_, x) => conv(x.replace(/<[^>]+>/g, ''), SUP))

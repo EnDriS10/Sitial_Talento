@@ -19,7 +19,7 @@
         { id: 'honor',    ico: '🎓', es: 'Honor a quien Honor Merece',   en: 'Hall of Fame',    href: ROOT + 'Honor_Merece' },
         { id: 'noticias', ico: '📰', es: 'Noticias y Entrevistas',       en: 'News & Interviews',           href: ROOT + 'noticias' },
         { id: 'media',    ico: '📸', es: 'Media',                        en: 'Media',                       href: ROOT + 'media' },
-        { id: 'contacto', ico: '📌', es: 'Enlaces y Contacto',           en: 'Links & Contact',             href: ROOT + '#contacto' }
+        { id: 'contacto', ico: '📌', es: 'Enlaces y Contacto',           en: 'Links & Contact',             href: ROOT + 'Contacto' }
     ];
     // ¿en qué página estamos?  (equipo.html pertenece a «Historial por Eventos» pero es una página aparte: se muestra todo)
     var actual = /\/Banco_Problemas(\.html)?(\/|$)|\/Problem_Data\//.test(path) ? 'banco'
@@ -38,9 +38,9 @@
         '#sm-panel{position:fixed;left:0;right:0;top:0;z-index:9991;display:flex;flex-direction:column;background:#04122b;box-shadow:0 8px 32px rgba(0,0,0,.45);max-height:0;overflow:hidden;opacity:0;pointer-events:none;transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .2s}' +
         '[data-theme="dark"] #sm-panel{background:#10161e}' +
         '#sm-panel.on{max-height:80vh;opacity:1;pointer-events:auto;overflow:auto}' +
-        '#sm-panel a{display:flex;gap:10px;align-items:center;padding:14px 22px;color:rgba(255,255,255,.85);text-decoration:none;border-left:3px solid transparent;font:600 .95rem/1.2 system-ui,sans-serif}' +
+        '#sm-panel a{display:flex;gap:10px;align-items:center;padding:14px 22px;color:rgba(255,255,255,.85);text-decoration:none;border-left:3px solid transparent;font-family:\'DM Sans\',system-ui,sans-serif;font-size:14px;font-weight:500;line-height:1.2}' +
         '#sm-panel a:hover{background:rgba(255,255,255,.07);color:#fff}' +
-        '#sm-panel .sm-pie{padding:12px 22px 16px;color:rgba(255,255,255,.4);font:.75rem system-ui,sans-serif}';
+        '#sm-panel .sm-pie{padding:12px 22px 16px;color:rgba(255,255,255,.4);font:11px \'DM Sans\',system-ui,sans-serif}';
     document.head.appendChild(st);
 
     var btn = document.createElement('button');

@@ -54,13 +54,18 @@ Los premios se dan como oro, plata, bronce y mención honorífica.
 url: /Olimpiada_Cubana/Estadisticas
 En las estadísticas por provincia el Sitial usa una puntuación ponderada: oro = 3 puntos, plata = 2, bronce = 1 y mención honorífica = 0,5. Las gráficas se pueden ampliar y la sección tiene vista de histogramas y vista de tabla.
 
-## Contacto y enlaces de interés
-url: /
-- Comité Científico de la Olimpiada Cubana de Química: Dr. Gerardo Manuel Ojeda Carralero, gmojedac@gmail.com.
-- Presidente de la Sociedad Cubana de Química: Dr. Julieta Coro Bermello, corobermellojulieta@gmail.com.
-- Web developer y Telegram Chemistry Olympiad: César Acosta Martínez, tchoquimica@yahoo.com. Aquí también se puede escribir para enviar una historia, noticia o corregir datos del sitio.
+## Contacto, redes sociales y enlaces de interés
+url: /Contacto
+Página de contacto del Sitial: https://sitialtalento.vercel.app/Contacto (sección «Enlaces y Contacto»). Redes y canales del concurso: canal de Telegram del Concurso (https://t.me/Concursantes_Quimica) e Instagram «La AgUSTiNeTa» (https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4). No existe un correo genérico del sitio: usa solo los correos de abajo.
+Contacto:
+- Comité Científico de la Olimpiada Cubana de Química: Dr. Gerardo Manuel Ojeda Carralero — gmojedac@gmail.com
+- Presidente de la Sociedad Cubana de Química: Dr. Julieta Coro Bermello — corobermellojulieta@gmail.com
+- Web Developer · Telegram Chemistry Olympiad: César Acosta Martínez — tchoquimica@yahoo.com (también para enviar una historia, noticia o corregir datos del sitio).
+Enlaces de interés:
 - Sociedad Cubana de Química: https://scqcuba.org/
 - Canal de Telegram del Concurso: https://t.me/Concursantes_Quimica
+- La AgUSTiNeTa (Instagram): https://www.instagram.com/la_agustineta?igsh=N3ptZGVmY3ZjYnA4
+Palabras clave: redes, redes sociales, telegram, instagram, correo, email, contacto, escribir, Sociedad Cubana de Química, comité científico, concurso.
 
 ## Cómo se actualizan los datos y cómo corregir un error
 url: /

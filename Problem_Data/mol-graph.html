@@ -161,7 +161,7 @@
         '1': 'R' + SUP_DIGITS['1'], '2': 'R' + SUP_DIGITS['2'],
         '3': 'R' + SUP_DIGITS['3'], '4': 'R' + SUP_DIGITS['4'],
         '5': 'X', '6': 'Y', '7': 'Z',
-        '8': "R'", '9': 'NC', '10': 'H'
+        '8': "R'", '9': 'NC', '10': 'H', '11': '~', '12': 'BPA'
     };
 
     // Recorre un SMILES en el MISMO orden en que RDKit asigna índices de
@@ -191,6 +191,37 @@
         return map;
     }
 
+    // ────────────────────────────────────────────────────────────────
+    // Plantilla de disposición para cetales espiro vecinos de un carbono
+    // espiro (agarospirol y similares): el layout automático de RDKit
+    // colapsa el anillo de dioxolano sobre el carbociclo. Se alinean las
+    // coordenadas a una plantilla dibujada a mano (anillo de 6 + dioxolano
+    // + dos sustituyentes del carbono espiro vecino).
+    // ────────────────────────────────────────────────────────────────
+    let _tmplKetal = null;
+    function _ketalTemplate() {
+        if (_tmplKetal !== null) return _tmplKetal;
+        const rad = d => d * Math.PI / 180;
+        const A = [['C', 0, 1.5], ['C', -1.299, 0.75], ['C', -1.299, -0.75], ['C', 0, -1.5], ['C', 1.299, -0.75], ['C', 1.299, 0.75],
+            ['O', 2.578, 0.18], ['C', 3.514, 1.221], ['C', 2.814, 2.433], ['O', 1.445, 2.142],
+            ['C', 1.5 * Math.cos(rad(60)), 1.5 + 1.5 * Math.sin(rad(60))], ['C', 1.5 * Math.cos(rad(160)), 1.5 + 1.5 * Math.sin(rad(160))]];
+        const B = [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 1], [6, 7], [7, 8], [8, 9], [9, 10], [10, 6], [1, 11], [1, 12]];
+        let mb = 'tmpl\n  MolGraph       2D\n\n' + String(A.length).padStart(3) + String(B.length).padStart(3) + '  0  0  0  0  0  0  0  0999 V2000\n';
+        A.forEach(a => { mb += a[1].toFixed(4).padStart(10) + a[2].toFixed(4).padStart(10) + '    0.0000 ' + a[0].padEnd(3) + ' 0  0  0  0  0  0  0  0  0  0  0  0\n'; });
+        B.forEach(b => { mb += String(b[0]).padStart(3) + String(b[1]).padStart(3) + '  1  0\n'; });
+        mb += 'M  END\n';
+        try { _tmplKetal = window.RDKit.get_mol(mb) || false; } catch (e) { _tmplKetal = false; }
+        return _tmplKetal;
+    }
+    function _molFor(smiles) {
+        const mol = window.RDKit.get_mol(smiles);
+        if (mol && /OCCO/.test(smiles)) {
+            const t = _ketalTemplate();
+            if (t) { try { mol.generate_aligned_coords(t, JSON.stringify({ allowRGroups: true, acceptFailure: true })); } catch (e) { /* layout por defecto */ } }
+        }
+        return mol;
+    }
+
     function svgForSmiles(smiles, size, colorAtoms, hl, hlColor) {
         if (!window.RDKit) return null;
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
@@ -198,7 +229,7 @@
         const cacheKey = smiles + '|' + size + '|' + (colorAtoms ? 'cpk' : 'std') + '|' + hlKey;
         if (_molCache[cacheKey]) return _molCache[cacheKey];
 
-        const mol = window.RDKit.get_mol(smiles);
+        const mol = _molFor(smiles);
         if (!mol) return null;
         try {
             const details = {
@@ -1271,7 +1302,7 @@ u6 -> fin | piridina, Δ
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
         const key = smiles + '|' + size;
         if (_ptsCache[key]) return _ptsCache[key];
-        const mol = window.RDKit.get_mol(smiles);
+        const mol = _molFor(smiles);
         if (!mol) return null;
         try {
             const n = mol.get_num_atoms();
@@ -1389,11 +1420,11 @@ u6 -> fin | piridina, Δ
             const col = _fcolor(a.color);
             const eq = a.estilo === 'eq' || a.estilo === 'equilibrio', res = a.estilo === 'resonancia', dash = a.estilo === 'punteada';
             let pts, seg; // seg: segmento principal para rótulos {x1,y1,x2,y2}
-            if (Math.abs(dy) < 10 && !a.ruta || a.ruta === 'recta' && Math.abs(dy) < 10) {
+            if (Math.abs(dy) < 10) {
                 const dir = dx >= 0 ? 1 : -1;
                 const x1 = dir > 0 ? ma.r + PAD : ma.l - PAD, x2 = dir > 0 ? mb.l - PAD : mb.r + PAD, y = ca.y;
                 pts = [[x1, y], [x2, y]]; seg = { x1, y1: y, x2, y2: y };
-            } else if (Math.abs(dx) < 10 && !a.ruta) {
+            } else if (Math.abs(dx) < 10) {
                 const dir = dy >= 0 ? 1 : -1;
                 const y1 = dir > 0 ? na.b + PAD : na.t - PAD, y2 = dir > 0 ? nb.t - PAD : nb.b + PAD, x = ca.x;
                 pts = [[x, y1], [x, y2]]; seg = { x1: x, y1, x2: x, y2 };

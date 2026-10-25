@@ -17,9 +17,9 @@
     }
     var TXT = {
         es: { offline: 'Sin conexión — mostrando la versión guardada', install: 'Instalar app',
-              update: 'Hay una nueva versión del Sitial', reload: 'Actualizar', close: 'Cerrar' },
+              update: 'Hay una nueva versión del Sitial', reload: 'Actualizar', updating: 'Actualizando…', close: 'Cerrar' },
         en: { offline: 'Offline — showing the saved version', install: 'Install app',
-              update: 'A new version is available', reload: 'Update', close: 'Close' }
+              update: 'A new version is available', reload: 'Update', updating: 'Updating…', close: 'Close' }
     };
     function t(k) { return TXT[lang()][k]; }
 
@@ -80,7 +80,13 @@
     window.addEventListener('load', function () {
         navigator.serviceWorker.register(root + 'sw.js', { scope: root }).then(function (reg) {
             function aviso(sw) {
-                bar('', t('update'), t('reload'), function () { sw.postMessage('SKIP_WAITING'); });
+                bar('', t('update'), t('reload'), function (self) {
+                    window._pwaPidioActualizar = true;
+                    var sp = self.querySelector('span'); if (sp) sp.textContent = t('updating');
+                    self.querySelectorAll('button').forEach(function (b) { b.remove(); });
+                    sw.postMessage('SKIP_WAITING');
+                    setTimeout(function () { location.reload(); }, 2500); // por si controllerchange no llega
+                });
             }
             if (reg.waiting && navigator.serviceWorker.controller) aviso(reg.waiting);
             reg.addEventListener('updatefound', function () {
