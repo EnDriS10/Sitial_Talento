@@ -818,6 +818,7 @@ const contenidoProblemas = {
 
             <div class="pc-answer">
                 <div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">8 puntos</span></div>
+                <div class="pc-scheme" data-scheme="q4-tartrazina-respuesta"></div>
                 <div class="pc-compounds">
                     <div class="pc-compound"><span class="pc-mol" data-size="sm" data-mol="anilina"></span><span class="pc-compound-name">A &mdash; anilina (reducción del nitro)</span></div>
                     <div class="pc-compound"><span class="pc-mol" data-size="sm" data-mol="acido-sulfanilico"></span><span class="pc-compound-name">B &mdash; ácido sulfanílico (sulfonación)</span></div>
@@ -1550,6 +1551,454 @@ d -&gt; e | + I2 → paso 6 (k6) | + HI"></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq">velocidad = <em>k</em><sub>3</sub>[<strong>B</strong>][I<sub>2</sub>] = <strong><em>k</em><sub>1</sub><em>k</em><sub>3</sub>[<strong>A</strong>][I<sub>2</sub>] / (<em>k</em><sub>2</sub> + <em>k</em><sub>3</sub>[I<sub>2</sub>])</strong></p><p class="pc-note">Respuesta correcta: 2 puntos. Sin crédito parcial.</p></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">4 puntos</span></div><table class="pc-table"><thead><tr><th>Afirmación</th><th>C</th><th>E</th></tr></thead><tbody><tr><td>Producto cuya vía de reacción tiene mayor constante de velocidad en el primer paso</td><td>✓</td><td></td></tr><tr><td>Es el producto mayoritario a [I<sub>2</sub>] alta</td><td>✓</td><td></td></tr><tr><td>Producto cuya vía de reacción tiene mayor <em>K</em><sub>eq</sub></td><td></td><td>✓</td></tr><tr><td>Es el producto mayoritario a [I<sub>2</sub>] baja</td><td></td><td>✓</td></tr></tbody></table><p>A [I<sub>2</sub>] alta manda el paso 1 (<em>k</em><sub>1</sub> &gt; <em>k</em><sub>4</sub>): domina <strong>C</strong>. A [I<sub>2</sub>] baja manda el equilibrio (<em>K</em><sub>eq</sub> = <em>k</em><sub>4</sub>/<em>k</em><sub>5</sub> = 1.4&times;10<sup>&minus;4</sup> frente a <em>k</em><sub>1</sub>/<em>k</em><sub>2</sub> = 5.2&times;10<sup>&minus;6</sup>): domina <strong>E</strong>.</p><p class="pc-note">1 punto por fila. No hay arrastre de error.</p></div>
 <div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq">velocidad<sub>C</sub> = velocidad<sub>E</sub>: &nbsp; <em>k</em><sub>1</sub><em>k</em><sub>3</sub>[A][I<sub>2</sub>]/(<em>k</em><sub>2</sub> + <em>k</em><sub>3</sub>[I<sub>2</sub>]) = <em>k</em><sub>4</sub><em>k</em><sub>6</sub>[A][I<sub>2</sub>]/(<em>k</em><sub>5</sub> + <em>k</em><sub>6</sub>[I<sub>2</sub>])</p><p class="pc-eq"><em>k</em><sub>1</sub><em>k</em><sub>3</sub>(<em>k</em><sub>5</sub> + <em>k</em><sub>6</sub>[I<sub>2</sub>]) = <em>k</em><sub>4</sub><em>k</em><sub>6</sub>(<em>k</em><sub>2</sub> + <em>k</em><sub>3</sub>[I<sub>2</sub>])</p><p class="pc-eq">[I<sub>2</sub>] = (<em>k</em><sub>2</sub><em>k</em><sub>4</sub><em>k</em><sub>6</sub> &minus; <em>k</em><sub>1</sub><em>k</em><sub>3</sub><em>k</em><sub>5</sub>) / (<em>k</em><sub>3</sub><em>k</em><sub>6</sub>(<em>k</em><sub>1</sub> &minus; <em>k</em><sub>4</sub>))</p><p class="pc-eq">= (8.3&times;2.9&times;10<sup>&minus;6</sup>&times;5.2&times;10<sup>5</sup> &minus; 4.29&times;10<sup>&minus;5</sup>&times;5.2&times;10<sup>5</sup>&times;2.1&times;10<sup>&minus;2</sup>) / (5.2&times;10<sup>5</sup>&times;5.2&times;10<sup>5</sup>&times;(4.29&times;10<sup>&minus;5</sup> &minus; 2.9&times;10<sup>&minus;6</sup>)) = <strong>1.11&times;10<sup>&minus;6</sup> mol dm<sup>&minus;3</sup></strong></p><p class="pc-note">Respuesta correcta: 2 puntos. 1 punto si la expresión algebraica es correcta pero la evaluación numérica es incorrecta. Se admite arrastre de error desde (b)(ii).</p></div>
+        `
+    },
+
+    // ────────────────────────────────────────────────────────────────
+    // 56ª IChO · UK Round One 2024 (Q13–Q17)
+    // ────────────────────────────────────────────────────────────────
+    "q13-bronce-2024": {
+        titulo: "El bronce",
+        numero: "Q13",
+        fuente: "56ª Olimpiada Internacional de Química (IChO) · UK Round One 2024",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 56th IChO, UK Round One 2024. Autores originales: H. Alonzi, R. Beattie, P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, A. Leonescu, B. Pilgrim, S. Redman, P. Robotham, S. Sdepanian, A. Taylor, A. Thom, G. Trenins. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras, esquemas y diagramas están generados por código propio (RDKit / MolGraph); no se incluyen las fotografías ni ilustraciones originales.",
+
+        enunciado: `
+            <p class="pc-q-title">Q13 — Esta pregunta trata sobre el bronce</p>
+
+            <div class="pc-intro">
+                <p>La selección femenina de fútbol de Inglaterra logró un gran éxito en el Mundial de 2023. Una de las jugadoras era Lucy Bronze. El bronce es una aleación de cobre y estaño.</p>
+                <p>El trofeo del Mundial estaba hecho de plata recubierta de oro amarillo y blanco. Tiene una masa de 4.60 kg.</p>
+            </div>
+            <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>¿Cuál de las siguientes representa la configuración electrónica de un átomo de plata? Marca la respuesta correcta en el cuadernillo.</p><table class="pc-table"><thead><tr><th>[Ar]4d<sup>10</sup></th><th>[Ar]4d<sup>10</sup>5s<sup>1</sup></th><th>[Kr]4d<sup>10</sup></th><th>[Kr]4d<sup>10</sup>5s<sup>1</sup></th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>¿Cuál de las siguientes representa la configuración electrónica de un ion Cu<sup>2+</sup>? Marca la respuesta correcta en el cuadernillo.</p><table class="pc-table"><thead><tr><th>1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>3d<sup>10</sup>4s<sup>1</sup></th><th>1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>3d<sup>10</sup></th><th>1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>3d<sup>9</sup></th><th>1s<sup>2</sup>2s<sup>2</sup>2p<sup>6</sup>3s<sup>2</sup>3p<sup>6</sup>4s<sup>2</sup>3d<sup>9</sup></th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>Calcula el volumen del trofeo suponiendo que fuera de plata maciza. La densidad de la plata es 10.5 g cm<sup>&minus;3</sup>.</p></div></div>
+            <p>Los trofeos suelen hacerse de bronce porque es más barato. La densidad del bronce varía según la fracción de estaño, <em>y</em>, en la aleación. La densidad del bronce, en g cm<sup>&minus;3</sup>, se calcula con la ecuación siguiente, donde <em>V</em> = 5.93&times;10<sup>&minus;23</sup> cm<sup>3</sup> y <em>M</em><sub>(Cu)</sub> y <em>M</em><sub>(Sn)</sub> son las masas molares en g mol<sup>&minus;1</sup>.</p>
+            <p class="pc-eq">densidad = 4 ( <em>M</em><sub>(Cu)</sub> + <em>y</em> ( <em>M</em><sub>(Sn)</sub> &minus; <em>M</em><sub>(Cu)</sub> ) ) / ( <em>V</em> &times; <em>N</em><sub>A</sub> )</p>
+            <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Calcula el porcentaje de estaño en una muestra de bronce de densidad 7.85 g cm<sup>&minus;3</sup>.</p></div></div>
+            <p>El bronce suele tener la misma estructura que el cobre puro. El cobre tiene la celda unidad cúbica centrada en las caras que se muestra. El radio atómico de un átomo de cobre, <em>r</em>, es 128 pm. La longitud de la diagonal de una cara es 4<em>r</em>.</p>
+            <svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cara de la celda cúbica centrada en las caras" style="max-width:330px;display:block;margin:8px auto">
+  <defs><clipPath id="fcc-cp"><rect x="60" y="30" width="170" height="170"/></clipPath>
+  <marker id="fcc-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9z" fill="currentColor"/></marker></defs>
+  <g clip-path="url(#fcc-cp)" fill="#f3c400" fill-opacity=".85" stroke="currentColor" stroke-width="1.4">
+    <circle cx="60" cy="30" r="60.1"/><circle cx="230" cy="30" r="60.1"/><circle cx="60" cy="200" r="60.1"/><circle cx="230" cy="200" r="60.1"/><circle cx="145" cy="115" r="60.1"/>
+  </g>
+  <rect x="60" y="30" width="170" height="170" fill="none" stroke="currentColor" stroke-width="2"/>
+  <line x1="60" y1="200" x2="230" y2="30" stroke="currentColor" stroke-width="1.4" marker-start="url(#fcc-m)" marker-end="url(#fcc-m)"/>
+  <text x="150" y="102" font-size="15" font-style="italic" fill="currentColor" transform="rotate(-45 150 102)" text-anchor="middle">4r</text>
+  <line x1="60" y1="222" x2="230" y2="222" stroke="currentColor" stroke-width="1.4" marker-start="url(#fcc-m)" marker-end="url(#fcc-m)"/>
+  <text x="145" y="242" font-size="15" font-style="italic" fill="currentColor" text-anchor="middle">a</text>
+</svg>
+            <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><p>Calcula la longitud del lado de la celda unidad, <em>a</em>, en cm.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(f)</span><div class="pc-part-body"><p>Calcula el volumen de la celda unidad en cm<sup>3</sup>.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(g)</span><div class="pc-part-body"><p>Calcula la densidad del cobre metálico en g cm<sup>&minus;3</sup>.</p></div></div>
+
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q13 — Esta pregunta trata sobre el bronce <span class="pc-total-chip">Total: 8 puntos</span></p>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>[Ar]4d<sup>10</sup></th><th>[Ar]4d<sup>10</sup>5s<sup>1</sup></th><th>[Kr]4d<sup>10</sup></th><th>[Kr]4d<sup>10</sup>5s<sup>1</sup></th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><strong>&#10003;</strong></td></tr></tbody></table><p class="pc-note">La plata (Z = 47) tiene el núcleo de kriptón y la excepción 4d<sup>10</sup>5s<sup>1</sup>.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>…3d<sup>10</sup>4s<sup>1</sup></th><th>…3p<sup>6</sup>3d<sup>10</sup></th><th>…3p<sup>6</sup>3d<sup>9</sup></th><th>…3p<sup>6</sup>4s<sup>2</sup>3d<sup>9</sup></th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td><strong>&#10003;</strong></td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">Cu: [Ar]3d<sup>10</sup>4s<sup>1</sup>; al ionizarse pierde primero el electrón 4s y luego uno 3d, quedando [Ar]3d<sup>9</sup>.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">volumen = masa / densidad = 4600 g / 10.5 g cm<sup>&minus;3</sup> = <strong>438 cm<sup>3</sup></strong> (= 0.438 dm<sup>3</sup> = 4.38&times;10<sup>&minus;4</sup> m<sup>3</sup>)</p><p class="pc-note">Se acepta en cm<sup>3</sup>, dm<sup>3</sup> o m<sup>3</sup>.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">7.85 = 4 (63.55 + <em>y</em>(118.71 &minus; 63.55)) / (5.93&times;10<sup>&minus;23</sup> &times; 6.022&times;10<sup>23</sup>)</p><p class="pc-eq">7.85 = (254.2 + 220.64 <em>y</em>) / 35.71</p><p class="pc-eq">280.33 = 254.2 + 220.64 <em>y</em> &nbsp;&rArr;&nbsp; <em>y</em> = 0.118 &nbsp;&rArr;&nbsp; <strong>11.8 %</strong></p><p class="pc-note">No se acepta 0.118: debe darse como porcentaje, tal como pide el enunciado.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>a</em><sup>2</sup> + <em>a</em><sup>2</sup> = (4<em>r</em>)<sup>2</sup> &nbsp;&rArr;&nbsp; <em>a</em> = 2&radic;2 <em>r</em></p><p class="pc-eq"><em>a</em> = 2&radic;2 &times; 128&times;10<sup>&minus;12</sup> m = 3.62&times;10<sup>&minus;10</sup> m = <strong>3.62&times;10<sup>&minus;8</sup> cm</strong></p><p class="pc-note">Sin punto si no se da en cm. Una respuesta con radicales (p. ej. 256&radic;2&times;10<sup>&minus;10</sup> cm) tampoco puntúa: el valor viene de un radio medido experimentalmente, así que debe darse en forma decimal.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>V</em> = <em>a</em><sup>3</sup> = (3.62&times;10<sup>&minus;8</sup> cm)<sup>3</sup> = <strong>4.75&times;10<sup>&minus;23</sup> cm<sup>3</sup></strong></p><p class="pc-note">Se admite arrastre de error desde (e). Las unidades incorrectas solo se penalizan una vez por pregunta.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq">átomos por celda = 8 &times; &frac18; + 6 &times; &frac12; = 4</p><p class="pc-eq">masa de la celda = 4 &times; 63.55 g mol<sup>&minus;1</sup> / 6.022&times;10<sup>23</sup> mol<sup>&minus;1</sup> = 4.22&times;10<sup>&minus;22</sup> g</p><p class="pc-eq">densidad = 4.22&times;10<sup>&minus;22</sup> g / 4.75&times;10<sup>&minus;23</sup> cm<sup>3</sup> = <strong>8.89 g cm<sup>&minus;3</sup></strong></p><p class="pc-note">Un punto por el número correcto de átomos por celda y otro por el resto del cálculo. Se admite arrastre de error desde (f).</p></div>
+        `
+    },
+
+    "q14-yodatos-2024": {
+        titulo: "Sales de yodato",
+        numero: "Q14",
+        fuente: "56ª Olimpiada Internacional de Química (IChO) · UK Round One 2024",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 56th IChO, UK Round One 2024. Autores originales: H. Alonzi, R. Beattie, P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, A. Leonescu, B. Pilgrim, S. Redman, P. Robotham, S. Sdepanian, A. Taylor, A. Thom, G. Trenins. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras, esquemas y diagramas están generados por código propio (RDKit / MolGraph); no se incluyen las fotografías ni ilustraciones originales.",
+
+        enunciado: `
+            <p class="pc-q-title">Q14 — Esta pregunta trata sobre las sales de yodato</p>
+
+            <div class="pc-intro">
+                <p>La mayoría de los minerales de yodo contienen iones yodato, IO<sub>3</sub><sup>&minus;</sup>. Uno de ellos se llama <strong>salesita</strong>.</p>
+            </div>
+            <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>Indica el estado de oxidación del yodo en el ion yodato.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>Dibuja el diagrama de puntos y cruces del ion yodato.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>¿Cuál es el ángulo O&ndash;I&ndash;O más probable en el ion yodato? Marca la respuesta correcta en el cuadernillo.</p><table class="pc-table"><thead><tr><th>&lt; 109.5°</th><th>109.5°</th><th>&gt; 109.5°</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <p>Los desastres nucleares pueden liberar isótopos radiactivos de yodo, que son dañinos. Una dosis diaria del elemento yodo equivalente a 130 mg de yoduro de potasio puede impedir la absorción de los isótopos radiactivos. El yoduro de potasio se degrada con facilidad. El gobierno del Reino Unido mantiene una reserva de una fuente de yodo más estable, el yodato de potasio, para este fin.</p>
+            <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Calcula la masa de yodato de potasio que contiene la misma cantidad de yodo que 130 mg de yoduro de potasio.</p></div></div>
+            <p>Los iones yodato reaccionan con iones yoduro en medio ácido para dar yodo.</p>
+            <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Escribe una ecuación iónica para la reacción entre los iones yodato y los iones yoduro en medio ácido.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>¿Qué tipo de reacción es? Marca la(s) respuesta(s) correcta(s) en el cuadernillo.</p><table class="pc-table"><thead><tr><th>redox</th><th>sustitución electrófila</th><th>eliminación</th><th>desproporción</th><th>polimerización</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div></div>
+            <p>Esta reacción se usa para determinar la cantidad de iones yodato en una muestra. La muestra reacciona con yoduro de potasio en exceso en medio ácido, y el yodo formado se valora con una disolución de iones tiosulfato (S<sub>2</sub>O<sub>3</sub><sup>2&minus;</sup>), que da iones yoduro e iones tetrationato (S<sub>4</sub>O<sub>6</sub><sup>2&minus;</sup>).</p>
+            <div class="pc-part"><span class="pc-part-label">(f)</span><div class="pc-part-body"><p>Escribe una ecuación iónica para la reacción entre los iones tiosulfato y el yodo.</p></div></div>
+            <p>El mineral salesita tiene la fórmula M(IO<sub>3</sub>)Z, donde <strong>M</strong> es un ion metálico y <strong>Z</strong> es un anión. La proporción de los tres iones en el mineral es 1:1:1. La masa molar del mineral es 255.46 g mol<sup>&minus;1</sup>.</p>
+            <p>Se disolvió 1.000 g del mineral en 30 cm<sup>3</sup> de HNO<sub>3</sub> 2 mol dm<sup>&minus;3</sup>. La disolución resultante se enrasó a 100.0 cm<sup>3</sup> con agua destilada, formando una disolución madre. 10.00 cm<sup>3</sup> de esta disolución madre reaccionan con yoduro de potasio en exceso. El yodo formado se valoró con disolución de tiosulfato de sodio 0.1000 mol dm<sup>&minus;3</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(g)</span><div class="pc-part-body"><p>Calcula el volumen de disolución de tiosulfato de sodio necesario para reaccionar con el yodo producido.</p><p>Supón que todo el yodo se formó en la reacción de los iones yodato con los iones yoduro.</p></div></div>
+            <p>Sin embargo, el ion metálico M<sup><em>n</em>+</sup> de este mineral también reacciona con los iones yoduro formando yodo adicional. Por eso, el volumen real de disolución de tiosulfato necesario en la valoración fue 27.40 cm<sup>3</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(h)</span><div class="pc-part-body"><p>Calcula el número de moles de yodo producidos por la reacción de un mol del ion metálico M<sup><em>n</em>+</sup> con yoduro en exceso.</p><p>Si no pudiste obtener un valor en el apartado (g), supón que la respuesta de (g) fue 15.67 cm<sup>3</sup>.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(i)</span><div class="pc-part-body"><p>El estado de oxidación del ion metálico M<sup><em>n</em>+</sup> en el mineral puede escribirse como +<em>n</em>. Indica el estado de oxidación del ion metálico después de haber reaccionado con los iones yoduro. Marca la respuesta correcta en el cuadernillo.</p><table class="pc-table"><thead><tr><th>+(<em>n</em>+3)</th><th>+(<em>n</em>+2)</th><th>+(<em>n</em>+1)</th><th>+(<em>n</em>)</th><th>+(<em>n</em>&minus;1)</th><th>+(<em>n</em>&minus;2)</th><th>+(<em>n</em>&minus;3)</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <p>Cuando el mineral se disolvió en ácido nítrico no se observó efervescencia.</p>
+            <div class="pc-part"><span class="pc-part-label">(j)</span><div class="pc-part-body"><p>Indica la fórmula de dos aniones que no podrían estar presentes en el mineral, según la observación anterior.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(k)</span><div class="pc-part-body"><p>Considerando toda la información del problema, elige de la lista siguiente cuál es el ion metálico M<sup><em>n</em>+</sup> y cuál el anión Z<sup><em>m</em>&minus;</sup>.</p><table class="pc-table"><thead><tr><th>M<sup><em>n</em>+</sup></th><th>Sc<sup>3+</sup></th><th>Fe<sup>2+</sup></th><th>Fe<sup>3+</sup></th><th>Cu<sup>+</sup></th><th>Cu<sup>2+</sup></th><th>Mg<sup>2+</sup></th><th>Ga<sup>2+</sup></th><th>Zn<sup>2+</sup></th></tr></thead><tbody></tbody></table><table class="pc-table"><thead><tr><th>Z<sup><em>m</em>&minus;</sup></th><th>F<sup>&minus;</sup></th><th>Cl<sup>&minus;</sup></th><th>Br<sup>&minus;</sup></th><th>H<sup>&minus;</sup></th><th>O<sup>2&minus;</sup></th><th>OH<sup>&minus;</sup></th><th>PO<sub>4</sub><sup>3&minus;</sup></th><th>SO<sub>3</sub><sup>2&minus;</sup></th></tr></thead><tbody></tbody></table></div></div>
+
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q14 — Esta pregunta trata sobre las sales de yodato <span class="pc-total-chip">Total: 15 puntos</span></p>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><strong>+5</strong></p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">1 punto</span></div><svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de puntos y cruces del ion yodato" style="max-width:340px;display:block;margin:8px auto"><g fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="150" cy="105" r="42"/><circle cx="96.3" cy="74.0" r="34"/><circle cx="203.7" cy="74.0" r="34"/><circle cx="150.0" cy="167.0" r="34"/><path d="M20,8 h-10 v214 h10 M268,8 h10 v214 h-10"/></g><g font-family="Inter,sans-serif" font-size="15" fill="currentColor" text-anchor="middle" dominant-baseline="middle"><text x="150" y="105">I</text><text x="96.3" y="74.0">O</text><text x="203.7" y="74.0">O</text><text x="150.0" y="167.0">O</text><text x="292" y="18" font-size="14">&minus;</text></g><path d="M122.2,82.1 l5.2,5.2 M127.4,82.1 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="119.6" cy="81.7" r="2.3" fill="currentColor"/><path d="M117.2,90.7 l5.2,5.2 M122.4,90.7 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="114.6" cy="90.3" r="2.3" fill="currentColor"/><path d="M177.6,90.7 l5.2,5.2 M182.8,90.7 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="185.4" cy="90.3" r="2.3" fill="currentColor"/><path d="M172.6,82.1 l5.2,5.2 M177.8,82.1 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="180.4" cy="81.7" r="2.3" fill="currentColor"/><path d="M142.4,137.4 l5.2,5.2 M147.6,137.4 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="155.0" cy="140.0" r="2.3" fill="currentColor"/><path d="M141.4,63.4 l5.2,5.2 M146.6,63.4 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><path d="M153.4,63.4 l5.2,5.2 M158.6,63.4 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="73.7" cy="78.4" r="2.3" fill="currentColor"/><circle cx="76.2" cy="85.2" r="2.3" fill="currentColor"/><circle cx="95.9" cy="51.0" r="2.3" fill="currentColor"/><circle cx="88.8" cy="52.3" r="2.3" fill="currentColor"/><circle cx="211.2" cy="52.3" r="2.3" fill="currentColor"/><circle cx="204.1" cy="51.0" r="2.3" fill="currentColor"/><circle cx="223.8" cy="85.2" r="2.3" fill="currentColor"/><circle cx="226.3" cy="78.4" r="2.3" fill="currentColor"/><circle cx="127.4" cy="171.4" r="2.3" fill="currentColor"/><circle cx="129.9" cy="178.2" r="2.3" fill="currentColor"/><circle cx="146.4" cy="189.7" r="2.3" fill="currentColor"/><path d="M151.0,187.1 l5.2,5.2 M156.2,187.1 l-5.2,5.2" stroke="currentColor" stroke-width="1.4"/><circle cx="170.1" cy="178.2" r="2.3" fill="currentColor"/><circle cx="172.6" cy="171.4" r="2.3" fill="currentColor"/></svg><p class="pc-note">Se aceptan otros diagramas de puntos y cruces equivalentes (con cargas formales). Debe indicarse la carga global &minus;1. Todos los O tienen ocho electrones; solo el yodo puede expandir el octeto.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>&lt; 109.5°</th><th>109.5°</th><th>&gt; 109.5°</th></tr></thead><tbody><tr><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">El yodo tiene un par solitario, que repele más que los pares enlazantes y cierra el ángulo O&ndash;I&ndash;O.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>m</em>(KIO<sub>3</sub>) = 130 mg / (39.102 + 126.90) g mol<sup>&minus;1</sup> &times; (39.102 + 126.90 + 3&times;16.00) g mol<sup>&minus;1</sup> = <strong>168 mg</strong> (0.168 g)</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)(i)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">IO<sub>3</sub><sup>&minus;</sup> + 5 I<sup>&minus;</sup> + 6 H<sup>+</sup> &rarr; 3 I<sub>2</sub> + 3 H<sub>2</sub>O</p><p class="pc-note">No se exigen símbolos de estado. Se acepta cualquier múltiplo con la estequiometría correcta.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)(ii)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>redox</th><th>sustitución electrófila</th><th>eliminación</th><th>desproporción</th><th>polimerización</th></tr></thead><tbody><tr><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">Es una comproporción: el I(+5) del yodato y el I(&minus;1) del yoduro dan I(0); por tanto, redox.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">2 S<sub>2</sub>O<sub>3</sub><sup>2&minus;</sup> + I<sub>2</sub> &rarr; S<sub>4</sub>O<sub>6</sub><sup>2&minus;</sup> + 2 I<sup>&minus;</sup></p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq"><em>n</em>(IO<sub>3</sub><sup>&minus;</sup>) en la alícuota = (1.000 g / 255.46 g mol<sup>&minus;1</sup>) &times; (10.00 / 100.0) = 3.9145&times;10<sup>&minus;4</sup> mol</p><p class="pc-eq"><em>n</em>(I<sub>2</sub>) = 3 &times; 3.9145&times;10<sup>&minus;4</sup> = 1.1744&times;10<sup>&minus;3</sup> mol</p><p class="pc-eq"><em>n</em>(S<sub>2</sub>O<sub>3</sub><sup>2&minus;</sup>) = 2 &times; 1.1744&times;10<sup>&minus;3</sup> = 2.3487&times;10<sup>&minus;3</sup> mol</p><p class="pc-eq"><em>V</em> = 2.3487&times;10<sup>&minus;3</sup> mol / 0.1000 mol dm<sup>&minus;3</sup> = 0.02349 dm<sup>3</sup> = <strong>23.49 cm<sup>3</sup></strong></p><p class="pc-note">La respuesta final puntúa los dos puntos. Un punto si la cantidad de I<sub>2</sub> es correcta, o si es incorrecta pero el resto del cálculo es coherente con ella.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq"><em>V</em><sub>exceso</sub> = 27.40 &minus; 23.49 = 3.91 cm<sup>3</sup></p><p class="pc-eq"><em>n</em>(I<sub>2</sub> del metal) = 3.91&times;10<sup>&minus;3</sup> dm<sup>3</sup> &times; 0.1000 mol dm<sup>&minus;3</sup> &times; &frac12; = 1.955&times;10<sup>&minus;4</sup> mol</p><p class="pc-eq"><em>n</em>(M<sup><em>n</em>+</sup>) = <em>n</em>(IO<sub>3</sub><sup>&minus;</sup>) = 3.9145&times;10<sup>&minus;4</sup> mol &nbsp;&rArr;&nbsp; 1.955&times;10<sup>&minus;4</sup> / 3.9145&times;10<sup>&minus;4</sup> = <strong>0.5 mol de I<sub>2</sub> por mol de M<sup><em>n</em>+</sup></strong></p><p class="pc-note">Un punto por calcular bien el yodo formado. Si se usa el valor dado (15.67 cm<sup>3</sup>), la respuesta es 1.5 mol de I<sub>2</sub> por mol de metal.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>+(<em>n</em>+3)</th><th>+(<em>n</em>+2)</th><th>+(<em>n</em>+1)</th><th>+(<em>n</em>)</th><th>+(<em>n</em>&minus;1)</th><th>+(<em>n</em>&minus;2)</th><th>+(<em>n</em>&minus;3)</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">Como 0.5 mol de I<sub>2</sub> (1 mol de electrones) se producen por mol de M<sup><em>n</em>+</sup>, su estado de oxidación disminuye en 1. Con el valor erróneo de 15.67 cm<sup>3</sup> en (g) la respuesta sería +(<em>n</em>&minus;3).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(j)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">Dos de: HCO<sub>3</sub><sup>&minus;</sup>, CO<sub>3</sub><sup>2&minus;</sup>, HSO<sub>3</sub><sup>&minus;</sup>, SO<sub>3</sub><sup>2&minus;</sup>, NO<sub>2</sub><sup>&minus;</sup></p><p class="pc-note">Estos aniones desprenderían gas (CO<sub>2</sub>, SO<sub>2</sub> o NO<sub>2</sub>) con HNO<sub>3</sub>. Hacen falta dos correctos para el punto. No se aceptan iones como NH<sub>2</sub><sup>&minus;</sup>, F<sup>&minus;</sup> o CN<sup>&minus;</sup> (sus formas protonadas son gases pero muy solubles en agua).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(k)</span><span class="pc-marks">2 puntos</span></div><p>M<sup><em>n</em>+</sup> = <strong>Cu<sup>2+</sup></strong> &nbsp;&middot;&nbsp; Z<sup><em>m</em>&minus;</sup> = <strong>OH<sup>&minus;</sup></strong></p><p class="pc-note">Un punto por cada identificación. Como el yodato es &minus;1, <em>n</em> &minus; <em>m</em> = +1; la masa restante del mineral es 255.46 &minus; 174.90 = 80.56 g mol<sup>&minus;1</sup>, que corresponde a Cu (63.55) + OH (17.01) = 80.56. El Cu<sup>2+</sup> oxida el yoduro (Cu<sup>2+</sup> &rarr; Cu<sup>+</sup>, bajando 1 el estado de oxidación, como se vio en (h) e (i)).</p></div>
+        `
+    },
+
+    "q15-fuelomicinas-2024": {
+        titulo: "Bacterias productoras de combustible",
+        numero: "Q15",
+        fuente: "56ª Olimpiada Internacional de Química (IChO) · UK Round One 2024",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 56th IChO, UK Round One 2024. Autores originales: H. Alonzi, R. Beattie, P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, A. Leonescu, B. Pilgrim, S. Redman, P. Robotham, S. Sdepanian, A. Taylor, A. Thom, G. Trenins. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras, esquemas y diagramas están generados por código propio (RDKit / MolGraph); no se incluyen las fotografías ni ilustraciones originales.",
+
+        enunciado: `
+            <p class="pc-q-title">Q15 — Esta pregunta trata sobre las bacterias productoras de combustible</p>
+
+            <div class="pc-intro">
+                <p>Un grupo de científicos ha desarrollado una cepa de bacterias capaz de producir moléculas con la densidad energética de los combustibles de cohete. Las han apodado «fuelomicinas».</p>
+            </div>
+            <div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="md" data-smiles="CC1CC1C1CC1C1CC1C1CC1C1CC1C1CC1C1CC1C=CC=CC=CC(=O)O"></span><span class="pc-compound-name">fuelomicina A</span></div></div>
+            <p>Las fuelomicinas contienen varios anillos de ciclopropano, que son «de alta energía» por una propiedad llamada tensión de anillo.</p>
+            <div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="C1CC1"></span><span class="pc-compound-name">ciclopropano</span></div></div>
+            <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>Determina la fórmula molecular del ciclopropano.</p></div></div>
+            <p>Para determinar cuánta energía se debe a la tensión de anillo, podemos comparar el ciclopropano con un anillo prácticamente sin tensión, el ciclohexano. La entalpía de combustión del ciclopropano es &minus;2091 kJ mol<sup>&minus;1</sup>; la del ciclohexano es &minus;3951 kJ mol<sup>&minus;1</sup>. La entalpía de formación del agua es &minus;285.8 kJ mol<sup>&minus;1</sup>; la del monóxido de carbono, &minus;110.5 kJ mol<sup>&minus;1</sup>; la del dióxido de carbono, &minus;393.5 kJ mol<sup>&minus;1</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Escribe la ecuación de combustión del ciclopropano.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Calcula la entalpía de formación del ciclopropano.</p></div><div class="pc-sub"><span class="pc-sub-label">(iii)</span><p>Calcula la entalpía de combustión por mol de átomos de carbono del ciclopropano.</p></div><div class="pc-sub"><span class="pc-sub-label">(iv)</span><p>Calcula la entalpía de combustión por mol de átomos de carbono del ciclohexano.</p></div></div></div>
+            <p>La idea de usar ciclopropanos en la estructura de un combustible de cohete se desarrolló por primera vez en 1959 con la molécula <strong>sintín</strong>.</p>
+            <div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="CC1(C2CC2)CC1C1CC1"></span><span class="pc-compound-name">sintín</span></div></div>
+            <p>La síntesis del sintín se basa en la química de enolatos: el carbono contiguo a un grupo carbonilo (posición alfa) se desprotona, y el intermedio enolato puede reaccionar con otra molécula, como el yodometano, para dar un producto final.</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=70
+a @0,0: CC(=O)C | acetona
+e @1,0: CC(=O)[CH2-] | intermedio enolato
+p @2,0: CCC(C)=O | butanona
+a -&gt; e | base
+e -&gt; p | CH3I"></div>
+            <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>Dibuja una forma de resonancia del intermedio enolato.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>En el cuadernillo, marca la(s) afirmación(es) correcta(s) sobre la reacción entre el yodometano y el intermedio enolato:</p><table class="pc-table"><thead><tr><th>Afirmación</th></tr></thead><tbody><tr><td>El enolato actúa como agente reductor; el yodometano, como agente oxidante.</td></tr><tr><td>El enolato actúa como agente oxidante; el yodometano, como agente reductor.</td></tr><tr><td>El enolato actúa como electrófilo; el yodometano, como nucleófilo.</td></tr><tr><td>El enolato actúa como nucleófilo; el yodometano, como electrófilo.</td></tr><tr><td>El enolato actúa como ácido; el yodometano, como base.</td></tr><tr><td>El enolato actúa como base; el yodometano, como ácido.</td></tr></tbody></table></div></div>
+            <p>Los enolatos también pueden reaccionar con un compuesto carbonílico, como se muestra:</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=70 gapy=40
+a @0,0: CC(=O)C | acetona
+e @1,0: CC(=O)[CH2-] | intermedio enolato
+ia @2,0: t:A | C6H12O2
+p @3,0: CC(=O)C=C(C)C
+b @2,1: CC(=O)C | acetona
+a -&gt; e | base
+e -&gt; ia | + acetona
+ia -&gt; p"></div>
+            <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><p>Dibuja la estructura del compuesto <strong>A</strong>, que se forma como intermedio en esta reacción.</p></div></div>
+            <p>El sintín se sintetizó a escala industrial según el esquema siguiente.</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.62 gapx=60 gapy=60
+sm @0,0: CC(=O)CCCO
+b @1,0: t:B | C5H9ClO
+c @2,0: t:C | C5H8O
+d @3,0: t:D | C10H14O
+e @3,1: t:E | C10H16N2
+sy @2,1: CC1(C2CC2)CC1C1CC1 | sintín
+n2 @1,1: t:N₂ +
+sm -&gt; b | HCl | paso 1
+b -&gt; c | K2CO3 | paso 2
+c -&gt; d | Al(OC(CH3)3)3 | paso 3
+d -&gt; e | H2N–NH2 | paso 4
+e -&gt; sy | reactivo | paso 5"></div>
+            <div class="pc-part"><span class="pc-part-label">(f)</span><div class="pc-part-body"><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Determina la estructura de los compuestos <strong>B</strong>&ndash;<strong>E</strong>.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Marca en el cuadernillo qué pasos implican química de enolatos.</p><table class="pc-table"><thead><tr><th>paso 1</th><th>paso 2</th><th>paso 3</th><th>paso 4</th><th>paso 5</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div></div>
+            <p>La producción de sintín se detuvo por su alto coste. Por eso, las bacterias que producen un combustible de cohete son una gran ventaja: pueden fabricar las moléculas de forma más económica. Las bacterias desarrolladas para producir fuelomicinas necesitan enzimas que catalicen cuatro tipos de reacciones (la cadena ondulada representa el resto del soporte proteico de la molécula):</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=90 gapy=40
+r1 @0,0: CC=CC(=O)S[*:11]
+p1 @1,0: CC1CC1C(=O)S[*:11]
+r2 @0,1: CC(=O)CC(=O)S[*:11]
+p2 @1,1: CC(O)CC(=O)S[*:11]
+r3 @0,2: OC(=O)CC(=O)S[*:11].CC(=O)S[*:11]
+p3 @1,2: CC(=O)CC(=O)S[*:11]
+x3 @2,2: t:+ X + Y
+r4 @0,3: CC(O)CC(=O)S[*:11]
+p4 @1,3: CC=CC(=O)S[*:11]
+r1 -&gt; p1 | enzima 1
+r2 -&gt; p2 | enzima 2
+r3 -&gt; p3 | enzima 3
+r4 -&gt; p4 | enzima 4"></div>
+            <div class="pc-part"><span class="pc-part-label">(g)</span><div class="pc-part-body"><p>Marca en el cuadernillo el tipo de reacción que cataliza la enzima 2.</p><table class="pc-table"><thead><tr><th>oxidación</th><th>reducción</th><th>condensación</th><th>hidrólisis</th><th>isomerización</th><th>eliminación</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <div class="pc-part"><span class="pc-part-label">(h)</span><div class="pc-part-body"><p>Identifica los otros productos <strong>X</strong> e <strong>Y</strong> de la enzima 3.</p></div></div>
+            <p>La síntesis de la fuelomicina A comienza de la forma siguiente. En esta secuencia, cada enzima se necesita exactamente una vez.</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.65 gapx=110
+r @0,0: OC(=O)CC(=O)S[*:11].CC(=O)S[*:11]
+p @1,0: CC1CC1C(=O)S[*:11]
+r -&gt; p | proceso de 4 enzimas (cada una una vez)"></div>
+            <div class="pc-part"><span class="pc-part-label">(i)</span><div class="pc-part-body"><p>Completa la tabla del cuadernillo con el orden de las enzimas necesarias para este proceso.</p><table class="pc-table"><thead><tr><th>primera enzima</th><th>segunda enzima</th><th>tercera enzima</th><th>última enzima</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q15 — Esta pregunta trata sobre las bacterias productoras de combustible <span class="pc-total-chip">Total: 20 puntos</span></p>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><strong>C<sub>3</sub>H<sub>6</sub></strong></p><p class="pc-note">Se acepta si se dibuja la fórmula estructural.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(i)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">2 C<sub>3</sub>H<sub>6</sub> + 9 O<sub>2</sub> &rarr; 6 CO<sub>2</sub> + 6 H<sub>2</sub>O</p><p class="pc-note">Se acepta cualquier múltiplo con la estequiometría correcta.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(ii)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">3(&minus;393.5) + 3(&minus;285.8) &minus; &Delta;<sub>f</sub>H = &minus;2091</p><p class="pc-eq">&Delta;<sub>f</sub>H(ciclopropano) = <strong>+53.1 kJ mol<sup>&minus;1</sup></strong></p><p class="pc-note">No puntúa si se da como valor negativo.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(iii)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">&minus;2091 / 3 = <strong>&minus;697.0 kJ mol<sup>&minus;1</sup></strong> por mol de C</p><p class="pc-note">No puntúa si el valor es positivo.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(iv)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">&minus;3951 / 6 = <strong>&minus;658.5 kJ mol<sup>&minus;1</sup></strong> por mol de C</p><p class="pc-note">La diferencia (&asymp; 38.5 kJ por mol de C) es la energía de tensión del anillo de ciclopropano.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div><div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="CC([O-])=C"></span><span class="pc-compound-name">enolato (forma de resonancia con la carga en el oxígeno)</span></div></div><p class="pc-note">Se acepta una estructura deslocalizada (con línea discontinua).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>Afirmación</th><th>Correcta</th></tr></thead><tbody><tr><td>El enolato actúa como agente reductor; el yodometano, como agente oxidante.</td><td></td></tr><tr><td>El enolato actúa como agente oxidante; el yodometano, como agente reductor.</td><td></td></tr><tr><td>El enolato actúa como electrófilo; el yodometano, como nucleófilo.</td><td></td></tr><tr><td>El enolato actúa como nucleófilo; el yodometano, como electrófilo.</td><td>&#10003;</td></tr><tr><td>El enolato actúa como ácido; el yodometano, como base.</td><td></td></tr><tr><td>El enolato actúa como base; el yodometano, como ácido.</td><td></td></tr></tbody></table><p class="pc-note">Debe marcarse la cuarta casilla. No se penaliza haber marcado también la primera (según qué valor de electronegatividad del yodo se use puede defenderse). Sin punto si se marca cualquier otra.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=70 gapy=40
+a @0,0: CC(=O)C | acetona
+e @1,0: CC(=O)[CH2-] | intermedio enolato
+ia @2,0: CC(=O)CC(C)(C)O | A · C6H12O2 | caja=verde
+p @3,0: CC(=O)C=C(C)C
+b @2,1: CC(=O)C | acetona
+a -&gt; e | base
+e -&gt; ia | + acetona
+ia -&gt; p"></div><p class="pc-note">A es el producto de la adición aldólica: 4-hidroxi-4-metilpentan-2-ona. Su deshidratación da la enona final.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)(i)</span><span class="pc-marks">6 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.62 gapx=60 gapy=60
+sm @0,0: CC(=O)CCCO
+b @1,0: CC(=O)CCCCl | B · C5H9ClO
+c @2,0: CC(=O)C1CC1 | C · C5H8O
+d @3,0: CC(=CC(=O)C1CC1)C1CC1 | D · C10H14O
+e @3,1: CC1(C2CC2)CC(=NN1)C1CC1 | E · C10H16N2
+sy @2,1: CC1(C2CC2)CC1C1CC1 | sintín
+n2 @1,1: t:N₂ +
+sm -&gt; b | HCl | paso 1
+b -&gt; c | K2CO3 | paso 2
+c -&gt; d | Al(OC(CH3)3)3 | paso 3
+d -&gt; e | H2N–NH2 | paso 4
+e -&gt; sy | reactivo | paso 5
+caja amarillo: b, c | enolato
+caja amarillo: c, d | enolato"></div><p class="pc-note">B: 5-cloropentan-2-ona (1 punto). C: ciclopropil metil cetona, por alquilación intramolecular del enolato (1 punto). D: enona de una condensación aldólica entre dos moléculas de C (2 puntos). E: pirazolina formada con hidracina (2 puntos); si se dibuja la hidrazona abierta se concede 1 punto. Se concede arrastre de error si el error es trivial, la transformación es correcta y la estructura es coherente con la fórmula dada.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)(ii)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>paso 1</th><th>paso 2</th><th>paso 3</th><th>paso 4</th><th>paso 5</th></tr></thead><tbody><tr><td>&nbsp;</td><td><strong>&#10003;</strong></td><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">Deben marcarse los pasos 2 (alquilación intramolecular del enolato) y 3 (condensación aldólica) y ningún otro.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>oxidación</th><th>reducción</th><th>condensación</th><th>hidrólisis</th><th>isomerización</th><th>eliminación</th></tr></thead><tbody><tr><td>&nbsp;</td><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">La enzima 2 reduce el grupo cetona a alcohol.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">2 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=90 gapy=40
+r1 @0,0: CC=CC(=O)S[*:11]
+p1 @1,0: CC1CC1C(=O)S[*:11]
+r2 @0,1: CC(=O)CC(=O)S[*:11]
+p2 @1,1: CC(O)CC(=O)S[*:11]
+r3 @0,2: OC(=O)CC(=O)S[*:11].CC(=O)S[*:11]
+p3 @1,2: CC(=O)CC(=O)S[*:11]
+x3 @2,2: O=C=O.S[*:11] | X = CO₂ · Y = HS~
+r4 @0,3: CC(O)CC(=O)S[*:11]
+p4 @1,3: CC=CC(=O)S[*:11]
+r1 -&gt; p1 | enzima 1
+r2 -&gt; p2 | enzima 2
+r3 -&gt; p3 | enzima 3
+r4 -&gt; p4 | enzima 4"></div><p class="pc-note"><strong>X</strong> = CO<sub>2</sub> (1 punto; el ácido malónico se descarboxila). <strong>Y</strong> = HS~ (el tiol libre del soporte; 1 punto).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">2 puntos</span></div><table class="pc-table"><thead><tr><th>primera enzima</th><th>segunda enzima</th><th>tercera enzima</th><th>última enzima</th></tr></thead><tbody><tr><td>3</td><td>2</td><td>4</td><td>1</td></tr></tbody></table><p class="pc-note">Sin puntos parciales: deben estar bien las cuatro. Primero 3 (condensación con descarboxilación → acetoacetilo), luego 2 (reducción → 3-hidroxibutirilo), 4 (eliminación → crotonilo) y 1 (ciclopropanación).</p></div>
+        `
+    },
+
+    "q16-gadopiclenol-2024": {
+        titulo: "El agente de contraste gadopiclenol",
+        numero: "Q16",
+        fuente: "56ª Olimpiada Internacional de Química (IChO) · UK Round One 2024",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 56th IChO, UK Round One 2024. Autores originales: H. Alonzi, R. Beattie, P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, A. Leonescu, B. Pilgrim, S. Redman, P. Robotham, S. Sdepanian, A. Taylor, A. Thom, G. Trenins. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras, esquemas y diagramas están generados por código propio (RDKit / MolGraph); no se incluyen las fotografías ni ilustraciones originales.",
+
+        enunciado: `
+            <p class="pc-q-title">Q16 — Esta pregunta trata sobre el agente de contraste de RM gadopiclenol</p>
+
+            <div class="pc-intro">
+                <p>Por la escasez de material en el sistema sanitario, no había bata de hospital que le quedara bien a Paddington, la mascota del equipo del Reino Unido, tras quitarse la ropa para una resonancia magnética (RM).</p>
+                <p>La RM usa la misma tecnología que la RMN. Para mejorar la imagen, a los pacientes se les suele administrar un agente de contraste con iones gadolinio(III). En 2022 el gobierno de EE. UU. aprobó el uso de un nuevo agente de contraste, el <strong>gadopiclenol</strong> (C<sub>35</sub>H<sub>54</sub>GdN<sub>7</sub>O<sub>15</sub>).</p>
+            </div>
+            <p>La síntesis del gadopiclenol empieza con la síntesis de los compuestos <strong>B</strong> y <strong>D</strong>.</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=60 gapy=40
+s1 @0,0: OC(=O)CCC(Br)C(=O)O
+a @1,0: t:A | C5H5BrCl2O2
+b @2,0: t:B
+s2 @0,1: OC(=O)c1cccc(C(=O)O)n1
+c @1,1: t:C | C7H9NO2
+d @2,1: t:D | C7H7Br2N
+s1 -&gt; a | SOCl2
+a -&gt; b | CH3CH2OH
+s2 -&gt; c | NaBH4
+c -&gt; d | PBr3"></div>
+            <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>Dibuja las estructuras de los compuestos <strong>A</strong>&ndash;<strong>D</strong>.</p></div></div>
+            <p>La síntesis continúa con la construcción del compuesto hexacarboxílico <strong>H</strong>.</p>
+            <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>Rodea los estereocentros en la estructura del compuesto <strong>H</strong> en el cuadernillo.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>Dibuja las estructuras de los compuestos <strong>E</strong>&ndash;<strong>G</strong>.</p></div></div>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=50 gapy=50
+tr @0,0: NCCNCCN | dietilentriamina
+e @1,0: t:E | C25H31N3O6S3
+f @2,0: t:F
+m @3,0: N1CCNCCNCc2cccc(n2)C1
+g @3,1: t:G
+h @2,1: OC(=O)CCC(C(=O)O)N1CCN(C(CCC(=O)O)C(=O)O)CCN(C(CCC(=O)O)C(=O)O)Cc2cccc(n2)C1 | H | tam=md
+tr -&gt; e | TsCl | K2CO3
+e -&gt; f | D | K2CO3
+f -&gt; m | H2SO4 conc. | luego NaOH
+m -&gt; g | B | K2CO3
+g -&gt; h | NaOH | luego HCl"></div>
+            <p>El compuesto <strong>H</strong> se convierte en gadopiclenol en dos pasos:</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=70 gapy=40
+h @0,0: OC(=O)CCC(C(=O)O)N1CCN(C(CCC(=O)O)C(=O)O)CCN(C(CCC(=O)O)C(=O)O)Cc2cccc(n2)C1 | H
+cx @1,0: t:complejo de Gd(III)
+gd @2,0: t:gadopiclenol | C35H54GdN7O15
+am @1,1: NCC(O)CO | 3-aminopropano-1,2-diol
+h -&gt; cx | GdCl3 | H2O, pH 7
+cx -&gt; gd | amina + EDC·HCl | (amidación, 3 veces)"></div>
+            <p>Como el gadolinio es tóxico, el gadopiclenol tiene la ventaja de que se necesita menos gadolinio por dosis. La dosis media de gadopiclenol es 6.00 cm<sup>3</sup> de una disolución acuosa de concentración 485.05 g dm<sup>&minus;3</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Calcula la masa del elemento gadolinio necesaria por dosis, en mg.</p></div></div>
+            <p>En un campo magnético, los núcleos de hidrógeno pueden estar en «espín arriba» (&uarr;) o «espín abajo» (&darr;). Cada espín actúa como un pequeño imán. Sumando todos los espines se obtiene la <strong>magnetización neta</strong>, <em>M</em>. Inicialmente hay más núcleos en espín arriba, por ser el estado de menor energía (punto a). Se aplica un pulso de radiación electromagnética que corresponde a la diferencia de energía entre los estados espín arriba y espín abajo, y voltea los espines justos para reducir <em>M</em> a cero (punto b).</p>
+            <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Espines nucleares: del punto a al punto e" style="max-width:640px;display:block;margin:8px auto;font-family:Inter,sans-serif"><text x="54" y="14" font-size="11" fill="currentColor" text-anchor="middle">punto a</text><path d="M14,50 V26 M10,32 L14,26 L18,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M29,50 V26 M25,32 L29,26 L33,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M44,50 V26 M40,32 L44,26 L48,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M59,50 V26 M55,32 L59,26 L63,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M74,50 V26 M70,32 L74,26 L78,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M89,50 V26 M85,32 L89,26 L93,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M14,88 V64 M10,70 L14,64 L18,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M29,88 V64 M25,70 L29,64 L33,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M44,88 V64 M40,70 L44,64 L48,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M59,62 V86 M55,80 L59,86 L63,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M74,62 V86 M70,80 L74,86 L78,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M89,62 V86 M85,80 L89,86 L93,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M54,140 V100.4 M49,107.4 L54,100.4 L59,107.4" stroke="#4b2aa8" stroke-width="2.4" fill="none"/><text x="66" y="138" font-size="11" fill="#4b2aa8">M</text><path d="M107,70 h8 M111,66 l4,4 l-4,4" stroke="currentColor" stroke-width="1" fill="none"/><text x="164" y="14" font-size="11" fill="currentColor" text-anchor="middle">punto b</text><path d="M124,50 V26 M120,32 L124,26 L128,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M139,50 V26 M135,32 L139,26 L143,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M154,50 V26 M150,32 L154,26 L158,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M169,50 V26 M165,32 L169,26 L173,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M184,50 V26 M180,32 L184,26 L188,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M199,50 V26 M195,32 L199,26 L203,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M124,62 V86 M120,80 L124,86 L128,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M139,62 V86 M135,80 L139,86 L143,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M154,62 V86 M150,80 L154,86 L158,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M169,62 V86 M165,80 L169,86 L173,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M184,62 V86 M180,80 L184,86 L188,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M199,62 V86 M195,80 L199,86 L203,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><text x="176" y="138" font-size="11" fill="#4b2aa8">M = 0</text><path d="M217,70 h8 M221,66 l4,4 l-4,4" stroke="currentColor" stroke-width="1" fill="none"/><text x="274" y="14" font-size="11" fill="currentColor" text-anchor="middle">punto c</text><path d="M234,50 V26 M230,32 L234,26 L238,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M249,50 V26 M245,32 L249,26 L253,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M264,50 V26 M260,32 L264,26 L268,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M279,50 V26 M275,32 L279,26 L283,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M294,50 V26 M290,32 L294,26 L298,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M309,50 V26 M305,32 L309,26 L313,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M234,88 V64 M230,70 L234,64 L238,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M249,62 V86 M245,80 L249,86 L253,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M264,62 V86 M260,80 L264,86 L268,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M279,62 V86 M275,80 L279,86 L283,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M294,62 V86 M290,80 L294,86 L298,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M309,62 V86 M305,80 L309,86 L313,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M274,140 V126.8 M269,133.8 L274,126.8 L279,133.8" stroke="#4b2aa8" stroke-width="2.4" fill="none"/><text x="286" y="138" font-size="11" fill="#4b2aa8">M</text><path d="M327,70 h8 M331,66 l4,4 l-4,4" stroke="currentColor" stroke-width="1" fill="none"/><text x="384" y="14" font-size="11" fill="currentColor" text-anchor="middle">punto d</text><path d="M344,50 V26 M340,32 L344,26 L348,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M359,50 V26 M355,32 L359,26 L363,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M374,50 V26 M370,32 L374,26 L378,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M389,50 V26 M385,32 L389,26 L393,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M404,50 V26 M400,32 L404,26 L408,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M419,50 V26 M415,32 L419,26 L423,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M344,88 V64 M340,70 L344,64 L348,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M359,88 V64 M355,70 L359,64 L363,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M374,62 V86 M370,80 L374,86 L378,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M389,62 V86 M385,80 L389,86 L393,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M404,62 V86 M400,80 L404,86 L408,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M419,62 V86 M415,80 L419,86 L423,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M384,140 V113.6 M379,120.6 L384,113.6 L389,120.6" stroke="#4b2aa8" stroke-width="2.4" fill="none"/><text x="396" y="138" font-size="11" fill="#4b2aa8">M</text><path d="M437,70 h8 M441,66 l4,4 l-4,4" stroke="currentColor" stroke-width="1" fill="none"/><text x="494" y="14" font-size="11" fill="currentColor" text-anchor="middle">punto e</text><path d="M454,50 V26 M450,32 L454,26 L458,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M469,50 V26 M465,32 L469,26 L473,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M484,50 V26 M480,32 L484,26 L488,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M499,50 V26 M495,32 L499,26 L503,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M514,50 V26 M510,32 L514,26 L518,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M529,50 V26 M525,32 L529,26 L533,32" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M454,88 V64 M450,70 L454,64 L458,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M469,88 V64 M465,70 L469,64 L473,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M484,88 V64 M480,70 L484,64 L488,70" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M499,62 V86 M495,80 L499,86 L503,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M514,62 V86 M510,80 L514,86 L518,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M529,62 V86 M525,80 L529,86 L533,80" stroke="#b3261e" stroke-width="1.6" fill="none"/><path d="M494,140 V100.4 M489,107.4 L494,100.4 L499,107.4" stroke="#4b2aa8" stroke-width="2.4" fill="none"/><text x="506" y="138" font-size="11" fill="#4b2aa8">M</text></svg>
+            <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><p>¿Qué tipo de radiación electromagnética se necesita para esto? Marca la respuesta correcta en el cuadernillo.</p><table class="pc-table"><thead><tr><th>ondas de radio</th><th>microondas</th><th>IR</th><th>visible</th><th>UV</th><th>rayos X</th><th>rayos gamma</th></tr></thead><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <p>Con el tiempo (entre el punto b y el punto e), algunos protones de espín abajo de mayor energía vuelven a espín arriba. Es la <strong>relajación</strong>, que se puede detectar y da los datos de la RM. Todo el proceso (del punto a al punto e) es un barrido. Una máquina de RM necesita varios barridos para formar una imagen clara, pero solo puede iniciar el siguiente cuando los núcleos de hidrógeno se han relajado por completo. El valor de la magnetización neta, <em>M</em>, en el tiempo <em>t</em> tras el pulso es:</p>
+            <p class="pc-eq"><em>M</em> = <em>M</em><sub>0</sub> ( 1 &minus; e<sup>&minus;<em>t</em>/<em>&tau;</em></sup> )</p>
+            <p>donde <em>M</em><sub>0</sub> es la magnetización neta antes del pulso y <em>&tau;</em> es una constante llamada tiempo de relajación.</p>
+            <div class="pc-part"><span class="pc-part-label">(f)</span><div class="pc-part-body"><p>Calcula la magnetización neta como porcentaje de <em>M</em><sub>0</sub> a un tiempo 3<em>&tau;</em> después de aplicar el pulso de radiación.</p></div></div>
+            <p>Los agentes de contraste de gadolinio se usan para reducir <em>&tau;</em> y poder hacer el siguiente barrido antes. Los espines de los protones se relajan más rápido cerca de electrones desapareados. Como el ion gadolinio(III) es grande, además de los siete átomos coordinantes del ligando hay espacio para que coordinen moléculas de agua. Esto permite que sus protones se relajen más rápido. Las moléculas de agua coordinadas al gadolinio se intercambian constantemente con otras del disolvente, de modo que muchos protones se relajan en poco tiempo. La calidad de un agente de contraste depende de: el número de electrones desapareados del ion metálico (siete en gadolinio(III)), el número medio de moléculas de agua coordinadas y la velocidad de intercambio del agua coordinada con el disolvente.</p>
+            <p>Se define la fracción molar, <em>&chi;</em>, como el cociente entre los moles de gadopiclenol y los moles de agua en el lugar que se está visualizando:</p>
+            <p class="pc-eq"><em>&chi;</em> = <em>n</em>(gadopiclenol) / <em>n</em>(H<sub>2</sub>O)</p>
+            <div class="pc-part"><span class="pc-part-label">(g)</span><div class="pc-part-body"><p>Calcula <em>&chi;</em> si la concentración molar de gadopiclenol en el lugar de la imagen es 0.0500 mol dm<sup>&minus;3</sup>. Supón que la densidad del agua en el tejido es 1.00 kg dm<sup>&minus;3</sup>.</p></div></div>
+            <p>Supón que el tiempo de relajación global, <em>&tau;</em>, es <em>&tau;</em> = <em>&tau;</em><sub>c</sub> + <em>&tau;</em><sub>e</sub>. El tiempo <em>&tau;</em><sub>c</sub> no depende del campo magnético de la máquina, <em>B</em>, mientras que <em>&tau;</em><sub>e</sub> &prop; 1/<em>B</em><sup>2</sup>. Podemos determinar <em>&tau;</em><sub>c</sub> midiendo los tiempos de relajación globales <em>&tau;</em><sub>1</sub> y <em>&tau;</em><sub>2</sub> a dos intensidades de campo, <em>B</em><sub>1</sub> y <em>B</em><sub>2</sub>.</p>
+            <div class="pc-part"><span class="pc-part-label">(h)</span><div class="pc-part-body"><p>Expresa el tiempo de relajación independiente del campo, <em>&tau;</em><sub>c</sub>, en función de <em>B</em><sub>1</sub>, <em>B</em><sub>2</sub>, <em>&tau;</em><sub>1</sub> y <em>&tau;</em><sub>2</sub>.</p></div></div>
+            <p>A baja temperatura, <em>&tau;</em><sub>c</sub> = 1 / (<em>q&chi; r</em><sub>c</sub>), donde <em>q</em> es el número de moléculas de agua coordinadas al gadolinio y <em>r</em><sub>c</sub> es la velocidad a la que el agua coordinada se intercambia con el disolvente. Esta velocidad depende de la temperatura <em>T</em> (en K): <em>r</em><sub>c</sub> = <em>A T</em> e<sup>&minus;&Delta;<em>H</em>/<em>RT</em></sup>, donde &Delta;<em>H</em> es la entalpía de activación y <em>A</em> es una constante.</p>
+            <div class="pc-part"><span class="pc-part-label">(i)</span><div class="pc-part-body"><p>Reordena la expresión de <em>&tau;</em><sub>c</sub> en la forma <em>y</em> = <em>a</em>/<em>T</em> + <em>b</em>, expresando <em>y</em> en función de <em>&tau;</em><sub>c</sub> y <em>T</em>, y los coeficientes <em>a</em> y <em>b</em> en función de <em>q</em>, <em>&chi;</em>, <em>A</em>, &Delta;<em>H</em> y <em>R</em>.</p></div></div>
+            <div class="pc-part"><span class="pc-part-label">(j)</span><div class="pc-part-body"><p>Algunos valores de <em>&tau;</em><sub>c</sub> a baja temperatura se dan en la tabla. Usando el resultado de (i), o por cualquier otro método, calcula el valor de <em>Aq&chi;</em> en K<sup>&minus;1</sup> s<sup>&minus;1</sup>.</p><table class="pc-table"><thead><tr><th><em>T</em> / K</th><th>275</th><th>280</th></tr></thead><tbody><tr><td><em>&tau;</em><sub>c</sub> / s</td><td>4.775&times;10<sup>&minus;4</sup></td><td>3.326&times;10<sup>&minus;4</sup></td></tr></tbody></table></div></div>
+            <div class="pc-part"><span class="pc-part-label">(k)</span><div class="pc-part-body"><p>Aplicando un método similar a las velocidades de intercambio a alta temperatura, se ha calculado que <em>A</em>/(<em>q&chi;</em>) = 6.618&times;10<sup>14</sup> K<sup>&minus;1</sup> s<sup>&minus;1</sup>. Usa esta información y tus resultados anteriores para calcular <em>q</em> (el número medio de moléculas de agua coordinadas al gadopiclenol).</p><p>Si no dispones de valores de cálculos anteriores, usa: <em>&chi;</em> = 0.00100 y <em>Aq&chi;</em> = 2.00&times;10<sup>9</sup> K<sup>&minus;1</sup> s<sup>&minus;1</sup>.</p></div></div>
+
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q16 — Esta pregunta trata sobre el agente de contraste de RM gadopiclenol <span class="pc-total-chip">Total: 24 puntos</span></p>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">4 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=60 gapy=40
+s1 @0,0: OC(=O)CCC(Br)C(=O)O
+a @1,0: ClC(=O)CCC(Br)C(Cl)=O | A · C5H5BrCl2O2
+b @2,0: CCOC(=O)CCC(Br)C(=O)OCC | B
+s2 @0,1: OC(=O)c1cccc(C(=O)O)n1
+c @1,1: OCc1cccc(CO)n1 | C · C7H9NO2
+d @2,1: BrCc1cccc(CBr)n1 | D · C7H7Br2N
+s1 -&gt; a | SOCl2
+a -&gt; b | CH3CH2OH
+s2 -&gt; c | NaBH4
+c -&gt; d | PBr3"></div><p class="pc-note">Un punto por cada compuesto. A: dicloruro de ácido (SOCl<sub>2</sub>); B: diéster etílico (esterificación del dicloruro con etanol); C: diol (el NaBH<sub>4</sub> reduce los ácidos carboxílicos, activados por el piridinio electrodeficiente); D: dibromuro (PBr<sub>3</sub> convierte el alcohol en bromuro). Se admite arrastre de error por fallos triviales (p. ej. un CH<sub>2</sub> de más) si la transformación es correcta y la estructura es coherente con la fórmula.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)</span><span class="pc-marks">2 puntos</span></div><div class="pc-free-host" data-esquema="size=md escala=0.9
+h @0,0: OC(=O)CCC(C(=O)O)N1CCN(C(CCC(=O)O)C(=O)O)CCN(C(CCC(=O)O)C(=O)O)Cc2cccc(n2)C1 | H | resaltar=5,13,25 | tam=md"></div><p class="pc-note">Los tres estereocentros son los carbonos CH que llevan el nitrógeno y el grupo CO<sub>2</sub>H (resaltados). Dos puntos si se marcan los tres sin ninguno incorrecto; un punto si se marcan dos correctos sin ninguno incorrecto, o los tres correctos más uno incorrecto.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">5 puntos</span></div><div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=50 gapy=50
+tr @0,0: NCCNCCN | dietilentriamina
+e @1,0: Cc1ccc(cc1)S(=O)(=O)NCCN(CCNS(=O)(=O)c1ccc(C)cc1)S(=O)(=O)c1ccc(C)cc1 | E · C25H31N3O6S3
+f @2,0: Cc1ccc(cc1)S(=O)(=O)N1CCN(S(=O)(=O)c2ccc(C)cc2)CCN(S(=O)(=O)c2ccc(C)cc2)Cc2cccc(n2)C1 | F
+m @3,0: N1CCNCCNCc2cccc(n2)C1
+g @3,1: CCOC(=O)CCC(C(=O)OCC)N1CCN(C(CCC(=O)OCC)C(=O)OCC)CCN(C(CCC(=O)OCC)C(=O)OCC)Cc2cccc(n2)C1 | G
+h @2,1: OC(=O)CCC(C(=O)O)N1CCN(C(CCC(=O)O)C(=O)O)CCN(C(CCC(=O)O)C(=O)O)Cc2cccc(n2)C1 | H | tam=md
+tr -&gt; e | TsCl | K2CO3
+e -&gt; f | D | K2CO3
+f -&gt; m | H2SO4 conc. | luego NaOH
+m -&gt; g | B | K2CO3
+g -&gt; h | NaOH | luego HCl"></div><p class="pc-note">E: tri-tosilado de la dietilentriamina (2 puntos); F: macrociclo tritosilado por alquilación doble con D (2 puntos); G: tri-alquilación de las tres aminas del macrociclo desprotegido con el bromo-diéster B, que da el éster etílico de H (1 punto). No hay arrastre de error para G, porque el enunciado da la estructura de H y permite razonar hacia atrás. Se admiten abreviaturas correctas (Ts, Et, CO<sub>2</sub>Et).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>M</em>(gadopiclenol) = 35&times;12.01 + 54&times;1.008 + 157.25 + 7&times;14.01 + 15&times;16.00 = 970.10 g mol<sup>&minus;1</sup></p><p class="pc-eq"><em>c</em> = 485.05 / 970.10 = 0.5000 mol dm<sup>&minus;3</sup></p><p class="pc-eq"><em>n</em>(Gd) = 0.5000 &times; 0.00600 = 3.000&times;10<sup>&minus;3</sup> mol &nbsp;&rArr;&nbsp; <em>m</em> = 3.000&times;10<sup>&minus;3</sup> &times; 157.25 = 0.472 g = <strong>472 mg</strong></p><p class="pc-note">Se acepta en mg o en g.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">1 punto</span></div><table class="pc-table"><thead><tr><th>ondas de radio</th><th>microondas</th><th>IR</th><th>visible</th><th>UV</th><th>rayos X</th><th>rayos gamma</th></tr></thead><tbody><tr><td><strong>&#10003;</strong></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">No se necesita cálculo: la RMN y la RM usan radiofrecuencias.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>M</em> = <em>M</em><sub>0</sub>(1 &minus; e<sup>&minus;3</sup>) = <em>M</em><sub>0</sub>(0.9502) &nbsp;&rArr;&nbsp; <strong>95.0 %</strong> de <em>M</em><sub>0</sub></p><p class="pc-note">Debe darse como porcentaje.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq">[agua] = 1000 g dm<sup>&minus;3</sup> / 18.016 g mol<sup>&minus;1</sup> = 55.506 mol dm<sup>&minus;3</sup></p><p class="pc-eq"><em>&chi;</em> = [gadopiclenol] / [agua] = 0.0500 / 55.506 = <strong>9.01&times;10<sup>&minus;4</sup></strong></p><p class="pc-note">Un punto si se calcula bien la concentración molar del agua, o si hay un error solo de potencia de 10.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>&tau;</em><sub>1</sub> = <em>&tau;</em><sub>c</sub> + <em>k</em>/<em>B</em><sub>1</sub><sup>2</sup>; &nbsp; <em>&tau;</em><sub>2</sub> = <em>&tau;</em><sub>c</sub> + <em>k</em>/<em>B</em><sub>2</sub><sup>2</sup></p><p class="pc-eq"><em>B</em><sub>1</sub><sup>2</sup>(<em>&tau;</em><sub>1</sub> &minus; <em>&tau;</em><sub>c</sub>) = <em>B</em><sub>2</sub><sup>2</sup>(<em>&tau;</em><sub>2</sub> &minus; <em>&tau;</em><sub>c</sub>) = <em>k</em></p><p class="pc-eq"><strong><em>&tau;</em><sub>c</sub> = (<em>B</em><sub>2</sub><sup>2</sup><em>&tau;</em><sub>2</sub> &minus; <em>B</em><sub>1</sub><sup>2</sup><em>&tau;</em><sub>1</sub>) / (<em>B</em><sub>2</sub><sup>2</sup> &minus; <em>B</em><sub>1</sub><sup>2</sup>)</strong></p><p class="pc-note">Los subíndices 1 y 2 son intercambiables: también es correcta (<em>B</em><sub>1</sub><sup>2</sup><em>&tau;</em><sub>1</sub> &minus; <em>B</em><sub>2</sub><sup>2</sup><em>&tau;</em><sub>2</sub>)/(<em>B</em><sub>1</sub><sup>2</sup> &minus; <em>B</em><sub>2</sub><sup>2</sup>).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(i)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq"><em>&tau;</em><sub>c</sub> = 1/(<em>q&chi;</em>) &middot; 1/(<em>AT</em>) &middot; e<sup>&Delta;<em>H</em>/<em>RT</em></sup> &nbsp;&rArr;&nbsp; <em>T&tau;</em><sub>c</sub> = e<sup>&Delta;<em>H</em>/<em>RT</em></sup> / (<em>q&chi;A</em>)</p><p class="pc-eq"><strong>ln(<em>T&tau;</em><sub>c</sub>) = (&Delta;<em>H</em>/<em>R</em>)(1/<em>T</em>) &minus; ln(<em>q&chi;A</em>)</strong></p><p class="pc-eq"><em>y</em> = ln(<em>T&tau;</em><sub>c</sub>); &nbsp; <em>a</em> = &Delta;<em>H</em>/<em>R</em>; &nbsp; <em>b</em> = &minus;ln(<em>q&chi;A</em>)</p><p class="pc-note">Un punto por <em>a</em> y otro por <em>b</em>; basta escribir la ecuación para ln(<em>T&tau;</em><sub>c</sub>).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(j)</span><span class="pc-marks">3 puntos</span></div><p class="pc-eq"><em>y</em><sub>1</sub> = <em>a</em>/<em>T</em><sub>1</sub> + <em>b</em>; &nbsp; <em>y</em><sub>2</sub> = <em>a</em>/<em>T</em><sub>2</sub> + <em>b</em> &nbsp;&rArr;&nbsp; <em>b</em> = (<em>y</em><sub>1</sub><em>T</em><sub>1</sub> &minus; <em>y</em><sub>2</sub><em>T</em><sub>2</sub>)/(<em>T</em><sub>1</sub> &minus; <em>T</em><sub>2</sub>)</p><p class="pc-eq"><em>y</em><sub>1</sub> = ln(275 &times; 4.775&times;10<sup>&minus;4</sup>) ; &nbsp; <em>y</em><sub>2</sub> = ln(280 &times; 3.326&times;10<sup>&minus;4</sup>)</p><p class="pc-eq"><em>b</em> = (&minus;558.298 + 664.659) / (&minus;5) = &minus;21.272</p><p class="pc-eq"><em>Aq&chi;</em> = e<sup>&minus;<em>b</em></sup> = <strong>1.73&times;10<sup>9</sup> K<sup>&minus;1</sup> s<sup>&minus;1</sup></strong></p><p class="pc-note">Un punto por la expresión que elimina <em>a</em>, otro por el valor de <em>b</em> y otro por el resultado final.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(k)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq"><em>Aq&chi;</em> / (<em>A</em>/(<em>q&chi;</em>)) = (<em>q&chi;</em>)<sup>2</sup> = 1.73&times;10<sup>9</sup> / 6.618&times;10<sup>14</sup> = 2.611&times;10<sup>&minus;6</sup></p><p class="pc-eq"><em>q</em> = &radic;(2.611&times;10<sup>&minus;6</sup>) / 9.01&times;10<sup>&minus;4</sup> = <strong>1.79</strong></p><p class="pc-note">Con los valores de reserva (<em>&chi;</em> = 0.00100, <em>Aq&chi;</em> = 2.00&times;10<sup>9</sup>): (<em>q&chi;</em>)<sup>2</sup> = 3.022&times;10<sup>&minus;6</sup>, <em>q</em> = 1.73. Un punto por (<em>q&chi;</em>)<sup>2</sup> correcto y otro por el valor final.</p></div>
+        `
+    },
+
+    "q17-azufre-atmosfera-2024": {
+        titulo: "Moléculas con azufre en la atmósfera",
+        numero: "Q17",
+        fuente: "56ª Olimpiada Internacional de Química (IChO) · UK Round One 2024",
+        creditos: "Adaptado y traducido al español a partir de: Royal Society of Chemistry — 56th IChO, UK Round One 2024. Autores originales: H. Alonzi, R. Beattie, P. Bolgar, R. Danylyuk, O. Evans, S. Kang, JL Kiappes, A. Leonescu, B. Pilgrim, S. Redman, P. Robotham, S. Sdepanian, A. Taylor, A. Thom, G. Trenins. Publicado bajo licencia Creative Commons BY-NC-SA. Las estructuras, esquemas y diagramas están generados por código propio (RDKit / MolGraph); no se incluyen las fotografías ni ilustraciones originales.",
+
+        enunciado: `
+            <p class="pc-q-title">Q17 — Esta pregunta trata sobre las moléculas con azufre en la atmósfera</p>
+
+            <div class="pc-intro">
+                <p>En septiembre de 2023, la NASA publicó espectroscopía del telescopio espacial James Webb que indicaba la presencia de metano y agua en la atmósfera del exoplaneta K2-18b. También encontraron indicios de <strong>dimetilsulfuro</strong>, que en la Tierra producen microorganismos marinos y es una posible firma de vida. El dimetilsulfuro es un líquido volátil de olor desagradable que aparece de forma natural en alimentos como la col.</p>
+                <p>En la Tierra, las moléculas orgánicas con azufre se degradan rápidamente por oxidación en la atmósfera. Las especies de azufre se muestran en el esquema siguiente.</p>
+            </div>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=50 gapy=40
+so2 @2,0: t:SO₂
+g @4,0: t:G
+e @2,1: CS(=O)O | E
+f @4,1: CS(=O)(=O)O | F
+n @1,2: CS[CH2] | N•
+c @0,3: CSC | C
+d @2,3: t:D
+su @4,3: CS(C)(=O)=O
+j @1,4: C[S](C)O | J•
+a @0,5: C[S+](C)CCC(=O)[O-] | A
+b @2,5: C[S+](C)(=O)CCC(=O)[O-] | B
+a -&gt; c
+a -&gt; b
+b -&gt; d
+c -&gt; d
+c -&gt; n | L• | | ruta=recta
+c -&gt; j | L• | | ruta=recta
+n -&gt; so2 | | | ruta=recta
+j -&gt; d | | | ruta=recta
+d -&gt; e
+d -&gt; su
+e -&gt; so2
+e -&gt; f
+su -&gt; f
+f -&gt; g"></div>
+            <p>El estado de oxidación del azufre cambia a lo largo del ciclo. Para determinarlo en una molécula: para cada enlace covalente formado por el azufre, se asigna el par (o pares) de electrones compartidos al átomo más electronegativo. Se determina la carga resultante en el átomo de azufre comparando el número de electrones asignados al azufre con los del átomo de azufre neutro (6). La carga resultante es el estado de oxidación del azufre.</p>
+            <p>Electronegatividades: H = 2.20, C = 2.55, S = 2.58, O = 3.44.</p>
+            <p>Ejemplo, en CH<sub>3</sub>&ndash;S&ndash;OH: al azufre se le asignan los electrones de los pares solitarios y del enlace C&ndash;S; los electrones del enlace O&ndash;S se asignan al oxígeno. El azufre queda con 6 electrones, igual que el átomo neutro: estado de oxidación = 0.</p>
+            <div class="pc-part"><span class="pc-part-label">(a)</span><div class="pc-part-body"><p>Determina los estados de oxidación del azufre en los compuestos <strong>B</strong>, <strong>C</strong> y <strong>E</strong>.</p></div></div>
+            <p>El compuesto <strong>D</strong> puede formarse por reacción del compuesto <strong>C</strong> con oxígeno.</p>
+            <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Escribe una ecuación para la reacción del compuesto <strong>C</strong> con oxígeno para formar el compuesto <strong>D</strong>.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Dibuja la estructura del compuesto <strong>D</strong>.</p></div></div></div>
+            <p>El compuesto <strong>G</strong> es muy soluble en agua y forma un ácido diprótico al disolverse.</p>
+            <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>Indica la fórmula del compuesto <strong>G</strong>.</p></div></div>
+            <p>Supón que a 323 K el compuesto <strong>G</strong> se comporta como un gas ideal. Se disuelven 13.4 cm<sup>3</sup> de gas <strong>G</strong> a 100 kPa en 1.000 dm<sup>3</sup> de agua.</p>
+            <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Calcula el pH de la disolución resultante, con aproximación al número entero más cercano. Supón que el ácido se disocia por completo.</p></div></div>
+            <p>La reacción directa del compuesto <strong>C</strong> con oxígeno para dar <strong>D</strong> es muy lenta. En la atmósfera, <strong>D</strong> se forma mediante una reacción con un radical <strong>L</strong><sup>&bull;</sup>. El radical <strong>L</strong><sup>&bull;</sup> puede reaccionar con <strong>C</strong> de dos formas distintas, produciendo los intermedios <strong>J</strong><sup>&bull;</sup> y <strong>N</strong><sup>&bull;</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(e)</span><div class="pc-part-body"><p>En el cuadernillo, marca cuáles de las descripciones siguientes son correctas sobre lo que le ocurre al compuesto <strong>C</strong> en la formación de los intermedios <strong>J</strong><sup>&bull;</sup> y <strong>N</strong><sup>&bull;</sup>.</p><table class="pc-table"><thead><tr><th></th><th>Formación de <strong>J</strong><sup>&bull;</sup></th><th>Formación de <strong>N</strong><sup>&bull;</sup></th></tr></thead><tbody><tr><td>Pérdida de H<sup>+</sup></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Pérdida de H<sup>&bull;</sup></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Pérdida de H<sup>&minus;</sup></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Reducción del azufre</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Oxidación del azufre</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Atomización</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Sustitución radicalaria</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Adición radicalaria</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></div></div>
+            <div class="pc-part"><span class="pc-part-label">(f)</span><div class="pc-part-body"><p>Indica la fórmula del radical <strong>L</strong><sup>&bull;</sup>.</p></div></div>
+            <p>La ley de velocidad para la formación de <strong>J</strong><sup>&bull;</sup> es: velocidad = <em>k</em><sub>1</sub>[<strong>C</strong>]<sup><em>a</em></sup>[<strong>L</strong><sup>&bull;</sup>]<sup><em>b</em></sup>. Se estudió el progreso de la reacción en fase gaseosa a 298 K para dos concentraciones iniciales distintas, con un gas inerte que completa la composición. La presión se mantuvo en 100 kPa. Las concentraciones en función del tiempo son:</p>
+            <table class="pc-table"><thead><tr><th></th><th>Experimento 1</th><th></th><th></th><th>Experimento 2</th><th></th><th></th></tr></thead><tbody><tr><td>Tiempo / s</td><td>0</td><td>10</td><td>20</td><td>0</td><td>10</td><td>20</td></tr><tr><td>[<strong>C</strong>] / mol dm<sup>&minus;3</sup></td><td>1000.00</td><td>999.50</td><td>999.25</td><td>500.00</td><td>499.42</td><td>499.00</td></tr><tr><td>[<strong>L</strong><sup>&bull;</sup>] / mol dm<sup>&minus;3</sup></td><td>1.00</td><td>0.50</td><td>0.25</td><td>2.00</td><td>1.42</td><td>1.00</td></tr><tr><td>[<strong>J</strong><sup>&bull;</sup>] / mol dm<sup>&minus;3</sup></td><td>0.00</td><td>0.50</td><td>0.75</td><td>0.00</td><td>0.58</td><td>1.00</td></tr></tbody></table>
+            <p>La concentración de un gas ideal a 298 K y 100 kPa es 40.4 mmol dm<sup>&minus;3</sup>.</p>
+            <div class="pc-part"><span class="pc-part-label">(g)</span><div class="pc-part-body"><p>Determina los valores de <em>a</em> y <em>b</em>.</p></div></div>
+            <p>En las reacciones en fase gaseosa, a veces hace falta una colisión con una molécula adicional, X, para aportar o retirar energía. Cualquier gas presente en la mezcla puede hacer de X (una de las moléculas que reaccionan u otra especie no reactiva). La formación de SO<sub>2</sub> a partir de <strong>N</strong><sup>&bull;</sup> es un ejemplo. La ecuación global es:</p>
+            <p class="pc-eq"><strong>N</strong><sup>&bull;</sup> + O<sub>2</sub> + X &rarr; SO<sub>2</sub> + X + otros productos</p>
+            <p>Cuando [<strong>N</strong><sup>&bull;</sup>] y [O<sub>2</sub>] son bajas, esta reacción parece tener la ley de velocidad velocidad = <em>k</em><sub>2</sub>[<strong>N</strong><sup>&bull;</sup>][O<sub>2</sub>], con <em>k</em><sub>2</sub> = 5.7&times;10<sup>&minus;12</sup> cm<sup>3</sup> molécula<sup>&minus;1</sup> s<sup>&minus;1</sup> a 298 K y 100 kPa. La ley de velocidad real implica las tres especies: velocidad = <em>k</em><sub>3</sub>[<strong>N</strong><sup>&bull;</sup>][O<sub>2</sub>][X].</p>
+            <div class="pc-part"><span class="pc-part-label">(h)</span><div class="pc-part-body"><p>Calcula el valor de <em>k</em><sub>3</sub> a 298 K con unidades en moléculas cm<sup>&minus;3</sup> en lugar de mol dm<sup>&minus;3</sup>. Pista: la concentración de X solo está determinada por la presión total.</p></div></div>
+
+        `,
+
+        respuesta: `
+            <p class="pc-q-title">Q17 — Esta pregunta trata sobre las moléculas con azufre en la atmósfera <span class="pc-total-chip">Total: 15 puntos</span></p>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(a)</span><span class="pc-marks">3 puntos</span></div><table class="pc-table"><thead><tr><th><strong>B</strong></th><th><strong>C</strong></th><th><strong>E</strong></th></tr></thead><tbody><tr><td>0</td><td>&minus;2</td><td>+2</td></tr></tbody></table><p class="pc-note">Un punto por cada uno. En C (CH<sub>3</sub>SCH<sub>3</sub>) los dos enlaces C&ndash;S y los dos pares solitarios van al S: 8 electrones, 6 &minus; 8 = &minus;2. En B los tres enlaces C&ndash;S dan 6 electrones y los enlaces con O se asignan al oxígeno: 6 &minus; 6 = 0. En E queda un par solitario y el enlace C&ndash;S: 4 electrones, 6 &minus; 4 = +2.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(i)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">C<sub>2</sub>H<sub>6</sub>S + &frac12; O<sub>2</sub> &rarr; C<sub>2</sub>H<sub>6</sub>OS</p><p class="pc-note">Se acepta cualquier múltiplo con la estequiometría correcta.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(b)(ii)</span><span class="pc-marks">1 punto</span></div><div class="pc-compounds"><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="CS(C)=O"></span><span class="pc-compound-name">D: dimetilsulfóxido (DMSO)</span></div><div class="pc-compound "><span class="pc-mol" data-size="sm" data-smiles="C[S+](C)[O-]"></span><span class="pc-compound-name">forma de resonancia</span></div></div><p class="pc-note">Cualquiera de las dos formas de resonancia da el punto completo.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(c)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq">G = <strong>SO<sub>3</sub></strong></p><p class="pc-note">SO<sub>3</sub> + H<sub>2</sub>O &rarr; H<sub>2</sub>SO<sub>4</sub>, un ácido diprótico.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(d)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><em>n</em>(SO<sub>3</sub>) = <em>pV</em>/<em>RT</em> = (100000 Pa &times; 13.4&times;10<sup>&minus;6</sup> m<sup>3</sup>) / (8.314 &times; 323) = 4.99&times;10<sup>&minus;4</sup> mol</p><p class="pc-eq"><em>n</em>(H<sup>+</sup>) = 2 &times; 4.99&times;10<sup>&minus;4</sup> = 9.98&times;10<sup>&minus;4</sup> mol &nbsp;&rArr;&nbsp; [H<sup>+</sup>] = 9.98&times;10<sup>&minus;4</sup> mol dm<sup>&minus;3</sup></p><p class="pc-eq">pH = &minus;log(9.98&times;10<sup>&minus;4</sup>) = 3.003 &asymp; <strong>3</strong></p><p class="pc-note">Basta la respuesta numérica. No puntúa si se olvida el factor de 2 del ácido diprótico.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(e)</span><span class="pc-marks">3 puntos</span></div><table class="pc-table"><thead><tr><th></th><th>Formación de <strong>J</strong><sup>&bull;</sup></th><th>Formación de <strong>N</strong><sup>&bull;</sup></th></tr></thead><tbody><tr><td>Pérdida de H<sup>+</sup></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Pérdida de H<sup>&bull;</sup></td><td>&nbsp;</td><td>&#10003;</td></tr><tr><td>Pérdida de H<sup>&minus;</sup></td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Reducción del azufre</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Oxidación del azufre</td><td>&#10003;</td><td>&nbsp;</td></tr><tr><td>Atomización</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Sustitución radicalaria</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>Adición radicalaria</td><td>&#10003;</td><td>&nbsp;</td></tr></tbody></table><p class="pc-note">Un punto por cada marca correcta; &minus;1 por cada marca incorrecta (sin bajar de 0). Ejemplo: tres correctas y una incorrecta dan 2 puntos.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(f)</span><span class="pc-marks">1 punto</span></div><p class="pc-eq"><strong>HO<sup>&bull;</sup></strong> (radical hidroxilo)</p><div class="pc-free-host" data-esquema="size=sm escala=0.5 gapx=50 gapy=40
+so2 @2,0: t:SO₂
+g @4,0: O=S(=O)=O | G
+e @2,1: CS(=O)O | E
+f @4,1: CS(=O)(=O)O | F
+n @1,2: CS[CH2] | N•
+c @0,3: CSC | C
+d @2,3: CS(C)=O | D
+su @4,3: CS(C)(=O)=O
+j @1,4: C[S](C)O | J•
+a @0,5: C[S+](C)CCC(=O)[O-] | A
+b @2,5: C[S+](C)(=O)CCC(=O)[O-] | B
+a -&gt; c
+a -&gt; b
+b -&gt; d
+c -&gt; d
+c -&gt; n | HO• | | ruta=recta
+c -&gt; j | HO• | | ruta=recta
+n -&gt; so2 | | | ruta=recta
+j -&gt; d | | | ruta=recta
+d -&gt; e
+d -&gt; su
+e -&gt; so2
+e -&gt; f
+su -&gt; f
+f -&gt; g"></div><p class="pc-note">Esquema completo con D (DMSO), G (SO<sub>3</sub>) y L<sup>&bull;</sup> (HO<sup>&bull;</sup>).</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(g)</span><span class="pc-marks">2 puntos</span></div><p>[<strong>C</strong>] es muy grande y prácticamente constante en los experimentos. En el experimento 1, [<strong>L</strong><sup>&bull;</sup>] decae con una semivida de 10 s: primer orden en <strong>L</strong><sup>&bull;</sup>, con velocidad = <em>k</em><sub>ef</sub>[<strong>L</strong><sup>&bull;</sup>], donde <em>k</em><sub>ef</sub> depende de [<strong>C</strong>]. En el experimento 2, [<strong>L</strong><sup>&bull;</sup>] decae más despacio, con semivida de 20 s, así que <em>k</em><sub>ef</sub> se reduce a la mitad; como [<strong>C</strong>] también es la mitad, <em>k</em><sub>ef</sub> &prop; [<strong>C</strong>].</p><p class="pc-eq">velocidad = <em>k</em><sub>1</sub>[<strong>C</strong>]<sup>1</sup>[<strong>L</strong><sup>&bull;</sup>]<sup>1</sup> &nbsp;&rArr;&nbsp; <strong><em>a</em> = 1, <em>b</em> = 1</strong></p><p class="pc-note">No se exige razonamiento. Un punto por <em>a</em> y otro por <em>b</em>.</p></div>
+<div class="pc-answer"><div class="pc-answer-head"><span class="pc-part-label">(h)</span><span class="pc-marks">2 puntos</span></div><p class="pc-eq"><em>k</em><sub>2</sub> = <em>k</em><sub>3</sub>[X]</p><p class="pc-eq"><em>V</em><sub>m</sub> = <em>RT</em>/<em>p</em> = 8.314 &times; 298 / 100000 = 0.02478 m<sup>3</sup> = 24.78 dm<sup>3</sup></p><p class="pc-eq">[X] = 6.02&times;10<sup>23</sup> / 24.78 = 2.429&times;10<sup>22</sup> moléculas dm<sup>&minus;3</sup> = 2.429&times;10<sup>19</sup> moléculas cm<sup>&minus;3</sup></p><p class="pc-eq"><em>k</em><sub>3</sub> = 5.7&times;10<sup>&minus;12</sup> / 2.429&times;10<sup>19</sup> = <strong>2.3&times;10<sup>&minus;31</sup> cm<sup>6</sup> molécula<sup>&minus;2</sup> s<sup>&minus;1</sup></strong></p><p class="pc-note">Un punto por el valor numérico correcto y otro por las unidades.</p></div>
         `
     }
 

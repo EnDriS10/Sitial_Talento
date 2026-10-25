@@ -1114,6 +1114,25 @@
     );
 
     SCHEMES['q4-tartrazina-sintesis'] = () => freeHost(`
+size=sm escala=0.6 gapx=40 gapy=45
+n @0,0: O=[N+]([O-])c1ccccc1 | nitrobenceno | tam=sm
+a @1,0: t:A | C6H7N
+b @2,0: t:B | C6H7NO3S
+c @3,0: t:C | [C6H5N2O3S]⁺ Cl⁻
+d @3,2: t:D | C6H8N2O3S
+ox @2,1: CCOC(=O)CC(=O)C(=O)OCC | oxalacetato de dietilo
+e @1,2: t:E
+f @0,2: t:F
+t @0,3: [Na+].[Na+].[Na+].[O-]C(=O)c1nn(-c2ccc(S(=O)(=O)[O-])cc2)c(O)c1N=Nc1ccc(S(=O)(=O)[O-])cc1 | tartrazina
+n -> a | Sn | HCl(aq)
+a -> b | H2SO4 conc. | 200 °C
+b -> c | NaNO2 | HCl
+c -> d | (i) Na2SO3/Na2CO3 | (ii) H+/H2O
+d -> e | − H2O | − CH3CH2OH
+e -> f | compuesto C
+f -> t | NaOH en exceso
+`);
+    SCHEMES['q4-tartrazina-respuesta'] = () => freeHost(`
 size=sm escala=0.42 gapx=24 gapy=40
 n @0,0: O=[N+]([O-])c1ccccc1 | nitrobenceno | tam=sm
 a @1,0: Nc1ccccc1 | A · C6H7N | tam=sm
@@ -1389,11 +1408,11 @@ u6 -> fin | piridina, Δ
         svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
         const defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs);
         const marks = {};
-        const marker = color => {
-            const k = color || 'cur'; if (marks[k]) return marks[k];
+        const marker = (color, sz) => {
+            const k = (color || 'cur') + (sz || ''); if (marks[k]) return marks[k];
             const id = st.uid + 'm' + Object.keys(marks).length; marks[k] = id;
             const m = document.createElementNS(NS, 'marker');
-            m.setAttribute('id', id); m.setAttribute('viewBox', '0 0 10 10'); m.setAttribute('refX', '8.5'); m.setAttribute('refY', '5'); m.setAttribute('markerWidth', '8'); m.setAttribute('markerHeight', '8'); m.setAttribute('orient', 'auto-start-reverse'); m.setAttribute('markerUnits', 'userSpaceOnUse');
+            m.setAttribute('id', id); m.setAttribute('viewBox', '0 0 10 10'); m.setAttribute('refX', '8.5'); m.setAttribute('refY', '5'); m.setAttribute('markerWidth', String(sz || 8)); m.setAttribute('markerHeight', String(sz || 8)); m.setAttribute('orient', 'auto-start-reverse'); m.setAttribute('markerUnits', 'userSpaceOnUse');
             m.innerHTML = `<path d="M0,0.5 L10,5 L0,9.5 z" fill="${color || 'var(--text)'}"/>`;
             defs.appendChild(m); return id;
         };
@@ -1401,7 +1420,8 @@ u6 -> fin | piridina, Δ
             const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); p.setAttribute('fill', 'none');
             p.setAttribute('stroke', color || 'var(--text)'); p.setAttribute('stroke-width', (opt && opt.w) || 2); p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
             if (opt && opt.dash) p.setAttribute('stroke-dasharray', '6 5');
-            if (opt && opt.end) p.setAttribute('marker-end', `url(#${marker(color)})`);
+            if (opt && opt.end) p.setAttribute('marker-end', `url(#${marker(color, opt.msize)})`);
+            if (opt && opt.opacity) p.setAttribute('stroke-opacity', opt.opacity);
             if (opt && opt.start) p.setAttribute('marker-start', `url(#${marker(color)})`);
             svg.appendChild(p); return p;
         };
@@ -1471,15 +1491,20 @@ u6 -> fin | piridina, Δ
                 const ps = ids.map(i => n.pts.pts[i]).filter(Boolean); if (!ps.length) return null;
                 const x = ps.reduce((s, p) => s + p[0], 0) / ps.length, y = ps.reduce((s, p) => s + p[1], 0) / ps.length;
                 const all = Object.values(n.pts.pts), cx = all.reduce((s, p) => s + p[0], 0) / all.length, cy = all.reduce((s, p) => s + p[1], 0) / all.length;
-                return { x: r.l + x / n.pts.w * k, y: r.t + y / n.pts.h * kh, cx: r.l + cx / n.pts.w * k, cy: r.t + cy / n.pts.h * kh };
+                return { atom: ids.length === 1, x: r.l + x / n.pts.w * k, y: r.t + y / n.pts.h * kh, cx: r.l + cx / n.pts.w * k, cy: r.t + cy / n.pts.h * kh };
             };
             const P = pt(cv.a), Q = pt(cv.b); if (!P || !Q) return;
+            {   // no salir/llegar al centro exacto del átomo: deja a la vista la letra del heteroátomo
+                const ex = Q.x - P.x, ey = Q.y - P.y, el = Math.hypot(ex, ey) || 1, g = Math.min(8, el * 0.3);
+                if (P.atom) { P.x += ex / el * g; P.y += ey / el * g; }
+                if (Q.atom) { Q.x -= ex / el * g; Q.y -= ey / el * g; }
+            }
             const mx = (P.x + Q.x) / 2, my = (P.y + Q.y) / 2, dx = Q.x - P.x, dy = Q.y - P.y, L = Math.hypot(dx, dy) || 1;
             let nx = -dy / L, ny = dx / L;
             if ((mx - P.cx) * nx + (my - P.cy) * ny < 0) { nx = -nx; ny = -ny; }
             const k = (cv.curv || 0.45) * L * (cv.giro < 0 ? -1 : 1) + (L < 30 ? 14 : 0) * (cv.giro < 0 ? -1 : 1);
             const c1 = [P.x + dx * 0.25 + nx * k, P.y + dy * 0.25 + ny * k], c2 = [P.x + dx * 0.75 + nx * k, P.y + dy * 0.75 + ny * k];
-            mkPath(`M${P.x.toFixed(1)},${P.y.toFixed(1)} C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${Q.x.toFixed(1)},${Q.y.toFixed(1)}`, _fcolor(cv.color) || '#d6403a', { end: true, w: 1.8 });
+            mkPath(`M${P.x.toFixed(1)},${P.y.toFixed(1)} C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${Q.x.toFixed(1)},${Q.y.toFixed(1)}`, _fcolor(cv.color) || '#d6403a', { end: true, w: 1.3, msize: 5.5, opacity: 0.7 });
         });
 
         // 4) cajas de resalte
