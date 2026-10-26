@@ -508,6 +508,15 @@
     }
     [data-theme="dark"] .pc-eq-box { background: rgba(255,255,255,.04); }
     .pc-eq-box sup, .pc-eq-box sub { font-size: 75%; }
+
+    /* ── ecuaciones tipo «matemáticas»: serif, fracciones y raíces que se ajustan al contenido ── */
+    .pc-eq.pc-math { font-family: 'STIX Two Text','Cambria Math','Latin Modern Math','Times New Roman',serif; font-size: 17px; line-height: 2.5; letter-spacing: 0; }
+    .pc-math sub, .pc-math sup { font-size: 68%; }
+    .pc-math .pc-eq-frac { margin: 0 5px; }
+    .pc-math .pc-eq-frac-num, .pc-math .pc-eq-frac-den { padding: 0 6px; line-height: 1.4; text-align: center; }
+    .pc-sqrt { display: inline-flex; align-items: stretch; vertical-align: middle; margin: 0 3px; }
+    .pc-sqrt-sign { flex: 0 0 15px; width: 15px; align-self: stretch; height: auto; overflow: visible; }
+    .pc-sqrt-body { border-top: 1.5px solid currentColor; padding: 3px 5px 1px 3px; display: inline-flex; align-items: center; }
     .pc-eq-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
     .pc-eq-frac-num, .pc-eq-frac-den { padding: 0 4px; }
     .pc-eq-frac-num { border-bottom: 1.4px solid var(--text); }

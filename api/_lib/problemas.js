@@ -11,6 +11,7 @@ const conv = (t, m) => String(t).split('').map((c) => m[c] || c).join('');
 
 export function htmlATexto(h) {
   return String(h || '')
+    .replace(/<svg[^>]*pc-sqrt-sign[\s\S]*?<\/svg>/gi, '√')
     .replace(/<svg[\s\S]*?<\/svg>/gi, '[diagrama]')
     .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, '[imagen: $1]')
     .replace(/<[^>]*data-mol="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => molATexto(x))
