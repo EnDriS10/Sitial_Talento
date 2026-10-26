@@ -71,7 +71,8 @@ Los datos son archivos `.html` con un `<script id="…">` que la página descarg
 Es un sitio 100 % estático: no hay build. En **Vercel** basta con importar el repositorio (framework "Other").
 
 - **URLs bonitas** (`/Historial_Eventos/IChO`, `/Equipo/IChO/2026`, `/Banco_Problemas/<id>/<tab>`): al no existir archivo real, Vercel/GitHub Pages sirven `404.html`, que redirige al archivo correcto.
-- **Vistas previas al compartir**: `middleware.js` intercepta `/Historial_Medallas/cuadrito=<slug>`, `/media?foto=<name>` y `/Banco_Problemas/<id>/<tab>` y devuelve el HTML con meta tags Open Graph propios; la imagen sale de `api/og.js`.
+- **Vistas previas al compartir**: `middleware.js` intercepta `/Equipo/<olimpiada>/<año>`, `/Historial_Medallas/cuadrito=<slug>`, `/media?foto=<name>` y `/Banco_Problemas/<id>/<tab>` y devuelve el HTML con meta tags Open Graph propios; la imagen sale de `api/og.js`.
+- **Sitemap**: `/sitemap.xml` se sirve desde `api/sitemap.js`, que lo genera a partir de `Data/` (equipos, cuadritos, problemas); `generate-sitemap.mjs` crea la copia estática.
 - **Cron** (`vercel.json`): `/api/check-links` corre a diario y reporta imágenes de Imgur caídas en los logs (opcional: variable `WEBHOOK_URL` para recibir el aviso).
 - **Caché**: `Assets/` con caché larga; `Data/` con `s-maxage=300` + `stale-while-revalidate`, de modo que los cambios en los datos se ven en pocos minutos.
 
@@ -176,12 +177,7 @@ Pestañas: Enunciado · ✍️ Tu respuesta · 🔑 Respuesta (pide confirmació
 - [ ] Página de perfil por profesor/entrenador compartible.
 - [ ] Comparador de equipos entre años y países.
 - [ ] Más fotos/vídeos por equipo y descarga de la ficha del equipo como imagen (para redes).
-- [x] Chatbot general con IA gratuita (ver *Chatbot*). Tutor del Banco de Problemas: hecho (ver *Banco de Problemas*).
-- [ ] Imagen Open Graph dinámica para `/Equipo/<olimpiada>/<año>`.
-- [ ] Sitemap generado automáticamente a partir de `Data/` (equipos, cuadritos, problemas).
 - [ ] Mirror/subida propia de imágenes (menos dependencia de Imgur) y aviso del cron por Telegram.
-- [ ] Más problemas en el Banco con filtros por tema, dificultad y año.
-- [x] Modo offline (PWA) y versión imprimible de rankings (ver *PWA, impresión y exportación*).
 - [ ] Panel de edición de datos (formulario que genere las entradas de `Data/`).
 - [ ] Traducción completa al inglés de todas las secciones.
 
