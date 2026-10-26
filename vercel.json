@@ -20,7 +20,8 @@
     { "source": "/Olimpiada_Cubana/:path*", "destination": "/index.html" },
     { "source": "/Honor_Merece/:path*", "destination": "/index.html" },
     { "source": "/Contacto", "destination": "/index.html" },
-    { "source": "/Equipo/:ol/:anio", "destination": "/equipo.html" }
+    { "source": "/Equipo/:path*", "destination": "/equipo.html" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ],
 
   "headers": [

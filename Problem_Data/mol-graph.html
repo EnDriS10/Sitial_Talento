@@ -213,13 +213,82 @@
         try { _tmplKetal = window.RDKit.get_mol(mb) || false; } catch (e) { _tmplKetal = false; }
         return _tmplKetal;
     }
+    // Complejo con metal central: «@Gd:i,j,k:SMILES» → se dibuja el ligando con sus coordenadas
+    // normales y se añade el átomo Gd en el centroide de los átomos donadores (índices i,j,k…),
+    // unido a cada uno (enlaces de coordinación).
+    function _complejo(spec) {
+        const mm = /^@([A-Z][a-z]?):([\d,]+):(.*)$/.exec(spec);
+        if (!mm) return null;
+        try {
+            const idx = mm[2].split(',').map(Number);
+            const lig = window.RDKit.get_mol(mm[3]);
+            if (!lig) return null;
+            lig.set_new_coords();
+            const lines = lig.get_molblock().split('\n');
+            const cl = lines[3], na = +cl.slice(0, 3), nb = +cl.slice(3, 6);
+            const at = lines.slice(4, 4 + na), bo = lines.slice(4 + na, 4 + na + nb), rest = lines.slice(4 + na + nb);
+            let cx = 0, cy = 0;
+            idx.forEach(i => { cx += +at[i].slice(0, 10); cy += +at[i].slice(10, 20); });
+            cx /= idx.length; cy /= idx.length;
+            at.push(cx.toFixed(4).padStart(10) + cy.toFixed(4).padStart(10) + '    0.0000 ' + mm[1].padEnd(3) + ' 0  0  0  0  0  0  0  0  0  0  0  0');
+            idx.forEach(i => bo.push(String(na + 1).padStart(3) + String(i + 1).padStart(3) + '  1  0'));
+            lines[3] = String(na + 1).padStart(3) + String(nb + idx.length).padStart(3) + cl.slice(6);
+            return window.RDKit.get_mol([...lines.slice(0, 4), ...at, ...bo, ...rest].join('\n'));
+        } catch (e) { return null; }
+    }
     function _molFor(smiles) {
+        if (smiles.charAt(0) === '@') return _complejo(smiles);
         const mol = window.RDKit.get_mol(smiles);
         if (mol && /OCCO/.test(smiles)) {
             const t = _ketalTemplate();
             if (t) { try { mol.generate_aligned_coords(t, JSON.stringify({ allowRGroups: true, acceptFailure: true })); } catch (e) { /* layout por defecto */ } }
         }
         return mol;
+    }
+
+
+    // ────────────────────────────────────────────────────────────────
+    // 2.c) CARGAS «ENCERRADAS» Y RADICALES — en los exámenes las cargas
+    //      se dibujan como ⊕ / ⊖ (signo dentro de un círculo) junto al
+    //      átomo, sin "C⁻" ni "N⁺" pegados a la letra, y los radicales
+    //      como un punto bien visible. RDKit no lo hace: se le pide que
+    //      no escriba la carga (atomLabels = solo el símbolo; vacío en
+    //      carbono) y que no dibuje sus puntos de radical, y se añaden
+    //      encima marcas propias en las posiciones de los átomos.
+    // ────────────────────────────────────────────────────────────────
+    const _SYM = { 1: 'H', 3: 'Li', 5: 'B', 6: 'C', 7: 'N', 8: 'O', 9: 'F', 11: 'Na', 12: 'Mg', 13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl', 19: 'K', 20: 'Ca', 26: 'Fe', 29: 'Cu', 30: 'Zn', 35: 'Br', 53: 'I', 64: 'Gd' };
+    function _molInfo(mol) {
+        try {
+            const js = JSON.parse(mol.get_json()), m = js.molecules[0], df = (js.defaults && js.defaults.atom) || {};
+            return { atoms: m.atoms.map(a => Object.assign({}, df, a)), bonds: (m.bonds || []).map(b => b.atoms) };
+        } catch (e) { return null; }
+    }
+    function _overlayMarks(info, pts, preset) {
+        const rr = 3.0 + preset.bond * 1.4, ink = '#0f0f0f', nb = {};
+        info.bonds.forEach(([a, b]) => { (nb[a] = nb[a] || []).push(b); (nb[b] = nb[b] || []).push(a); });
+        const away = (i) => {
+            let vx = 0, vy = 0;
+            (nb[i] || []).forEach(j => { if (pts[i] && pts[j]) { const dx = pts[i][0] - pts[j][0], dy = pts[i][1] - pts[j][1], L = Math.hypot(dx, dy) || 1; vx += dx / L; vy += dy / L; } });
+            const L = Math.hypot(vx, vy);
+            return L < 0.45 ? [0.6, -0.8] : [vx / L, vy / L];
+        };
+        let out = '';
+        info.atoms.forEach((a, i) => {
+            if (!pts[i] || !a.z) return;
+            const [ux, uy] = away(i), p = pts[i];
+            if (a.chg) {
+                const d = (a.z === 6 ? 7.5 : 11.5) + rr * 0.4, cx = p[0] + ux * d, cy = p[1] + uy * d, q = rr * 0.62;
+                out += `<g class="pc-chg" stroke="${ink}" stroke-width="${(preset.bond * 0.75).toFixed(2)}" fill="none"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"/><path d="M${(cx - q).toFixed(1)},${cy.toFixed(1)} h${(2 * q).toFixed(1)}${a.chg > 0 ? ` M${cx.toFixed(1)},${(cy - q).toFixed(1)} v${(2 * q).toFixed(1)}` : ''}"/></g>`;
+            }
+            if (a.nRad) {
+                const d = (a.z === 6 ? 6 : 11) + rr * 0.3, cx = p[0] + ux * d, cy = p[1] + uy * d, rd = rr * 0.62;
+                for (let k = 0; k < a.nRad; k++) {
+                    const off = (k - (a.nRad - 1) / 2) * rd * 2.6, nx = -uy, ny = ux;
+                    out += `<circle class="pc-rad" cx="${(cx + nx * off).toFixed(1)}" cy="${(cy + ny * off).toFixed(1)}" r="${rd.toFixed(1)}" fill="${ink}"/>`;
+                }
+            }
+        });
+        return out;
     }
 
     function svgForSmiles(smiles, size, colorAtoms, hl, hlColor) {
@@ -269,6 +338,22 @@
                     if (label) details.atomLabels[idx] = label;
                 });
             }
+            // cargas ⊕/⊖ y radicales con marcas propias (ver 2.c)
+            const info = _molInfo(mol);
+            let marks = false;
+            if (info) {
+                info.atoms.forEach((a, i) => {
+                    if (!a.z) return;                                   // comodín: ya tiene su etiqueta
+                    if (a.chg) {
+                        details.atomLabels = details.atomLabels || {};
+                        const h = a.impHs || 0;
+                        details.atomLabels[i] = a.z === 6 ? '' : (_SYM[a.z] || '') + (h ? 'H' + (h > 1 ? h : '') : '');
+                        marks = true;
+                    }
+                    if (a.nRad) marks = true;
+                });
+                if (marks) details.includeRadicals = false;
+            }
             if (hl && hl.length) {
                 details.atoms = hl.filter(i => i >= 0 && i < mol.get_num_atoms());
                 const hx = /^#([0-9a-f]{6})/i.exec(hlColor || '') || /^#([0-9a-f]{6})/i.exec('#e0b400');
@@ -281,6 +366,16 @@
             // de RDKit; deja solo <svg>...</svg> con los trazos.
             svg = svg.replace(/<rect[^>]*fill:#FFFFFF00[^>]*>\s*<\/rect>/i, '');
             svg = svg.replace('<svg ', '<svg class="pc-skel-svg pc-mol-rdkit" ');
+            if (marks) {
+                try {
+                    const n = mol.get_num_atoms(), all = []; for (let i = 0; i < n; i++) all.push(i);
+                    const d2 = Object.assign({}, details, { atoms: all, highlightColour: [0, 0, 0, 0] });
+                    const sv2 = mol.get_svg_with_highlights(JSON.stringify(d2)), pts = {};
+                    const re = /<ellipse cx='([\d.\-]+)' cy='([\d.\-]+)'[^>]*class='atom-(\d+)'/g; let mm;
+                    while ((mm = re.exec(sv2))) pts[+mm[3]] = [parseFloat(mm[1]), parseFloat(mm[2])];
+                    svg = svg.replace(/<\/svg>\s*$/, _overlayMarks(info, pts, preset) + '</svg>');
+                } catch (e) { /* sin marcas propias: se queda el dibujo de RDKit */ }
+            }
             _molCache[cacheKey] = svg;
             return svg;
         } finally {

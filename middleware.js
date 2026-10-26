@@ -17,8 +17,18 @@
 // resolviendo la petición normalmente (archivo estático, rewrite, 404).
 // ════════════════════════════════════════════════════════════════════
 
+import { datosEquipo, perfilHonor, fotoMedia, describirFoto, recortar } from './api/_lib/sitial-data.js';
+
 export const config = {
-  matcher: ['/Historial_Medallas/:path*', '/media', '/media.html', '/Banco_Problemas/:path*'],
+  matcher: [
+    '/Historial_Medallas/:path*',
+    '/media',
+    '/media.html',
+    '/Banco_Problemas/:path*',
+    '/Equipo/:path*',
+    '/equipo.html',
+    '/Honor_Merece/:path*',
+  ],
 };
 
 const MEDALLA_LABEL = {
@@ -26,14 +36,6 @@ const MEDALLA_LABEL = {
   plata: 'Medalla de Plata',
   bronce: 'Medalla de Bronce',
   mencion: 'Mención Honorífica',
-};
-
-const EVENTO_LABEL = {
-  icho: 'IChO',
-  imcho: 'IMChO',
-  oiaq: 'OIAQ',
-  ocacq: 'OCACQ',
-  otras: 'Otro evento',
 };
 
 function slugify(nombre) {
@@ -131,28 +133,44 @@ async function buildCuadritoOG(origin, slug) {
 }
 
 async function buildMediaOG(origin, fotoName) {
-  const res = await fetch(`${origin}/Data/media_data.html`);
-  if (!res.ok) return null;
-  const text = await res.text();
-  const re = new RegExp(`name:\\s*"${fotoName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\s*,\\s*link:\\s*"([^"]+)"`);
-  const m = text.match(re);
-  if (!m) return null;
-  const link = m[1];
-
-  // "name" tiene forma DD_MM_AAAA_evento[_num]
-  const partes = fotoName.split('_');
-  let fechaTxt = '';
-  let eventoTxt = 'Sitial de Talentos Cubanos';
-  if (partes.length >= 4) {
-    const [dd, mm, aaaa, evento] = partes;
-    fechaTxt = `${dd}/${mm}/${aaaa}`;
-    eventoTxt = EVENTO_LABEL[evento] || evento;
-  }
-
+  const f = await fotoMedia(origin, fotoName);
+  if (!f) return null;
+  const { evento, fecha } = describirFoto(fotoName);
   return {
-    title: `Foto — ${eventoTxt}${fechaTxt ? ' · ' + fechaTxt : ''}`,
+    title: `Foto — ${evento || 'Sitial de Talentos Cubanos'}${fecha ? ' · ' + fecha.corta : ''}`,
     description: 'Galería de fotos — Sitial de Talentos Cubanos, Olimpiadas de Química.',
-    image: link, // la propia foto de Imgur sirve directo como og:image
+    // Tarjeta de marca con la propia foto de fondo (api/og?tipo=foto). Si la
+    // foto no se puede preparar, esa ruta redirige a la imagen original.
+    image: `${origin}/api/og?${new URLSearchParams({ tipo: 'foto', n: fotoName }).toString()}`,
+  };
+}
+
+async function buildEquipoOG(origin, ol, año, sub) {
+  const eq = await datosEquipo(origin, ol, año, sub);
+  if (!eq) return null;
+  const sedeTxt = [eq.pais, eq.sede].filter(Boolean).join(' ');
+  const n = eq.est.length;
+  const desc =
+    `${eq.titulo}: ${n} ${n === 1 ? 'participante' : 'participantes'}, ` +
+    `${eq.nMed} ${eq.nMed === 1 ? 'medalla' : 'medallas'}${sedeTxt ? ' · ' + sedeTxt : ''}`;
+  const qs = new URLSearchParams({ tipo: 'equipo', ol: eq.K, anio: String(eq.año) });
+  if (eq.sub) qs.set('sub', eq.sub);
+  return {
+    title: `${eq.titulo} — Equipo cubano | Sitial de Talentos`,
+    description: desc,
+    image: `${origin}/api/og?${qs.toString()}`,
+    url: origin + eq.ruta,
+  };
+}
+
+async function buildHonorOG(origin, id) {
+  const p = await perfilHonor(origin, id);
+  if (!p) return null;
+  return {
+    title: `${p.nombre} — Honor a quien Honor Merece`,
+    description: recortar(p.desc || p.subtitulo || p.role, 200) || 'Honor a quien Honor Merece — Sitial de Talentos Cubanos',
+    image: `${origin}/api/og?${new URLSearchParams({ tipo: 'profesor', id: p.id }).toString()}`,
+    url: origin + p.ruta,
   };
 }
 
@@ -197,10 +215,15 @@ async function injectMeta(fetchHtmlPromise, og, pageUrl, extraHeadScript) {
   if (!res.ok) return null;
   let html = await res.text();
 
+  // URL canónica de la página compartida (og.url si la ruta bonita difiere de
+  // la petición, p.ej. /equipo.html?ol=icho&anio=2026 → /Equipo/IChO/2026).
+  const urlFinal = og.url || pageUrl;
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(og.title)}</title>`);
+  html = setMetaAttr(html, 'name', 'description', og.description);
   html = setMetaAttr(html, 'property', 'og:title', og.title);
   html = setMetaAttr(html, 'property', 'og:description', og.description);
-  html = setMetaAttr(html, 'property', 'og:url', pageUrl);
+  html = setMetaAttr(html, 'property', 'og:url', urlFinal);
+  html = html.replace(/(<link rel="canonical"[^>]*?href=")[^"]*(")/, (m, a, b) => a + escapeHtml(urlFinal) + b);
   html = setMetaAttr(html, 'name', 'twitter:title', og.title);
   html = setMetaAttr(html, 'name', 'twitter:description', og.description);
   // og:image / twitter:image llevan una URL, no texto — sin escapar comillas HTML.
@@ -284,6 +307,40 @@ export default async function middleware(request) {
           request.url,
           fixScript
         );
+        if (out) return out;
+      }
+    }
+
+    // 4) Equipo de una olimpiada/año (ruta bonita o enlace con query)
+    let eqArgs = null;
+    const equipoPath = pathname.match(/^\/Equipo\/([^/]+)\/(\d{4})(?:\/([^/]+))?\/?$/);
+    if (equipoPath) {
+      eqArgs = [
+        decodeURIComponent(equipoPath[1]),
+        equipoPath[2],
+        equipoPath[3] ? decodeURIComponent(equipoPath[3]) : null,
+      ];
+    } else if (pathname === '/equipo.html' && searchParams.get('ol') && searchParams.get('anio')) {
+      eqArgs = [searchParams.get('ol'), searchParams.get('anio'), searchParams.get('sub')];
+    }
+    if (eqArgs) {
+      const og = await buildEquipoOG(origin, ...eqArgs);
+      if (og) {
+        // equipo.html calcula su <base> y sus parámetros a partir de
+        // location (que aquí ya es la ruta bonita), así que no necesita
+        // script de corrección.
+        const out = await injectMeta(fetch(`${origin}/equipo.html`), og, request.url);
+        if (out) return out;
+      }
+    }
+
+    // 5) Perfil de honor (entrenador / prócer): /Honor_Merece/<Cat>/<id>
+    const honorMatch = pathname.match(/^\/Honor_Merece\/(?:Entrenadores|Proceres)\/([^/]+)\/?$/);
+    if (honorMatch) {
+      const og = await buildHonorOG(origin, decodeURIComponent(honorMatch[1]));
+      if (og) {
+        const fixScript = `document.getElementById('app-base-href').href = location.origin + '/';`;
+        const out = await injectMeta(fetch(`${origin}/index.html`), og, request.url, fixScript);
         if (out) return out;
       }
     }

@@ -1368,6 +1368,9 @@
         #modal-back-btn { background: rgba(255,255,255,.12); border: none; border-radius: 8px; color: #fff; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background .2s; }
         #modal-back-btn:hover { background: rgba(255,255,255,.22); }
         #modal-topbar-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: rgba(255,255,255,.8); }
+        #modal-share-btn { margin-left: auto; background: rgba(255,255,255,.12); border: none; border-radius: 50%; width: 36px; height: 36px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .2s; flex-shrink: 0; }
+        #modal-share-btn:hover { background: rgba(255,255,255,.22); transform: scale(1.08); }
+        #modal-share-btn svg { width: 17px; height: 17px; }
         #modal-scroll { flex: 1; overflow-y: auto; }
         #modal-body { max-width: 780px; margin: 0 auto; }
 
@@ -2825,10 +2828,14 @@
         <div id="modal-topbar">
             <button id="modal-back-btn" onclick="cerrarArticulo()">← Volver</button>
             <span id="modal-topbar-title">Honor a quien Honor Merece</span>
+            <button id="modal-share-btn" onclick="compartirArticuloHonor()" aria-label="Compartir" title="Compartir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+            </button>
         </div>
         <div id="modal-scroll">
             <div id="modal-body"></div>
         </div>
+        <div class="foto-share-toast" id="honor-share-toast"></div>
     </div>
 
     <div id="noticias" class="seccion">
@@ -3556,6 +3563,7 @@ async function cargarHonorData() {
 function abrirArticulo(id) {
     const art = articulos[id];
     if (!art) return;
+    window._honorShareId = id;
     document.getElementById('modal-body').innerHTML = art.contenido;
     const overlay = document.getElementById('modal-overlay');
     overlay.style.display = 'flex';
@@ -3563,6 +3571,39 @@ function abrirArticulo(id) {
     if (window._seccionActual === 'honor' && _honorCategoriaActual) {
         window._articuloAbiertoId = id;
         _sincronizarURL();
+    }
+}
+// Compartir el perfil de honor abierto (entrenador / prócer). El enlace es la
+// ruta bonita /Honor_Merece/<Categoría>/<id>: el middleware le pone título,
+// descripción y la imagen dinámica (api/og?tipo=profesor) para las redes.
+function _urlArticuloHonor() {
+    const id = window._honorShareId;
+    if (!id) return null;
+    const d = (_honorDataGlobal || []).find(x => x.id === id);
+    const sub = d && String(d.Entrenador) !== '1' ? 'Proceres' : 'Entrenadores';
+    return location.origin + _rutaBaseSinIndex() + 'Honor_Merece/' + sub + '/' + encodeURIComponent(id);
+}
+function compartirArticuloHonor() {
+    const url = _urlArticuloHonor();
+    if (!url) return;
+    const esEn = window._lang === 'en';
+    const nombre = ((document.querySelector('#modal-body h2') || {}).textContent || '').trim();
+    const texto = esEn ? `Learn about ${nombre} on Sitial de Talentos` : `Conoce a ${nombre} en Sitial de Talentos`;
+    if (navigator.share) {
+        navigator.share({ title: nombre || 'Sitial de Talentos', text: texto, url }).catch(() => {});
+        return;
+    }
+    const fin = (ok) => mostrarToastCompartir('honor-share-toast',
+        ok ? (esEn ? 'Link copied!' : '¡Enlace copiado!') : (esEn ? 'Could not copy link' : 'No se pudo copiar el enlace'));
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => fin(true)).catch(() => fin(false));
+    } else {
+        try {
+            const t = document.createElement('textarea');
+            t.value = url; t.style.position = 'fixed'; t.style.opacity = '0';
+            document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
+            fin(true);
+        } catch (e) { fin(false); }
     }
 }
 function cerrarArticulo() {

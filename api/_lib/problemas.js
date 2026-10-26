@@ -2,6 +2,7 @@
 // (enunciado, solución con esquema de puntuación, imágenes y puntos máximos) y queda en memoria.
 import { leer, evalDatos } from './kb.js';
 import { Espacio, coseno } from './vectores.js';
+import { esquemaATexto, molATexto, dslATexto } from './esquemas.js';
 
 const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ', '&hellip;': '…', '&rarr;': '→', '&larr;': '←', '&harr;': '↔', '&rlarr;': '⇄', '&minus;': '−', '&times;': '×', '&middot;': '·', '&deg;': '°', '&plusmn;': '±', '&le;': '≤', '&ge;': '≥', '&ne;': '≠', '&asymp;': '≈', '&Delta;': 'Δ', '&delta;': 'δ', '&alpha;': 'α', '&beta;': 'β', '&gamma;': 'γ', '&lambda;': 'λ', '&mu;': 'μ', '&nu;': 'ν', '&pi;': 'π', '&sigma;': 'σ', '&omega;': 'ω', '&theta;': 'θ', '&epsilon;': 'ε', '&rArr;': '⇒', '&lArr;': '⇐', '&ndash;': '–', '&mdash;': '—', '&lsquo;': '‘', '&rsquo;': '’', '&ldquo;': '“', '&rdquo;': '”', '&laquo;': '«', '&raquo;': '»', '&Aring;': 'Å', '&sup2;': '²', '&sup3;': '³' };
 const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉', '+': '₊', '-': '₋' };
@@ -12,10 +13,10 @@ export function htmlATexto(h) {
   return String(h || '')
     .replace(/<svg[\s\S]*?<\/svg>/gi, '[diagrama]')
     .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, '[imagen: $1]')
-    .replace(/<[^>]*data-mol="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, '[estructura: $1]')
-    .replace(/<[^>]*data-scheme="([^"]+)"[^>]*>/gi, '[esquema de síntesis: $1]')
+    .replace(/<[^>]*data-mol="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => molATexto(x))
+    .replace(/<[^>]*data-scheme="([^"]+)"[^>]*>/gi, (_, x) => esquemaATexto(x))
     .replace(/<[^>]*data-smiles="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => '[estructura SMILES: ' + x + ']')
-    .replace(/<div class="pc-free-host" data-esquema="([^"]*)"[^>]*>\s*<\/div>/gi, (_, x) => '\n[esquema: ' + x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\n+/g, ' ; ') + ']\n')
+    .replace(/<div class="pc-free-host" data-esquema="([^"]*)"[^>]*>\s*<\/div>/gi, (_, x) => '\n[ESQUEMA — compuestos y flechas:\n' + dslATexto(x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')) + '\n]\n')
     .replace(/<[^>]*data-diagram="([^"]+)"[^>]*>/gi, '[diagrama: $1]')
     .replace(/<sub>([\s\S]*?)<\/sub>/gi, (_, x) => conv(x.replace(/<[^>]+>/g, ''), SUB))
     .replace(/<sup>([\s\S]*?)<\/sup>/gi, (_, x) => conv(x.replace(/<[^>]+>/g, ''), SUP))
@@ -60,10 +61,21 @@ export function datosProblema(id) {
     const m = ln.match(/^\s*((?:\([a-z0-9]+\))+)\s*«\s*([\d.,]+)\s*punt/i);
     if (m) baremo.push({ id: m[1], max: parseFloat(m[2].replace(',', '.')) });
   });
+  // problema de práctica sin «N puntos»: baremo por defecto (4 por inciso del enunciado) para poder calificar
+  let baremoDefecto = false;
+  if (!baremo.length) {
+    const enTxt = htmlATexto(c.enunciado);
+    const vistos = new Set();
+    enTxt.split('\n').forEach((ln) => {
+      const mm = ln.match(/^\s*((?:\([a-z0-9]+\))+)\s*$/i);
+      if (mm && !vistos.has(mm[1])) { vistos.add(mm[1]); baremo.push({ id: mm[1], max: 4 }); }
+    });
+    if (baremo.length) { baremoDefecto = true; max = baremo.reduce((a, x) => a + x.max, 0); }
+  }
   const m = metaPor[id] || {};
   return {
     id, titulo: c.titulo, numero: c.numero, fuente: c.fuente, dificultad: m.dificultad,
-    enunciado: htmlATexto(c.enunciado), solucion: solTxt, maxPuntos: max || null, baremo,
+    enunciado: htmlATexto(c.enunciado), solucion: solTxt, maxPuntos: max || null, baremo, baremoDefecto,
     imagenes: [...new Set(imgs)].slice(0, 4),
     temas: [m.temas, m.temaEspecifico].flat().filter(Boolean).join(', '),
   };

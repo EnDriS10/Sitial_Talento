@@ -66,7 +66,7 @@ async function imagenEnunciado(url) {
 }
 
 // ── Prompts ──
-const baremoTxt = (p) => (p.baremo && p.baremo.length ? p.baremo.map((x) => `${x.id}=${x.max}`).join(', ') : 'no hay lista; usa los puntos «N puntos» de la solución');
+const baremoTxt = (p) => (p.baremo && p.baremo.length ? p.baremo.map((x) => `${x.id}=${x.max}`).join(', ') + (p.baremoDefecto ? ' (problema de práctica sin puntos oficiales: escala por defecto de 4 por inciso; reparte los puntos del inciso entre sus elementos —p. ej. cada compuesto o paso—)' : '') : 'no hay lista; usa los puntos «N puntos» de la solución');
 const REGLAS_COMUNES = (p, lang) => `Eres el tutor de química del «Sitial de Talentos Cubanos», entrenando a estudiantes para olimpiadas internacionales (IChO). Idioma de respuesta: ${lang === 'en' ? 'English' : 'español'}. Notación clara (H₂O, mol·L⁻¹).
 PROBLEMA ${p.numero || ''} — ${p.titulo}${p.fuente ? ' (' + p.fuente + ')' : ''}
 ════ ENUNCIADO ════
@@ -75,7 +75,7 @@ ${p.enunciado}
 ${p.solucion}
 ════ FIN ════
 Incisos y puntos máximos: ${baremoTxt(p)}. Total: ${p.maxPuntos || 'suma de los puntos indicados'}.
-Los marcadores [estructura: x], [esquema…], [diagrama…] sustituyen a dibujos que el estudiante sí ve.`;
+Los marcadores [estructura SMILES: …], [ESQUEMA …] y [diagrama…] sustituyen a dibujos que el estudiante sí ve; en los esquemas cada compuesto va con su SMILES (la numeración de la web puede diferir de la del enunciado: identifica los compuestos por su estructura y su posición en la secuencia).`;
 
 function systemPista(p, lang) {
   return `${REGLAS_COMUNES(p, lang)}
@@ -96,7 +96,8 @@ ${p.enunciado}
 ════ FIN ════
 Incisos del problema: ${p.baremo && p.baremo.length ? p.baremo.map((x) => x.id).join(', ') : 'los que figuran en el enunciado'}.
 Recibirás la resolución del estudiante (fotos y/o texto). Tu trabajo NO es corregir, solo:
-1. "transcripcion": transcribe FIELMENTE todo lo que escribió, inciso por inciso (ecuaciones, números, unidades, razonamientos; los dibujos descríbelos entre [dibujo: …]). Mantén sus errores tal cual. Si algo es ilegible escribe [ilegible].
+1. "transcripcion": transcribe FIELMENTE todo lo que escribió, inciso por inciso (ecuaciones, números, unidades, razonamientos; los dibujos descríbelos entre [dibujo: …]).
+   ESTRUCTURAS Y ESQUEMAS DIBUJADOS (muy importante): para cada molécula dibujada o fotografiada escribe su nombre/tipo de compuesto y su SMILES aproximado (grupos funcionales, sustituyentes y posición de cada uno), p. ej. [dibujo: compuesto 2 = β-cetoaldehído, SMILES COc1cc(C)c(C=CC(=O)CC=O)c(C)c1C]. En una síntesis lista los compuestos EN ORDEN con la etiqueta que lleven (1, 2, A, B…) y los reactivos/tipo de reacción escritos sobre cada flecha. Si una foto es una captura o figura de un esquema completo, transcribe TODOS sus compuestos y flechas. No resumas ni omitas compuestos: la nota depende de ello. Mantén sus errores tal cual. Si algo es ilegible escribe [ilegible].
 2. "presentes": ids de los incisos en los que hay algún intento de respuesta. "faltan": ids sin ningún intento.
 3. "cortada": true si la resolución parece INCOMPLETA o cortada a mitad (termina en medio de un cálculo, foto recortada, página que continúa, «sigue…»), aunque haya incisos presentes.
 4. "ilegible": lista breve de partes que no pudiste leer.
@@ -112,7 +113,8 @@ MODO CALIFICACIÓN. Recibirás la TRANSCRIPCIÓN de la resolución del estudiant
 - No penalices por una mala lectura de la letra: si dudas, dilo en "advertencias" y sé generoso.
 - "resumen": 2-3 frases de balance y un consejo.
 ${penal ? `Nota: el estudiante usó ayudas (penalización ${penal}% que aplica el sistema; tú NO la descuentes).` : ''}
-Responde SOLO con JSON: {"incisos":[{"id":"(a)","puntos":1,"comentario":"…","como_se_hace":"…"}],"resumen":"…","advertencias":["…"]}`;
+- Las estructuras se comparan por su fórmula/SMILES y sus grupos funcionales, no por cómo estén dibujadas ni por la numeración. Si la transcripción contiene la secuencia correcta de compuestos y reactivos, otórgale los puntos aunque el formato sea distinto (captura, foto o texto). Nunca pongas 0 en un inciso si la transcripción contiene contenido pertinente a él.
+Responde SOLO con JSON: {"incisos":[{"id":"(a)","max":1,"puntos":1,"comentario":"…","como_se_hace":"…"}],"resumen":"…","advertencias":["…"]}`;
 }
 
 function systemDiscutir(p, lang, resultado, foco) {
