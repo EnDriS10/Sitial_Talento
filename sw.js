@@ -22,7 +22,7 @@
    Para forzar que todos los usuarios renueven la caché de la "carcasa"
    tras un cambio grande, sube VERSION.
    ══════════════════════════════════════════════════════════════ */
-const VERSION   = 'v11';
+const VERSION   = 'v12';
 const SHELL     = 'sitial-shell-' + VERSION;
 const DATA      = 'sitial-data-' + VERSION;
 const STATIC    = 'sitial-static-' + VERSION;

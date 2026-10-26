@@ -171,6 +171,8 @@ export default async function handler(req, res) {
   if (!p) return json(res, 404, { code: 'no_problem', error: 'Problema no encontrado.' });
 
   const imgs = (Array.isArray(b.images) ? b.images : []).filter((x) => typeof x === 'string' && IMG_RE.test(x) && x.length < 2.2e6).slice(0, accion === 'grade' ? 4 : 2);
+  const crudas = Array.isArray(b.images) ? b.images.length : 0;
+  if (crudas > imgs.length && crudas <= (accion === 'grade' ? 4 : 2)) return json(res, 413, { code: 'too_large', error: 'Alguna imagen no es válida o pesa demasiado (máx. ~1.6 MB por foto). Prueba con otra captura o más pequeña.' });
   if (imgs.reduce((a, x) => a + x.length, 0) > 4e6) return json(res, 413, { code: 'too_large', error: 'Las imágenes pesan demasiado.' });
 
   try {

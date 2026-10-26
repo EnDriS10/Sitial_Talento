@@ -1169,7 +1169,7 @@ function _tuLoad() { try { return JSON.parse(localStorage.getItem('pvTutor:' + _
 function _tuSave(st) { try { localStorage.setItem('pvTutor:' + _pvId, JSON.stringify(st)); } catch (e) {} }
 function _tuPct(st) { return Math.min(40, st.hints.reduce((a, h) => a + (h.cost || 0), 0)); }
 
-// Reduce la foto (lado máx. 1400 px, JPEG) para que quepa en la petición
+// Reduce la foto (lado máx. 2000 px, JPEG) para que quepa en la petición
 function _tuComprimir(file) {
     return new Promise((ok, fail) => {
         const fr = new FileReader();
@@ -1178,10 +1178,17 @@ function _tuComprimir(file) {
             const im = new Image();
             im.onerror = () => fail(new Error('img'));
             im.onload = () => {
-                const k = Math.min(1, 1400 / Math.max(im.width, im.height));
-                const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
-                const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
-                ok(c.toDataURL('image/jpeg', 0.8));
+                // hasta 2000 px (los esquemas con moléculas y reactivos pierden detalle con menos); si pesa de más, se baja calidad/tamaño
+                let lado = Math.min(2000, Math.max(im.width, im.height)), q = 0.88, out = '';
+                for (let i = 0; i < 6; i++) {
+                    const k = Math.min(1, lado / Math.max(im.width, im.height));
+                    const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+                    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+                    out = c.toDataURL('image/jpeg', q);
+                    if (out.length < 1.0e6) break;
+                    q = Math.max(0.6, q - 0.08); lado = Math.round(lado * 0.85);
+                }
+                ok(out);
             };
             im.src = fr.result;
         };

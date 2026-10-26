@@ -161,7 +161,7 @@
         '1': 'R' + SUP_DIGITS['1'], '2': 'R' + SUP_DIGITS['2'],
         '3': 'R' + SUP_DIGITS['3'], '4': 'R' + SUP_DIGITS['4'],
         '5': 'X', '6': 'Y', '7': 'Z',
-        '8': "R'", '9': 'NC', '10': 'H', '11': '~', '12': 'BPA'
+        '8': "R'", '9': 'NC', '10': 'H', '11': '~', '12': 'BPA', '15': 'Ph', '16': 'R'
     };
 
     // Recorre un SMILES en el MISMO orden en que RDKit asigna índices de
@@ -278,7 +278,7 @@
             if (!pts[i] || !a.z) return;
             const [ux, uy] = away(i), p = pts[i];
             if (a.chg) {
-                const d = (a.z === 6 ? 7.5 : 11.5) + rr * 0.4, cx = p[0] + ux * d, cy = p[1] + uy * d, q = rr * 0.62;
+                const d = (a.z === 6 ? 7.5 : 11.5) + rr * 0.4, cx = p[0] + ux * d + (a.z !== 6 && (a.impHs || 0) > 0 ? 9 + 3 * ((a.impHs || 1) - 1) : 0), cy = p[1] + uy * d - (a.z !== 6 && (a.impHs || 0) > 0 ? 2 : 0), q = rr * 0.62;
                 out += `<g class="pc-chg" stroke="${ink}" stroke-width="${(preset.bond * 0.75).toFixed(2)}" fill="none"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${rr.toFixed(1)}"/><path d="M${(cx - q).toFixed(1)},${cy.toFixed(1)} h${(2 * q).toFixed(1)}${a.chg > 0 ? ` M${cx.toFixed(1)},${(cy - q).toFixed(1)} v${(2 * q).toFixed(1)}` : ''}"/></g>`;
             }
             if (a.nRad) {
