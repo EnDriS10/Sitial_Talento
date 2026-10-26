@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+# La imagen de vista previa (og:image) vive en /api/og: los rastreadores de
+# Facebook, X, WhatsApp, etc. respetan robots.txt también al bajar imágenes,
+# así que ésta debe estar permitida aunque el resto de /api/ no.
+Allow: /api/og
 Disallow: /api/
 
 Sitemap: https://sitialtalento.vercel.app/sitemap.xml
