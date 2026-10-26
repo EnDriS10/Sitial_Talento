@@ -216,6 +216,7 @@
     // Complejo con metal central: «@Gd:i,j,k:SMILES» → se dibuja el ligando con sus coordenadas
     // normales y se añade el átomo Gd en el centroide de los átomos donadores (índices i,j,k…),
     // unido a cada uno (enlaces de coordinación).
+    const _cxInfo = {};
     function _complejo(spec) {
         const mm = /^@([A-Z][a-z]?):([\d,]+):(.*)$/.exec(spec);
         if (!mm) return null;
@@ -231,8 +232,8 @@
             idx.forEach(i => { cx += +at[i].slice(0, 10); cy += +at[i].slice(10, 20); });
             cx /= idx.length; cy /= idx.length;
             at.push(cx.toFixed(4).padStart(10) + cy.toFixed(4).padStart(10) + '    0.0000 ' + mm[1].padEnd(3) + ' 0  0  0  0  0  0  0  0  0  0  0  0');
-            idx.forEach(i => bo.push(String(na + 1).padStart(3) + String(i + 1).padStart(3) + '  1  0'));
-            lines[3] = String(na + 1).padStart(3) + String(nb + idx.length).padStart(3) + cl.slice(6);
+            _cxInfo[spec] = { gd: na, donors: idx };   // los enlaces de coordinación se dibujan aparte (marcas perpendiculares)
+            lines[3] = String(na + 1).padStart(3) + String(nb).padStart(3) + cl.slice(6);
             return window.RDKit.get_mol([...lines.slice(0, 4), ...at, ...bo, ...rest].join('\n'));
         } catch (e) { return null; }
     }
@@ -291,6 +292,42 @@
         return out;
     }
 
+    // «~» (resto de la molécula): ondulado grueso perpendicular al enlace, centrado en el átomo comodín.
+    // Complejos: enlaces de coordinación como marcas «|||» perpendiculares, translúcidas, con punta hacia el metal.
+    function _overlayExtra(info, pts, preset, cxi, tildes) {
+        if (!info) return '';
+        const ink = '#0f0f0f', nb = {};
+        info.bonds.forEach(([a, b]) => { (nb[a] = nb[a] || []).push(b); (nb[b] = nb[b] || []).push(a); });
+        let out = '';
+        tildes.forEach(i => {
+            const j = (nb[i] || [])[0], p = pts[i], q = pts[j];
+            if (!p || !q) return;
+            let ux = p[0] - q[0], uy = p[1] - q[1]; const L = Math.hypot(ux, uy) || 1; ux /= L; uy /= L;
+            const nx = -uy, ny = ux, half = 8 + preset.bond * 1.5, A = 2.6, n = 24;
+            let d = '';
+            for (let k = 0; k <= n; k++) {
+                const t = (k / n) * 2 - 1, w = Math.sin(t * Math.PI * 1.5 * 2 / 2 * 1) * A;
+                const x = p[0] + nx * t * half + ux * w, y = p[1] + ny * t * half + uy * w;
+                d += (k ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+            }
+            out += `<path class="pc-wavy" d="${d}" fill="none" stroke="${ink}" stroke-width="${(preset.bond * 1.35).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        });
+        if (cxi && pts[cxi.gd]) {
+            const G = pts[cxi.gd];
+            cxi.donors.forEach(di => {
+                const P = pts[di]; if (!P) return;
+                let vx = G[0] - P[0], vy = G[1] - P[1]; const L = Math.hypot(vx, vy); if (L < 20) return;
+                vx /= L; vy /= L;
+                const nx = -vy, ny = vx, s0 = 9, s1 = L - 8, step = 3.4, tk = 2.6;
+                let d = '';
+                for (let t = s0; t < s1 - 5; t += step) { const x = P[0] + vx * t, y = P[1] + vy * t; d += `M${(x - nx * tk).toFixed(1)},${(y - ny * tk).toFixed(1)}L${(x + nx * tk).toFixed(1)},${(y + ny * tk).toFixed(1)}`; }
+                const ex = P[0] + vx * s1, ey = P[1] + vy * s1, bx = ex - vx * 6, by = ey - vy * 6;
+                out += `<g class="pc-coord" opacity="0.5"><path d="${d}" stroke="${ink}" stroke-width="0.9" fill="none"/><path d="M${ex.toFixed(1)},${ey.toFixed(1)}L${(bx + nx * 2.8).toFixed(1)},${(by + ny * 2.8).toFixed(1)}L${(bx - nx * 2.8).toFixed(1)},${(by - ny * 2.8).toFixed(1)}Z" fill="${ink}"/></g>`;
+            });
+        }
+        return out;
+    }
+
     function svgForSmiles(smiles, size, colorAtoms, hl, hlColor) {
         if (!window.RDKit) return null;
         const preset = SIZE_PRESETS[size] || SIZE_PRESETS.md;
@@ -335,12 +372,15 @@
                 details.atomLabels = {};
                 mapKeys.forEach(idx => {
                     const label = WILDCARD_LABELS[mapNums[idx]];
-                    if (label) details.atomLabels[idx] = label;
+                    if (label) details.atomLabels[idx] = label === '~' ? '' : label;   // «~» se dibuja aparte (ondulado perpendicular)
                 });
             }
             // cargas ⊕/⊖ y radicales con marcas propias (ver 2.c)
             const info = _molInfo(mol);
             let marks = false;
+            const cxi = smiles.charAt(0) === '@' ? _cxInfo[smiles] : null;
+            const tildes = mapKeys.filter(k => mapNums[k] === '11' || mapNums[k] === 11).map(Number);
+            if (cxi || tildes.length) marks = true;
             if (info) {
                 info.atoms.forEach((a, i) => {
                     if (!a.z) return;                                   // comodín: ya tiene su etiqueta
@@ -373,7 +413,7 @@
                     const sv2 = mol.get_svg_with_highlights(JSON.stringify(d2)), pts = {};
                     const re = /<ellipse cx='([\d.\-]+)' cy='([\d.\-]+)'[^>]*class='atom-(\d+)'/g; let mm;
                     while ((mm = re.exec(sv2))) pts[+mm[3]] = [parseFloat(mm[1]), parseFloat(mm[2])];
-                    svg = svg.replace(/<\/svg>\s*$/, _overlayMarks(info, pts, preset) + '</svg>');
+                    svg = svg.replace(/<\/svg>\s*$/, _overlayMarks(info, pts, preset) + _overlayExtra(info, pts, preset, cxi, tildes) + '</svg>');
                 } catch (e) { /* sin marcas propias: se queda el dibujo de RDKit */ }
             }
             _molCache[cacheKey] = svg;
