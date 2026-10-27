@@ -985,36 +985,51 @@
     function svgCubo(spec) {
         const sub = {};
         String(spec || '').split(',').forEach(t => { const m = /^\s*([0-7])\s*=\s*(.+?)\s*$/.exec(t); if (m) sub[+m[1]] = m[2]; });
-        const S = 56, dx = 26, dy = -22, ox = 0, oy = 0;
-        const V = [[0, 0], [S, 0], [S, S], [0, S]].map(p => [p[0] + ox, p[1] + oy]);
+        const S = 56, dx = 26, dy = -22;
+        const V = [[0, 0], [S, 0], [S, S], [0, S]];
         V.push(...V.slice(0, 4).map(p => [p[0] + dx, p[1] + dy]));
-        const cx = V.reduce((a, p) => a + p[0], 0) / 8, cy = V.reduce((a, p) => a + p[1], 0) / 8;
         const E = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [4, 7], [0, 4], [1, 5], [2, 6]];
         const H = [[6, 7], [3, 7], [7, 4]]; // aristas ocultas (vértice trasero inferior izquierdo)
-        // dirección «libre» de cada vértice (evita las aristas del propio cubo)
         const DIR = [[-0.8, -0.6], [0.95, 0.3], [0.75, 0.65], [-0.75, 0.65], [-0.45, -0.9], [0.75, -0.65], [0.95, 0.25], [-0.8, 0.5]];
-        const L = 15, items = [];
-        let minX = -6, maxX = S + dx + 6, minY = dy - 6, maxY = S + 6;
+        const rot = (v, d) => { const a = d * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [v[0] * c - v[1] * s, v[0] * s + v[1] * c]; };
+        const B = 15;                       // longitud de enlace de los sustituyentes
+        const lines = [], labels = [];      // lines: [x1,y1,x2,y2,dbl,trim1,trim2]
+        const pts = [[-6, dy - 6], [S + dx + 6, S + 6]];
+        const add = (p, q, o) => { o = o || {}; lines.push([p[0], p[1], q[0], q[1], !!o.dbl, o.t1 || 0, o.t2 || 0]); pts.push(p, q); };
+        const lab = (p, t, anchor) => { labels.push([p[0], p[1], t, anchor || 'middle']); pts.push([p[0] - 9, p[1] - 8], [p[0] + 9 + (t.length > 2 ? 8 : 0), p[1] + 8]); };
+        const at = (p, d) => [p[0] + d[0] * B, p[1] + d[1] * B];
         Object.keys(sub).forEach(k => {
-            const v = V[+k]; let [ux, uy] = DIR[+k]; const n = Math.hypot(ux, uy) || 1; ux /= n; uy /= n;
-            const ex = v[0] + ux * L, ey = v[1] + uy * L;
-            const txt = sub[k]; const wTxt = txt.replace(/[_^{}]/g, '').length * 6.6 + 4;
-            const left = ux < -0.2, right = ux > 0.2;
-            const tx = ex + (left ? -2 : right ? 2 : 0), ty = ey + (uy < -0.4 ? -4 : uy > 0.4 ? 10 : 4);
-            const anchor = left ? 'end' : right ? 'start' : 'middle';
-            items.push({ v, ex, ey, tx, ty, anchor, txt });
-            const x0 = left ? tx - wTxt : right ? tx : tx - wTxt / 2, x1 = left ? tx : right ? tx + wTxt : tx + wTxt / 2;
-            minX = Math.min(minX, x0 - 2); maxX = Math.max(maxX, x1 + 2); minY = Math.min(minY, ty - 14); maxY = Math.max(maxY, ty + 6);
+            const v = V[+k]; let u = DIR[+k]; const n = Math.hypot(u[0], u[1]); u = [u[0] / n, u[1] / n];
+            const g = sub[k], C0 = at(v, u);
+            add(v, C0);
+            const carb = (x) => {                       // C(=O)X con X = OH / Cl
+                const dO = rot(u, -60), dX = rot(u, 60), O = at(C0, dO), X = at(C0, dX);
+                add(C0, O, { dbl: true, t2: 7 }); lab(O, 'O');
+                return { X, dX };
+            };
+            if (g === 'COOH') { const r = carb(); add(C0, r.X, { t2: 8 }); lab(r.X, 'OH'); }
+            else if (g === 'COCl') { const r = carb(); add(C0, r.X, { t2: 8 }); lab(r.X, 'Cl'); }
+            else if (g === 'COOOtBu' || g === 'CO3tBu') {   // C(=O)–O–O–C(CH3)3
+                const r = carb(), d1 = r.dX, d2 = rot(u, -60), Oa = r.X, Ob = at(Oa, d2), Oc = at(Ob, d1);
+                add(C0, Oa, { t2: 7 }); lab(Oa, 'O'); add(Oa, Ob, { t1: 7, t2: 7 }); lab(Ob, 'O'); add(Ob, Oc, { t1: 7 });
+                [d1, rot(d1, 90), rot(d1, -90)].forEach(d => add(Oc, at(Oc, d)));
+            } else { lab(at(C0, [0, 0]), g); }
         });
-        const W = maxX - minX, Hh = maxY - minY;
-        const X = x => (x - minX).toFixed(1), Y = y => (y - minY).toFixed(1);
-        let svg = `<svg viewBox="0 0 ${W.toFixed(1)} ${Hh.toFixed(1)}" class="pc-skel-svg pc-mol-custom pc-mol-cubo" xmlns="http://www.w3.org/2000/svg" style="max-width:${Math.round(Math.max(110, W * 1.35))}px">`;
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        pts.forEach(p => { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); });
+        minX -= 4; minY -= 4; maxX += 4; maxY += 4;
+        const W = maxX - minX, Hh = maxY - minY, X = x => (x - minX).toFixed(1), Y = y => (y - minY).toFixed(1);
+        let svg = `<svg viewBox="0 0 ${W.toFixed(1)} ${Hh.toFixed(1)}" class="pc-skel-svg pc-mol-custom pc-mol-cubo" xmlns="http://www.w3.org/2000/svg" style="max-width:${Math.round(Math.max(110, W * 1.7))}px">`;
         H.forEach(e => { svg += `<line x1="${X(V[e[0]][0])}" y1="${Y(V[e[0]][1])}" x2="${X(V[e[1]][0])}" y2="${Y(V[e[1]][1])}" class="pc-skel-bond" style="opacity:.32"/>`; });
         E.forEach(e => { svg += `<line x1="${X(V[e[0]][0])}" y1="${Y(V[e[0]][1])}" x2="${X(V[e[1]][0])}" y2="${Y(V[e[1]][1])}" class="pc-skel-bond"/>`; });
-        items.forEach(it => {
-            svg += `<line x1="${X(it.v[0])}" y1="${Y(it.v[1])}" x2="${X(it.ex)}" y2="${Y(it.ey)}" class="pc-skel-bond"/>`;
-            svg += `<text x="${X(it.tx)}" y="${Y(it.ty)}" text-anchor="${it.anchor}" class="pc-skel-label" style="font-size:11px">${_fesc(it.txt).replace(/([A-Za-z\)])(\d+)/g, '$1<tspan baseline-shift="sub" font-size="8.5">$2</tspan>')}</text>`;
+        lines.forEach(l => {
+            let [x1, y1, x2, y2, dbl, t1, t2] = l; const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+            x1 += ux * t1; y1 += uy * t1; x2 -= ux * t2; y2 -= uy * t2;
+            const ln = (a, b, c, d) => `<line x1="${X(a)}" y1="${Y(b)}" x2="${X(c)}" y2="${Y(d)}" class="pc-skel-bond"/>`;
+            if (dbl) { const ox = -uy * 1.9, oy = ux * 1.9; svg += ln(x1 + ox, y1 + oy, x2 + ox, y2 + oy) + ln(x1 - ox, y1 - oy, x2 - ox, y2 - oy); }
+            else svg += ln(x1, y1, x2, y2);
         });
+        labels.forEach(l => { svg += `<text x="${X(l[0])}" y="${(parseFloat(Y(l[1])) + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="central" class="pc-skel-label" style="font-size:11px">${_fesc(l[2])}</text>`; });
         return svg + '</svg>';
     }
 
