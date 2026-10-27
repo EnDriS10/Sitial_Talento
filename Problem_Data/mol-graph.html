@@ -161,7 +161,7 @@
         '1': 'R' + SUP_DIGITS['1'], '2': 'R' + SUP_DIGITS['2'],
         '3': 'R' + SUP_DIGITS['3'], '4': 'R' + SUP_DIGITS['4'],
         '5': 'X', '6': 'Y', '7': 'Z',
-        '8': "R'", '9': 'NC', '10': 'H', '11': '~', '12': 'BPA', '15': 'Ph', '16': 'R'
+        '8': "R'", '9': 'NC', '10': 'H', '11': '~', '12': 'BPA', '15': 'Ph', '16': 'R', '17': 'NO2'
     };
 
     // Recorre un SMILES en el MISMO orden en que RDKit asigna índices de
@@ -218,22 +218,27 @@
     // unido a cada uno (enlaces de coordinación).
     const _cxInfo = {};
     function _complejo(spec) {
-        const mm = /^@([A-Z][a-z]?):([\d,]+):(.*)$/.exec(spec);
+        const mm = /^@([A-Z][a-z]?):([\d,;]+):(.*)$/.exec(spec);
         if (!mm) return null;
         try {
-            const idx = mm[2].split(',').map(Number);
+            const groups = mm[2].split(';').filter(Boolean).map(g => g.split(',').map(Number));
             const lig = window.RDKit.get_mol(mm[3]);
             if (!lig) return null;
             lig.set_new_coords();
             const lines = lig.get_molblock().split('\n');
             const cl = lines[3], na = +cl.slice(0, 3), nb = +cl.slice(3, 6);
             const at = lines.slice(4, 4 + na), bo = lines.slice(4 + na, 4 + na + nb), rest = lines.slice(4 + na + nb);
-            let cx = 0, cy = 0;
-            idx.forEach(i => { cx += +at[i].slice(0, 10); cy += +at[i].slice(10, 20); });
-            cx /= idx.length; cy /= idx.length;
-            at.push(cx.toFixed(4).padStart(10) + cy.toFixed(4).padStart(10) + '    0.0000 ' + mm[1].padEnd(3) + ' 0  0  0  0  0  0  0  0  0  0  0  0');
-            _cxInfo[spec] = { gd: na, donors: idx };   // los enlaces de coordinación se dibujan aparte (marcas perpendiculares)
-            lines[3] = String(na + 1).padStart(3) + String(nb).padStart(3) + cl.slice(6);
+            const generic = mm[1] === 'M';                         // «M» genérico: se dibuja ⓜ encima (átomo auxiliar Xe sin rótulo)
+            const mets = [];
+            groups.forEach((idx, k) => {
+                let cx = 0, cy = 0;
+                idx.forEach(i => { cx += +at[i].slice(0, 10); cy += +at[i].slice(10, 20); });
+                cx /= idx.length; cy /= idx.length;
+                at.push(cx.toFixed(4).padStart(10) + cy.toFixed(4).padStart(10) + '    0.0000 ' + (generic ? 'Xe' : mm[1]).padEnd(3) + ' 0  0  0  0  0  0  0  0  0  0  0  0');
+                mets.push({ at: na + k, donors: idx });
+            });
+            _cxInfo[spec] = { mets, generic };   // los enlaces de coordinación se dibujan aparte (marcas perpendiculares)
+            lines[3] = String(na + groups.length).padStart(3) + String(nb).padStart(3) + cl.slice(6);
             return window.RDKit.get_mol([...lines.slice(0, 4), ...at, ...bo, ...rest].join('\n'));
         } catch (e) { return null; }
     }
@@ -312,19 +317,21 @@
             }
             out += `<path class="pc-wavy" d="${d}" fill="none" stroke="${ink}" stroke-width="${(preset.bond * 1.35).toFixed(2)}" stroke-linecap="round" stroke-linejoin="round"/>`;
         });
-        if (cxi && pts[cxi.gd]) {
-            const G = pts[cxi.gd];
-            cxi.donors.forEach(di => {
+        if (cxi) cxi.mets.forEach(met => {
+            const G = pts[met.at]; if (!G) return;
+            const rr = cxi.generic ? 11 : 8;
+            met.donors.forEach(di => {
                 const P = pts[di]; if (!P) return;
                 let vx = G[0] - P[0], vy = G[1] - P[1]; const L = Math.hypot(vx, vy); if (L < 20) return;
                 vx /= L; vy /= L;
-                const nx = -vy, ny = vx, s0 = 9, s1 = L - 8, step = 3.4, tk = 2.6;
+                const nx = -vy, ny = vx, s0 = 9, s1 = L - rr, step = 3.4, tk = 2.6;
                 let d = '';
                 for (let t = s0; t < s1 - 5; t += step) { const x = P[0] + vx * t, y = P[1] + vy * t; d += `M${(x - nx * tk).toFixed(1)},${(y - ny * tk).toFixed(1)}L${(x + nx * tk).toFixed(1)},${(y + ny * tk).toFixed(1)}`; }
                 const ex = P[0] + vx * s1, ey = P[1] + vy * s1, bx = ex - vx * 6, by = ey - vy * 6;
                 out += `<g class="pc-coord" opacity="0.5"><path d="${d}" stroke="${ink}" stroke-width="0.9" fill="none"/><path d="M${ex.toFixed(1)},${ey.toFixed(1)}L${(bx + nx * 2.8).toFixed(1)},${(by + ny * 2.8).toFixed(1)}L${(bx - nx * 2.8).toFixed(1)},${(by - ny * 2.8).toFixed(1)}Z" fill="${ink}"/></g>`;
             });
-        }
+            if (cxi.generic) out += `<circle cx="${G[0].toFixed(1)}" cy="${G[1].toFixed(1)}" r="9.5" fill="#fff" fill-opacity=".9" stroke="${ink}" stroke-width="1.1"/><text x="${G[0].toFixed(1)}" y="${(G[1] + 0.5).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-size="11" font-family="Inter,sans-serif" fill="${ink}">M</text>`;
+        });
         return out;
     }
 
@@ -366,7 +373,7 @@
             // de "R". Con atomLabels el texto queda fijado en el mismo
             // cálculo de layout, sin ningún paso posterior que pueda
             // fallar.
-            const mapNums = _atomIndexOfMapNums(smiles);
+            const mapNums = _atomIndexOfMapNums(smiles.replace(/^@[A-Z][a-z]?:[\d,;]+:/, ''));
             const mapKeys = Object.keys(mapNums);
             if (mapKeys.length) {
                 details.atomLabels = {};
@@ -379,6 +386,7 @@
             const info = _molInfo(mol);
             let marks = false;
             const cxi = smiles.charAt(0) === '@' ? _cxInfo[smiles] : null;
+            if (cxi && cxi.generic) { details.atomLabels = details.atomLabels || {}; cxi.mets.forEach(m => { details.atomLabels[m.at] = ''; }); }
             const tildes = mapKeys.filter(k => mapNums[k] === '11' || mapNums[k] === 11).map(Number);
             if (cxi || tildes.length) marks = true;
             if (info) {
@@ -969,7 +977,49 @@
     // 5) RENDER DE UN NODO "MOLÉCULA" (usado tanto por [data-mol] /
     //    [data-smiles] sueltos como dentro de un esquema de síntesis)
     // ────────────────────────────────────────────────────────────────
+    // ── CUBO (cubano y derivados) ────────────────────────────────
+    //  Sintaxis: "cubo:0=COOH,6=COOH"  (vértice=sustituyente).
+    //  Vértices: 0 sup-izq, 1 sup-der, 2 inf-der, 3 inf-izq (cara frontal);
+    //  4 sup-izq, 5 sup-der, 6 inf-der, 7 inf-izq (cara trasera, oculta 7).
+    //  Pares típicos: 1,2 → "0,1"; 1,3 → "0,2"; 1,4 (diagonal del cubo) → "3,5".
+    function svgCubo(spec) {
+        const sub = {};
+        String(spec || '').split(',').forEach(t => { const m = /^\s*([0-7])\s*=\s*(.+?)\s*$/.exec(t); if (m) sub[+m[1]] = m[2]; });
+        const S = 56, dx = 26, dy = -22, ox = 0, oy = 0;
+        const V = [[0, 0], [S, 0], [S, S], [0, S]].map(p => [p[0] + ox, p[1] + oy]);
+        V.push(...V.slice(0, 4).map(p => [p[0] + dx, p[1] + dy]));
+        const cx = V.reduce((a, p) => a + p[0], 0) / 8, cy = V.reduce((a, p) => a + p[1], 0) / 8;
+        const E = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [4, 7], [0, 4], [1, 5], [2, 6]];
+        const H = [[6, 7], [3, 7], [7, 4]]; // aristas ocultas (vértice trasero inferior izquierdo)
+        // dirección «libre» de cada vértice (evita las aristas del propio cubo)
+        const DIR = [[-0.8, -0.6], [0.95, 0.3], [0.75, 0.65], [-0.75, 0.65], [-0.45, -0.9], [0.75, -0.65], [0.95, 0.25], [-0.8, 0.5]];
+        const L = 15, items = [];
+        let minX = -6, maxX = S + dx + 6, minY = dy - 6, maxY = S + 6;
+        Object.keys(sub).forEach(k => {
+            const v = V[+k]; let [ux, uy] = DIR[+k]; const n = Math.hypot(ux, uy) || 1; ux /= n; uy /= n;
+            const ex = v[0] + ux * L, ey = v[1] + uy * L;
+            const txt = sub[k]; const wTxt = txt.replace(/[_^{}]/g, '').length * 6.6 + 4;
+            const left = ux < -0.2, right = ux > 0.2;
+            const tx = ex + (left ? -2 : right ? 2 : 0), ty = ey + (uy < -0.4 ? -4 : uy > 0.4 ? 10 : 4);
+            const anchor = left ? 'end' : right ? 'start' : 'middle';
+            items.push({ v, ex, ey, tx, ty, anchor, txt });
+            const x0 = left ? tx - wTxt : right ? tx : tx - wTxt / 2, x1 = left ? tx : right ? tx + wTxt : tx + wTxt / 2;
+            minX = Math.min(minX, x0 - 2); maxX = Math.max(maxX, x1 + 2); minY = Math.min(minY, ty - 14); maxY = Math.max(maxY, ty + 6);
+        });
+        const W = maxX - minX, Hh = maxY - minY;
+        const X = x => (x - minX).toFixed(1), Y = y => (y - minY).toFixed(1);
+        let svg = `<svg viewBox="0 0 ${W.toFixed(1)} ${Hh.toFixed(1)}" class="pc-skel-svg pc-mol-custom pc-mol-cubo" xmlns="http://www.w3.org/2000/svg" style="max-width:${Math.round(Math.max(110, W * 1.35))}px">`;
+        H.forEach(e => { svg += `<line x1="${X(V[e[0]][0])}" y1="${Y(V[e[0]][1])}" x2="${X(V[e[1]][0])}" y2="${Y(V[e[1]][1])}" class="pc-skel-bond" style="opacity:.32"/>`; });
+        E.forEach(e => { svg += `<line x1="${X(V[e[0]][0])}" y1="${Y(V[e[0]][1])}" x2="${X(V[e[1]][0])}" y2="${Y(V[e[1]][1])}" class="pc-skel-bond"/>`; });
+        items.forEach(it => {
+            svg += `<line x1="${X(it.v[0])}" y1="${Y(it.v[1])}" x2="${X(it.ex)}" y2="${Y(it.ey)}" class="pc-skel-bond"/>`;
+            svg += `<text x="${X(it.tx)}" y="${Y(it.ty)}" text-anchor="${it.anchor}" class="pc-skel-label" style="font-size:11px">${_fesc(it.txt).replace(/([A-Za-z\)])(\d+)/g, '$1<tspan baseline-shift="sub" font-size="8.5">$2</tspan>')}</text>`;
+        });
+        return svg + '</svg>';
+    }
+
     function renderMolSmiles(smiles, size, colorAtoms, hl, hlColor) {
+        if (/^\s*cubo:/i.test(smiles)) return svgCubo(smiles.replace(/^\s*cubo:/i, ''));
         const svg = svgForSmiles(smiles, size || 'md', !!colorAtoms, hl, hlColor);
         if (!svg) return '<span class="pc-mol-missing">[SMILES inválido: ' + _fesc(smiles) + ']</span>';
         return svg;
@@ -1381,7 +1431,7 @@ u6 -> fin | piridina, Δ
     //      corchete: a, b | ‡                 ([ ] alrededor de uno o varios nodos)
     // ────────────────────────────────────────────────────────────────
     const FREE_COLORS = { amarillo: '#e0b400', verde: '#2e9e4f', azul: '#2f6fdc', rojo: '#d6403a', gris: '#8a8f98', naranja: '#e07b1a', morado: '#8a4fd0' };
-    const FREE_NODE_KEYS = ['caja', 'color', 'resaltar', 'tam', 'etiqueta', 'incognita'];
+    const FREE_NODE_KEYS = ['caja', 'resalte', 'color', 'resaltar', 'tam', 'etiqueta', 'incognita'];
     const FREE_ARROW_KEYS = ['arriba', 'abajo', 'nota', 'estilo', 'ruta', 'largo', 'color'];
     const FREE_CURVE_KEYS = ['giro', 'color', 'curvatura'];
     function _fesc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -1493,7 +1543,7 @@ u6 -> fin | piridina, Δ
                 mb.classList.remove('pc-scheme-mol');
             } else {
                 const hl = (n.kv.resaltar || '').split(/[,\s]+/).filter(x => /^\d+$/.test(x)).map(Number);
-                const html = n.smiles ? renderMolSmiles(n.smiles, sz, /cpk|si|true/i.test(n.kv.color || ''), hl, _fcolor(n.kv.caja) ) : renderMolById(n.mol, sz, /cpk|si|true/i.test(n.kv.color || ''));
+                const html = n.smiles ? renderMolSmiles(n.smiles, sz, /cpk|si|true/i.test(n.kv.color || ''), hl, _fcolor(n.kv.resalte || n.kv.caja) ) : renderMolById(n.mol, sz, /cpk|si|true/i.test(n.kv.color || ''));
                 mb.innerHTML = html;
                 const sv = mb.querySelector('svg');
                 if (sv) { sv.style.width = w + 'px'; sv.style.height = Math.round(p.h * esc) + 'px'; sv.style.maxWidth = 'none'; }

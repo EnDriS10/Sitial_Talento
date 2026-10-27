@@ -2,7 +2,7 @@
 // (enunciado, solución con esquema de puntuación, imágenes y puntos máximos) y queda en memoria.
 import { leer, evalDatos } from './kb.js';
 import { Espacio, coseno } from './vectores.js';
-import { esquemaATexto, molATexto, dslATexto } from './esquemas.js';
+import { esquemaATexto, molATexto, dslATexto, legible } from './esquemas.js';
 
 const ENT = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ', '&hellip;': '…', '&rarr;': '→', '&larr;': '←', '&harr;': '↔', '&rlarr;': '⇄', '&minus;': '−', '&times;': '×', '&middot;': '·', '&deg;': '°', '&plusmn;': '±', '&le;': '≤', '&ge;': '≥', '&ne;': '≠', '&asymp;': '≈', '&Delta;': 'Δ', '&delta;': 'δ', '&alpha;': 'α', '&beta;': 'β', '&gamma;': 'γ', '&lambda;': 'λ', '&mu;': 'μ', '&nu;': 'ν', '&pi;': 'π', '&sigma;': 'σ', '&omega;': 'ω', '&theta;': 'θ', '&epsilon;': 'ε', '&rArr;': '⇒', '&lArr;': '⇐', '&ndash;': '–', '&mdash;': '—', '&lsquo;': '‘', '&rsquo;': '’', '&ldquo;': '“', '&rdquo;': '”', '&laquo;': '«', '&raquo;': '»', '&Aring;': 'Å', '&sup2;': '²', '&sup3;': '³' };
 const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉', '+': '₊', '-': '₋' };
@@ -16,7 +16,7 @@ export function htmlATexto(h) {
     .replace(/<img[^>]*alt="([^"]*)"[^>]*>/gi, '[imagen: $1]')
     .replace(/<[^>]*data-mol="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => molATexto(x))
     .replace(/<[^>]*data-scheme="([^"]+)"[^>]*>/gi, (_, x) => esquemaATexto(x))
-    .replace(/<[^>]*data-smiles="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => '[estructura SMILES: ' + x + ']')
+    .replace(/<[^>]*data-smiles="([^"]+)"[^>]*>\s*<\/[a-z]+>/gi, (_, x) => '[estructura SMILES: ' + legible(x) + ']')
     .replace(/<div class="pc-free-host" data-esquema="([^"]*)"[^>]*>\s*<\/div>/gi, (_, x) => '\n[ESQUEMA — compuestos y flechas:\n' + dslATexto(x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')) + '\n]\n')
     .replace(/<[^>]*data-diagram="([^"]+)"[^>]*>/gi, '[diagrama: $1]')
     .replace(/<sub>([\s\S]*?)<\/sub>/gi, (_, x) => conv(x.replace(/<[^>]+>/g, ''), SUB))

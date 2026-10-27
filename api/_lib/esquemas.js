@@ -17,6 +17,18 @@ function cargar() {
   return _c;
 }
 
+// SMILES «extendidos» del motor de dibujo → texto que un modelo entienda
+export function legible(smi) {
+  let s = String(smi || '');
+  if (/^\s*cubo:/i.test(s)) {
+    const sub = s.replace(/^\s*cubo:/i, '').trim();
+    return 'CUBANO (C8H8, cubo con 8 vértices numerados 0-7: 0 sup-izq/1 sup-der/2 inf-der/3 inf-izq de la cara frontal; 4-7 cara trasera)' + (sub ? ' con sustituyentes vértice=grupo: ' + sub + ' (1,4 = vértices opuestos del cubo, 1,3 = diagonal de cara, 1,2 = arista)' : ' sin sustituyentes');
+  }
+  s = s.replace(/\[\*:17\]/g, '[N+](=O)[O-]');
+  if (/^@M:/.test(s)) s = s.replace(/^@M:[\d,;]+:/, '') + '  (con iones metálicos M dibujados y flechas de coordinación)';
+  return s;
+}
+
 export function smilesDe(id) { return cargar().mols[id] || null; }
 
 // DSL del esquema libre → texto legible (resuelve m:id a su SMILES)
@@ -29,10 +41,10 @@ export function dslATexto(dsl) {
     let m = ln.match(/^(\w+)\s*@[\d.,\s-]+:\s*(.*)$/);
     if (m) {
       const partes = m[2].split('|').map((s) => s.trim());
-      let cont = partes[0], extra = partes.slice(1).filter((x) => x && !/^(caja|resaltar|tam)=/.test(x));
+      let cont = partes[0], extra = partes.slice(1).filter((x) => x && !/^(caja|resalte|resaltar|tam)=/.test(x));
       if (/^m:/.test(cont)) cont = 'estructura SMILES: ' + (mols[cont.slice(2)] || cont.slice(2));
       else if (/^t:/.test(cont)) cont = 'texto: ' + cont.slice(2);
-      else cont = 'estructura SMILES: ' + cont;
+      else cont = 'estructura SMILES: ' + legible(cont);
       out.push(`compuesto ${m[1]} — ${cont}${extra.length ? ' (' + extra.join(' · ') + ')' : ''}`);
       return;
     }
@@ -52,4 +64,4 @@ export function esquemaATexto(id) {
   const d = cargar().esq[id];
   return d ? '\n[ESQUEMA «' + id + '» — compuestos y flechas (cada compuesto con su SMILES):\n' + dslATexto(d) + '\n]\n' : '[esquema de síntesis: ' + id + ']';
 }
-export function molATexto(id) { const s = smilesDe(id); return s ? '[estructura SMILES: ' + s + ']' : '[estructura: ' + id + ']'; }
+export function molATexto(id) { const s = smilesDe(id); return s ? '[estructura SMILES: ' + legible(s) + ']' : '[estructura: ' + id + ']'; }
