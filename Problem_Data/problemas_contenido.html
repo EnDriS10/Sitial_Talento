@@ -3292,13 +3292,13 @@ ox @0,0: COc1ccc(C(=O)c2ccccc2)c(O)c1 | oxibenzona | resaltar=7,15 | resalte=roj
             <p>donde <em>d</em> es la distancia entre los átomos de nitrógeno de lados opuestos del anillo y <em>&epsilon;</em> es una constante de proporcionalidad que se supone igual para <strong>1</strong> y <strong>2</strong>. La longitud del enlace N–Mg es 2.052 Å.</p>
             <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Calcula la constante de proporcionalidad <em>&epsilon;</em> en Å<sup>−1</sup> con cuatro cifras significativas.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Calcula la longitud del enlace N–Zn en Å con cuatro cifras significativas.</p></div><div class="pc-sub"><span class="pc-sub-label">(iii)</span><p>Calcula la longitud de onda de absorción de la porfina <strong>1</strong> (para la cual <em>d</em> = 4.112 Å) en nm con cuatro cifras significativas.</p></div></div></div>
             <p>La porficeno es un isómero de la porfina que ha atraído atención como interruptor molecular. Los átomos de hidrógeno de la porficeno pueden «saltar» a través del anillo, interconvirtiendo dos estados <em>trans</em> estables (T y T*) que son las posiciones encendido/apagado del interruptor. También hay un estado <em>cis</em> inestable C. Los estados <em>trans</em> pueden interconvertirse a través del estado <em>cis</em> con constante de velocidad <em>k</em><sub>1</sub>, o directamente con constante de velocidad <em>k</em><sub>2</sub>.</p>
-            <div class="pc-free-host" data-esquema="size=sm escala=0.8 gapx=80 gapy=40
-t @0,0: t:T
-c @1,0: t:C
-ts @2,0: t:T*
-t &lt;=&gt; c | k1
-c &lt;=&gt; ts | k1"></div>
-            <p class="pc-eq pc-math">T &#8652; T* &nbsp;(directo, <em>k</em><sub>2</sub>)</p>
+            <div class="pc-free-host" data-esquema="size=sm escala=0.7 gapx=40 gapy=40
+c @1,0: C1=Cc2nc1ccc1ccc([nH]1)c1ccc(ccc3nc2C=C3)[nH]1 | C
+t @0,1: C1=Cc2nc1ccc1ccc([nH]1)c1nc(ccc3ccc2[nH]3)C=C1 | T
+ts @2,1: C1=Cc2nc1ccc1ccc([nH]1)c1nc(ccc3ccc2[nH]3)C=C1 | T*
+t -&gt; c | k1 | ruta=recta
+c -&gt; ts | rápida | ruta=recta
+t -&gt; ts | k2"></div>
             <p>A temperaturas altas <em>k</em><sub>1</sub> ≫ <em>k</em><sub>2</sub> y puede ignorarse la conversión directa T → T*. Se obtuvieron la siguiente ecuación de velocidad y los siguientes datos cinéticos para la isomerización.</p>
             <p class="pc-eq pc-math"><em>k</em><sub>1</sub> = <em>A</em> exp<span style="font-size:1.25em">(</span>−<span class="pc-eq-frac"><span class="pc-eq-frac-num"><em>E</em><sub>a</sub></span><span class="pc-eq-frac-den"><em>RT</em></span></span><span style="font-size:1.25em">)</span></p>
             <table class="pc-table"><thead><tr><th><em>T</em> / K</th><th><em>k</em><sub>1</sub> / s<sup>−1</sup></th></tr></thead><tbody><tr><td>493</td><td>3.31 × 10<sup>12</sup></td></tr><tr><td>393</td><td>1.32 × 10<sup>12</sup></td></tr></tbody></table>
@@ -3350,36 +3350,39 @@ c &lt;=&gt; ts | k1"></div>
             <div class="pc-part"><span class="pc-part-label">(b)</span><div class="pc-part-body"><p>Usando los estados de oxidación del apartado (a), escribe las ecuaciones de las siguientes etapas del ciclo.</p><div class="pc-sub"><span class="pc-sub-label">(i)</span><p>Etapa 1: la semiecuación de la conversión de nitrito en hidroxilamina.</p></div><div class="pc-sub"><span class="pc-sub-label">(ii)</span><p>Etapa 2: la reacción del ion amonio y la hidroxilamina para dar hidracina.</p></div><div class="pc-sub"><span class="pc-sub-label">(iii)</span><p>Etapa 3: la semiecuación de la conversión de hidracina en nitrógeno gaseoso.</p></div></div></div>
             <div class="pc-part"><span class="pc-part-label">(c)</span><div class="pc-part-body"><p>A partir de ello, escribe la ecuación global del proceso anammox.</p></div></div>
             <p>Para entender mejor los lípidos de estas bacterias, un grupo de investigación sintetizó el ácido [5]-ladderanoico, un componente clave de dichos lípidos. La síntesis se muestra a continuación. No se muestran todos los subproductos.</p>
-            <div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=30 gapy=30
+            <div class="pc-free-host" data-esquema="size=sm escala=0.45 gapx=6 gapy=34
 sm @0,0: O=C1OC(=O)C2CCC12
-a @1,0: t:A
-b @2,0: t:B
+a @1,0: t:A | C6H12O2
+b @2,0: t:B | C8H16O6S2
 c @3,0: t:C
-sm -&gt; a | LiAlH4 (exceso)
-a -&gt; b | CH3SO2Cl | N(C2H5)3
-b -&gt; c | Na2S | EtOH / H2O"></div><div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=30 gapy=30
-c @0,0: t:C
-d @1,0: t:D
-an @2,0: t:anión E−
-f @3,0: t:F
-c -&gt; d | 1) H2O2 / H+ | 2) SO2Cl2
-d -&gt; an | K+ −OtBu
-an -&gt; f | cierre del anillo | de 3 miembros"></div><div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=30 gapy=30
-f @0,0: t:F
-g @1,0: t:G
-h @2,0: t:H
-i @3,0: t:I
-f -&gt; g | − X (SO) | M = 48.06
-g -&gt; h | 1) Cu, dimerización | 2) Cl2 / Mn
-h -&gt; i | K+ −OtBu"></div><div class="pc-free-host" data-esquema="size=sm escala=0.6 gapx=30 gapy=30
-i @0,0: t:I
-j @1,0: t:J
-k @2,0: t:K
-ac @3,0: OC(=O)CCCCCCCC1C2C3C4C5CCC5C4C3C2C1 | ácido [5]-ladderanoico
-i -&gt; j | 1) cadena lateral | 2) HF / piridina
+s @3,1: O=S1CC2CCC2C1
+d @2,1: t:D
+an @1,1: t:anión E−
+f @0,1: t:[F]
+g @0,2: t:G
+core @1,2: C1C2C3C4C5CCC5C4C3C2C1
+h @2,2: t:H
+i @3,2: t:I
+tbs @3,3: C[Si](C)(C(C)(C)C)OCCCCCCC=CC1C2C3C4C5CCC5C4C3C2C1
+j @0,3: t:J
+k @0,4: t:K
+ac @2,4: OC(=O)CCCCCCCC1C2C3C4C5CCC5C4C3C2C1 | 
+sm -&gt; a | LiAlH4
+a -&gt; b | MsCl | NEt3
+b -&gt; c | Na2S
+c -&gt; s | H2O2 | H2SO4
+s -&gt; d | SO2Cl2
+d -&gt; an | KOtBu
+an -&gt; f
+f -&gt; g | − X 
+g -&gt; core | Cu
+core -&gt; h | Mn, Cl
+h -&gt; i | KOtBu
+i -&gt; tbs | cadena lateral
+tbs -&gt; j | HF | py
 j -&gt; k | H2 / Ni
 k -&gt; ac | CrO3 | H2SO4"></div>
-            <p><em>Datos: A, C<sub>6</sub>H<sub>12</sub>O<sub>2</sub>; B, C<sub>8</sub>H<sub>16</sub>O<sub>6</sub>S<sub>2</sub>; D, <em>m/z</em> 164.01 (68.3 %) y 166.00 (21.8 %); F contiene un anillo de tres miembros; G es un hidrocarburo con <sup>13</sup>C RMN 141.7, 44.1, 20.8 ppm; I, <sup>13</sup>C RMN 140.1, 50.1, 48.2, 44.8, 42.0, 26.2 ppm; J contiene un grupo TBS (éter de silicio) en la cadena lateral antes de la desprotección.</em></p>
+            <p><small>Datos: A, C<sub>6</sub>H<sub>12</sub>O<sub>2</sub>; B, C<sub>8</sub>H<sub>16</sub>O<sub>6</sub>S<sub>2</sub> (MsCl en exceso, NEt<sub>3</sub>); D, <em>m/z</em> 164.01 (68.3 %) y 166.00 (21.8 %); F contiene un anillo de tres miembros; X, gas de masa molar 48.06 g mol<sup>−1</sup>; G, hidrocarburo con <sup>13</sup>C RMN 141.7, 44.1 y 20.8 ppm; I, <sup>13</sup>C RMN 140.1, 50.1, 48.2, 44.8, 42.0 y 26.2 ppm; H: tras dimerización con Cu y cloración con Mn; la cadena lateral se añade como éter TBS, que se desprotege con HF/piridina. El producto final es el ácido [5]-ladderanoico.</small></p>
             <div class="pc-part"><span class="pc-part-label">(d)</span><div class="pc-part-body"><p>Dibuja las estructuras de los compuestos <strong>A</strong> – <strong>K</strong> y del subproducto <strong>X</strong>. No se requiere estereoquímica en ninguna estructura.</p></div></div>
 
         `,
