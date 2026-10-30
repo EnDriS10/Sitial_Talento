@@ -1445,7 +1445,7 @@ u6 -> fin | piridina, Δ
     //      caja amarillo: a, b | Stobbe
     //      corchete: a, b | ‡                 ([ ] alrededor de uno o varios nodos)
     // ────────────────────────────────────────────────────────────────
-    const FREE_COLORS = { amarillo: '#e0b400', verde: '#2e9e4f', azul: '#2f6fdc', rojo: '#d6403a', gris: '#8a8f98', naranja: '#e07b1a', morado: '#8a4fd0' };
+    const FREE_COLORS = { amarillo: '#e0b400', verde: '#2e9e4f', azul: '#2f6fdc', rojo: '#d6403a', gris: '#8a8f98', negro: '#1d2733', naranja: '#e07b1a', morado: '#8a4fd0' };
     const FREE_NODE_KEYS = ['caja', 'resalte', 'color', 'resaltar', 'tam', 'etiqueta', 'incognita'];
     const FREE_ARROW_KEYS = ['arriba', 'abajo', 'nota', 'estilo', 'ruta', 'largo', 'color'];
     const FREE_CURVE_KEYS = ['giro', 'color', 'curvatura'];
@@ -1552,7 +1552,7 @@ u6 -> fin | piridina, Δ
             const w = Math.round(p.w * esc), h = nodes.every(q => q.text != null) ? 36 : Math.round(preset.h * esc);
             const el = document.createElement('div'); el.className = 'pc-free-node'; el.dataset.id = n.id;
             el.style.gridColumn = String(2 * (n.c - minC) + 1); el.style.gridRow = String(2 * (n.r - minR) + 1);
-            const mb = document.createElement('div'); mb.className = 'pc-free-mol pc-scheme-mol'; mb.style.height = h + 'px'; mb.style.minWidth = Math.round(40) + 'px';
+            const mb = document.createElement('div'); mb.className = 'pc-free-mol pc-scheme-mol'; mb.style.height = h + 'px'; mb.style.minWidth = (n.text === '' ? 2 : Math.round(40)) + 'px';
             if (n.text != null) {
                 mb.innerHTML = `<div class="pc-scheme-text${n.kv.incognita || /^\?/.test(n.text) ? ' pc-scheme-unknown' : ''}">${_fquim(n.text.replace(/^\?/, ''))}</div>`;
                 mb.classList.remove('pc-scheme-mol');
@@ -1630,7 +1630,7 @@ u6 -> fin | piridina, Δ
             const na = rel(els[A.id]), nb = rel(els[B.id]);
             const ma = rel(els[A.id].querySelector('.pc-free-mol')), mb = rel(els[B.id].querySelector('.pc-free-mol'));
             const ca = { x: (ma.l + ma.r) / 2, y: (ma.t + ma.b) / 2 }, cb = { x: (mb.l + mb.r) / 2, y: (mb.t + mb.b) / 2 };
-            const dx = cb.x - ca.x, dy = cb.y - ca.y, PA = 7 + ((spec.brackets || []).some(q => q.ids.includes(A.id)) ? 9 : 0), PB = 7 + ((spec.brackets || []).some(q => q.ids.includes(B.id)) ? 9 : 0);
+            const dx = cb.x - ca.x, dy = cb.y - ca.y, PA = (byId[A.id] && byId[A.id].text === '' ? 0 : 7) + ((spec.brackets || []).some(q => q.ids.includes(A.id)) ? 9 : 0), PB = (byId[B.id] && byId[B.id].text === '' ? 0 : 7) + ((spec.brackets || []).some(q => q.ids.includes(B.id)) ? 9 : 0);
             const col = _fcolor(a.color);
             const eq = a.estilo === 'eq' || a.estilo === 'equilibrio', res = a.estilo === 'resonancia', dash = a.estilo === 'punteada';
             let pts, seg; // seg: segmento principal para rótulos {x1,y1,x2,y2}
@@ -1648,7 +1648,7 @@ u6 -> fin | piridina, Δ
             } else if (a.ruta === 'recta') {
                 pts = [[ca.x + Math.sign(dx) * 20, ca.y + Math.sign(dy) * 20], [cb.x - Math.sign(dx) * 20, cb.y - Math.sign(dy) * 20]]; seg = { x1: pts[0][0], y1: pts[0][1], x2: pts[1][0], y2: pts[1][1] };
             } else { // vh (por defecto): baja/sube y luego gira hacia el destino
-                const y1 = dy >= 0 ? na.b + PA : na.t - PA, x2 = dx >= 0 ? mb.l - PB : mb.r + PB;
+                const e0 = byId[A.id] && byId[A.id].text === '', y1 = e0 ? ca.y : (dy >= 0 ? na.b + PA : na.t - PA), x2 = dx >= 0 ? mb.l - PB : mb.r + PB;
                 pts = [[ca.x, y1], [ca.x, cb.y], [x2, cb.y]]; seg = Math.abs(x2 - ca.x) >= Math.abs(cb.y - y1) ? { x1: ca.x, y1: cb.y, x2, y2: cb.y } : { x1: ca.x, y1, x2: ca.x, y2: cb.y };
             }
             if (a.largo && pts.length === 2) { // acorta la flecha recta a `largo` px, centrada
@@ -1660,7 +1660,7 @@ u6 -> fin | piridina, Δ
                 mkPath(`M${p[0] + nx * o},${p[1] + ny * o} L${q[0] + nx * o},${q[1] + ny * o} M${q[0] + nx * o},${q[1] + ny * o} L${q[0] + nx * o - ux * hd + nx * 4.5},${q[1] + ny * o - uy * hd + ny * 4.5}`, col);
                 mkPath(`M${q[0] - nx * o},${q[1] - ny * o} L${p[0] - nx * o},${p[1] - ny * o} M${p[0] - nx * o},${p[1] - ny * o} L${p[0] - nx * o + ux * hd - nx * 4.5},${p[1] - ny * o + uy * hd - ny * 4.5}`, col);
             } else {
-                mkPath('M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L'), col, { end: true, start: res, dash });
+                mkPath('M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L'), col, { end: a.estilo !== 'linea', start: res, dash });
             }
             // rótulos
             const horiz = Math.abs(seg.y2 - seg.y1) <= Math.abs(seg.x2 - seg.x1);
