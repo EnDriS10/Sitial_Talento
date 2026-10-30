@@ -59,19 +59,11 @@
       g += '<div class="ptb-el" data-c="' + e.c + '" style="grid-column:' + col + ';grid-row:' + row + '" tabindex="0" role="button" aria-label="' + e.n + ', número ' + e.z + ', masa molar ' + e.m + ' g/mol" data-cat="' + e.c + '">' +
            '<i>' + e.z + '</i><b>' + e.s + '</b><em>' + e.n + '</em><u>' + e.m + '</u></div>';
     }
-    var leg = Object.keys(CAT).map(function (k) { return '<span class="ptb-cat" data-c="' + k + '" data-k="' + k + '"><s></s>' + CAT[k] + '</span>'; }).join('');
     host.innerHTML = '<section class="ptb" aria-label="Tabla periódica"><div class="ptb-head"><h2>Tabla periódica</h2><span>Masas molares en g mol⁻¹ · pasa el ratón sobre un elemento</span></div>' +
-      '<div class="ptb-scroll"><div class="ptb-grid">' + g + '</div></div><div class="ptb-leg">' + leg + '</div></section>';
+      '<div class="ptb-scroll"><div class="ptb-grid">' + g + '</div></div></section>';
     var grid = host.querySelector('.ptb-grid');
     // la fila 8 queda como separación; las filas 9–10 contienen los bloques f
     grid.style.gridTemplateRows = 'repeat(7,auto) 14px auto auto';
-    // filtrar por categoría al pasar sobre la leyenda
-    host.querySelectorAll('.ptb-cat').forEach(function (l) {
-      var k = l.getAttribute('data-k');
-      function on() { grid.querySelectorAll('.ptb-el').forEach(function (el) { if (el.getAttribute('data-cat') !== k) el.setAttribute('data-fade', '1'); }); }
-      function off() { grid.querySelectorAll('.ptb-el').forEach(function (el) { el.removeAttribute('data-fade'); }); }
-      l.addEventListener('mouseenter', on); l.addEventListener('mouseleave', off);
-    });
     // táctil / teclado: un toque selecciona
     var cur = null;
     grid.addEventListener('click', function (ev) {
